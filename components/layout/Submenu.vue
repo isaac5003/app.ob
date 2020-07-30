@@ -47,7 +47,7 @@ export default {
   computed: {
     moduleIcon() {
       return getIcon(this.icon);
-    }
-  }
+    },
+  },
 };
 </script>

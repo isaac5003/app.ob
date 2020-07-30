@@ -1,5 +1,6 @@
 <template>
   <layout-content
+    v-loading="loading"
     page-title="Listado de clientes"
     :breadcrumb="[
       { name: 'Clientes', to: '/customers' },
@@ -52,15 +53,24 @@
           </div>
         </div>
       </el-form>
-      <el-table :data="customers.customers" stripe size="mini" v-loading="loading">
+      <el-table :data="customers.customers" stripe size="mini">
         <el-table-column type="index" min-width="40" />
         <el-table-column label="Nombre" prop="name" min-width="350" />
-        <el-table-column label="Tipo" prop="customerType.name" min-width="120" />
+        <el-table-column
+          label="Tipo"
+          prop="customerType.name"
+          min-width="120"
+        />
         <el-table-column label="NIT" prop="nit" min-width="160" />
         <el-table-column label="NRC" prop="nrc" min-width="90" />
         <el-table-column label="Estado" min-width="90">
           <template slot-scope="scope">
-            <el-tag size="small" type="success" v-if="scope.row.isActiveCustomer">Activo</el-tag>
+            <el-tag
+              size="small"
+              type="success"
+              v-if="scope.row.isActiveCustomer"
+              >Activo</el-tag
+            >
             <el-tag size="small" type="warning" v-else>Inactivo</el-tag>
           </template>
         </el-table-column>
@@ -69,19 +79,23 @@
             <el-dropdown trigger="click">
               <el-button icon="el-icon-more" size="small" />
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item @click.native="showCustomerPreview(scope.row)">
+                <el-dropdown-item
+                  @click.native="showCustomerPreview(scope.row)"
+                >
                   <i class="el-icon-view"></i> Vista previa
                 </el-dropdown-item>
-                <el-dropdown-item @click.native="goToEditPage(scope.row)">
+                <el-dropdown-item
+                  @click.native="
+                    $router.push(`/customers/edit/${scope.row.id}`)
+                  "
+                >
                   <i class="el-icon-edit-outline"></i> Editar cliente
                 </el-dropdown-item>
                 <el-dropdown-item @click.native="changeActive(scope.row)">
                   <span v-if="scope.row.isActiveCustomer">
                     <i class="el-icon-close"></i> Desactivar
                   </span>
-                  <span v-else>
-                    <i class="el-icon-check"></i> Activar
-                  </span>
+                  <span v-else> <i class="el-icon-check"></i> Activar </span>
                   cliente
                 </el-dropdown-item>
                 <!-- <el-dropdown-item>

@@ -38,6 +38,7 @@ export default {
     "./plugins/element-ui.js",
     "./plugins/filters.js",
     "./plugins/vue-debounce.js",
+    "./plugins/vue-mask.js",
   ],
   /*
    ** Nuxt.js dev-modules

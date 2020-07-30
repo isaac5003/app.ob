@@ -140,50 +140,50 @@ export default {
           id: "",
           path: "/",
           name: "Escritorio",
-          icon: getIcon("desktop")
+          icon: getIcon("desktop"),
         },
         {
           always: false,
           id: "0f88f2ea-aae9-44ad-8df0-0ee3debbf167",
           path: "/services",
           name: "Servicios",
-          icon: getIcon("duplicate")
+          icon: getIcon("duplicate"),
         },
         {
           always: false,
           id: "9ff0b6f4-9c58-475b-b2dd-5eea6d7b66aa",
           path: "/customers",
           name: "Clientes",
-          icon: getIcon("users")
+          icon: getIcon("users"),
         },
         {
           always: false,
           id: "cfb8addb-541b-482f-8fa1-dfe5db03fdf4",
           path: "/invoices",
           name: "Facturación",
-          icon: getIcon("dolar")
+          icon: getIcon("dolar"),
         },
         {
           always: false,
           id: "a98b98e6-b2d5-42a3-853d-9516f64eade8",
           path: "/entries",
           name: "Contabilidad",
-          icon: getIcon("cash")
-        }
+          icon: getIcon("cash"),
+        },
       ],
       changeWorkSpace: {
         cid: "",
-        bid: ""
+        bid: "",
       },
       changeWorkSpaceRules: {
         cid: selectValidation(true),
-        bid: selectValidation(true)
-      }
+        bid: selectValidation(true),
+      },
     };
   },
   methods: {
     updateWorkSpace(formName, { cid, bid }) {
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate((valid) => {
         if (!valid) {
           return false;
         }
@@ -203,30 +203,30 @@ export default {
                   text: "Cambiando espacio de trabajo...",
                   spinner: "el-icon-loading",
                   background: "rgba(255, 255, 255, 0.8)",
-                  customClass: "text-3xl"
+                  customClass: "text-3xl",
                 });
                 setTimeout(() => {
                   this.$axios
                     .put("/auth/update-workspace", { cid, bid })
-                    .then(res => {
+                    .then((res) => {
                       this.$auth
                         .setUserToken(res.data.access_token)
-                        .then(res => {
+                        .then((res) => {
                           this.$notify.success({
                             title: "Éxito",
                             message:
-                              "Se ha cambiado de espacio de trabajo correctamente."
+                              "Se ha cambiado de espacio de trabajo correctamente.",
                           });
                           this.$router.push("/");
                         });
                     })
-                    .catch(err => {
+                    .catch((err) => {
                       this.$notify.error({
                         title: "Error",
-                        message: err.response.data.message
+                        message: err.response.data.message,
                       });
                     })
-                    .then(alw => {
+                    .then((alw) => {
                       instance.confirmButtonLoading = false;
                       instance.confirmButtonText = "Si, cambiar";
                       done();
@@ -235,25 +235,25 @@ export default {
                 }, 2000);
               }
               done();
-            }
+            },
           }
         );
       });
-    }
+    },
   },
   computed: {
     companies() {
-      return this.$auth.user.profile.access.map(a => {
+      return this.$auth.user.profile.access.map((a) => {
         return {
           id: a.id,
-          name: a.name
+          name: a.name,
         };
       });
     },
     branches() {
       if (this.changeWorkSpace.cid != "") {
         const company = this.$auth.user.profile.access.find(
-          a => a.id == this.changeWorkSpace.cid
+          (a) => a.id == this.changeWorkSpace.cid
         );
         return company.branches;
       } else {
@@ -265,15 +265,16 @@ export default {
     },
     modules() {
       const company = this.$auth.user.profile.access.find(
-        a => a.id == this.$auth.user.workspace.company.id
+        (a) => a.id == this.$auth.user.workspace.company.id
       );
       const branch = company.branches.find(
-        b => b.id == this.$auth.user.workspace.branch.id
+        (b) => b.id == this.$auth.user.workspace.branch.id
       );
       return this.items.filter(
-        item => item.always || branch.modules.map(m => m.id).includes(item.id)
+        (item) =>
+          item.always || branch.modules.map((m) => m.id).includes(item.id)
       );
-    }
-  }
+    },
+  },
 };
 </script>

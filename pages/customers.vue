@@ -9,7 +9,7 @@
 import LayoutSubmenu from "../components/layout/Submenu";
 import { getIcon } from "../tools";
 export default {
-  name: "Services",
+  name: "Customers",
   middleware: "access",
   meta: {
     id: "9ff0b6f4-9c58-475b-b2dd-5eea6d7b66aa",

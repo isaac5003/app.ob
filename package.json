@@ -19,6 +19,7 @@
     "nuxt": "^2.13.3",
     "simplebar-vue": "^1.5.1",
     "tailwindcss": "^1.5.1",
+    "v-mask": "^2.2.3",
     "vue-debounce": "^2.5.7"
   },
   "devDependencies": {
