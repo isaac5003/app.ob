@@ -90,7 +90,8 @@
           :key="k"
           tag="li"
           :to="item.path"
-          exact-active-class="text-blue-900 bg-yellow-500"
+          active-class="text-blue-900 bg-yellow-500"
+          :exact="item.exact"
           class="group flex items-center rounded text-white h-10 w-10 cursor-pointer space-x-4 p-2 transition transform duration-300 hover:w-50 hover:text-blue-900 hover:bg-yellow-500 hover:shadow-md"
         >
           <svg
@@ -141,6 +142,7 @@ export default {
           path: "/",
           name: "Escritorio",
           icon: getIcon("desktop"),
+          exact: true,
         },
         {
           always: false,
@@ -148,6 +150,7 @@ export default {
           path: "/services",
           name: "Servicios",
           icon: getIcon("duplicate"),
+          exact: false,
         },
         {
           always: false,
@@ -155,6 +158,7 @@ export default {
           path: "/customers",
           name: "Clientes",
           icon: getIcon("users"),
+          exact: false,
         },
         {
           always: false,
@@ -162,6 +166,7 @@ export default {
           path: "/invoices",
           name: "Facturación",
           icon: getIcon("dolar"),
+          exact: false,
         },
         {
           always: false,
@@ -169,6 +174,7 @@ export default {
           path: "/entries",
           name: "Contabilidad",
           icon: getIcon("cash"),
+          exact: false,
         },
       ],
       changeWorkSpace: {
