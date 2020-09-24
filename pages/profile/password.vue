@@ -39,10 +39,10 @@
         </el-form-item>
       </div>
       <div class="flex justify-end">
-        <el-button size="small">Cancelar</el-button>
         <el-button type="primary" native-type="submit" size="small"
           >Guardar</el-button
         >
+        <el-button size="small" @click="close">Cancelar</el-button>
       </div>
     </el-form>
   </layout-content>
@@ -122,6 +122,21 @@ export default {
           }
         );
       });
+    },
+    close() {
+      this.$confirm(
+        "¿Estás seguro que deseas salir de esta pantalla?",
+        "Confirmación",
+        {
+          confirmButtonText: "Si, porfavor",
+          cancelButtonText: "Cancelar",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.$router.push("/");
+        })
+        .catch(() => {});
     },
   },
 };

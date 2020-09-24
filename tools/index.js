@@ -36,16 +36,27 @@ function getIcon(icon) {
   }
 }
 
-function inputValidation(required = true, min = null, max = null) {
+function inputValidation(required = true, min = null, max = null, type = null) {
   const rules = [];
-  rules.push({
-    required,
-    message: "Este campo es requerido.",
-    trigger: "blur",
-  });
+  if (type == "email") {
+    rules.push({
+      type: type,
+      required,
+      message: "Ingresa una direccion de correo valida.",
+      trigger: ["blur", "change"],
+    });
+  } else {
+    rules.push({
+      type: type,
+      required,
+      message: "Este campo es requerido.",
+      trigger: "blur",
+    });
+  }
   if (min != null) {
     if (max != null) {
       rules.push({
+        type: type,
         min,
         max,
         message: `Minimo ${min} y maximo ${max} caracteres`,
@@ -53,6 +64,7 @@ function inputValidation(required = true, min = null, max = null) {
       });
     } else {
       rules.push({
+        type: type,
         min,
         message: `Minimo ${min} caracteres`,
         trigger: "blur",
@@ -60,12 +72,72 @@ function inputValidation(required = true, min = null, max = null) {
     }
   } else {
     rules.push({
+      type: type,
       max,
       message: `Maximo ${max} caracteres`,
       trigger: "blur",
     });
   }
   return rules;
+}
+
+/**
+ * Funcion que permite identificar si hay informacion sin guardar
+ * @param {object} self Referencia a this.
+ * @param {text} storagekey Nombre de la llave a usar en localstorage
+ * @param {function} next Funcion para conginuar
+ */
+function checkBeforeLeave(self, storagekey, next) {
+  const stored = localStorage.getItem(storagekey);
+  if (!stored) {
+    return next();
+  }
+  self
+    .$confirm(
+      "Existe informacion sin guardar. ¿Estas seguro que deseas salir?",
+      "Autoguardado",
+      {
+        confirmButtonText: "Si, salir",
+        cancelButtonText: "No, gracias",
+        type: "warning",
+        closeOnClickModal: false,
+        closeOnPressEscape: false,
+      }
+    )
+    .then(() => {
+      localStorage.removeItem(storagekey);
+      next();
+    });
+}
+
+/**
+ * Funcion que permite identificar informacion que se dejo pendiente
+ * @param {object} self Referencia a this
+ * @param {string} storagekey Nombre de la llave a usar en el LocalStorage
+ * @param {string} form Name of the object where to store
+ */
+function checkBeforeEnter(self, storagekey, form) {
+  const stored = localStorage.getItem(storagekey);
+  if (stored) {
+    self
+      .$confirm(
+        "Existe informacion guardada previamente. ¿deseas recuperarla?",
+        "Autoguardado",
+        {
+          confirmButtonText: "Si, recuperar",
+          cancelButtonText: "No, gracias",
+          type: "info",
+          closeOnClickModal: false,
+          closeOnPressEscape: false,
+        }
+      )
+      .then(() => {
+        self[form] = JSON.parse(stored);
+      })
+      .catch(() => {
+        localStorage.removeItem(storagekey);
+      });
+  }
 }
 
 function selectValidation(required = true) {
@@ -82,4 +154,6 @@ module.exports = {
   getIcon,
   inputValidation,
   selectValidation,
+  checkBeforeLeave,
+  checkBeforeEnter,
 };

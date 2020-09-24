@@ -11,7 +11,9 @@
       :rules="servicesNewFormRules"
       status-icon
       ref="servicesNewForm"
-      @submit.native.prevent="submitNewService('servicesNewForm', servicesNewForm)"
+      @submit.native.prevent="
+        submitNewService('servicesNewForm', servicesNewForm)
+      "
     >
       <div class="grid grid-cols-12 gap-4">
         <div class="col-span-6">
@@ -22,21 +24,22 @@
               v-model="servicesNewForm.name"
               size="small"
               autocomplete="off"
-              @blur="setStorage(servicesNewForm)"
+              @change="setStorage(servicesNewForm)"
             />
           </el-form-item>
         </div>
         <div class="col-span-2">
           <el-form-item label="Costo" prop="cost">
-            <el-input
+            <el-input-number
               ref="cost"
               type="number"
-              min="0"
-              step="0.01"
+              :min="0.01"
+              :step="0.01"
               v-model="servicesNewForm.cost"
               size="small"
               autocomplete="off"
-              @blur="setStorage(servicesNewForm)"
+              @change="setStorage(servicesNewForm)"
+              style="width: 100%"
             />
           </el-form-item>
         </div>
@@ -50,7 +53,9 @@
             >
               <el-row :gutter="15">
                 <el-col :span="8" v-for="(s, k) in sellingTypes" :key="k">
-                  <el-radio :label="s.id" border class="w-full" size="small">{{s.name}}</el-radio>
+                  <el-radio :label="s.id" border class="w-full" size="small">{{
+                    s.name
+                  }}</el-radio>
                 </el-col>
               </el-row>
             </el-radio-group>
@@ -64,13 +69,17 @@
             type="textarea"
             :rows="4"
             v-model="servicesNewForm.description"
-            @blur="setStorage(servicesNewForm)"
+            @change="setStorage(servicesNewForm)"
           ></el-input>
         </el-form-item>
       </div>
       <div class="flex justify-end">
-        <el-button type="primary" size="small" native-type="submit">Guardar</el-button>
-        <el-button size="small" @click="cancel()">Cancelar</el-button>
+        <el-button type="primary" size="small" native-type="submit"
+          >Guardar</el-button
+        >
+        <el-button size="small" @click="$router.push('/services')"
+          >Cancelar</el-button
+        >
       </div>
     </el-form>
   </layout-content>
@@ -78,7 +87,12 @@
 
 <script>
 import LayoutContent from "../../components/layout/Content";
-import { inputValidation, selectValidation } from "../../tools";
+import {
+  checkBeforeEnter,
+  checkBeforeLeave,
+  inputValidation,
+  selectValidation,
+} from "../../tools";
 
 const storagekey = "new-service";
 
@@ -99,28 +113,12 @@ export default {
         this.errorMessage = err.response.data.message;
       });
 
-    const stored = localStorage.getItem(storagekey);
-    if (stored) {
-      this.$confirm(
-        "¿Existe informacion guardada previamente, deseas recuperarla?",
-        "Autoguardado",
-        {
-          confirmButtonText: "Si, porfavor",
-          cancelButtonText: "No, gracias",
-          type: "info",
-          closeOnClickModal: false,
-          closeOnPressEscape: false,
-        }
-      )
-        .then(() => {
-          this.servicesNewForm = JSON.parse(stored);
-        })
-        .catch(() => {
-          localStorage.removeItem(storagekey);
-        });
-    }
+    checkBeforeEnter(this, storagekey, "servicesNewForm");
   },
   fetchOnServer: false,
+  beforeRouteLeave(to, from, next) {
+    checkBeforeLeave(this, storagekey, next);
+  },
   data() {
     return {
       sellingTypes: [],
@@ -132,7 +130,7 @@ export default {
       },
       servicesNewFormRules: {
         name: inputValidation(true, 5, 60),
-        cost: inputValidation(true, 0),
+        cost: inputValidation(true, 0, null, "number"),
         sellingType: selectValidation(true),
         description: inputValidation(false, 5),
       },
@@ -209,23 +207,6 @@ export default {
             },
           }
         );
-      });
-    },
-    cancel() {
-      const stored = localStorage.getItem(storagekey);
-      this.$confirm(
-        `¿Estás seguro que deseas salir?. ${
-          stored ? "Se perderá el avance realizado." : ""
-        }`,
-        "Confirmación",
-        {
-          confirmButtonText: "Si, salir",
-          cancelButtonText: "Cancelar",
-          type: "warning",
-        }
-      ).then(() => {
-        localStorage.removeItem(storagekey);
-        this.$router.push("/services");
       });
     },
   },

@@ -473,6 +473,7 @@ export default {
         this.$router.push("/customers");
       });
     },
+    submitEditCustomer() {},
   },
   computed: {
     states() {

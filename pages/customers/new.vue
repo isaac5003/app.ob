@@ -1,68 +1,360 @@
 <template>
   <layout-content
-    page-title="Nuevo servicio"
+    v-loading="loading"
+    page-title="Nuevo cliente"
     :breadcrumb="[
-      { name: 'Servicios', to: '/services' },
-      { name: 'Nuevo servicio', to: null },
+      { name: 'Clientes', to: '/customers' },
+      { name: 'Listado de clientes', to: '/customers' },
+      { name: 'Nuevo cliente', to: null },
     ]"
   >
     <el-form
-      :model="servicesNewForm"
-      :rules="servicesNewFormRules"
+      :model="customersNewForm"
+      :rules="customersNewFormRules"
       status-icon
-      ref="servicesNewForm"
-      @submit.native.prevent="submitNewService('servicesNewForm', servicesNewForm)"
+      ref="customersNewForm"
+      @submit.native.prevent="
+        submitNewCustomer('customersNewForm', customersNewForm)
+      "
+      class="flex flex-col mt-5"
     >
-      <div class="grid grid-cols-12 gap-4">
-        <div class="col-span-6">
-          <el-form-item label="Nombre del servicio" prop="name">
-            <el-input
-              ref="name"
-              type="text"
-              v-model="servicesNewForm.name"
-              size="small"
-              autocomplete="off"
-            />
-          </el-form-item>
+      <div class="flex flex-col">
+        <div class="mb-2">
+          <span class="text-sm font-medium">Informacion general</span>
         </div>
-        <div class="col-span-2">
-          <el-form-item label="Costo" prop="cost">
-            <el-input
-              ref="cost"
-              type="number"
-              min="0"
-              step="0.01"
-              v-model="servicesNewForm.cost"
-              size="small"
-              autocomplete="off"
-            />
-          </el-form-item>
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-7">
+            <el-form-item label="Nombre o razón social" prop="name">
+              <el-input
+                clearable
+                type="text"
+                v-model="customersNewForm.name"
+                size="small"
+                autocomplete="off"
+                maxlength="100"
+                minlength="5"
+                show-word-limit
+                @change="setStorage(customersNewForm)"
+              />
+            </el-form-item>
+          </div>
+          <div class="col-span-3">
+            <el-form-item label="Identificador" prop="shortName">
+              <el-input
+                clearable
+                type="text"
+                v-model="customersNewForm.shortName"
+                size="small"
+                autocomplete="off"
+                maxlength="15"
+                minlength="3"
+                show-word-limit
+                @change="setStorage(customersNewForm)"
+              />
+            </el-form-item>
+          </div>
+          <div class="col-span-2" v-show="false">
+            <el-form-item label="Es tambien proveedor" prop="isProvider">
+              <el-radio-group
+                v-model="customersNewForm.isProvider"
+                class="w-full"
+                @change="setStorage(customersNewForm)"
+              >
+                <el-radio :label="true">Si</el-radio>
+                <el-radio :label="false">No</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </div>
         </div>
-        <div class="col-span-4">
-          <el-form-item label="Tipo de venta" prop="sellingType">
-            <el-radio-group ref="sellingType" v-model="servicesNewForm.sellingType" class="w-full">
-              <el-row :gutter="15">
-                <el-col :span="8" v-for="(s, k) in sellingTypes" :key="k">
-                  <el-radio :label="s.id" border class="w-full" size="small">{{s.name}}</el-radio>
-                </el-col>
-              </el-row>
-            </el-radio-group>
-          </el-form-item>
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-6">
+            <el-form-item label="Dirección 1" prop="address1">
+              <el-input
+                clearable
+                type="text"
+                v-model="customersNewForm.address1"
+                size="small"
+                autocomplete="off"
+                maxlength="150"
+                minlength="5"
+                show-word-limit
+                @change="setStorage(customersNewForm)"
+              />
+            </el-form-item>
+          </div>
+          <div class="col-span-6">
+            <el-form-item label="Dirección 2" prop="address2">
+              <el-input
+                clearable
+                type="text"
+                v-model="customersNewForm.address2"
+                size="small"
+                autocomplete="off"
+                maxlength="150"
+                minlength="5"
+                show-word-limit
+                @change="setStorage(customersNewForm)"
+              />
+            </el-form-item>
+          </div>
+        </div>
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-4">
+            <el-form-item label="País" prop="country">
+              <el-select
+                class="w-full"
+                v-model="customersNewForm.country"
+                size="small"
+                placeholder="Seleccionar país"
+                filterable
+                clearable
+                @change="clearSelect('state')"
+                default-first-option
+              >
+                <el-option
+                  v-for="country in countries"
+                  :key="country.id"
+                  :label="country.name"
+                  :value="country.id"
+                />
+              </el-select>
+            </el-form-item>
+          </div>
+          <div class="col-span-4">
+            <el-form-item label="Departamento" prop="state">
+              <el-select
+                class="w-full"
+                v-model="customersNewForm.state"
+                size="small"
+                placeholder="Seleccionar departamento"
+                filterable
+                clearable
+                @change="clearSelect('city')"
+                default-first-option
+              >
+                <el-option
+                  v-for="state in states"
+                  :key="state.id"
+                  :label="state.name"
+                  :value="state.id"
+                />
+              </el-select>
+            </el-form-item>
+          </div>
+          <div class="col-span-4">
+            <el-form-item label="Municipio" prop="city">
+              <el-select
+                class="w-full"
+                v-model="customersNewForm.city"
+                size="small"
+                placeholder="Seleccionar municipio"
+                filterable
+                clearable
+                default-first-option
+                @change="setStorage(customersNewForm)"
+              >
+                <el-option
+                  v-for="city in cities"
+                  :key="city.id"
+                  :label="city.name"
+                  :value="city.id"
+                />
+              </el-select>
+            </el-form-item>
+          </div>
+        </div>
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-4">
+            <el-form-item label="Contacto" prop="contactName">
+              <el-input
+                clearable
+                type="text"
+                v-model="customersNewForm.contactName"
+                size="small"
+                autocomplete="off"
+                maxlength="50"
+                minlength="5"
+                show-word-limit
+                @change="setStorage(customersNewForm)"
+              />
+            </el-form-item>
+          </div>
+          <div class="col-span-4">
+            <el-form-item label="Teléfono" prop="phone">
+              <el-input
+                clearable
+                type="text"
+                v-model="customersNewForm.phone"
+                size="small"
+                autocomplete="off"
+                placeholder="####-####"
+                v-mask="'####-####'"
+                @change="setStorage(customersNewForm)"
+              />
+            </el-form-item>
+          </div>
+          <div class="col-span-4">
+            <el-form-item label="Correo electrónico" prop="email">
+              <el-input
+                clearable
+                type="text"
+                v-model="customersNewForm.email"
+                size="small"
+                autocomplete="off"
+                @change="setStorage(customersNewForm)"
+              />
+            </el-form-item>
+          </div>
+        </div>
+        <div class="mb-2">
+          <span class="text-sm font-medium">Informacion general</span>
+        </div>
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-4">
+            <el-form-item label="Tipo de cliente" prop="customerType">
+              <el-select
+                class="w-full"
+                v-model="customersNewForm.customerType"
+                size="small"
+                placeholder="Seleccionar tipo de cliente"
+                filterable
+                clearable
+                default-first-option
+                @change="setStorage(customersNewForm)"
+              >
+                <el-option
+                  v-for="ct in customerTypes"
+                  :key="ct.id"
+                  :label="ct.name"
+                  :value="ct.id"
+                />
+              </el-select>
+            </el-form-item>
+          </div>
+          <div class="col-span-4" v-show="customersNewForm.customerType == 2">
+            <el-form-item
+              label="Tipo de persona natural"
+              prop="customerTypeNatural"
+            >
+              <el-select
+                class="w-full"
+                v-model="customersNewForm.customerTypeNatural"
+                size="small"
+                placeholder="Seleccionar tipo de persona natural"
+                filterable
+                clearable
+                default-first-option
+                @change="setStorage(customersNewForm)"
+              >
+                <el-option
+                  v-for="ct in customerTypeNaturals"
+                  :key="ct.id"
+                  :label="ct.name"
+                  :value="ct.id"
+                />
+              </el-select>
+            </el-form-item>
+          </div>
+        </div>
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-4" v-show="customersNewForm.customerType == 2">
+            <el-form-item label="DUI" prop="dui">
+              <el-input
+                type="text"
+                v-model="customersNewForm.dui"
+                size="small"
+                autocomplete="off"
+                placeholder="########-#"
+                v-mask="'########-#'"
+                @change="setStorage(customersNewForm)"
+              />
+            </el-form-item>
+          </div>
+          <div class="col-span-6">
+            <el-form-item label="NIT" prop="nit">
+              <el-input
+                type="text"
+                v-model="customersNewForm.nit"
+                size="small"
+                autocomplete="off"
+                placeholder="####-######-###-#"
+                v-mask="'####-######-###-#'"
+                @change="setStorage(customersNewForm)"
+              />
+            </el-form-item>
+          </div>
+          <div
+            class="col-span-2"
+            v-show="
+              customersNewForm.customerType == 1 ||
+                customersNewForm.customerTypeNatural == 2
+            "
+          >
+            <el-form-item label="NRC" prop="nrc">
+              <el-input
+                type="text"
+                v-model="customersNewForm.nrc"
+                size="small"
+                autocomplete="off"
+                @change="setStorage(customersNewForm)"
+              />
+            </el-form-item>
+          </div>
+        </div>
+        <div
+          class="grid grid-cols-12 gap-4"
+          v-show="
+            customersNewForm.customerType == 1 ||
+              customersNewForm.customerTypeNatural == 2
+          "
+        >
+          <div class="col-span-4">
+            <el-form-item
+              label="Tipo de contribuyente"
+              prop="customerTaxerType"
+            >
+              <el-select
+                class="w-full"
+                v-model="customersNewForm.customerTaxerType"
+                size="small"
+                placeholder="Seleccionar tipo de contribuyente"
+                filterable
+                clearable
+                default-first-option
+                @change="setStorage(customersNewForm)"
+              >
+                <el-option
+                  v-for="ct in customerTaxerTypes"
+                  :key="ct.id"
+                  :label="ct.name"
+                  :value="ct.id"
+                />
+              </el-select>
+            </el-form-item>
+          </div>
+          <div class="col-span-8">
+            <el-form-item label="Giro" prop="giro">
+              <el-input
+                type="text"
+                v-model="customersNewForm.giro"
+                size="small"
+                autocomplete="off"
+                maxlength="150"
+                minlength="5"
+                show-word-limit
+                @change="setStorage(customersNewForm)"
+              />
+            </el-form-item>
+          </div>
         </div>
       </div>
-      <div>
-        <el-form-item label="Descripción del servicio" prop="description">
-          <el-input
-            ref="description"
-            type="textarea"
-            :rows="4"
-            v-model="servicesNewForm.description"
-          ></el-input>
-        </el-form-item>
-      </div>
-      <div class="flex justify-end">
-        <el-button type="primary" size="small" native-type="submit">Guardar</el-button>
-        <el-button size="small" @click="cancel()">Cancelar</el-button>
+      <div class="flex justify-end" v-if="activeTab != 'integrations'">
+        <el-button type="primary" size="small" native-type="submit"
+          >Actualizar</el-button
+        >
+        <el-button size="small" @click="$router.push('/customers')"
+          >Cancelar</el-button
+        >
       </div>
     </el-form>
   </layout-content>
@@ -70,119 +362,150 @@
 
 <script>
 import LayoutContent from "../../components/layout/Content";
-import { inputValidation, selectValidation } from "../../tools";
-export default {
-  name: "ServicesEdit",
-  components: { LayoutContent },
-  fetch() {
-    const sellingTypes = () => {
-      return this.$axios.get("/services/selling-types");
-    };
+import {
+  inputValidation,
+  selectValidation,
+  checkBeforeLeave,
+  checkBeforeEnter,
+} from "../../tools";
+import Notification from "../../components/Notification";
 
-    Promise.all([sellingTypes()])
+const storagekey = "new-customer";
+
+export default {
+  name: "CustomerNew",
+  components: { LayoutContent, Notification },
+  fetch() {
+    const customerTypes = () => this.$axios.get(`/customers/customer-types`);
+    const customerTypeNaturals = () =>
+      this.$axios.get(`/customers/customer-type-naturals`);
+    const customerTaxerTypes = () =>
+      this.$axios.get(`/customers/customer-taxer-types`);
+    const countries = () => this.$axios.get(`/others/countries`);
+    const states = () => this.$axios.get(`/others/states`);
+    const cities = () => this.$axios.get(`/others/cities`);
+
+    Promise.all([
+      customerTypes(),
+      customerTypeNaturals(),
+      customerTaxerTypes(),
+      countries(),
+      states(),
+      cities(),
+    ])
       .then((res) => {
-        const [sellingTypes] = res;
-        this.sellingTypes = sellingTypes.data.types;
+        // Se ubica en el tab seleccionado
+        if (this.$route.query.tab) {
+          this.activeTab = this.$route.query.tab;
+        }
+
+        const [
+          customerTypes,
+          customerTypeNaturals,
+          customerTaxerTypes,
+          countries,
+          states,
+          cities,
+        ] = res;
+
+        this.customerTypes = customerTypes.data.types;
+        this.customerTypeNaturals = customerTypeNaturals.data.typeNaturals;
+        this.customerTaxerTypes = customerTaxerTypes.data.taxerTypes;
+        this.countries = countries.data.countries;
+        this.rawStates = states.data.states;
+        this.rawCities = cities.data.cities;
+        this.loading = false;
       })
       .catch((err) => {
-        this.errorMessage = err.response.data.message;
+        this.$message.error(err.response.data.message);
+        this.$router.push("/customers");
       });
+
+    checkBeforeEnter(this, storagekey, "customersNewForm");
   },
   fetchOnServer: false,
+  beforeRouteLeave(to, from, next) {
+    checkBeforeLeave(this, storagekey, next);
+  },
   data() {
     return {
-      sellingTypes: [],
-      servicesNewForm: {
+      loading: false,
+      activeTab: "general-information",
+      countries: [],
+      rawStates: [],
+      rawCities: [],
+      customerTypes: [],
+      customerTypeNaturals: [],
+      customerTaxerTypes: [],
+      customersNewForm: {
         name: "",
-        cost: "",
-        sellingType: "",
-        description: "",
+        shortName: "",
+        isProvider: false,
+        dui: "",
+        nit: "",
+        nrc: "",
+        giro: "",
+        customerType: "",
+        customerTypeNatural: "",
+        customerTaxerType: "",
+        contactName: "",
+        address1: "",
+        address2: "",
+        phone: "",
+        email: "",
+        country: "",
+        state: "",
+        city: "",
       },
-      servicesNewFormRules: {
-        name: inputValidation(true, 5, 60),
-        cost: inputValidation(true, 0),
-        sellingType: selectValidation(true),
-        description: inputValidation(false, 5),
+      customersNewFormRules: {
+        name: inputValidation(true, 5, 100),
+        shortName: inputValidation(true, 3, 15),
+        isProvider: false,
+        address1: inputValidation(true, 5, 150),
+        address2: inputValidation(false, 5, 150),
+        country: selectValidation(true),
+        state: selectValidation(true),
+        city: selectValidation(true),
+        contactName: inputValidation(true, 5, 50),
+        phone: inputValidation(true),
+        email: inputValidation(true, null, null, "email"),
+        customerType: selectValidation(true),
+        customerTypeNatural: selectValidation(true),
+        dui: inputValidation(true),
+        nit: inputValidation(true),
+        nrc: inputValidation(true, 3),
+        customerTaxerType: selectValidation(true),
+        giro: inputValidation(true, 5, 150),
       },
     };
   },
   methods: {
-    submitNewService(formName, { name, cost, sellingType, description }) {
-      this.$refs[formName].validate(async (valid) => {
-        if (!valid) {
-          return false;
-        }
-
-        this.$confirm(
-          "¿Estás seguro que deseas guardar este nuevo servicio?",
-          "Confirmación",
-          {
-            confirmButtonText: "Si, guardar",
-            cancelButtonText: "Cancelar",
-            type: "warning",
-            beforeClose: (action, instance, done) => {
-              if (action === "confirm") {
-                instance.confirmButtonLoading = true;
-                instance.confirmButtonText = "Procesando...";
-                this.$axios
-                  .post("/services", {
-                    name,
-                    cost,
-                    sellingType,
-                    description,
-                  })
-                  .then((res) => {
-                    this.$notify.success({
-                      title: "Exito",
-                      message: res.data.message,
-                    });
-                    setTimeout(() => {
-                      this.$confirm(
-                        "¿Deseas crear un nuevo servicio?",
-                        "Confirmación",
-                        {
-                          confirmButtonText: "Si, porfavor",
-                          cancelButtonText: "No, gracias",
-                          type: "warning",
-                          closeOnClickModal: false,
-                          closeOnPressEscape: false,
-                        }
-                      )
-                        .then(() => {
-                          this.$refs[formName].resetFields();
-                        })
-                        .catch(() => {
-                          this.$router.push("/services");
-                        });
-                    }, 500);
-                  })
-                  .catch((err) => {
-                    this.$notify.error({
-                      title: "Error",
-                      message: err.response.data.message,
-                    });
-                  })
-                  .then((alw) => {
-                    instance.confirmButtonLoading = false;
-                    instance.confirmButtonText = "Si, guardar";
-                    done();
-                  });
-              } else {
-                done();
-              }
-            },
-          }
-        );
-      });
+    setStorage(customersNewForm) {
+      localStorage.setItem(storagekey, JSON.stringify(customersNewForm));
     },
-    cancel() {
-      this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
-        confirmButtonText: "Si, salir",
-        cancelButtonText: "Cancelar",
-        type: "warning",
-      }).then(() => {
-        this.$router.push("/services");
-      });
+    clearSelect(name) {
+      switch (name) {
+        case "state":
+          this.customersNewForm.state = "";
+          this.customersNewForm.city = "";
+          break;
+        case "city":
+          this.customersNewForm.city = "";
+          break;
+      }
+      this.setStorage(this.customersNewForm);
+    },
+  },
+  computed: {
+    states() {
+      return this.rawStates.filter(
+        (s) => s.country.id == this.customersNewForm.country
+      );
+    },
+    cities() {
+      return this.rawCities.filter(
+        (c) => c.state.id == this.customersNewForm.state
+      );
     },
   },
 };

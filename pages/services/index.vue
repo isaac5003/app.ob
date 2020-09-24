@@ -33,6 +33,7 @@
                 default-first-option
                 @change="fetchServices"
               >
+                <el-option label="Todos los estados" value="" />
                 <el-option label="Activo" :value="true" />
                 <el-option label="Inactivo" :value="false" />
               </el-select>
@@ -48,6 +49,7 @@
                 default-first-option
                 @change="fetchServices"
               >
+                <el-option label="Todos los tipos" value="" />
                 <el-option
                   v-for="item in sellingTypes"
                   :key="item.id"
@@ -71,10 +73,19 @@
           </div>
         </div>
       </el-form>
-      <el-table :data="services.services" stripe size="mini" v-loading="loading">
+      <el-table
+        :data="services.services"
+        stripe
+        size="mini"
+        v-loading="loading"
+      >
         <el-table-column type="index" min-width="40" />
         <el-table-column label="Nombre" prop="name" min-width="200" />
-        <el-table-column label="Descripción" prop="description" min-width="300" />
+        <el-table-column
+          label="Descripción"
+          prop="description"
+          min-width="300"
+        />
         <el-table-column label="Precio" min-width="100" align="right">
           <template slot-scope="scope">
             <span>{{ scope.row.cost | formatMoney }}</span>
@@ -87,7 +98,9 @@
         </el-table-column>
         <el-table-column label="Estado" prop="status" min-width="80">
           <template slot-scope="scope">
-            <el-tag size="small" type="success" v-if="scope.row.active">Activo</el-tag>
+            <el-tag size="small" type="success" v-if="scope.row.active"
+              >Activo</el-tag
+            >
             <el-tag size="small" type="warning" v-else>Inactivo</el-tag>
           </template>
         </el-table-column>
@@ -96,16 +109,16 @@
             <el-dropdown trigger="click">
               <el-button icon="el-icon-more" size="small" />
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item @click.native="$router.push(`/services/edit/${scope.row.id}`)">
+                <el-dropdown-item
+                  @click.native="$router.push(`/services/edit/${scope.row.id}`)"
+                >
                   <i class="el-icon-edit-outline"></i> Editar servicio
                 </el-dropdown-item>
                 <el-dropdown-item @click.native="changeActive(scope.row)">
                   <span v-if="scope.row.active">
                     <i class="el-icon-close"></i> Desactivar
                   </span>
-                  <span v-else>
-                    <i class="el-icon-check"></i> Activar
-                  </span>
+                  <span v-else> <i class="el-icon-check"></i> Activar </span>
                   servicio
                 </el-dropdown-item>
                 <el-dropdown-item

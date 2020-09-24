@@ -12,7 +12,7 @@ export default {
   name: "Services",
   middleware: "access",
   meta: {
-    id: "0f88f2ea-aae9-44ad-8df0-0ee3debbf167"
+    id: "0f88f2ea-aae9-44ad-8df0-0ee3debbf167",
   },
   components: { LayoutSubmenu },
   data() {
@@ -21,15 +21,15 @@ export default {
         {
           name: "Nuevo servicio",
           icon: getIcon("plus"),
-          path: "/services/new"
+          path: "/services/new",
         },
         {
           name: "Listado de servicios",
           icon: getIcon("menu"),
-          path: "/services"
-        }
-      ]
+          path: "/services",
+        },
+      ],
     };
-  }
+  },
 };
 </script>

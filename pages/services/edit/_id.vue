@@ -12,7 +12,9 @@
       :rules="servicesEditFormRules"
       status-icon
       ref="servicesEditForm"
-      @submit.native.prevent="submitEditService('servicesEditForm', servicesEditForm)"
+      @submit.native.prevent="
+        submitEditService('servicesEditForm', servicesEditForm)
+      "
     >
       <div class="grid grid-cols-12 gap-4">
         <div class="col-span-6">
@@ -28,23 +30,30 @@
         </div>
         <div class="col-span-2">
           <el-form-item label="Costo" prop="cost">
-            <el-input
+            <el-input-number
               ref="cost"
               type="number"
-              min="0"
-              step="0.01"
+              :min="0.01"
+              :step="0.01"
               v-model="servicesEditForm.cost"
               size="small"
               autocomplete="off"
+              style="width: 100%"
             />
           </el-form-item>
         </div>
         <div class="col-span-4">
           <el-form-item label="Tipo de venta" prop="sellingType">
-            <el-radio-group ref="sellingType" v-model="servicesEditForm.sellingType" class="w-full">
+            <el-radio-group
+              ref="sellingType"
+              v-model="servicesEditForm.sellingType"
+              class="w-full"
+            >
               <el-row :gutter="15">
                 <el-col :span="8" v-for="(s, k) in sellingTypes" :key="k">
-                  <el-radio :label="s.id" border class="w-full" size="small">{{s.name}}</el-radio>
+                  <el-radio :label="s.id" border class="w-full" size="small">{{
+                    s.name
+                  }}</el-radio>
                 </el-col>
               </el-row>
             </el-radio-group>
@@ -62,7 +71,9 @@
         </el-form-item>
       </div>
       <div class="flex justify-end">
-        <el-button type="primary" size="small" native-type="submit">Guardar</el-button>
+        <el-button type="primary" size="small" native-type="submit"
+          >Guardar</el-button
+        >
         <el-button size="small" @click="cancel()">Cancelar</el-button>
       </div>
     </el-form>
@@ -104,7 +115,7 @@ export default {
       },
       servicesEditFormRules: {
         name: inputValidation(true, 5, 60),
-        cost: inputValidation(true, 0),
+        cost: inputValidation(true, 0, null, "number"),
         sellingType: selectValidation(true),
         description: inputValidation(false, 5),
       },
