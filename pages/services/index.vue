@@ -79,7 +79,7 @@
         size="mini"
         v-loading="loading"
       >
-        <el-table-column type="index" min-width="40" />
+        <el-table-column prop="index" min-width="40" />
         <el-table-column label="Nombre" prop="name" min-width="200" />
         <el-table-column
           label="Descripción"
