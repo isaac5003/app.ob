@@ -26,7 +26,7 @@
         class="flex items-center py-3 px-3 hover:bg-blue-200 hover:text-blue-800 text-gray-900 text-sm rounded cursor-pointer space-x-2"
       >
         <svg
-          class="w-4 h-4 fill-current"
+          class="w-5 h-5"
           fill="none"
           stroke-linecap="round"
           stroke-linejoin="round"

@@ -28,6 +28,16 @@ export default {
           icon: getIcon("menu"),
           path: "/customers",
         },
+        {
+          name: "Reportes",
+          icon: getIcon("document-text"),
+          path: "/customers*/reports",
+        },
+        {
+          name: "Configuraciones",
+          icon: getIcon("cog"),
+          path: "/customers/settings",
+        },
       ],
     };
   },

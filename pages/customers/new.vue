@@ -287,7 +287,7 @@
             class="col-span-2"
             v-show="
               customersNewForm.customerType == 1 ||
-                customersNewForm.customerTypeNatural == 2
+              customersNewForm.customerTypeNatural == 2
             "
           >
             <el-form-item label="NRC" prop="nrc">
@@ -305,7 +305,7 @@
           class="grid grid-cols-12 gap-4"
           v-show="
             customersNewForm.customerType == 1 ||
-              customersNewForm.customerTypeNatural == 2
+            customersNewForm.customerTypeNatural == 2
           "
         >
           <div class="col-span-4">
@@ -441,12 +441,12 @@ export default {
         name: "",
         shortName: "",
         isProvider: false,
-        dui: "",
+        dui: null,
         nit: "",
         nrc: "",
         giro: "",
         customerType: "",
-        customerTypeNatural: "",
+        customerTypeNatural: null,
         customerTaxerType: "",
         contactName: "",
         address1: "",
@@ -470,8 +470,6 @@ export default {
         phone: inputValidation(true),
         email: inputValidation(true, null, null, "email"),
         customerType: selectValidation(true),
-        customerTypeNatural: selectValidation(true),
-        dui: inputValidation(true),
         nit: inputValidation(true),
         nrc: inputValidation(true, 3),
         customerTaxerType: selectValidation(true),
@@ -494,6 +492,118 @@ export default {
           break;
       }
       this.setStorage(this.customersNewForm);
+    },
+    submitNewCustomer(formName, formData) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+
+        console.log({
+          name: formData.name,
+          shortName: formData.shortName,
+          isProvider: formData.isProvider,
+          dui: formData.dui,
+          nit: formData.nit,
+          nrc: formData.nrc,
+          giro: formData.giro,
+          customerType: formData.customerType,
+          customerTypeNatural: formData.customerTypeNatural,
+          customerTaxerType: formData.customerTaxerType,
+          branch: {
+            contactName: formData.contactName,
+            contactInfo: JSON.stringify({
+              phones: [formData.phone],
+              emails: [formData.email],
+            }),
+            address1: formData.address1,
+            address2: formData.address2,
+            country: formData.country,
+            state: formData.state,
+            city: formData.city,
+          },
+        });
+
+        this.$confirm(
+          "¿Estás seguro que deseas guardar este nuevo cliente?",
+          "Confirmación",
+          {
+            confirmButtonText: "Si, guardar",
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                this.$axios
+                  .post("/customers", {
+                    name: formData.name,
+                    shortName: formData.shortName,
+                    isProvider: formData.isProvider,
+                    dui: formData.dui,
+                    nit: formData.nit,
+                    nrc: formData.nrc,
+                    giro: formData.giro,
+                    customerType: formData.customerType,
+                    customerTypeNatural: formData.customerTypeNatural,
+                    customerTaxerType: formData.customerTaxerType,
+                    branch: {
+                      contactName: formData.contactName,
+                      contactInfo: JSON.stringify({
+                        phones: [formData.phone],
+                        emails: [formData.email],
+                      }),
+                      address1: formData.address1,
+                      address2: formData.address2,
+                      country: formData.country,
+                      state: formData.state,
+                      city: formData.city,
+                    },
+                  })
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Exito",
+                      message: res.data.message,
+                    });
+                    setTimeout(() => {
+                      this.$confirm(
+                        "¿Deseas crear un nuevo cliente?",
+                        "Confirmación",
+                        {
+                          confirmButtonText: "Si, porfavor",
+                          cancelButtonText: "No, gracias",
+                          type: "warning",
+                          closeOnClickModal: false,
+                          closeOnPressEscape: false,
+                        }
+                      )
+                        .then(() => {
+                          this.$refs[formName].resetFields();
+                        })
+                        .catch(() => {
+                          this.$router.push("/customers");
+                        });
+                    }, 500);
+                  })
+                  .catch((err) => {
+                    this.$notify.error({
+                      title: "Error",
+                      message: err.response.data.message,
+                    });
+                  })
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = "Si, guardar";
+                    localStorage.removeItem(storagekey);
+                    done();
+                  });
+              } else {
+                done();
+              }
+            },
+          }
+        );
+      });
     },
   },
   computed: {

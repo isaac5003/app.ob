@@ -65,7 +65,7 @@
               placeholder="Buscar..."
               v-model="searchValue"
               size="small"
-              style="margin-top: 26px;"
+              style="margin-top: 26px"
               clearable
               v-debounce:500ms="fetchServices"
               @change="fetchServices"
@@ -106,8 +106,8 @@
         </el-table-column>
         <el-table-column label min-width="60" align="center">
           <template slot-scope="scope">
-            <el-dropdown trigger="click">
-              <el-button icon="el-icon-more" size="small" />
+            <el-dropdown trigger="click" szie="mini">
+              <el-button icon="el-icon-more" size="mini" />
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item
                   @click.native="$router.push(`/services/edit/${scope.row.id}`)"
