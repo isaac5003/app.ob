@@ -162,7 +162,7 @@
         </div>
       </el-form>
       <el-table :data="customers.customers" stripe size="mini">
-        <el-table-column type="index" min-width="40" />
+        <el-table-column prop="index" min-width="40" />
         <el-table-column label="Nombre" prop="name" min-width="350" />
         <el-table-column
           label="Tipo"
