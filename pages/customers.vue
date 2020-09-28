@@ -27,12 +27,13 @@ export default {
           name: "Listado de clientes",
           icon: getIcon("menu"),
           path: "/customers",
+          epath: ["/customers/edit"],
         },
-        {
-          name: "Reportes",
-          icon: getIcon("document-text"),
-          path: "/customers*/reports",
-        },
+        // {
+        //   name: "Reportes",
+        //   icon: getIcon("document-text"),
+        //   path: "/customers/reports",
+        // },
         {
           name: "Configuraciones",
           icon: getIcon("cog"),

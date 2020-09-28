@@ -65,8 +65,8 @@
           <template
             v-if="
               selectedCustomer &&
-              (!selectedCustomer.customerTypeNatural ||
-                selectedCustomer.customerTypeNatural.id == 2)
+                (!selectedCustomer.customerTypeNatural ||
+                  selectedCustomer.customerTypeNatural.id == 2)
             "
           >
             <div class="col-span-2 flex flex-col">
@@ -194,7 +194,7 @@
                 </el-dropdown-item>
                 <el-dropdown-item
                   @click.native="
-                    $router.push(`/customers/edit/${scope.row.id}`)
+                    $router.push(`/customers/edit?ref=${scope.row.id}`)
                   "
                 >
                   <i class="el-icon-edit-outline"></i> Editar cliente

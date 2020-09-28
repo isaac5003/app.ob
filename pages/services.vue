@@ -27,6 +27,7 @@ export default {
           name: "Listado de servicios",
           icon: getIcon("menu"),
           path: "/services",
+          epath: ["/services/edit"],
         },
       ],
     };

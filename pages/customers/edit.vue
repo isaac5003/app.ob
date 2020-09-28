@@ -20,10 +20,12 @@
       <el-tabs
         v-model="activeTab"
         @tab-click="
-          $router.push({
-            path: `/customers/edit/${$route.params.id}`,
-            query: { tab: activeTab },
-          })
+          $router
+            .replace({
+              path: `/customers/edit?ref=${$route.query.ref}`,
+              query: { tab: activeTab },
+            })
+            .catch(() => {})
         "
       >
         <el-tab-pane label="Información general" name="general-information">
@@ -342,16 +344,16 @@
 </template>
 
 <script>
-import LayoutContent from "../../../components/layout/Content";
-import { inputValidation, selectValidation } from "../../../tools";
-import Notification from "../../../components/Notification";
+import LayoutContent from "../../components/layout/Content";
+import { inputValidation, selectValidation } from "../../tools";
+import Notification from "../../components/Notification";
 
 export default {
   name: "CustomerEdit",
   components: { LayoutContent, Notification },
   fetch() {
     const customer = () =>
-      this.$axios.get(`/customers/${this.$route.params.id}`);
+      this.$axios.get(`/customers/${this.$route.query.ref}`);
     const customerTypes = () => this.$axios.get(`/customers/customer-types`);
     const customerTypeNaturals = () =>
       this.$axios.get(`/customers/customer-type-naturals`);
