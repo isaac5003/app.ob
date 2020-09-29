@@ -22,8 +22,8 @@
         :key="k"
         tag="li"
         :to="{ path: m.path }"
-        exact-active-class="bg-blue-200 text-blue-800"
         class="flex items-center py-3 px-3 hover:bg-blue-200 hover:text-blue-800 text-gray-900 text-sm rounded cursor-pointer space-x-2"
+        :class="{ 'bg-blue-200 text-blue-800': activePath($route.path, m) }"
       >
         <svg
           class="w-5 h-5"
@@ -43,9 +43,22 @@
 
 <script>
 import { getIcon } from "../../tools";
+
 export default {
   name: "Submenu",
   props: ["pageName", "menu", "icon"],
+  fetchOnServer: false,
+  methods: {
+    activePath(path, item) {
+      const paths = [item.path];
+      if (item.epath) {
+        for (const p of item.epath) {
+          paths.push(p);
+        }
+      }
+      return paths.includes(path);
+    },
+  },
   computed: {
     moduleIcon() {
       return getIcon(this.icon);

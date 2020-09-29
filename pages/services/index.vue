@@ -110,7 +110,9 @@
               <el-button icon="el-icon-more" size="mini" />
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item
-                  @click.native="$router.push(`/services/edit/${scope.row.id}`)"
+                  @click.native="
+                    $router.push(`/services/edit?ref=${scope.row.id}`)
+                  "
                 >
                   <i class="el-icon-edit-outline"></i> Editar servicio
                 </el-dropdown-item>

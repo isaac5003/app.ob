@@ -461,7 +461,7 @@ export default {
           address1: branch.address1,
           address2: branch.address2,
           phone: branch.contactInfo.phones[0],
-          email: branch.contactInfo.emails[0 ],
+          email: branch.contactInfo.emails[0],
           country: branch.country.id,
           state: branch.state.id,
           city: branch.city.id,

@@ -81,14 +81,14 @@
 </template>
 
 <script>
-import LayoutContent from "../../../components/layout/Content";
-import { inputValidation, selectValidation } from "../../../tools";
+import LayoutContent from "../../components/layout/Content";
+import { inputValidation, selectValidation } from "../../tools";
 export default {
   name: "ServicesEdit",
   components: { LayoutContent },
   fetch() {
     const sellingTypes = () => this.$axios.get("/services/selling-types");
-    const service = () => this.$axios.get(`/services/${this.$route.params.id}`);
+    const service = () => this.$axios.get(`/services/${this.$route.query.ref}`);
 
     Promise.all([sellingTypes(), service()])
       .then((res) => {
@@ -140,7 +140,7 @@ export default {
                 instance.confirmButtonLoading = true;
                 instance.confirmButtonText = "Procesando...";
                 this.$axios
-                  .put(`/services/${this.$route.params.id}`, {
+                  .put(`/services/${this.$route.query.ref}`, {
                     name,
                     cost,
                     sellingType,
