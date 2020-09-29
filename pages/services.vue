@@ -29,6 +29,11 @@ export default {
           path: "/services",
           epath: ["/services/edit"],
         },
+        {
+          name: "Configuraciones",
+          icon: getIcon("cog"),
+          path: "/services/settings",
+        },
       ],
     };
   },

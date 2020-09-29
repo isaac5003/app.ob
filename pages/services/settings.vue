@@ -2,7 +2,7 @@
   <layout-content
     page-title="Configuraciones"
     :breadcrumb="[
-      { name: 'Clientes', to: '/customers' },
+      { name: 'Servicios', to: '/services' },
       { name: 'Configuraciones', to: null },
     ]"
   >
@@ -11,7 +11,7 @@
       @tab-click="
         $router
           .replace({
-            path: `/customers/settings`,
+            path: `/services/settings`,
             query: { tab },
           })
           .catch(() => {})
@@ -22,7 +22,7 @@
           class="w-full"
           type="info"
           title="Integraciones"
-          message="En esta sección se realizan las configuraciones de integración con otros modulos de manera general. Estas configuraciones se aplicarán a todos los clientes que no tengan una configuración individual."
+          message="En esta sección se realizan las configuraciones de integración con otros modulos de manera general. Estas configuraciones se aplicarán a todos los servicios que no tengan una configuración individual."
         />
         <el-tabs
           tab-position="left"
@@ -30,7 +30,7 @@
           @tab-click="
             $router
               .replace({
-                path: `/customers/settings`,
+                path: `/services/settings`,
                 query: { tab, utab },
               })
               .catch(() => {})
@@ -84,12 +84,6 @@ export default {
       tab: "integrations",
       utab: "invoicing",
       integrations: [
-        {
-          name: "Facturación",
-          ref: "cfb8addb-541b-482f-8fa1-dfe5db03fdf4",
-          id: "invoicing",
-          icon: getIcon("dolar"),
-        },
         {
           name: "Contabilidad",
           ref: "a98b98e6-b2d5-42a3-853d-9516f64eade8",

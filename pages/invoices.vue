@@ -1,13 +1,6 @@
 <template>
   <div class="flex">
-    <layout-submenu page-name="Mi Perfil" :menu="menu">
-      <div slot="upper">
-        <img
-          :src="require('../assets/images/main-avatar.png')"
-          class="p-1 border-4 w-50 h-50 rounded-full"
-        />
-      </div>
-    </layout-submenu>
+    <layout-submenu page-name="Facturación" :menu="menu" icon="dolar" />
     <nuxt-child />
   </div>
 </template>
@@ -16,32 +9,38 @@
 import LayoutSubmenu from "../components/layout/Submenu";
 import { getIcon } from "../tools";
 export default {
-  name: "ProfileHolder",
+  name: "Invoices",
   middleware: "access",
   meta: {
-    id: "cfb8addb-541b-482f-8fa1-dfe5db03fdf4"
+    id: "cfb8addb-541b-482f-8fa1-dfe5db03fdf4",
   },
   components: { LayoutSubmenu },
   data() {
     return {
       menu: [
         {
-          name: "Mi perfil",
-          icon: getIcon("user"),
-          path: "/profile"
+          name: "Nueva factura",
+          icon: getIcon("plus"),
+          path: "/invoices/new",
         },
-        // {
-        //   name: "Cambiar avatar",
-        //   icon: "image",
-        //   path: "/profile/avatar"
-        // },
         {
-          name: "Cambiar contraseña",
-          icon: getIcon("lock"),
-          path: "/profile/password"
-        }
-      ]
+          name: "Listado de facturas",
+          icon: getIcon("menu"),
+          path: "/invoices",
+          epath: ["/invoices/edit"],
+        },
+        {
+          name: "Reportes",
+          icon: getIcon("document-text"),
+          path: "/invoices/reports",
+        },
+        {
+          name: "Configuraciones",
+          icon: getIcon("cog"),
+          path: "/invoices/settings",
+        },
+      ],
     };
-  }
+  },
 };
 </script>

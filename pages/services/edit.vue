@@ -25,6 +25,9 @@
               v-model="servicesEditForm.name"
               size="small"
               autocomplete="off"
+              minlength="5"
+              maxlength="60"
+              show-word-limit
             />
           </el-form-item>
         </div>
@@ -67,6 +70,9 @@
             type="textarea"
             :rows="4"
             v-model="servicesEditForm.description"
+            minlength="5"
+            maxlength="5000"
+            show-word-limit
           ></el-input>
         </el-form-item>
       </div>
@@ -74,7 +80,9 @@
         <el-button type="primary" size="small" native-type="submit"
           >Guardar</el-button
         >
-        <el-button size="small" @click="cancel()">Cancelar</el-button>
+        <el-button size="small" @click="$router.push('/services')"
+          >Cancelar</el-button
+        >
       </div>
     </el-form>
   </layout-content>
@@ -82,7 +90,15 @@
 
 <script>
 import LayoutContent from "../../components/layout/Content";
-import { inputValidation, selectValidation } from "../../tools";
+import {
+  checkBeforeEnter,
+  checkBeforeLeave,
+  inputValidation,
+  selectValidation,
+} from "../../tools";
+
+const storagekey = "edit-service";
+
 export default {
   name: "ServicesEdit",
   components: { LayoutContent },
@@ -102,8 +118,13 @@ export default {
       .catch((err) => {
         this.errorMessage = err.response.data.message;
       });
+
+    checkBeforeEnter(this, storagekey, "servicesNewForm");
   },
   fetchOnServer: false,
+  beforeRouteLeave(to, from, next) {
+    checkBeforeLeave(this, storagekey, next);
+  },
   data() {
     return {
       sellingTypes: [],
@@ -170,15 +191,6 @@ export default {
             },
           }
         );
-      });
-    },
-    cancel() {
-      this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
-        confirmButtonText: "Si, salir",
-        cancelButtonText: "Cancelar",
-        type: "warning",
-      }).then(() => {
-        this.$router.push("/services");
       });
     },
   },

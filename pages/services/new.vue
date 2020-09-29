@@ -25,6 +25,9 @@
               size="small"
               autocomplete="off"
               @change="setStorage(servicesNewForm)"
+              maxlength="60"
+              minlength="5"
+              show-word-limit
             />
           </el-form-item>
         </div>
@@ -70,6 +73,9 @@
             :rows="4"
             v-model="servicesNewForm.description"
             @change="setStorage(servicesNewForm)"
+            minlength="5"
+            maxlength="5000"
+            show-word-limit
           ></el-input>
         </el-form-item>
       </div>
