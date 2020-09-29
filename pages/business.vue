@@ -19,21 +19,21 @@ export default {
           icon: getIcon("office-building"),
           path: "/business",
         },
-        {
-          name: "Usuarios",
-          icon: getIcon("user-group"),
-          path: "/business/users",
-        },
-        {
-          name: "Modulos",
-          icon: getIcon("collection"),
-          path: "/business/modules",
-        },
-        {
-          name: "Facturación",
-          icon: getIcon("credit-card"),
-          path: "/business/invoicing",
-        },
+        // {
+        //   name: "Usuarios",
+        //   icon: getIcon("user-group"),
+        //   path: "/business/users",
+        // },
+        // {
+        //   name: "Modulos",
+        //   icon: getIcon("collection"),
+        //   path: "/business/modules",
+        // },
+        // {
+        //   name: "Facturación",
+        //   icon: getIcon("credit-card"),
+        //   path: "/business/invoicing",
+        // },
       ],
     };
   },

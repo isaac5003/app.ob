@@ -203,6 +203,7 @@
 import LayoutContent from "../../components/layout/Content";
 export default {
   name: "BusinessIndex",
+  middleware: "admin",
   components: { LayoutContent },
   fetch() {
     const business = () => {

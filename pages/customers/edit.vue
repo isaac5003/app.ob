@@ -21,7 +21,7 @@
         v-model="activeTab"
         @tab-click="
           $router.push({
-            path: `/customers/edit/${$route.params.id}`,
+            path: `/customers/edit?ref=${$route.query.ref}`,
             query: { tab: activeTab },
           })
         "
@@ -377,14 +377,14 @@
 </template>
 
 <script>
-import LayoutContent from "../../../components/layout/Content";
+import LayoutContent from "../../components/layout/Content";
 import {
   inputValidation,
   selectValidation,
   checkBeforeLeave,
   checkBeforeEnter,
-} from "../../../tools";
-import Notification from "../../../components/Notification";
+} from "../../tools";
+import Notification from "../../components/Notification";
 
 const storagekey = "edit-customer";
 
@@ -393,7 +393,7 @@ export default {
   components: { LayoutContent, Notification },
   fetch() {
     const customer = () =>
-      this.$axios.get(`/customers/${this.$route.params.id}`);
+      this.$axios.get(`/customers/${this.$route.query.ref}`);
     const customerTypes = () => this.$axios.get(`/customers/customer-types`);
     const customerTypeNaturals = () =>
       this.$axios.get(`/customers/customer-type-naturals`);
@@ -547,7 +547,7 @@ export default {
                 instance.confirmButtonLoading = true;
                 instance.confirmButtonText = "Procesando...";
                 this.$axios
-                  .put(`/customers/${this.$route.params.id}`, {
+                  .put(`/customers/${this.$route.query.ref}`, {
                     name: formData.name,
                     shortName: formData.shortName,
                     isProvider: formData.isProvider,

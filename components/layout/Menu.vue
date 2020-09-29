@@ -123,6 +123,7 @@
         effect="dark"
         content="Mi Empresa"
         placement="right"
+        v-if="$auth.user.profile.admin"
       >
         <nuxt-link
           to="/business"

@@ -1,4 +1,5 @@
 export default function({ $auth, route, redirect }) {
+  console.log(route);
   const company = $auth.user.profile.access.find(
     (a) => a.id == $auth.user.workspace.company.id
   );
