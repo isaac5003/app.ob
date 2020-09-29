@@ -36,6 +36,10 @@
                   v-model="customersEditForm.name"
                   size="small"
                   autocomplete="off"
+                  maxlength="100"
+                  minlength="5"
+                  show-word-limit
+                  @change="setStorage(customersEditForm)"
                 />
               </el-form-item>
             </div>
@@ -47,6 +51,10 @@
                   v-model="customersEditForm.shortName"
                   size="small"
                   autocomplete="off"
+                  maxlength="15"
+                  minlength="3"
+                  show-word-limit
+                  @change="setStorage(customersEditForm)"
                 />
               </el-form-item>
             </div>
@@ -55,6 +63,7 @@
                 <el-radio-group
                   v-model="customersEditForm.isProvider"
                   class="w-full"
+                  @change="setStorage(customersEditForm)"
                 >
                   <el-radio :label="true">Si</el-radio>
                   <el-radio :label="false">No</el-radio>
@@ -71,6 +80,10 @@
                   v-model="customersEditForm.address1"
                   size="small"
                   autocomplete="off"
+                  maxlength="150"
+                  minlength="5"
+                  show-word-limit
+                  @change="setStorage(customersEditForm)"
                 />
               </el-form-item>
             </div>
@@ -82,6 +95,10 @@
                   v-model="customersEditForm.address2"
                   size="small"
                   autocomplete="off"
+                  maxlength="150"
+                  minlength="5"
+                  show-word-limit
+                  @change="setStorage(customersEditForm)"
                 />
               </el-form-item>
             </div>
@@ -139,6 +156,7 @@
                   filterable
                   clearable
                   default-first-option
+                  @change="setStorage(customersEditForm)"
                 >
                   <el-option
                     v-for="city in cities"
@@ -159,6 +177,10 @@
                   v-model="customersEditForm.contactName"
                   size="small"
                   autocomplete="off"
+                  maxlength="50"
+                  minlength="5"
+                  show-word-limit
+                  @change="setStorage(customersEditForm)"
                 />
               </el-form-item>
             </div>
@@ -167,11 +189,12 @@
                 <el-input
                   clearable
                   type="text"
-                  v-model="customersEditForm.cellphone"
+                  v-model="customersEditForm.phone"
                   size="small"
                   autocomplete="off"
                   placeholder="####-####"
                   v-mask="'####-####'"
+                  @change="setStorage(customersEditForm)"
                 />
               </el-form-item>
             </div>
@@ -183,6 +206,7 @@
                   v-model="customersEditForm.email"
                   size="small"
                   autocomplete="off"
+                  @change="setStorage(customersEditForm)"
                 />
               </el-form-item>
             </div>
@@ -203,6 +227,7 @@
                   filterable
                   clearable
                   default-first-option
+                  @change="setStorage(customersEditForm)"
                 >
                   <el-option
                     v-for="ct in customerTypes"
@@ -228,8 +253,8 @@
                   placeholder="Seleccionar tipo de persona natural"
                   filterable
                   clearable
-                  @change="changeNatural(customersEditForm.customerTypeNatural)"
                   default-first-option
+                  @change="setStorage(customersEditForm)"
                 >
                   <el-option
                     v-for="ct in customerTypeNaturals"
@@ -254,6 +279,7 @@
                   autocomplete="off"
                   placeholder="########-#"
                   v-mask="'########-#'"
+                  @change="setStorage(customersEditForm)"
                 />
               </el-form-item>
             </div>
@@ -266,6 +292,7 @@
                   autocomplete="off"
                   placeholder="####-######-###-#"
                   v-mask="'####-######-###-#'"
+                  @change="setStorage(customersEditForm)"
                 />
               </el-form-item>
             </div>
@@ -279,13 +306,17 @@
                   v-model="customersEditForm.nrc"
                   size="small"
                   autocomplete="off"
+                  @change="setStorage(customersEditForm)"
                 />
               </el-form-item>
             </div>
           </div>
           <div
             class="grid grid-cols-12 gap-4"
-            v-show="customersEditForm.customerType == 1"
+            v-show="
+              customersEditForm.customerType == 1 ||
+              customersEditForm.customerTypeNatural == 2
+            "
           >
             <div class="col-span-4">
               <el-form-item
@@ -300,6 +331,7 @@
                   filterable
                   clearable
                   default-first-option
+                  @change="setStorage(customersEditForm)"
                 >
                   <el-option
                     v-for="ct in customerTaxerTypes"
@@ -317,6 +349,7 @@
                   v-model="customersEditForm.giro"
                   size="small"
                   autocomplete="off"
+                  @change="setStorage(customersEditForm)"
                 />
               </el-form-item>
             </div>
@@ -335,7 +368,9 @@
         <el-button type="primary" size="small" native-type="submit"
           >Actualizar</el-button
         >
-        <el-button size="small" @click="cancel()">Cancelar</el-button>
+        <el-button size="small" @click="$router.push('/customers')"
+          >Cancelar</el-button
+        >
       </div>
     </el-form>
   </layout-content>
@@ -343,8 +378,15 @@
 
 <script>
 import LayoutContent from "../../../components/layout/Content";
-import { inputValidation, selectValidation } from "../../../tools";
+import {
+  inputValidation,
+  selectValidation,
+  checkBeforeLeave,
+  checkBeforeEnter,
+} from "../../../tools";
 import Notification from "../../../components/Notification";
+
+const storagekey = "edit-customer";
 
 export default {
   name: "CustomerEdit",
@@ -391,6 +433,8 @@ export default {
         this.customerTaxerTypes = customerTaxerTypes.data.taxerTypes;
         const customer = customerData.data.customer;
         const branch = customer.customerBranches[0];
+        console.log(branch);
+        this.customer = customer;
 
         this.countries = countries.data.countries;
         this.rawStates = states.data.states;
@@ -416,8 +460,8 @@ export default {
           contactName: branch.contactName,
           address1: branch.address1,
           address2: branch.address2,
-          cellphone: branch.contactInfo.cellphone,
-          email: branch.contactInfo.email,
+          phone: branch.contactInfo.phones[0],
+          email: branch.contactInfo.emails[0 ],
           country: branch.country.id,
           state: branch.state.id,
           city: branch.city.id,
@@ -429,8 +473,13 @@ export default {
         this.$message.error(err.response.data.message);
         this.$router.push("/customers");
       });
+
+    checkBeforeEnter(this, storagekey, "customersEditForm");
   },
   fetchOnServer: false,
+  beforeRouteLeave(to, from, next) {
+    checkBeforeLeave(this, storagekey, next);
+  },
   data() {
     return {
       loading: true,
@@ -461,19 +510,97 @@ export default {
         state: "",
         city: "",
       },
+      customer: null,
     };
   },
   methods: {
-    cancel() {
-      this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
-        confirmButtonText: "Si, salir",
-        cancelButtonText: "Cancelar",
-        type: "warning",
-      }).then(() => {
-        this.$router.push("/customers");
+    setStorage(customersEditForm) {
+      localStorage.setItem(storagekey, JSON.stringify(customersEditForm));
+    },
+    clearSelect(name) {
+      switch (name) {
+        case "state":
+          this.customersEditForm.state = "";
+          this.customersEditForm.city = "";
+          break;
+        case "city":
+          this.customersEditForm.city = "";
+          break;
+      }
+      this.setStorage(this.customersEditForm);
+    },
+    submitEditCustomer(formName, formData) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+
+        this.$confirm(
+          "¿Estás seguro que deseas actualizar este cliente?",
+          "Confirmación",
+          {
+            confirmButtonText: "Si, actualizar",
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                this.$axios
+                  .put(`/customers/${this.$route.params.id}`, {
+                    name: formData.name,
+                    shortName: formData.shortName,
+                    isProvider: formData.isProvider,
+                    dui: formData.dui,
+                    nit: formData.nit,
+                    nrc: formData.nrc,
+                    giro: formData.giro,
+                    customerType: formData.customerType,
+                    customerTypeNatural: formData.customerTypeNatural,
+                    customerTaxerType: formData.customerTaxerType,
+                    branch: {
+                      id: this.customer.customerBranches[0].id,
+                      contactName: formData.contactName,
+                      contactInfo: {
+                        phones: [formData.phone],
+                        emails: [formData.email],
+                      },
+                      address1: formData.address1,
+                      address2: formData.address2,
+                      country: formData.country,
+                      state: formData.state,
+                      city: formData.city,
+                    },
+                  })
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Exito",
+                      message: res.data.message,
+                    });
+                    setTimeout(() => {
+                      this.$router.push("/customers");
+                    }, 300);
+                  })
+                  .catch((err) => {
+                    this.$notify.error({
+                      title: "Error",
+                      message: err.response.data.message,
+                    });
+                  })
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = "Si, actualizar";
+                    localStorage.removeItem(storagekey);
+                    done();
+                  });
+              } else {
+                done();
+              }
+            },
+          }
+        );
       });
     },
-    submitEditCustomer() {},
   },
   computed: {
     states() {

@@ -350,7 +350,7 @@
       </div>
       <div class="flex justify-end" v-if="activeTab != 'integrations'">
         <el-button type="primary" size="small" native-type="submit"
-          >Actualizar</el-button
+          >Guardar</el-button
         >
         <el-button size="small" @click="$router.push('/customers')"
           >Cancelar</el-button
