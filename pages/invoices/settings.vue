@@ -41,32 +41,27 @@
                     <el-button icon="el-icon-more" size="mini" />
                     <el-dropdown-menu slot="dropdown">
                       <el-dropdown-item
-                        @click.native="openInvoicePreview(scope.row)"
-                      >
-                        <i class="el-icon-view"></i> Vista previa
-                      </el-dropdown-item>
-                      <el-dropdown-item
                         @click.native="
                           $router.push(`/invoices/edit?ref=${scope.row.id}`)
                         "
                       >
-                        <i class="el-icon-edit-outline"></i> Editar cliente
+                        <i class="el-icon-edit-outline"></i> Editar zona
                       </el-dropdown-item>
                       <el-dropdown-item @click.native="changeActive(scope.row)">
-                        <span v-if="scope.row.isActiveInvoice">
+                        <span v-if="scope.row.active">
                           <i class="el-icon-close"></i> Desactivar
                         </span>
                         <span v-else>
                           <i class="el-icon-check"></i> Activar
                         </span>
-                        cliente
+                        zona
                       </el-dropdown-item>
                       <el-dropdown-item
                         :divided="true"
                         class="text-red-500 font-semibold"
                         @click.native="deleteInvoice(scope.row)"
                       >
-                        <i class="el-icon-delete"></i> Eliminar cliente
+                        <i class="el-icon-delete"></i> Eliminar zona
                       </el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
@@ -87,7 +82,7 @@
           class="w-full"
           type="info"
           title="Integraciones"
-          message="En esta sección se realizan las configuraciones de integración con otros modulos de manera general. Estas configuraciones se aplicarán a todos los clientes que no tengan una configuración individual."
+          message="En esta sección se realizan las configuraciones de integración con otros modulos de manera general. Estas configuraciones se aplicarán a todos los zonas que no tengan una configuración individual."
         />
         <el-tabs
           tab-position="left"
@@ -179,6 +174,58 @@ export default {
       ],
       zones: [],
     };
+  },
+  methods: {
+    fetchZones() {
+      let params = this.page;
+      this.$axios
+        .get("/invoices/zones")
+        .then((res) => {
+         this.zones = res.data.zones;
+        })
+        .catch((err) => {
+          this.errorMessage = err.response.data.message;
+        });
+    },
+     changeActive({ id, active }) {
+      const action = active ? "desactivar" : "activar";
+      this.$confirm(
+        `¿Estás seguro que deseas ${action} esta zona?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, ${action}`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .put(`/invoices/zones/status/${id}`, { status: !active })
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchZones();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, ${action}`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
+    },
   },
   computed: {
     filteredIntegrations() {
