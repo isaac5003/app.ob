@@ -1,6 +1,6 @@
 <template>
   <div class="flex">
-    <layout-submenu page-name="Facturación" :menu="menu" icon="dolar" />
+    <layout-submenu page-name="Ventas" :menu="menu" icon="dolar" />
     <nuxt-child />
   </div>
 </template>
@@ -12,7 +12,7 @@ export default {
   name: "Invoices",
   middleware: "access",
   meta: {
-    id: "cfb8addb-541b-482f-8fa1-dfe5db03fdf4",
+    id: "a98b98e6-b2d5-42a3-853d-9516f64eade8",
   },
   components: { LayoutSubmenu },
   data() {
