@@ -163,10 +163,6 @@ const spacing = {
   "160": "40rem",
 };
 module.exports = {
-  purge: {
-    enabled: false,
-    content: ["./**/*.vue"],
-  },
   theme: {
     extend: {
       spacing,

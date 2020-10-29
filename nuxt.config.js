@@ -1,8 +1,4 @@
 export default {
-  mode: "universal",
-  /*
-   ** Headers of the page
-   */
   head: {
     title: "Openbox Cloud",
     meta: [
@@ -14,68 +10,40 @@ export default {
         content: process.env.npm_package_description || "",
       },
     ],
-    link: [
-      { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
-      {
-        rel: "stylesheet",
-        href:
-          "https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap",
-      },
-    ],
+    link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
   },
-  /*
-   ** Customize the progress-bar color
-   */
   loading: { color: "#2c5282", height: "5px" },
-  /*
-   ** Global CSS
-   */
   css: ["./assets/styles/tailwind.css"],
-  /*
-   ** Plugins to load before mounting the App
-   */
   plugins: [
     "./plugins/element-ui.js",
     "./plugins/filters.js",
     "./plugins/vue-debounce.js",
-    "./plugins/vue-mask.js",
   ],
-  /*
-   ** Nuxt.js dev-modules
-   */
-  buildModules: [],
-  /*
-   ** Nuxt.js modules
-   */
+  buildModules: ["@nuxtjs/tailwindcss", "@nuxtjs/google-fonts"],
   modules: ["@nuxtjs/axios", "@nuxtjs/auth-next"],
-
-  axios: {
-    baseURL: "http://localhost:5001/",
-  },
-
-  /*
-   ** Build configuration
-   */
-  build: {
-    /*
-     ** You can extend webpack config here
-     */
-    postcss: {
-      plugins: {
-        tailwindcss: "./tailwind.config.js",
-      },
-    },
-    extend(config, ctx) {},
-  },
-
   server: {
     port: 5002,
   },
-
   router: {
     middleware: ["auth"],
   },
-
+  axios: {
+    baseURL: "http://localhost:5001/",
+  },
+  tailwindcss: {
+    cssPath: "~/assets/styles/tailwind.css",
+    configPath: "tailwind.config.js",
+    exposeConfig: false,
+    config: {},
+  },
+  googleFonts: {
+    families: {
+      Poppins: {
+        wght: [100, 200, 300, 400, 500, 600, 700, 800, 900],
+        ital: [100, 200, 300, 400, 500, 600, 700, 800, 900],
+      },
+    },
+  },
   auth: {
     redirect: {
       login: "/auth/login",
