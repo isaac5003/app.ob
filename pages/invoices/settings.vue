@@ -19,7 +19,7 @@
     >
       <el-tab-pane label="Zonas y vendedores" name="zones-sellers">
         <div class="grid grid-cols-12 gap-4">
-          <div class="col-span-5 flex flex-col space-y-2">
+          <div class="col-span-5 flex flex-col space-y-4">
             <div class="flex justify-between items-center">
               <span class="text-blue-900 font-semibold text-lg">ZONAS</span>
               <el-button type="primary" size="mini" icon="el-icon-plus" />
@@ -27,7 +27,7 @@
             <el-table :data="zones" stripe size="mini">
               <el-table-column prop="index" min-width="40" />
               <el-table-column label="Zona" prop="name" min-width="175" />
-              <el-table-column label="Estado" prop="nit" min-width="80">
+              <el-table-column label="Estado" min-width="80">
                 <template slot-scope="scope">
                   <el-tag size="small" type="success" v-if="scope.row.active"
                     >Activo</el-tag
@@ -69,7 +69,7 @@
               </el-table-column>
             </el-table>
           </div>
-          <div class="col-span-7 bg-red-500 "></div>
+          <div class="col-span-7 bg-red-500"></div>
         </div>
       </el-tab-pane>
       <el-tab-pane
@@ -77,7 +77,7 @@
         name="payment-conditions"
       ></el-tab-pane>
       <el-tab-pane label="Correlativos" name="sequences"></el-tab-pane>
-      <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
+      <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
         <Notification
           class="w-full"
           type="info"
@@ -117,7 +117,7 @@
             {{ integration.name }}
           </el-tab-pane>
         </el-tabs>
-      </el-tab-pane>
+      </el-tab-pane> -->
     </el-tabs>
   </layout-content>
 </template>
@@ -181,13 +181,13 @@ export default {
       this.$axios
         .get("/invoices/zones")
         .then((res) => {
-         this.zones = res.data.zones;
+          this.zones = res.data.zones;
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
         });
     },
-     changeActive({ id, active }) {
+    changeActive({ id, active }) {
       const action = active ? "desactivar" : "activar";
       this.$confirm(
         `¿Estás seguro que deseas ${action} esta zona?`,

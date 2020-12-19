@@ -7,13 +7,13 @@ export default {
       {
         hid: "description",
         name: "description",
-        content: process.env.npm_package_description || "",
+        content:
+          "Sistema de soporte para la gestión empresarial, que permite tener acceso a herramientas de soporte operativo y administrativo.",
       },
     ],
     link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
   },
   loading: { color: "#2c5282", height: "5px" },
-  css: ["./assets/styles/tailwind.css"],
   plugins: [
     "./plugins/element-ui.js",
     "./plugins/filters.js",
@@ -21,20 +21,11 @@ export default {
   ],
   buildModules: ["@nuxtjs/tailwindcss", "@nuxtjs/google-fonts"],
   modules: ["@nuxtjs/axios", "@nuxtjs/auth-next"],
-  server: {
-    port: 5002,
-  },
   router: {
     middleware: ["auth"],
   },
   axios: {
     baseURL: "http://localhost:5001/",
-  },
-  tailwindcss: {
-    cssPath: "~/assets/styles/tailwind.css",
-    configPath: "tailwind.config.js",
-    exposeConfig: false,
-    config: {},
   },
   googleFonts: {
     families: {

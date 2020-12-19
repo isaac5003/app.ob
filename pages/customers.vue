@@ -34,11 +34,11 @@ export default {
         //   icon: getIcon("document-text"),
         //   path: "/customers/reports",
         // },
-        {
-          name: "Configuraciones",
-          icon: getIcon("cog"),
-          path: "/customers/settings",
-        },
+        // {
+        //   name: "Configuraciones",
+        //   icon: getIcon("cog"),
+        //   path: "/customers/settings",
+        // },
       ],
     };
   },

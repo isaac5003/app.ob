@@ -17,7 +17,7 @@
           .catch(() => {})
       "
     >
-      <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
+      <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
         <Notification
           class="w-full"
           type="info"
@@ -57,7 +57,7 @@
             {{ integration.name }}
           </el-tab-pane>
         </el-tabs>
-      </el-tab-pane>
+      </el-tab-pane> -->
     </el-tabs>
   </layout-content>
 </template>

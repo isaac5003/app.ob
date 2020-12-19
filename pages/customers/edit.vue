@@ -346,14 +346,14 @@
             </div>
           </div>
         </el-tab-pane>
-        <el-tab-pane label="Integraciones" name="integrations">
+        <!-- <el-tab-pane label="Integraciones" name="integrations">
           <Notification
             class="w-full"
             type="info"
             title="Integraciones"
             message="En esta sección se muestran las configuraciones necesarias para poder integrar otros modulos del sistema cuando estos están disponibles."
           />
-        </el-tab-pane>
+        </el-tab-pane> -->
       </el-tabs>
       <div class="flex justify-end" v-if="activeTab != 'integrations'">
         <el-button type="primary" size="small" native-type="submit"

@@ -105,6 +105,16 @@ function inputValidation(required = true, min = null, max = null, type = null) {
   return rules;
 }
 
+function selectValidation(required = true) {
+  return [
+    {
+      required,
+      message: "Este campo es requerido.",
+      trigger: "change",
+    },
+  ];
+}
+
 /**
  * Funcion que permite identificar si hay informacion sin guardar
  * @param {object} self Referencia a this.
@@ -162,16 +172,6 @@ function checkBeforeEnter(self, storagekey, form) {
         localStorage.removeItem(storagekey);
       });
   }
-}
-
-function selectValidation(required = true) {
-  return [
-    {
-      required,
-      message: "Este campo es requerido.",
-      trigger: "change",
-    },
-  ];
 }
 
 function hasModule(module, user) {

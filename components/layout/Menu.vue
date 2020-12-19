@@ -11,7 +11,9 @@
         class="item"
         effect="dark"
         :open-delay="1000"
-        :content="`${$auth.user.workspace.company.name} | ${$auth.user.workspace.branch.name}`"
+        :content="
+          `${$auth.user.workspace.company.name} | ${$auth.user.workspace.branch.name}`
+        "
         placement="right"
       >
         <el-popover
@@ -150,8 +152,10 @@
       <el-tooltip
         class="item"
         effect="dark"
-        :content="`${$auth.user.names} 
-        ${$auth.user.lastnames}`"
+        :content="
+          `${$auth.user.names} 
+        ${$auth.user.lastnames}`
+        "
         placement="right"
       >
         <nuxt-link
@@ -182,30 +186,30 @@ export default {
           icon: getIcon("desktop"),
           exact: true,
         },
-        // {
-        //   always: false,
-        //   id: "0f88f2ea-aae9-44ad-8df0-0ee3debbf167",
-        //   path: "/services",
-        //   name: "Servicios",
-        //   icon: getIcon("duplicate"),
-        //   exact: false,
-        // },
-        // {
-        //   always: false,
-        //   id: "9ff0b6f4-9c58-475b-b2dd-5eea6d7b66aa",
-        //   path: "/customers",
-        //   name: "Clientes",
-        //   icon: getIcon("users"),
-        //   exact: false,
-        // },
-        // {
-        //   always: false,
-        //   id: "cfb8addb-541b-482f-8fa1-dfe5db03fdf4",
-        //   path: "/invoices",
-        //   name: "Ventas",
-        //   icon: getIcon("dolar"),
-        //   exact: false,
-        // },
+        {
+          always: false,
+          id: "0f88f2ea-aae9-44ad-8df0-0ee3debbf167",
+          path: "/services",
+          name: "Servicios",
+          icon: getIcon("duplicate"),
+          exact: false,
+        },
+        {
+          always: false,
+          id: "9ff0b6f4-9c58-475b-b2dd-5eea6d7b66aa",
+          path: "/customers",
+          name: "Clientes",
+          icon: getIcon("users"),
+          exact: false,
+        },
+        {
+          always: false,
+          id: "cfb8addb-541b-482f-8fa1-dfe5db03fdf4",
+          path: "/invoices",
+          name: "Ventas",
+          icon: getIcon("dolar"),
+          exact: false,
+        },
         {
           always: false,
           id: "a98b98e6-b2d5-42a3-853d-9516f64eade8",
