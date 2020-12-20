@@ -1,9 +1,10 @@
 <template>
   <layout-content
-    page-title="Listado de servicios"
+    v-loading="loading"
+    page-title="Partidas contables"
     :breadcrumb="[
-      { name: 'Servicios', to: '/services' },
-      { name: 'Listado de servicios', to: null },
+      { name: 'Contabilidad', to: '/entries' },
+      { name: 'Partidas contables', to: null },
     ]"
   >
     <div class="flex flex-col space-y-2">
@@ -19,47 +20,46 @@
           }"
         />
       </div>
-      <el-form label-position="top">
-        <div class="flex justify-between">
-          <div class="flex space-x-4">
-            <el-form-item class="w-60" label="Estado">
-              <el-select
-                v-model="status"
-                placeholder="Seleccionar"
+      <el-form class="flex flex-col" label-position="top">
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-3">
+            <el-form-item label="Rango de fechas:">
+              <el-date-picker
+                style="width: 100%;"
                 size="small"
-                class="w-full"
-                filterable
-                clearable
-                default-first-option
-                @change="fetchServices"
-              >
-                <el-option label="Todos los estados" value="" />
-                <el-option label="Activo" :value="true" />
-                <el-option label="Inactivo" :value="false" />
-              </el-select>
+                v-model="filterBy.dateRange"
+                type="daterange"
+                align="left"
+                unlink-panels
+                range-separator="-"
+                start-placeholder="Fecha inicio"
+                end-placeholder="Fecha final"
+                :editable="false"
+                format="dd/MM/yyyy"
+              />
             </el-form-item>
-            <el-form-item class="w-60" label="Tipo de venta">
+          </div>
+          <div class="col-span-2">
+            <el-form-item label="Tipo de partida:">
               <el-select
-                v-model="type"
-                placeholder="Seleccionar"
+                v-model="filterBy.entryType"
+                placeholder="Seleccionar tipo"
                 size="small"
                 class="w-full"
-                filterable
                 clearable
+                filterable
                 default-first-option
-                @change="fetchServices"
               >
-                <el-option label="Todos los tipos" value="" />
                 <el-option
-                  v-for="item in sellingTypes"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
+                  v-for="entryType in entryTypes"
+                  :key="entryType.id"
+                  :label="entryType.name"
+                  :value="entryType.id"
                 />
               </el-select>
             </el-form-item>
           </div>
-          <div class="w-75">
+          <div class="col-start-10 col-span-3">
             <el-input
               suffix-icon="el-icon-search"
               placeholder="Buscar..."
@@ -67,88 +67,82 @@
               size="small"
               style="margin-top: 26px"
               clearable
-              v-debounce:500ms="fetchServices"
-              @change="fetchServices"
+              v-debounce:500ms="fetchEntries"
+              @change="fetchEntries"
             />
           </div>
         </div>
       </el-form>
-      <el-table
-        :data="services.services"
-        stripe
-        size="mini"
-        v-loading="loading"
-      >
-        <el-table-column prop="index" min-width="40" />
-        <el-table-column label="Nombre" prop="name" min-width="200" />
-        <el-table-column
-          label="Descripción"
-          prop="description"
-          min-width="300"
-        />
-        <el-table-column label="Precio" min-width="100" align="right">
+      <el-table :data="entries.entries" stripe size="mini">
+        <el-table-column type="index" label="#" min-width="50" align="center" />
+        <el-table-column label="Serie" prop="serie" min-width="50" />
+        <el-table-column label="Fecha" min-width="90">
           <template slot-scope="scope">
-            <span>{{ scope.row.cost | formatMoney }}</span>
+            <span>{{ scope.row.date | formatDate('YYYY-MM-DD') }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Tipo de venta" prop="type" min-width="100">
+        <el-table-column label="Titulo" prop="title" min-width="400" />
+        <el-table-column label="Cargo" min-width="90" align="right">
           <template slot-scope="scope">
-            <span>{{ scope.row.sellingType.name }}</span>
+            <span>{{ scope.row.cargo | formatMoney }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Estado" prop="status" min-width="80">
+        <el-table-column label="Tipo" min-width="80" align="center">
           <template slot-scope="scope">
-            <el-tag size="small" type="success" v-if="scope.row.active"
-              >Activo</el-tag
-            >
-            <el-tag size="small" type="warning" v-else>Inactivo</el-tag>
+            <span>{{ scope.row.accountingEntryType.name }}</span>
           </template>
         </el-table-column>
-        <el-table-column label min-width="60" align="center">
+        <el-table-column label="Estado" min-width="105">
+          <template slot-scope="scope">
+            <el-tag
+              size="small"
+              type="success"
+              v-if="scope.row.accounted && scope.row.squared"
+            >Completa</el-tag>
+            <el-tag size="small" type="warning" v-else-if="scope.row.squared">Cuadrada</el-tag>
+            <el-tag size="small" type="danger" v-else>Incompleta</el-tag>
+          </template>
+        </el-table-column>
+          <el-table-column label min-width="60" align="center">
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item
-                  @click.native="
-                    $router.push(`/services/edit?ref=${scope.row.id}`)
-                  "
-                >
-                  <i class="el-icon-edit-outline"></i> Editar servicio
+                <el-dropdown-item @click.native="openPreviewEntry(scope.row)">
+                  <i class="el-icon-view"></i> Vista previa
                 </el-dropdown-item>
-                <el-dropdown-item @click.native="changeActive(scope.row)">
-                  <span v-if="scope.row.active">
-                    <i class="el-icon-close"></i> Desactivar
-                  </span>
-                  <span v-else> <i class="el-icon-check"></i> Activar </span>
-                  servicio
+                <el-dropdown-item
+                  @click.native="$router.push(`entries/edit/${scope.row.id}`)"
+                >
+                  <i class="el-icon-edit-outline"></i> Editar partida
+                </el-dropdown-item>
+                <el-dropdown-item @click.native="printEntry(scope.row)">
+                  <i class="el-icon-printer"></i> Imprimir partida
                 </el-dropdown-item>
                 <el-dropdown-item
                   :divided="true"
-                  class="font-semibold"
-                  @click.native="deleteService(scope.row)"
+                  class="text-red-500 font-semibold"
+                  @click.native="deleteEntry(scope.row.id)"
                 >
-                  <span class="text-red-500">
-                    <i class="el-icon-delete"></i> Eliminar servicio
-                  </span>
+                  <i class="el-icon-delete"></i> Eliminar partida
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </template>
         </el-table-column>
       </el-table>
-      <div class="flex justify-end">
+      <!-- <div class="flex justify-end">
         <el-pagination
           @size-change="handleSizeChange"
-          @current-change="fetchServices"
+          @current-change="fetchInvoices"
           :current-page.sync="page.page"
           :page-sizes="[5, 10, 15, 25, 50, 100]"
           :page-size="page.size"
           layout="total, sizes, prev, pager, next"
-          :total="parseInt(services.count)"
+          :total="parseInt(invoices.count)"
           :pager-count="5"
         />
-      </div>
+      </div> -->
     </div>
   </layout-content>
 </template>
@@ -157,64 +151,53 @@
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
 export default {
-  name: "ServicesIndex",
+  name: "EntriesIndex",
   components: { LayoutContent, Notification },
-  fetch() {
-    const sellingTypes = () => {
-      return this.$axios.get("/services/selling-types");
-    };
+  // fetch() {
+  //   const invoices = () => {
+  //     return this.$axios.get("/invoices", { params: this.page });
+  //   };
 
-    const services = () => {
-      return this.$axios.get("/services", { params: this.page });
-    };
-
-    Promise.all([sellingTypes(), services()])
-      .then((res) => {
-        const [sellingTypes, services] = res;
-        this.sellingTypes = sellingTypes.data.types;
-        this.services = services.data;
-        this.loading = false;
-      })
-      .catch((err) => {
-        this.errorMessage = err.response.data.message;
-      });
-  },
-  fetchOnServer: false,
+  //   Promise.all([invoices()])
+  //     .then((res) => {
+  //       const [invoices] = res;
+  //       this.invoices = invoices.data;
+  //       this.loading = false;
+  //     })
+  //     .catch((err) => {
+  //       this.errorMessage = err.response.data.message;
+  //     });
+  // },
+  // fetchOnServer: false,
   data() {
     return {
-      loading: true,
+      loading: false,
       errorMessage: "",
       searchValue: "",
-      status: "",
-      type: "",
-      sellingTypes: [],
-      services: {
-        services: [],
-        count: 0,
+      filterBy: {
+        dateRange: null,
+        entryType: '',
       },
-      page: {
-        limit: 10,
-        page: 1,
+      entries: {
+        entries: [],
+        count: 0,
       },
     };
   },
   methods: {
-    fetchServices() {
+    fetchInvoices() {
       let params = this.page;
       if (this.status !== "") {
         params = { ...params, active: this.status };
-      }
-      if (this.type !== "") {
-        params = { ...params, type: this.type };
       }
       if (this.searchValue !== "") {
         params = { ...params, search: this.searchValue.toLowerCase() };
       }
 
       this.$axios
-        .get("/services", { params })
+        .get("/invoices", { params })
         .then((res) => {
-          this.services = res.data;
+          this.invoices = res.data;
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
@@ -222,12 +205,12 @@ export default {
     },
     handleSizeChange(val) {
       this.page.limit = val;
-      this.fetchServices();
+      this.fetchInvoices();
     },
-    changeActive({ id, active }) {
-      const action = active ? "desactivar" : "activar";
+    changeActive({ id, isActiveInvoice }) {
+      const action = isActiveInvoice ? "desactivar" : "activar";
       this.$confirm(
-        `¿Estás seguro que deseas ${action} este servicio?`,
+        `¿Estás seguro que deseas ${action} este cliente?`,
         "Confirmación",
         {
           confirmButtonText: `Si, ${action}`,
@@ -238,13 +221,13 @@ export default {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
               this.$axios
-                .put(`/services/status/${id}`, { status: !active })
+                .put(`/invoices/status/${id}`, { status: !isActiveInvoice })
                 .then((res) => {
                   this.$notify.success({
                     title: "Éxito",
                     message: res.data.message,
                   });
-                  this.fetchServices();
+                  this.fetchInvoices();
                 })
                 .catch((err) => {
                   this.$notify.error({
@@ -263,9 +246,9 @@ export default {
         }
       );
     },
-    deleteService({ id }) {
+    deleteInvoice({ id }) {
       this.$confirm(
-        `¿Estás seguro que deseas eliminar este servicio?`,
+        `¿Estás seguro que deseas eliminar este cliente?`,
         "Confirmación",
         {
           confirmButtonText: `Si, eliminar`,
@@ -276,13 +259,13 @@ export default {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
               this.$axios
-                .delete(`/services/${id}`)
+                .delete(`/invoices/${id}`)
                 .then((res) => {
                   this.$notify.success({
                     title: "Éxito",
                     message: res.data.message,
                   });
-                  this.fetchServices();
+                  this.fetchInvoices();
                 })
                 .catch((err) => {
                   this.$notify.error({
@@ -300,6 +283,11 @@ export default {
           },
         }
       );
+    },
+    async openInvoicePreview({ id }) {
+      const { data } = await this.$axios.get(`/invoices/${id}`);
+      this.selectedInvoice = data.invoice;
+      this.showInvoicePreview = true;
     },
   },
 };

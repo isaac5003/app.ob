@@ -6,16 +6,9 @@
         @submit.native.prevent="processLogin(email, password)"
       >
         <div class="flex items-center justify-center h-15">
-          <img
-            class="h-full"
-            src="./../../assets/images/logo_h_black.png"
-            alt="Openbox Cloud"
-          />
+          <img class="h-full" src="./../../assets/images/logo_h_black.png" alt="Openbox Cloud" />
         </div>
-        <span
-          class="flex w-full justify-center text-2xl font-semibold text-gray-900"
-          >Iniciar sesión</span
-        >
+        <span class="flex w-full justify-center text-2xl font-semibold text-gray-900">Iniciar sesión</span>
         <el-alert
           :title="errorMessage"
           type="error"
@@ -36,11 +29,8 @@
             type="password"
             v-model="password"
           />
-          <div class="flex items-center justify-between mt-10">
-            <el-checkbox>Recordarme</el-checkbox>
-            <a href="javascript:" class="text-xs text-blue-900"
-              >Olvidé mi contraseña</a
-            >
+          <div class="flex items-center justify-end mt-10">
+            <a href="javascript:" class="text-xs text-blue-900 hover:underline">Olvidé mi contraseña</a>
           </div>
         </div>
         <div class="flex justify-center">
@@ -49,8 +39,7 @@
             type="primary"
             native-type="submit"
             :loading="loading"
-            >Iniciar sesión</el-button
-          >
+          >Iniciar sesión</el-button>
         </div>
       </el-form>
     </div>
@@ -67,7 +56,10 @@
         acceso a diferentes herramientas que le brindaran soporte en el dí­a a
         dí­a de sus operaciones o administración de personal y/o recursos. Para
         mayor información de lo que puedes hacer con Openbox Cloud haz
-        <a href="javascript:;" class="border-b">clic Aquí</a>.
+        <a
+          href="javascript:;"
+          class="border-b"
+        >clic Aquí</a>.
       </span>
     </div>
   </div>

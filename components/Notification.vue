@@ -1,6 +1,9 @@
 <template>
   <div :class="`${colors.bgLightest}`">
-    <div class="flex items-center border rounded p-5 space-x-2" :class="`${colors.borderLight}`">
+    <div
+      class="flex items-center border rounded p-5 space-x-2 text-xs"
+      :class="`${colors.borderLight}`"
+    >
       <div
         :class="`${colors.bgLight}`"
         class="flex justify-center items-center w-10 h-10 rounded-full"
@@ -68,7 +71,7 @@ export default {
             borderLight: "border-orange-400",
             borderBase: "border-orange-500",
             textDark: "text-orange-600",
-            textDarker: "text-orange-800"
+            textDarker: "text-orange-800",
           };
           break;
         case "danger":
@@ -78,7 +81,7 @@ export default {
             borderLight: "border-red-400",
             borderBase: "border-red-500",
             textDark: "text-red-600",
-            textDarker: "text-red-800"
+            textDarker: "text-red-800",
           };
           break;
         case "success":
@@ -88,7 +91,7 @@ export default {
             borderLight: "border-green-400",
             borderBase: "border-green-600",
             textDark: "text-green-700",
-            textDarker: "text-green-800"
+            textDarker: "text-green-800",
           };
           break;
         case "info":
@@ -99,11 +102,11 @@ export default {
             borderLight: "border-blue-400",
             borderBase: "border-blue-600",
             textDark: "text-blue-700",
-            textDarker: "text-blue-800"
+            textDarker: "text-blue-800",
           };
           break;
       }
-    }
-  }
+    },
+  },
 };
 </script>

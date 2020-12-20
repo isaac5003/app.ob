@@ -1,6 +1,6 @@
 <template>
   <div class="flex">
-    <layout-submenu page-name="Contabilidad" :menu="menu" icon="cash" />
+    <layout-submenu page-name="Clientes" :menu="menu" icon="users" />
     <nuxt-child />
   </div>
 </template>
@@ -9,35 +9,35 @@
 import LayoutSubmenu from "../components/layout/Submenu";
 import { getIcon } from "../tools";
 export default {
-  name: "Invoices",
+  name: "Customers",
   middleware: "access",
   meta: {
-    id: "cfb8addb-541b-482f-8fa1-dfe5db03fdf4",
+    id: "9ff0b6f4-9c58-475b-b2dd-5eea6d7b66aa",
   },
   components: { LayoutSubmenu },
   data() {
     return {
       menu: [
         {
-          name: "Nueva partida",
+          name: "Nuevo cliente",
           icon: getIcon("plus"),
-          path: "/entries/new",
+          path: "/customers/new",
         },
         {
-          name: "Listado de partidas",
+          name: "Listado de clientes",
           icon: getIcon("menu"),
-          path: "/entries",
-          epath: ["/entries/edit"],
+          path: "/customers",
+          epath: ["/customers/edit"],
         },
-        {
-          name: "Reportes",
-          icon: getIcon("document-text"),
-          path: "/entries/reports",
-        },
+        // {
+        //   name: "Reportes",
+        //   icon: getIcon("document-text"),
+        //   path: "/customers/reports",
+        // },
         {
           name: "Configuraciones",
           icon: getIcon("cog"),
-          path: "/entries/settings",
+          path: "/customers/settings",
         },
       ],
     };

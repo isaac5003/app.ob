@@ -1,5 +1,7 @@
 <template>
-  <div class="flex flex-col items-center py-8 px-4 bg-white w-60 border-r space-y-12">
+  <div
+    class="flex flex-col items-center py-6 px-4 bg-white w-60 border-r space-y-14"
+  >
     <div class="flex items-center w-full text-gray-800 space-x-2">
       <svg
         class="w-7 h-7"
@@ -20,11 +22,11 @@
         :key="k"
         tag="li"
         :to="{ path: m.path }"
-        exact-active-class="bg-blue-200 text-blue-800"
         class="flex items-center py-3 px-3 hover:bg-blue-200 hover:text-blue-800 text-gray-900 text-sm rounded cursor-pointer space-x-2"
+        :class="{ 'bg-blue-200 text-blue-800': activePath($route.path, m) }"
       >
         <svg
-          class="w-4 h-4 fill-current"
+          class="w-5 h-5"
           fill="none"
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -41,13 +43,26 @@
 
 <script>
 import { getIcon } from "../../tools";
+
 export default {
   name: "Submenu",
   props: ["pageName", "menu", "icon"],
+  fetchOnServer: false,
+  methods: {
+    activePath(path, item) {
+      const paths = [item.path];
+      if (item.epath) {
+        for (const p of item.epath) {
+          paths.push(p);
+        }
+      }
+      return paths.includes(path);
+    },
+  },
   computed: {
     moduleIcon() {
       return getIcon(this.icon);
-    }
-  }
+    },
+  },
 };
 </script>
