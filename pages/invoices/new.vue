@@ -1,11 +1,11 @@
 <template>
   <layout-content
     v-loading="loading"
-    page-title="Nuevo cliente"
+    page-title="Nueva Factura"
     :breadcrumb="[
-      { name: 'Clientes', to: '/customers' },
-      { name: 'Listado de clientes', to: '/customers' },
-      { name: 'Nuevo cliente', to: null },
+      { name: 'Facturas', to: '/invoices' },
+      
+      { name: 'Nueva factura', to: null },
     ]"
   >
     <el-form
@@ -16,339 +16,167 @@
       @submit.native.prevent="
         submitNewCustomer('customersNewForm', customersNewForm)
       "
-      class="flex flex-col mt-5"
+      class="flex flex-col mt-4"
     >
-      <div class="flex flex-col">
-        <div class="mb-2">
-          <span class="text-sm font-medium">Informacion general</span>
-        </div>
+    <div class="flex flex-col">
+        <!-- first row -->
         <div class="grid grid-cols-12 gap-4">
-          <div class="col-span-7">
-            <el-form-item label="Nombre o razón social" prop="name">
-              <el-input
-                clearable
-                type="text"
-                v-model="customersNewForm.name"
-                size="small"
-                autocomplete="off"
-                maxlength="100"
-                minlength="5"
-                show-word-limit
-                @change="setStorage(customersNewForm)"
-              />
-            </el-form-item>
+          <!-- tipo de documento -->
+          <div class="col-span-5 flex">
+           <div class="isRequired">
+             <el-form-item label="Tipo de documento" prop="name">
+                <el-select v-model="value" size="small" placeholder="Select">
+                  <el-option
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
+             </el-form-item>
+           </div>
           </div>
+          <!-- n° autorizacion -->
+          <div class="col-span-2">
+           <div class="isRequired">
+             <el-form-item label="N° de autorización" >
+                <el-input
+                  size="small"
+                  placeholder=""
+                  v-model="input"
+                  :disabled="true">
+              </el-input>
+             </el-form-item>
+           </div>
+          </div>
+           <!-- n° Correlativo -->
+          <div class="col-span-2">
+           <div class="isRequired">
+             <el-form-item label="N° de correlativo" >
+                <el-input
+                  size="small"
+                  placeholder=""
+                  v-model="input"
+                  :disabled="true">
+              </el-input>
+             </el-form-item>
+           </div>
+          </div>
+          <!-- Fecha Factura -->
+          <div class="col-span-2">
+           <div class="isRequired">
+             <el-form-item label="Fecha de factura" >
+                 <el-date-picker
+                    size="small"
+                    type="date"
+                    placeholder=""
+                    :picker-options="pickerOptions">
+                 </el-date-picker>
+             </el-form-item>
+           </div>
+          </div>
+        </div>
+
+        <!-- second row -->
+        <div class="grid grid-cols-12 gap-4">
+          <!-- cliente -->
           <div class="col-span-3">
-            <el-form-item label="Identificador" prop="shortName">
-              <el-input
-                clearable
-                type="text"
-                v-model="customersNewForm.shortName"
-                size="small"
-                autocomplete="off"
-                maxlength="15"
-                minlength="3"
-                show-word-limit
-                @change="setStorage(customersNewForm)"
-              />
-            </el-form-item>
+            <div class="isRequired">
+             <el-form-item label="Cliente" prop="name">
+                <el-select v-model="value" size="small" placeholder="Select">
+                  <el-option
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
+             </el-form-item>
+           </div>
           </div>
-          <div class="col-span-2" v-if="false">
-            <el-form-item label="Es tambien proveedor" prop="isProvider">
-              <el-radio-group
-                v-model="customersNewForm.isProvider"
-                class="w-full"
-                @change="setStorage(customersNewForm)"
-              >
-                <el-radio :label="true">Si</el-radio>
-                <el-radio :label="false">No</el-radio>
-              </el-radio-group>
-            </el-form-item>
+          <!-- sucursal -->
+          <div class="col-span-2">
+            <el-form-item label="Sucursal" prop="name">
+                <el-select v-model="value" size="small" placeholder="Select">
+                  <el-option
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
+             </el-form-item>
+          </div>
+          <!-- condiciones de pago -->
+          <div class="col-span-3">
+            <el-form-item label="Condiciones de pago" prop="name">
+                <el-select v-model="value" size="small" placeholder="Select">
+                  <el-option
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
+             </el-form-item>
+            </div>
+          
+          <!-- Venta a cuenta de -->
+          <div class="col-span-4"></div>
+            
+             <el-form-item label="Venta a cuenta de" prop="name">
+                <el-select v-model="value" size="small" placeholder="Select">
+                  <el-option
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
+             </el-form-item>
+          
+        </div>
+
+        <!-- third row -->
+        <div class="flex flex-row grid grid-cols-12 gap-4">
+         
+          <!-- NRC -->
+          <div class="col-span-1">
+            <span>NRC</span>
+          </div>
+          <!-- NIT -->
+          <div class="col-span-2"> 
+            <span>NIT</span>
+          </div>
+          <!-- Direccion -->
+          <div class="col-span-3">
+            <span>Dirección</span>
+          </div>
+          <!-- departamento -->
+          <div class="col-span-2">
+            <span>Departamento</span>
+          </div>
+          <!-- Municipio -->
+          <div class="col-span-2">
+            <span>Municipio</span>
+          </div>
+          <!-- Giro -->
+          <div class="col-span-2">
+            <span>Giro</span>
           </div>
         </div>
-        <div class="grid grid-cols-12 gap-4">
-          <div class="col-span-6">
-            <el-form-item label="Dirección 1" prop="address1">
-              <el-input
-                clearable
-                type="text"
-                v-model="customersNewForm.address1"
-                size="small"
-                autocomplete="off"
-                maxlength="150"
-                minlength="5"
-                show-word-limit
-                @change="setStorage(customersNewForm)"
-              />
-            </el-form-item>
-          </div>
-          <div class="col-span-6">
-            <el-form-item label="Dirección 2" prop="address2">
-              <el-input
-                clearable
-                type="text"
-                v-model="customersNewForm.address2"
-                size="small"
-                autocomplete="off"
-                maxlength="150"
-                minlength="5"
-                show-word-limit
-                @change="setStorage(customersNewForm)"
-              />
-            </el-form-item>
-          </div>
+
+        <!-- fourth row -->
+        <div class="grid grid-cols-12 mt-4">
+         <div class="cols-span-12 col-start-11 col-end-12 ">
+              <el-button type="primary" size="small"  native-type="submit"
+              >Agregar Servicio</el-button>
         </div>
-        <div class="grid grid-cols-12 gap-4">
-          <div class="col-span-4">
-            <el-form-item label="País" prop="country">
-              <el-select
-                class="w-full"
-                v-model="customersNewForm.country"
-                size="small"
-                placeholder="Seleccionar país"
-                filterable
-                clearable
-                @change="clearSelect('state')"
-                default-first-option
-              >
-                <el-option
-                  v-for="country in countries"
-                  :key="country.id"
-                  :label="country.name"
-                  :value="country.id"
-                />
-              </el-select>
-            </el-form-item>
-          </div>
-          <div class="col-span-4">
-            <el-form-item label="Departamento" prop="state">
-              <el-select
-                class="w-full"
-                v-model="customersNewForm.state"
-                size="small"
-                placeholder="Seleccionar departamento"
-                filterable
-                clearable
-                @change="clearSelect('city')"
-                default-first-option
-              >
-                <el-option
-                  v-for="state in states"
-                  :key="state.id"
-                  :label="state.name"
-                  :value="state.id"
-                />
-              </el-select>
-            </el-form-item>
-          </div>
-          <div class="col-span-4">
-            <el-form-item label="Municipio" prop="city">
-              <el-select
-                class="w-full"
-                v-model="customersNewForm.city"
-                size="small"
-                placeholder="Seleccionar municipio"
-                filterable
-                clearable
-                default-first-option
-                @change="setStorage(customersNewForm)"
-              >
-                <el-option
-                  v-for="city in cities"
-                  :key="city.id"
-                  :label="city.name"
-                  :value="city.id"
-                />
-              </el-select>
-            </el-form-item>
-          </div>
         </div>
-        <div class="grid grid-cols-12 gap-4">
-          <div class="col-span-4">
-            <el-form-item label="Contacto" prop="contactName">
-              <el-input
-                clearable
-                type="text"
-                v-model="customersNewForm.contactName"
-                size="small"
-                autocomplete="off"
-                maxlength="50"
-                minlength="5"
-                show-word-limit
-                @change="setStorage(customersNewForm)"
-              />
-            </el-form-item>
-          </div>
-          <div class="col-span-4">
-            <el-form-item label="Teléfono" prop="phone">
-              <el-input
-                clearable
-                type="text"
-                v-model="customersNewForm.phone"
-                size="small"
-                autocomplete="off"
-                placeholder="####-####"
-                v-mask="'####-####'"
-                @change="setStorage(customersNewForm)"
-              />
-            </el-form-item>
-          </div>
-          <div class="col-span-4">
-            <el-form-item label="Correo electrónico" prop="email">
-              <el-input
-                clearable
-                type="text"
-                v-model="customersNewForm.email"
-                size="small"
-                autocomplete="off"
-                @change="setStorage(customersNewForm)"
-              />
-            </el-form-item>
-          </div>
-        </div>
-        <div class="mb-2">
-          <span class="text-sm font-medium">Informacion general</span>
-        </div>
-        <div class="grid grid-cols-12 gap-4">
-          <div class="col-span-4">
-            <el-form-item label="Tipo de cliente" prop="customerType">
-              <el-select
-                class="w-full"
-                v-model="customersNewForm.customerType"
-                size="small"
-                placeholder="Seleccionar tipo de cliente"
-                filterable
-                clearable
-                default-first-option
-                @change="setStorage(customersNewForm)"
-              >
-                <el-option
-                  v-for="ct in customerTypes"
-                  :key="ct.id"
-                  :label="ct.name"
-                  :value="ct.id"
-                />
-              </el-select>
-            </el-form-item>
-          </div>
-          <div class="col-span-4" v-if="customersNewForm.customerType == 2">
-            <el-form-item
-              label="Tipo de persona natural"
-              prop="customerTypeNatural"
-            >
-              <el-select
-                class="w-full"
-                v-model="customersNewForm.customerTypeNatural"
-                size="small"
-                placeholder="Seleccionar tipo de persona natural"
-                filterable
-                clearable
-                default-first-option
-                @change="setStorage(customersNewForm)"
-              >
-                <el-option
-                  v-for="ct in customerTypeNaturals"
-                  :key="ct.id"
-                  :label="ct.name"
-                  :value="ct.id"
-                />
-              </el-select>
-            </el-form-item>
-          </div>
-        </div>
-        <div class="grid grid-cols-12 gap-4">
-          <div class="col-span-4" v-if="customersNewForm.customerType == 2">
-            <el-form-item label="DUI" prop="dui">
-              <el-input
-                type="text"
-                v-model="customersNewForm.dui"
-                size="small"
-                autocomplete="off"
-                placeholder="########-#"
-                v-mask="'########-#'"
-                @change="setStorage(customersNewForm)"
-              />
-            </el-form-item>
-          </div>
-          <div class="col-span-6">
-            <el-form-item label="NIT" prop="nit">
-              <el-input
-                type="text"
-                v-model="customersNewForm.nit"
-                size="small"
-                autocomplete="off"
-                placeholder="####-######-###-#"
-                v-mask="'####-######-###-#'"
-                @change="setStorage(customersNewForm)"
-              />
-            </el-form-item>
-          </div>
-          <div
-            class="col-span-2"
-            v-if="
-              customersNewForm.customerType == 1 ||
-                customersNewForm.customerTypeNatural == 2
-            "
-          >
-            <el-form-item label="NRC" prop="nrc">
-              <el-input
-                type="text"
-                v-model="customersNewForm.nrc"
-                size="small"
-                autocomplete="off"
-                @change="setStorage(customersNewForm)"
-              />
-            </el-form-item>
-          </div>
-        </div>
-        <div
-          class="grid grid-cols-12 gap-4"
-          v-if="
-            customersNewForm.customerType == 1 ||
-              customersNewForm.customerTypeNatural == 2
-          "
-        >
-          <div class="col-span-4">
-            <el-form-item
-              label="Tipo de contribuyente"
-              prop="customerTaxerType"
-            >
-              <el-select
-                class="w-full"
-                v-model="customersNewForm.customerTaxerType"
-                size="small"
-                placeholder="Seleccionar tipo de contribuyente"
-                filterable
-                clearable
-                default-first-option
-                @change="setStorage(customersNewForm)"
-              >
-                <el-option
-                  v-for="ct in customerTaxerTypes"
-                  :key="ct.id"
-                  :label="ct.name"
-                  :value="ct.id"
-                />
-              </el-select>
-            </el-form-item>
-          </div>
-          <div class="col-span-8">
-            <el-form-item label="Giro" prop="giro">
-              <el-input
-                type="text"
-                v-model="customersNewForm.giro"
-                size="small"
-                autocomplete="off"
-                maxlength="150"
-                minlength="5"
-                show-word-limit
-                @change="setStorage(customersNewForm)"
-              />
-            </el-form-item>
-          </div>
-        </div>
-      </div>
-      <div class="flex justify-end" v-if="activeTab != 'integrations'">
+     </div>
+
+
+      <div class="flex justify-end mt-4" v-if="activeTab != 'integrations'">
         <el-button type="primary" size="small" native-type="submit"
           >Guardar</el-button
         >
