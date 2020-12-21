@@ -16,9 +16,9 @@
       @submit.native.prevent="
         submitNewCustomer('customersNewForm', customersNewForm)
       "
-      class="flex flex-col mt-4"
+    
     >
-    <div class="flex flex-col">
+    <div class="flex flex-col ">
         <!-- first row -->
         <div class="grid grid-cols-12 gap-4">
           <!-- tipo de documento -->
@@ -167,8 +167,8 @@
         </div>
 
         <!-- fourth row -->
-        <div class="grid grid-cols-12 mt-4">
-         <div class="cols-span-12 col-start-11 col-end-12 ">
+        <div class="grid grid-cols-12 ">
+         <div class="cols-span-12 col-start-11 col-end-12 my-4">
               <el-button type="primary" size="small"  native-type="submit"
               >Agregar Servicio</el-button>
         </div>
@@ -176,7 +176,7 @@
      </div>
 
 
-      <div class="flex justify-end mt-4" v-if="activeTab != 'integrations'">
+      <div class="flex justify-end " v-if="activeTab != 'integrations'">
         <el-button type="primary" size="small" native-type="submit"
           >Guardar</el-button
         >
