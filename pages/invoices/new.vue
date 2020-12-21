@@ -13,9 +13,7 @@
       :rules="invoicesNewFormRules"
       status-icon
      
-      @submit.native.prevent="
-        submitNewCustomer('customersNewForm', customersNewForm)
-      "
+     
     
     >
    <div class="flex flex-col space-y-4">
@@ -25,7 +23,7 @@
           <!-- tipo de documento -->
           <div class="col-span-5 flex">
            <div class="isRequired">
-             <el-form-item label="Tipo de documento" prop="name">
+             <el-form-item label="Tipo de documento" prop="document">
                 <el-select v-model="value" size="small" clearable placeholder="Select">
                   <el-option
                     v-for="item in documents"
@@ -87,7 +85,7 @@
              <el-form-item label="Cliente" prop="name">
                 <el-select v-model="value" clearable size="small" placeholder="Select">
                   <el-option
-                    v-for="item in options"
+                    v-for="item in clientes"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value">
@@ -101,7 +99,7 @@
             <el-form-item  label="Sucursal" prop="name">
                 <el-select v-model="value" clearable size="small" placeholder="Select">
                   <el-option
-                    v-for="item in options"
+                    v-for="item in sucursales"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value">
@@ -117,14 +115,14 @@
                  <div class="w-full flex flex-row items-center">
                    <el-select v-model="value" size="small" placeholder="Select">
                     <el-option
-                      v-for="item in options"
+                      v-for="item in paymants"
                       :key="item.value"
                       :label="item.label"
                       :value="item.value">
                     </el-option>
                   </el-select>
                       <div class="border-2 h-8 border-gray-300 rounded-sm bg-gray-100 px-2 flex items-center">
-                        <el-checkbox v-model="checked1" size="small" disabled>
+                        <el-checkbox v-model="chkPaymants" size="small" disabled>
                           
                         </el-checkbox>
                       </div>
@@ -144,14 +142,14 @@
                 <div class="w-full flex flex-row items-center">
                   <el-select v-model="value" size="small" placeholder="Select">
                     <el-option
-                      v-for="item in options"
+                      v-for="item in sellers"
                       :key="item.value"
                       :label="item.label"
                       :value="item.value">
                     </el-option>
                   </el-select>
                       <div class="border-2 h-8 border-gray-300 rounded-sm bg-gray-100 px-2 flex items-center">
-                        <el-checkbox v-model="checked1" size="small" disabled>
+                        <el-checkbox v-model="chkSeller" size="small" disabled>
                           
                         </el-checkbox>
                       </div>
@@ -219,7 +217,7 @@
                 <el-form-item label="Servicio" prop="service">
                     <el-select v-model="value" clearable size="small" class="w-full" placeholder="Seleccionar servicio">
                       <el-option
-                        v-for="item in options"
+                        v-for="item in services"
                         :key="item.value"
                         :label="item.label"
                         :value="item.value">
@@ -236,7 +234,7 @@
               <div class="col-span-5 w-full ">
                 
                 <el-form-item label="Cantidad" >
-                    <el-input-number  :disabled="true" size="small" v-model="numcant" controls-position="right" @change="handleChange" :min="1" :max="10">
+                    <el-input-number  :disabled="true" size="small" v-model="numcant" controls-position="right" :min="1" :max="10">
 
                     </el-input-number>
                 </el-form-item>
@@ -249,7 +247,7 @@
                   <el-form-item label="Precio" >
                   
                     <div class="w-full flex flex-row items-center">
-                     <el-input-number  :disabled="true" size="small" v-model="numcant" controls-position="right" @change="handleChange" :min="1" :max="10">
+                     <el-input-number  :disabled="true" size="small" v-model="numcant" controls-position="right"  :min="1" :max="10">
 
                     </el-input-number>
                       <div class="border-2 h-8 border-gray-300 rounded-sm bg-gray-100 px-2 flex items-center">
@@ -293,11 +291,12 @@
       <!-- table row -->
      <div class="grid grid-cols-12">
       <div class="col-span-12">
-        <el-table class="text-lg font-light"
-          :data="[]"
-          style="width: 100%">
+        <el-table
+          :data="facturas"
+          style="width: 100%"
+          size="small">
           <el-table-column
-            prop="Num"
+            prop="num"
             label="#"
             width="50">
           </el-table-column>
@@ -309,7 +308,7 @@
           <el-table-column
             prop="details"
             label="Descripción"
-            width="400">>
+            width="400">
             
           </el-table-column>
           <el-table-column
@@ -364,11 +363,11 @@
       </div>
 
       <!-- boton guardar cancelar -->
-      <div class="flex justify-end " v-if="activeTab != 'integrations'">
+      <div class="flex justify-end " >
         <el-button type="primary" size="small" native-type="submit"
           >Guardar</el-button
         >
-        <el-button size="small" @click="$router.push('/customers')"
+        <el-button size="small" 
           >Cancelar</el-button
         >
      </div>
@@ -380,22 +379,30 @@
 
 <script>
 import LayoutContent from "../../components/layout/Content";
-import {
-  inputValidation,
-  selectValidation,
-  checkBeforeLeave,
-  checkBeforeEnter,
-} from "../../tools";
+
 import Notification from "../../components/Notification";
 
-const storagekey = "new-customer";
+
 
 export default {
   name: "InvoicesNew",
   components: { LayoutContent, Notification },
   
   data() {
+    
     return {
+      facturas:[
+        {
+          num: '1',
+          cant: '3',
+          details: "Hola k ase",
+          precuni: "45.55",
+          vnosujeta: "hola",
+          vexenta: "hola",
+          vgrabada: "hola"
+        },
+      ],
+      
       loading: false,
      
       invoicesNewForm: {
@@ -404,6 +411,46 @@ export default {
       invoicesNewFormRules: {
         
       },
+      
+        sellers: [{
+          value: 'Option1',
+          label: 'Isaac'
+        }, {
+          value: 'Option2',
+          label: 'Jorbe'
+        },
+        {
+          value: 'Option3',
+          label: 'Bryan'
+        }],
+        services: [{
+          value: 'Option1',
+          label: 'Servicio 1'
+        }, {
+          value: 'Option2',
+          label: 'Servicio 2'
+        }],
+       paymants: [{
+          value: 'Option1',
+          label: 'Contado'
+        }, {
+          value: 'Option2',
+          label: 'Credito'
+        }],
+        sucursales: [{
+          value: 'Option1',
+          label: 'Sucursal 1'
+        }, {
+          value: 'Option2',
+          label: 'Sucursal 2'
+        }],
+        clientes: [{
+          value: 'Option1',
+          label: 'Cliente 1'
+        }, {
+          value: 'Option2',
+          label: 'Cliente 2'
+        }],
       documents: [{
           value: 'Option1',
           label: 'FCF - Consumidor Final'
@@ -444,8 +491,13 @@ export default {
           }]
         },
          value2: '',
+         input: "",
+         chkSeller: "",
+         chkPaymants: "",
     };
+  
   },
+  
   methods: {
     handleClose(done) {
         this.$confirm('Are you sure to close this dialog?')
