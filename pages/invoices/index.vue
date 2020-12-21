@@ -20,9 +20,10 @@
           }"
         />
       </div>
-      <el-form label-position="top">
-        <div class="flex justify-end">
-          <div class="w-75">
+      <el-form label-position="top" class="flex flex-col space-y-4">
+        <div class="grid grid-cols-12 gap-4">
+
+          <div class="col-start-10 col-span-3">
             <el-input
               suffix-icon="el-icon-search"
               placeholder="Buscar..."
@@ -35,11 +36,109 @@
             />
           </div>
         </div>
+        <!-- Colocamos los input corespondientes-->
+        <div class="flex   grid-cols-12 space-x-4 ">
+              <div class=" col-span-4 w-full ">
+    <span class="text-gray-700 ">Rango de fechas:</span>
+    <el-date-picker
+      v-model="value1"
+       size="small"
+      type="datetimerange"
+      range-separator="-"
+      start-placeholder="Fecha de Inicio"
+      end-placeholder="Fecha de final">
+    </el-date-picker> 
+    </div>
+
+       <div class="col-span-4 w-full ">
+          <span class="text-gray-700 text-xs" > Cliente:</span>
+          <el-select v-model="value" 
+           size="small"
+          clearable placeholder="Todos los clientes:">
+    <el-option
+      v-for="item in options"
+      :key="item.value"
+      :label="item.label"
+      :value="item.value">
+    </el-option>
+  </el-select>
+  </div>
+
+   <div class="col-span-3  ">
+          <span class="text-gray-700 text-xs" > Tipo fact:</span>
+          <el-select v-model="value" 
+           size="small"
+          clearable placeholder="Todos los tipos:">
+    <el-option
+      v-for="item in options"
+      :key="item.value"
+      :label="item.label"
+      :value="item.value">
+    </el-option>
+  </el-select>
+  </div>
+
+   <div class="col-span-3  ">
+          <span class="text-gray-700 text-xs" > Estado:</span>
+          <el-select v-model="value"
+           size="small"
+           clearable placeholder="Todos los estados:">
+    <el-option
+      v-for="item in options"
+      :key="item.value"
+      :label="item.label"
+      :value="item.value">
+    </el-option>
+  </el-select>
+  </div>
+      </div>
+   <!-- div vendedor, zona-->
+      <div class=" flex flex-row grid-cols-12 space-x-4" >
+        <div class=" grid cols-span-4 w-56">
+          <span class="text-gray-700 text-xs" > Vendedor:</span>
+          <el-select v-model="value" 
+           size="small"
+          clearable placeholder="Todos los clientes:">
+    <el-option
+      v-for="item in options"
+      :key="item.value"
+      :label="item.label"
+      :value="item.value">
+    </el-option>
+  </el-select>
+        </div>
+        <div class=" col-span-3 w-56">
+          <span class="text-gray-700 text-xs" > Zona:</span>
+          <el-select v-model="value" 
+           size="small"
+          clearable placeholder="Todos los Zona:">
+    <el-option
+      v-for="item in options"
+      :key="item.value"
+      :label="item.label"
+      :value="item.value">
+    </el-option>
+  </el-select>
+        </div>
+        <div class="col-span-3 w-56">
+          <span class="text-gray-700 text-xs" > Servicio:</span>
+          <el-select v-model="value" 
+           size="small"
+          clearable placeholder="Todos los servicio:">
+    <el-option
+      v-for="item in options"
+      :key="item.value"
+      :label="item.label"
+      :value="item.value">
+    </el-option>
+  </el-select>
+        </div>
+      </div>
       </el-form>
-      <el-table :data="invoices.invoices" stripe size="mini">
+      <el-table :data="resultados" stripe size="mini">
         <el-table-column prop="index" min-width="40" />
-        <el-table-column label="Nombre" prop="name" min-width="350" />
-        <el-table-column label="Tipo" prop="invoiceType.name" min-width="120" />
+        <el-table-column label="Nombre" prop="nombre" min-width="350" />
+        <el-table-column label="Tipo" prop="tipo" min-width="120" />
         <el-table-column label="NIT" prop="nit" min-width="160" />
         <el-table-column label="NRC" prop="nrc" min-width="90" />
         <el-table-column label="NIT" prop="nit" min-width="160" />
@@ -133,10 +232,23 @@ export default {
         invoices: [],
         count: 0,
       },
+
       page: {
         limit: 10,
         page: 1,
       },
+
+      resultados:[
+        {
+      
+          nombre: 'Isaac',
+          tipo: 'moreno',
+          nit: '123434',
+          nrc:'123',
+          nit:'1223',
+          nrc:'12322'        
+                }
+      ]
     };
   },
   methods: {
