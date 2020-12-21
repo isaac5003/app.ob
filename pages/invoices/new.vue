@@ -233,7 +233,7 @@
             <!-- second row -->
             <div class="grid grid-cols-12 ">
               <!-- Cantidad -->
-              <div class="col-span-6 ">
+              <div class="col-span-5 w-full ">
                 
                 <el-form-item label="Cantidad" >
                     <el-input-number  :disabled="true" size="small" v-model="numcant" controls-position="right" @change="handleChange" :min="1" :max="10">
@@ -244,23 +244,25 @@
               </div>
 
               <!-- precio -->
-              <div class="col-span-6">
+               <div class="col-span-7">
+            
                   <el-form-item label="Precio" >
-                <div class="w-full">
-                  <div class="w-full flex flex-row  ">
-                    <el-input-number  size="small" v-model="num" :disabled="true" controls-position="right" :min="1" :max="10">
+                  
+                    <div class="w-full flex flex-row items-center">
+                     <el-input-number  :disabled="true" size="small" v-model="numcant" controls-position="right" @change="handleChange" :min="1" :max="10">
 
                     </el-input-number>
-                    <div class="border-2 border-gray-300 rounded-sm bg-gray-100 px-2">
-                      <el-checkbox v-model="checked1" size="small" disabled>
-                          IVA incl.
-                      </el-checkbox>
+                      <div class="border-2 h-8 border-gray-300 rounded-sm bg-gray-100 px-2 flex items-center">
+                        <el-checkbox v-model="checked1" size="small" disabled>
+                           IVA incl.
+                        </el-checkbox>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                </el-form-item>
-              </div>
+                 
+                  </el-form-item>
+               </div>
             </div>
+
             <!-- third row -->
             <div class="grid grid-cols-12">
               <!--Descripcion -->
@@ -291,7 +293,7 @@
       <!-- table row -->
      <div class="grid grid-cols-12">
       <div class="col-span-12">
-        <el-table class="text-lg font-medium"
+        <el-table class="text-lg font-light"
           :data="[]"
           style="width: 100%">
           <el-table-column
