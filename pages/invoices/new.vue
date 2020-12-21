@@ -9,15 +9,16 @@
     ]"
   >
     <el-form
-      :model="customersNewForm"
-      :rules="customersNewFormRules"
+      :model="invoicesNewForm"
+      :rules="invoicesNewFormRules"
       status-icon
-      ref="customersNewForm"
+     
       @submit.native.prevent="
         submitNewCustomer('customersNewForm', customersNewForm)
       "
     
     >
+   <div class="flex flex-col space-y-4">
     <div class="flex flex-col ">
         <!-- first row -->
         <div class="grid grid-cols-12 gap-4">
@@ -25,9 +26,9 @@
           <div class="col-span-5 flex">
            <div class="isRequired">
              <el-form-item label="Tipo de documento" prop="name">
-                <el-select v-model="value" size="small" placeholder="Select">
+                <el-select v-model="value" size="small" clearable placeholder="Select">
                   <el-option
-                    v-for="item in options"
+                    v-for="item in documents"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value">
@@ -67,6 +68,7 @@
            <div class="isRequired">
              <el-form-item label="Fecha de factura" >
                  <el-date-picker
+                    v-model="value2"
                     size="small"
                     type="date"
                     placeholder=""
@@ -81,9 +83,9 @@
         <div class="grid grid-cols-12 gap-4">
           <!-- cliente -->
           <div class="col-span-3">
-            <div class="isRequired">
+            
              <el-form-item label="Cliente" prop="name">
-                <el-select v-model="value" size="small" placeholder="Select">
+                <el-select v-model="value" clearable size="small" placeholder="Select">
                   <el-option
                     v-for="item in options"
                     :key="item.value"
@@ -92,12 +94,12 @@
                   </el-option>
                 </el-select>
              </el-form-item>
-           </div>
+          
           </div>
           <!-- sucursal -->
-          <div class="col-span-2">
-            <el-form-item label="Sucursal" prop="name">
-                <el-select v-model="value" size="small" placeholder="Select">
+          <div class="col-span-3">
+            <el-form-item  label="Sucursal" prop="name">
+                <el-select v-model="value" clearable size="small" placeholder="Select">
                   <el-option
                     v-for="item in options"
                     :key="item.value"
@@ -109,36 +111,63 @@
           </div>
           <!-- condiciones de pago -->
           <div class="col-span-3">
-            <el-form-item label="Condiciones de pago" prop="name">
-                <el-select v-model="value" size="small" placeholder="Select">
-                  <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                  </el-option>
-                </el-select>
-             </el-form-item>
+            
+              <el-form-item label="Condiciones de pago"  prop="name">
+               <div class="w-full">
+                 <div class="w-full flex flex-row  ">
+                  <el-select v-model="value" size="small" placeholder="Select">
+                    <el-option
+                      v-for="item in options"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>
+                  <div class="border-2 border-gray-300 rounded-sm bg-gray-100 px-2">
+                    <el-checkbox v-model="checked1" size="small" disabled>
+
+                    </el-checkbox>
+                  </div>
+                </div>
+               </div>
+              </el-form-item>
+              
+           
+             
             </div>
           
           <!-- Venta a cuenta de -->
-          <div class="col-span-4"></div>
+           <div class="col-span-3">
             
-             <el-form-item label="Venta a cuenta de" prop="name">
-                <el-select v-model="value" size="small" placeholder="Select">
-                  <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                  </el-option>
-                </el-select>
-             </el-form-item>
+              <el-form-item label="Condiciones de pago"  prop="name">
+               <div class="w-full">
+                 <div class="w-full flex flex-row  ">
+                  <el-select v-model="value" size="small" placeholder="Select">
+                    <el-option
+                      v-for="item in options"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>
+                  <div class="border-2 border-gray-300 rounded-sm bg-gray-100 px-2">
+                    <el-checkbox v-model="checked1" size="small"  disabled>
+
+                    </el-checkbox>
+                  </div>
+                </div>
+               </div>
+              </el-form-item>
+              
+           
+             
+            </div>
+          
           
         </div>
 
         <!-- third row -->
-        <div class="flex flex-row grid grid-cols-12 gap-4">
+        <div class="flex flex-row grid grid-cols-12 gap-4 text-gray-800">
          
           <!-- NRC -->
           <div class="col-span-1">
@@ -166,16 +195,173 @@
           </div>
         </div>
 
-        <!-- fourth row -->
+        <!-- fourth row btn agregarservicio -->
         <div class="grid grid-cols-12 ">
-         <div class="cols-span-12 col-start-11 col-end-12 my-4">
-              <el-button type="primary" size="small"  native-type="submit"
+         <div class="cols-span-12 col-start-11 col-end-12 ">
+              <el-button type="primary" size="small" @click="dialogVisible = true"
               >Agregar Servicio</el-button>
         </div>
         </div>
+
+        <!-- dialogo -->
+        <el-dialog
+          title="Agregar Servicio"
+          :visible.sync="dialogVisible"
+          width="35%"
+          :before-close="handleClose"
+          >
+          <div class="flex flex-col">
+            <!-- first row -->
+            <div class="grid grid-cols-12">
+              <!-- Servicio -->
+              <div class="col-span-12 ">
+                
+                <el-form-item label="Servicio" prop="service">
+                    <el-select v-model="value" clearable size="small" class="w-full" placeholder="Seleccionar servicio">
+                      <el-option
+                        v-for="item in options"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                      </el-option>
+                    </el-select>
+                </el-form-item>
+              
+              </div>
+
+            </div>
+            <!-- second row -->
+            <div class="grid grid-cols-12 ">
+              <!-- Cantidad -->
+              <div class="col-span-6 ">
+                
+                <el-form-item label="Cantidad" >
+                    <el-input-number  :disabled="true" size="small" v-model="numcant" controls-position="right" @change="handleChange" :min="1" :max="10">
+
+                    </el-input-number>
+                </el-form-item>
+              
+              </div>
+
+              <!-- precio -->
+              <div class="col-span-6">
+                  <el-form-item label="Precio" >
+                <div class="w-full">
+                  <div class="w-full flex flex-row  ">
+                    <el-input-number  size="small" v-model="num" :disabled="true" controls-position="right" :min="1" :max="10">
+
+                    </el-input-number>
+                    <div class="border-2 border-gray-300 rounded-sm bg-gray-100 px-2">
+                      <el-checkbox v-model="checked1" size="small" disabled>
+                          IVA incl.
+                      </el-checkbox>
+                    </div>
+                  </div>
+                </div>
+                </el-form-item>
+              </div>
+            </div>
+            <!-- third row -->
+            <div class="grid grid-cols-12">
+              <!--Descripcion -->
+              <div class="col-span-12">
+                
+                <el-form-item label="Descripción" prop="name">
+                    <el-input
+                      type="textarea"
+                      :rows="5"
+                      size="small"
+                      v-model="textarea"
+                      :disabled="true">
+                    </el-input>
+                </el-form-item>
+              
+              </div>
+
+            </div>
+          </div>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="dialogVisible = false">Cancel</el-button>
+            <el-button type="primary" @click="dialogVisible = false">Confirm</el-button>
+          </span>
+        </el-dialog>
+
      </div>
 
+      <!-- table row -->
+     <div class="grid grid-cols-12">
+      <div class="col-span-12">
+        <el-table class="text-lg font-medium"
+          :data="[]"
+          style="width: 100%">
+          <el-table-column
+            prop="Num"
+            label="#"
+            width="50">
+          </el-table-column>
+          <el-table-column
+            prop="cant"
+            label="Cant."
+            width="90">
+          </el-table-column>
+          <el-table-column
+            prop="details"
+            label="Descripción"
+            width="400">>
+            
+          </el-table-column>
+          <el-table-column
+            prop="precuni"
+            label="Precio Unit.">
+          </el-table-column>
+          <el-table-column
+            prop="vnosujeta"
+            label="V. No sujeta">
+          </el-table-column>
+          <el-table-column
+            prop="vexenta"
+            label="V. Exenta">
+          </el-table-column>
+          <el-table-column
+            prop="vgrabada"
+            label="V. Grabada">
+          </el-table-column>
+        </el-table>
+    </div>  
+     </div>
+      <!-- sumas -->
+      <div class="grid grid-cols-12">
+        <div class="col-span-5 col-start-8 col-end-13  flex flex-col">
+          <div class="divide-y divide-gray-300">
+            <div class=" flex flex-row space-x-12 justify-end">
+              <div class="text-blue-800 text-right">SUMAS:</div>
+              <div class="text-gray-800">hola</div>
+            </div>
+            <div class=" flex flex-row space-x-12 justify-end">
+              <div class="text-blue-800 text-right">Subtotal:</div>
+              <div class="text-gray-800">hola</div>
+            </div>
+            <div class="flex flex-row space-x-12 justify-end">
+              <div class="text-blue-800 text-right">Iva retenido:</div>
+              <div class="text-gray-800">hola</div>
+            </div>
+            <div class="flex flex-row space-x-12 justify-end">
+              <div class="text-blue-800 text-right">Ventas exentas:</div>
+              <div class="text-gray-800">hola</div>
+            </div>
+            <div class="flex flex-row space-x-12 justify-end">
+              <div class="text-blue-800 text-right">Ventas no sujetas:</div>
+              <div class="text-gray-800">hola</div>
+            </div>
+            <div class="flex flex-row space-x-12 justify-end ">
+              <div class="text-blue-800 text-right font-semibold">Venta Total:</div>
+              <div class="text-gray-800">hola</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
+      <!-- boton guardar cancelar -->
       <div class="flex justify-end " v-if="activeTab != 'integrations'">
         <el-button type="primary" size="small" native-type="submit"
           >Guardar</el-button
@@ -183,8 +369,10 @@
         <el-button size="small" @click="$router.push('/customers')"
           >Cancelar</el-button
         >
-      </div>
+     </div>
+   </div>
     </el-form>
+    
   </layout-content>
 </template>
 
@@ -201,234 +389,70 @@ import Notification from "../../components/Notification";
 const storagekey = "new-customer";
 
 export default {
-  name: "CustomerNew",
+  name: "InvoicesNew",
   components: { LayoutContent, Notification },
-  fetch() {
-    const customerTypes = () => this.$axios.get(`/customers/customer-types`);
-    const customerTypeNaturals = () =>
-      this.$axios.get(`/customers/customer-type-naturals`);
-    const customerTaxerTypes = () =>
-      this.$axios.get(`/customers/customer-taxer-types`);
-    const countries = () => this.$axios.get(`/others/countries`);
-    const states = () => this.$axios.get(`/others/states`);
-    const cities = () => this.$axios.get(`/others/cities`);
-
-    Promise.all([
-      customerTypes(),
-      customerTypeNaturals(),
-      customerTaxerTypes(),
-      countries(),
-      states(),
-      cities(),
-    ])
-      .then((res) => {
-        // Se ubica en el tab seleccionado
-        if (this.$route.query.tab) {
-          this.activeTab = this.$route.query.tab;
-        }
-
-        const [
-          customerTypes,
-          customerTypeNaturals,
-          customerTaxerTypes,
-          countries,
-          states,
-          cities,
-        ] = res;
-
-        this.customerTypes = customerTypes.data.types;
-        this.customerTypeNaturals = customerTypeNaturals.data.typeNaturals;
-        this.customerTaxerTypes = customerTaxerTypes.data.taxerTypes;
-        this.countries = countries.data.countries;
-        this.rawStates = states.data.states;
-        this.rawCities = cities.data.cities;
-        this.loading = false;
-      })
-      .catch((err) => {
-        this.$message.error(err.response.data.message);
-        this.$router.push("/customers");
-      });
-
-    checkBeforeEnter(this, storagekey, "customersNewForm");
-  },
-  fetchOnServer: false,
-  beforeRouteLeave(to, from, next) {
-    checkBeforeLeave(this, storagekey, next);
-  },
+  
   data() {
     return {
       loading: false,
-      activeTab: "general-information",
-      countries: [],
-      rawStates: [],
-      rawCities: [],
-      customerTypes: [],
-      customerTypeNaturals: [],
-      customerTaxerTypes: [],
-      customersNewForm: {
-        name: "",
-        shortName: "",
-        isProvider: false,
-        dui: null,
-        nit: "",
-        nrc: "",
-        giro: "",
-        customerType: null,
-        customerTypeNatural: null,
-        customerTaxerType: null,
-        contactName: "",
-        address1: "",
-        address2: "",
-        phone: "",
-        email: "",
-        country: "",
-        state: "",
-        city: "",
+     
+      invoicesNewForm: {
+       
       },
-      customersNewFormRules: {
-        name: inputValidation(true, 5, 100),
-        shortName: inputValidation(true, 3, 15),
-        isProvider: false,
-        address1: inputValidation(true, 5, 150),
-        address2: inputValidation(false, 5, 150),
-        country: selectValidation(true),
-        state: selectValidation(true),
-        city: selectValidation(true),
-        contactName: inputValidation(false, 5, 50),
-        phone: inputValidation(false),
-        email: inputValidation(false, null, null, "email"),
-        customerType: selectValidation(true),
-        nit: inputValidation(true),
-        nrc: inputValidation(true, 3),
-        customerTaxerType: selectValidation(true),
-        giro: inputValidation(true, 5, 150),
+      invoicesNewFormRules: {
+        
       },
+      documents: [{
+          value: 'Option1',
+          label: 'FCF - Consumidor Final'
+        }, {
+          value: 'Option2',
+          label: 'CFC - Crédito Fiscal'
+        }],
+        value: '',
+        dialogVisible: false,
+        numcant:[
+          {num:1},
+          {num:2},
+          {num:3},
+              ],
+          pickerOptions: {
+          disabledDate(time) {
+            return time.getTime() > Date.now();
+          },
+          shortcuts: [{
+            text: 'Today',
+            onClick(picker) {
+              picker.$emit('pick', new Date());
+            }
+          }, {
+            text: 'Yesterday',
+            onClick(picker) {
+              const date = new Date();
+              date.setTime(date.getTime() - 3600 * 1000 * 24);
+              picker.$emit('pick', date);
+            }
+          }, {
+            text: 'A week ago',
+            onClick(picker) {
+              const date = new Date();
+              date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit('pick', date);
+            }
+          }]
+        },
+         value2: '',
     };
   },
   methods: {
-    setStorage(customersNewForm) {
-      localStorage.setItem(storagekey, JSON.stringify(customersNewForm));
-    },
-    clearSelect(name) {
-      switch (name) {
-        case "state":
-          this.customersNewForm.state = "";
-          this.customersNewForm.city = "";
-          break;
-        case "city":
-          this.customersNewForm.city = "";
-          break;
-      }
-      this.setStorage(this.customersNewForm);
-    },
-    submitNewCustomer(formName, formData) {
-      this.$refs[formName].validate(async (valid) => {
-        if (!valid) {
-          return false;
-        }
-
-        this.$confirm(
-          "¿Estás seguro que deseas guardar este nuevo cliente?",
-          "Confirmación",
-          {
-            confirmButtonText: "Si, guardar",
-            cancelButtonText: "Cancelar",
-            type: "warning",
-            beforeClose: (action, instance, done) => {
-              if (action === "confirm") {
-                instance.confirmButtonLoading = true;
-                instance.confirmButtonText = "Procesando...";
-                this.$axios
-                  .post("/customers", {
-                    name: formData.name,
-                    shortName: formData.shortName,
-                    isProvider: formData.isProvider,
-                    dui: formData.dui,
-                    nit: formData.nit,
-                    nrc: formData.nrc,
-                    giro: formData.giro,
-                    customerType:
-                      formData.customerType == ""
-                        ? null
-                        : formData.customerType,
-                    customerTypeNatural:
-                      formData.customerTypeNatural == ""
-                        ? null
-                        : formData.customerTypeNatural,
-                    customerTaxerType:
-                      formData.customerTaxerType == ""
-                        ? null
-                        : formData.customerTaxerType,
-                    branch: {
-                      contactName: formData.contactName,
-                      contactInfo: {
-                        phones: [formData.phone],
-                        emails: [formData.email],
-                      },
-                      address1: formData.address1,
-                      address2: formData.address2,
-                      country: formData.country,
-                      state: formData.state,
-                      city: formData.city,
-                    },
-                  })
-                  .then((res) => {
-                    this.$notify.success({
-                      title: "Exito",
-                      message: res.data.message,
-                    });
-                    localStorage.removeItem(storagekey);
-                    setTimeout(() => {
-                      this.$confirm(
-                        "¿Deseas crear un nuevo cliente?",
-                        "Confirmación",
-                        {
-                          confirmButtonText: "Si, porfavor",
-                          cancelButtonText: "No, gracias",
-                          type: "warning",
-                          closeOnClickModal: false,
-                          closeOnPressEscape: false,
-                        }
-                      )
-                        .then(() => {
-                          this.$refs[formName].resetFields();
-                        })
-                        .catch(() => {
-                          this.$router.push("/customers");
-                        });
-                    }, 500);
-                  })
-                  .catch((err) => {
-                    this.$notify.error({
-                      title: "Error",
-                      message: err.response.data.message,
-                    });
-                  })
-                  .then((alw) => {
-                    instance.confirmButtonLoading = false;
-                    instance.confirmButtonText = "Si, guardar";
-                    done();
-                  });
-              } else {
-                done();
-              }
-            },
-          }
-        );
-      });
-    },
-  },
-  computed: {
-    states() {
-      return this.rawStates.filter(
-        (s) => s.country.id == this.customersNewForm.country
-      );
-    },
-    cities() {
-      return this.rawCities.filter(
-        (c) => c.state.id == this.customersNewForm.state
-      );
-    },
-  },
-};
+    handleClose(done) {
+        this.$confirm('Are you sure to close this dialog?')
+          .then(_ => {
+            done();
+          })
+          .catch(_ => {});
+      },
+   
+}
+}
 </script>
