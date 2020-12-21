@@ -114,8 +114,8 @@
             
               <el-form-item label="Condiciones de pago"  prop="name">
                <div class="w-full">
-                 <div class="w-full flex flex-row  ">
-                  <el-select v-model="value" size="small" placeholder="Select">
+                 <div class="w-full flex flex-row items-center">
+                   <el-select v-model="value" size="small" placeholder="Select">
                     <el-option
                       v-for="item in options"
                       :key="item.value"
@@ -123,11 +123,11 @@
                       :value="item.value">
                     </el-option>
                   </el-select>
-                  <div class="border-2 border-gray-300 rounded-sm bg-gray-100 px-2">
-                    <el-checkbox v-model="checked1" size="small" disabled>
-
-                    </el-checkbox>
-                  </div>
+                      <div class="border-2 h-8 border-gray-300 rounded-sm bg-gray-100 px-2 flex items-center">
+                        <el-checkbox v-model="checked1" size="small" disabled>
+                          
+                        </el-checkbox>
+                      </div>
                 </div>
                </div>
               </el-form-item>
@@ -139,9 +139,9 @@
           <!-- Venta a cuenta de -->
            <div class="col-span-3">
             
-              <el-form-item label="Condiciones de pago"  prop="name">
-               <div class="w-full">
-                 <div class="w-full flex flex-row  ">
+               <el-form-item label="Venta a cuenta de" >
+                  
+                <div class="w-full flex flex-row items-center">
                   <el-select v-model="value" size="small" placeholder="Select">
                     <el-option
                       v-for="item in options"
@@ -150,14 +150,14 @@
                       :value="item.value">
                     </el-option>
                   </el-select>
-                  <div class="border-2 border-gray-300 rounded-sm bg-gray-100 px-2">
-                    <el-checkbox v-model="checked1" size="small"  disabled>
-
-                    </el-checkbox>
-                  </div>
-                </div>
-               </div>
-              </el-form-item>
+                      <div class="border-2 h-8 border-gray-300 rounded-sm bg-gray-100 px-2 flex items-center">
+                        <el-checkbox v-model="checked1" size="small" disabled>
+                          
+                        </el-checkbox>
+                      </div>
+                    </div>
+                 
+                  </el-form-item>
               
            
              
@@ -167,14 +167,14 @@
         </div>
 
         <!-- third row -->
-        <div class="flex flex-row grid grid-cols-12 gap-4 text-gray-800">
+        <div class="flex flex-row grid grid-cols-12 gap-4 text-gray-800 text-sm">
          
           <!-- NRC -->
           <div class="col-span-1">
             <span>NRC</span>
           </div>
           <!-- NIT -->
-          <div class="col-span-2"> 
+          <div class="col-span-1"> 
             <span>NIT</span>
           </div>
           <!-- Direccion -->
@@ -190,18 +190,18 @@
             <span>Municipio</span>
           </div>
           <!-- Giro -->
-          <div class="col-span-2">
+          <div class="col-span-3">
             <span>Giro</span>
           </div>
         </div>
 
         <!-- fourth row btn agregarservicio -->
-        <div class="grid grid-cols-12 ">
-         <div class="cols-span-12 col-start-11 col-end-12 ">
+        
+         <div  class="flex justify-end">
               <el-button type="primary" size="small" @click="dialogVisible = true"
               >Agregar Servicio</el-button>
         </div>
-        </div>
+      
 
         <!-- dialogo -->
         <el-dialog
