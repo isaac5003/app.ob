@@ -69,7 +69,66 @@
               </el-table-column>
             </el-table>
           </div>
-          <div class="col-span-7 bg-red-500"></div>
+
+          <!-- Inicio de tabla vendedores -->
+
+          <div class="col-span-7 flex flex-col space-y-4">
+
+            <div class="flex justify-between items-center">
+              <span class="text-blue-900 font-semibold text-lg">VENDEDORES</span>
+              <el-button type="primary" size="mini" icon="el-icon-plus" />
+            </div>
+
+            <el-table :data="vendedores" stripe size="mini">
+              <el-table-column label="ID" prop="id" min-width="40" />
+              <el-table-column label="Vendedor" prop="nombre" min-width="175" />
+              <el-table-column label="Zona" prop="zona" min-width="175" />
+
+              <el-table-column label="Estado" min-width="80">
+                <template slot-scope="scope">
+                  <el-tag size="small" type="success" v-if="scope.row.active"
+                    >Activo</el-tag
+                  >
+                  <el-tag size="small" type="danger" v-else>Inactivo</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column label min-width="60" align="center">
+                <template slot-scope="scope">
+                  <el-dropdown trigger="click" szie="mini">
+                    <el-button icon="el-icon-more" size="mini" />
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item
+                        @click.native="
+                          $router.push(`/invoices/edit?ref=${scope.row.id}`)
+                        "
+                      >
+                        <i class="el-icon-edit-outline"></i> Editar vendedor
+                      </el-dropdown-item>
+                      <el-dropdown-item @click.native="changeActive(scope.row)">
+                        <span v-if="scope.row.active">
+                          <i class="el-icon-close"></i> Desactivar
+                        </span>
+                        <span v-else>
+                          <i class="el-icon-check"></i> Activar
+                        </span>
+                        Vendedor
+                      </el-dropdown-item>
+                      <el-dropdown-item :divided="true" class="text-red-500 font-semibold" @click.native="deleteInvoice(scope.row)">
+                        <i class="el-icon-delete"></i> Eliminar Vendedor22
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                </template>
+              </el-table-column>
+              
+            </el-table>
+
+
+          <!-- Fin del div vendedores -->
+          </div>
+
+
+
         </div>
       </el-tab-pane>
       <el-tab-pane
@@ -173,7 +232,15 @@ export default {
         },
       ],
       zones: [],
+      vendedores: [
+        {
+          id: '1',
+          nombre: 'Isaac',
+          zona: 'San Salvador'
+        },
+      ]
     };
+    
   },
   methods: {
     fetchZones() {
