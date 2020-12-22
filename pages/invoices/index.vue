@@ -38,6 +38,7 @@
           </div>
         </div>
         <!-- Colocamos los input corespondientes-->
+        <!--No hay etiquetas que agregar-->
         <div class="flex   grid-cols-12 space-x-4  ">
               <div class=" col-span-4 w-full ">
     <span class="text-gray-700 text-xs">Rango de fechas:</span>
