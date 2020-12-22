@@ -6,7 +6,7 @@
       { name: 'Facturación', to: '/invoices' },
       { name: 'Listado de facturas', to: null },
     ]"
-  >
+       >
     <div class="flex flex-col space-y-2">
       <div class="flex justify-center" v-if="errorMessage">
         <Notification
@@ -20,6 +20,7 @@
           }"
         />
       </div>
+      
       <el-form label-position="top" class="flex flex-col space-y-4">
         <div class="grid grid-cols-12 gap-4">
 
@@ -37,11 +38,11 @@
           </div>
         </div>
         <!-- Colocamos los input corespondientes-->
-        <div class="flex   grid-cols-12 space-x-4 ">
+        <div class="flex   grid-cols-12 space-x-4  ">
               <div class=" col-span-4 w-full ">
-    <span class="text-gray-700 ">Rango de fechas:</span>
+    <span class="text-gray-700 text-xs">Rango de fechas:</span>
     <el-date-picker
-      v-model="value1"
+      v-model="rangFech"
        size="small"
       type="datetimerange"
       range-separator="-"
@@ -49,11 +50,12 @@
       end-placeholder="Fecha de final">
     </el-date-picker> 
     </div>
-
-       <div class="col-span-4 w-full ">
+ 
+       <div class="col-span-4 w-full  ">
           <span class="text-gray-700 text-xs" > Cliente:</span>
-          <el-select v-model="value" 
+          <el-select v-model="clienV" 
            size="small"
+           
           clearable placeholder="Todos los clientes:">
     <el-option
       v-for="item in options"
@@ -64,9 +66,9 @@
   </el-select>
   </div>
 
-   <div class="col-span-3  ">
+   <div class="col-span-4  ">
           <span class="text-gray-700 text-xs" > Tipo fact:</span>
-          <el-select v-model="value" 
+          <el-select v-model="TypeFact" 
            size="small"
           clearable placeholder="Todos los tipos:">
     <el-option
@@ -78,9 +80,9 @@
   </el-select>
   </div>
 
-   <div class="col-span-3  ">
+   <div class="col-span-4 ">
           <span class="text-gray-700 text-xs" > Estado:</span>
-          <el-select v-model="value"
+          <el-select v-model="status"
            size="small"
            clearable placeholder="Todos los estados:">
     <el-option
@@ -96,7 +98,7 @@
       <div class=" flex flex-row grid-cols-12 space-x-4" >
         <div class=" grid cols-span-4 w-56">
           <span class="text-gray-700 text-xs" > Vendedor:</span>
-          <el-select v-model="value" 
+          <el-select v-model="VendClie" 
            size="small"
           clearable placeholder="Todos los clientes:">
     <el-option
@@ -107,8 +109,9 @@
     </el-option>
   </el-select>
         </div>
+                <div class=" col-span-3 w-56">
           <span class="text-gray-700 text-xs" > Zona:</span>
-          <el-select v-model="value" 
+          <el-select v-model="zonaValue" 
            size="small"
           clearable placeholder="Todos los Zona:">
     <el-option
@@ -121,7 +124,7 @@
         </div>
         <div class="col-span-3 w-56">
           <span class="text-gray-700 text-xs" > Servicio:</span>
-          <el-select v-model="value" 
+          <el-select v-model="servVlue" 
            size="small"
           clearable placeholder="Todos los servicio:">
     <el-option
@@ -227,6 +230,16 @@ export default {
       loading: false,
       errorMessage: "",
       searchValue: "",
+      rangFech:"",
+      clienV:"",
+      TypeFact:"",
+      status:"",
+      VendClie:"",
+      zonaValue:"",
+      servVlue:"",
+
+
+
       invoices: {
         invoices: [],
         count: 0,
