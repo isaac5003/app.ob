@@ -24,12 +24,13 @@
           <!-- tipo de documento -->
           <div class="col-span-3">
             <el-form-item label="Tipo de documento" prop="document">
-                <el-select v-model="value" class="w-full" size="small" clearable placeholder="Seleccionar">
+                <el-select v-model="invoicesNewForm.document" class="w-full" size="small" clearable placeholder="Seleccionar">
                   <el-option
                     v-for="item in documents"
                     :key="item.value"
                     :label="item.label"
-                    :value="item.value">
+                    :value="item.value"
+                     @change="setStorage(invoicesNewForm)">
                   </el-option>
                 </el-select>
             </el-form-item>
@@ -40,7 +41,7 @@
               <el-input
                 size="small"
                 placeholder=""
-                v-model="input"
+                v-model="invoicesNewForm.auth"
                 :disabled="true">
               </el-input>
              </el-form-item>
@@ -51,21 +52,22 @@
               <el-input
                 size="small"
                 placeholder=""
-                v-model="input"
+                v-model="invoicesNewForm.correlativo"
                 :disabled="true">
               </el-input>
             </el-form-item>
           </div>
           <!-- Fecha Factura -->
           <div class="col-span-2">
-            <el-form-item label="Fecha de factura" >
+            <el-form-item label="Fecha de factura" prop="date">
               <el-date-picker
-                v-model="value2"
+                v-model="invoicesNewForm.date"
                 size="small"
                 type="date"
                 placeholder=""
                 :picker-options="pickerOptions"
-                style="width: 100%;">
+                style="width: 100%;"
+                @change="setStorage(invoicesNewForm)">
               </el-date-picker>
             </el-form-item>
           </div>
@@ -75,13 +77,14 @@
         <div class="grid grid-cols-12 gap-4">
           <!-- cliente -->
           <div class="col-span-3">
-           <el-form-item label="Cliente" prop="name">
-                <el-select v-model="value" class="w-full" clearable filterable placeholder="Seleccionar">
+           <el-form-item label="Cliente" prop="costumer">
+                <el-select v-model="invoicesNewForm.costumer" class="w-full" clearable filterable placeholder="Seleccionar">
                   <el-option
                     v-for="item in clientes"
                     :key="item.value"
                     :label="item.label"
-                    :value="item.value">
+                    :value="item.value"
+                     @change="setStorage(invoicesNewForm)">
                   </el-option>
                 </el-select>
              </el-form-item>
@@ -89,8 +92,8 @@
           </div>
           <!-- sucursal -->
           <div class="col-span-3">
-            <el-form-item  label="Sucursal" prop="name">
-                <el-select v-model="value" class="w-full" clearable filterable  size="small" placeholder="Seleccionar">
+            <el-form-item  label="Sucursal" prop="office">
+                <el-select v-model="invoicesNewForm.office" class="w-full" clearable filterable  size="small" placeholder="Seleccionar">
                   <el-option
                     v-for="item in sucursales"
                     :key="item.value"
@@ -102,8 +105,8 @@
           </div>
           <!-- condiciones de pago -->
           <div class="col-span-3">
-            <el-form-item label="Condiciones de pago"  prop="name">
-              <el-select v-model="value" size="small" class="w-full" clearable filterable  placeholder="Seleccionar">
+            <el-form-item label="Condiciones de pago"  prop="paymants">
+              <el-select v-model="invoicesNewForm.paymants" size="small" class="w-full" clearable filterable  placeholder="Seleccionar">
                     <el-option
                       v-for="item in paymants"
                       :key="item.value"
@@ -116,8 +119,8 @@
           
           <!-- Venta a cuenta de -->
           <div class="col-span-3">
-            <el-form-item label="Venta a cuenta de" >
-              <el-select v-model="value" class="w-full" size="small" clearable filterable placeholder="Seleccionar">
+            <el-form-item label="Venta a cuenta de" prop="sellfor">
+              <el-select v-model="invoicesNewForm.sellfor" class="w-full" size="small" clearable filterable placeholder="Seleccionar">
                 <el-option
                   v-for="item in sellers"
                   :key="item.value"
@@ -213,15 +216,15 @@
             
                   <el-form-item label="Precio" >
                   
-                    <div class="w-full flex flex-row items-center">
+                    <div class="flex w-full items-center">
                      <el-input-number  :disabled="true" size="small" v-model="numcant" controls-position="right"  :min="1" :max="10">
 
                     </el-input-number>
-                      <div class="border-2 h-8 border-gray-300 rounded-sm bg-gray-100 px-2 flex items-center">
-                        <el-checkbox v-model="checked1" size="small" disabled>
+                     
+                        <el-checkbox v-model="chkIva"  border class="mt-1 px-3" size="small" disabled>
                            IVA incl.
                         </el-checkbox>
-                      </div>
+                      
                     </div>
                  
                   </el-form-item>
@@ -233,12 +236,12 @@
               <!--Descripcion -->
               <div class="col-span-12">
                 
-                <el-form-item label="Descripción" prop="name">
+                <el-form-item label="Descripción" prop="description">
                     <el-input
                       type="textarea"
                       :rows="5"
                       size="small"
-                      v-model="textarea"
+                      v-model="descripcion"
                       :disabled="true">
                     </el-input>
                 </el-form-item>
@@ -247,10 +250,17 @@
 
             </div>
           </div>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="dialogVisible = false">Cancel</el-button>
-            <el-button type="primary" @click="dialogVisible = false">Confirm</el-button>
-          </span>
+         
+           <!-- boton guardar cancelar -->
+      <div class="flex justify-end dialog-footer" slot="footer"  >
+       
+        <el-button size="small" 
+          @click="dialogVisible = false">Cancelar</el-button
+        >
+         <el-button type="primary" size="small" 
+         @click="dialogVisible = false" >Guardar</el-button
+        >
+     </div>
         </el-dialog>
 
      </div>
@@ -440,7 +450,7 @@ export default {
   
       
 
-    checkBeforeEnter(this, storagekey, "customersNewInvoice");
+    checkBeforeEnter(this, storagekey, "invoicesNewForm");
   },
   fetchOnServer: false,
   beforeRouteLeave(to, from, next) {
@@ -465,10 +475,27 @@ export default {
       loading: false,
      
       invoicesNewForm: {
-       
+        document: "",
+        auth: "",
+        correlativo: "",
+        date: "",
+        costumer: "",
+        office: "",
+        paymants:"",
+        sellfor: "",
+
+
       },
       invoicesNewFormRules: {
-        
+        document: selectValidation(true),
+        date: selectValidation(true),
+        costumer: selectValidation(true),
+        office: selectValidation(true),
+        paymants: selectValidation(true),
+        sellfor: selectValidation(true),
+        service: selectValidation(true),
+        description: inputValidation(true)
+      
       },
       
         sellers: [{
@@ -517,7 +544,8 @@ export default {
           value: 'Option2',
           label: 'CFC - Crédito Fiscal'
         }],
-        value: '',
+      
+        
         dialogVisible: false,
         numcant:[
           {num:1},
@@ -551,6 +579,8 @@ export default {
          input: "",
          chkSeller: "",
          chkPaymants: "",
+         chkIva: "",
+         descripcion: "",
     };
   
   },
@@ -563,6 +593,9 @@ export default {
           })
           .catch(_ => {});
       },
+      setStorage(invoicesNewForm) {
+      localStorage.setItem(storagekey, JSON.stringify(invoicesNewForm));
+    },
    
 }
 }
