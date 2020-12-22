@@ -262,6 +262,17 @@ export default {
           this.errorMessage = err.response.data.message;
         });
     },
+    fetchSellers(){
+      let params = this.page;
+      this.$axios
+          .get("/invoices/sellers")
+          .then((res) => {
+            this.sellers = res.data.sellers;
+          })
+          .catch((err) => {
+            this.errorMessage = err.response.data.message;
+          })
+    },
     changeActive({ id, active }) {
       const action = active ? "desactivar" : "activar";
       this.$confirm(
