@@ -29,8 +29,7 @@
               <el-table-column label="Zona" prop="name" min-width="175" />
               <el-table-column label="Estado" min-width="80">
                 <template slot-scope="scope">
-                  <el-tag size="small" type="success" v-if="scope.row.active"
-                    >Activo</el-tag
+                  <el-tag size="small" type="success" v-if="scope.row.active">Activo</el-tag
                   >
                   <el-tag size="small" type="danger" v-else>Inactivo</el-tag>
                 </template>
@@ -83,8 +82,8 @@
               <el-table-column label="ID" prop="index" min-width="40" />
               <el-table-column label="Vendedor" prop="name" min-width="170" />
               <el-table-column label="Zona" min-width="175">
-                <template slot-scope="[]">
-                  <span>DATA</span>
+                <template slot-scope="scope">
+                  <span>{{scope.row.invoicesZone ? scope.row.invoicesZone.name : ''}} </span>
                 </template>
               </el-table-column>
 
@@ -217,7 +216,7 @@ export default {
 
         this.zones = zones.data.zones;
         this.sellers = sellers.data.sellers;
-        // console.log(sellers);
+        console.log(sellers.data);
         this.loading = false;
       })
       .catch((err) => {
