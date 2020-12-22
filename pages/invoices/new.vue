@@ -12,6 +12,7 @@
       :model="invoicesNewForm"
       :rules="invoicesNewFormRules"
       status-icon
+      ref="customersNewInvoice"
      
      
     
@@ -21,10 +22,9 @@
         <!-- first row -->
         <div class="grid grid-cols-12 gap-4">
           <!-- tipo de documento -->
-          <div class="col-span-5 flex">
-           <div class="isRequired">
-             <el-form-item label="Tipo de documento" prop="document">
-                <el-select v-model="value" size="small" clearable placeholder="Select">
+          <div class="col-span-3">
+            <el-form-item label="Tipo de documento" prop="document">
+                <el-select v-model="value" class="w-full" size="small" clearable placeholder="Seleccionar">
                   <el-option
                     v-for="item in documents"
                     :key="item.value"
@@ -32,48 +32,42 @@
                     :value="item.value">
                   </el-option>
                 </el-select>
-             </el-form-item>
-           </div>
+            </el-form-item>
           </div>
           <!-- n° autorizacion -->
-          <div class="col-span-2">
-           <div class="isRequired">
-             <el-form-item label="N° de autorización" >
-                <el-input
-                  size="small"
-                  placeholder=""
-                  v-model="input"
-                  :disabled="true">
+          <div class="col-span-2 col-start-7">
+            <el-form-item label="N° de autorización" >
+              <el-input
+                size="small"
+                placeholder=""
+                v-model="input"
+                :disabled="true">
               </el-input>
              </el-form-item>
-           </div>
           </div>
            <!-- n° Correlativo -->
           <div class="col-span-2">
-           <div class="isRequired">
-             <el-form-item label="N° de correlativo" >
-                <el-input
-                  size="small"
-                  placeholder=""
-                  v-model="input"
-                  :disabled="true">
+            <el-form-item label="N° de correlativo" >
+              <el-input
+                size="small"
+                placeholder=""
+                v-model="input"
+                :disabled="true">
               </el-input>
-             </el-form-item>
-           </div>
+            </el-form-item>
           </div>
           <!-- Fecha Factura -->
           <div class="col-span-2">
-           <div class="isRequired">
-             <el-form-item label="Fecha de factura" >
-                 <el-date-picker
-                    v-model="value2"
-                    size="small"
-                    type="date"
-                    placeholder=""
-                    :picker-options="pickerOptions">
-                 </el-date-picker>
-             </el-form-item>
-           </div>
+            <el-form-item label="Fecha de factura" >
+              <el-date-picker
+                v-model="value2"
+                size="small"
+                type="date"
+                placeholder=""
+                :picker-options="pickerOptions"
+                style="width: 100%;">
+              </el-date-picker>
+            </el-form-item>
           </div>
         </div>
 
@@ -81,9 +75,8 @@
         <div class="grid grid-cols-12 gap-4">
           <!-- cliente -->
           <div class="col-span-3">
-            
-             <el-form-item label="Cliente" prop="name">
-                <el-select v-model="value" clearable size="small" placeholder="Select">
+           <el-form-item label="Cliente" prop="name">
+                <el-select v-model="value" class="w-full" clearable filterable placeholder="Seleccionar">
                   <el-option
                     v-for="item in clientes"
                     :key="item.value"
@@ -97,7 +90,7 @@
           <!-- sucursal -->
           <div class="col-span-3">
             <el-form-item  label="Sucursal" prop="name">
-                <el-select v-model="value" clearable size="small" placeholder="Select">
+                <el-select v-model="value" class="w-full" clearable filterable  size="small" placeholder="Seleccionar">
                   <el-option
                     v-for="item in sucursales"
                     :key="item.value"
@@ -109,11 +102,8 @@
           </div>
           <!-- condiciones de pago -->
           <div class="col-span-3">
-            
-              <el-form-item label="Condiciones de pago"  prop="name">
-               <div class="w-full">
-                 <div class="w-full flex flex-row items-center">
-                   <el-select v-model="value" size="small" placeholder="Select">
+            <el-form-item label="Condiciones de pago"  prop="name">
+              <el-select v-model="value" size="small" class="w-full" clearable filterable  placeholder="Seleccionar">
                     <el-option
                       v-for="item in paymants"
                       :key="item.value"
@@ -121,58 +111,35 @@
                       :value="item.value">
                     </el-option>
                   </el-select>
-                      <div class="border-2 h-8 border-gray-300 rounded-sm bg-gray-100 px-2 flex items-center">
-                        <el-checkbox v-model="chkPaymants" size="small" disabled>
-                          
-                        </el-checkbox>
-                      </div>
-                </div>
-               </div>
-              </el-form-item>
-              
-           
-             
-            </div>
+            </el-form-item>
+          </div>
           
           <!-- Venta a cuenta de -->
-           <div class="col-span-3">
-            
-               <el-form-item label="Venta a cuenta de" >
-                  
-                <div class="w-full flex flex-row items-center">
-                  <el-select v-model="value" size="small" placeholder="Select">
-                    <el-option
-                      v-for="item in sellers"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
-                  </el-select>
-                      <div class="border-2 h-8 border-gray-300 rounded-sm bg-gray-100 px-2 flex items-center">
-                        <el-checkbox v-model="chkSeller" size="small" disabled>
-                          
-                        </el-checkbox>
-                      </div>
-                    </div>
-                 
-                  </el-form-item>
-              
-           
-             
-            </div>
+          <div class="col-span-3">
+            <el-form-item label="Venta a cuenta de" >
+              <el-select v-model="value" class="w-full" size="small" clearable filterable placeholder="Seleccionar">
+                <el-option
+                  v-for="item in sellers"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </div>
           
           
         </div>
 
         <!-- third row -->
-        <div class="flex flex-row grid grid-cols-12 gap-4 text-gray-800 text-sm">
+        <div class="grid grid-cols-12 gap-4 text-xs">
          
           <!-- NRC -->
           <div class="col-span-1">
             <span>NRC</span>
           </div>
           <!-- NIT -->
-          <div class="col-span-1"> 
+          <div class="col-span-2"> 
             <span>NIT</span>
           </div>
           <!-- Direccion -->
@@ -188,7 +155,7 @@
             <span>Municipio</span>
           </div>
           <!-- Giro -->
-          <div class="col-span-3">
+          <div class="col-span-2">
             <span>Giro</span>
           </div>
         </div>
@@ -294,74 +261,149 @@
         <el-table
           :data="facturas"
           style="width: 100%"
+          stripe
           size="small">
           <el-table-column
-            prop="num"
+            type="index"
             label="#"
-            width="50">
-          </el-table-column>
+          />
+          
           <el-table-column
-            prop="cant"
+            prop="quantity"
             label="Cant."
-            width="90">
+            min-width="50">
           </el-table-column>
           <el-table-column
             prop="details"
             label="Descripción"
-            width="400">
+            width="270">
             
           </el-table-column>
           <el-table-column
             prop="precuni"
-            label="Precio Unit.">
+            label="Precio Unit."
+            min-width="75"
+            align="right">
           </el-table-column>
           <el-table-column
             prop="vnosujeta"
-            label="V. No sujeta">
+            label="V. No sujeta"
+             min-width="75"
+            align="right">
           </el-table-column>
           <el-table-column
             prop="vexenta"
-            label="V. Exenta">
+            label="V. Exenta"
+             min-width="75"
+            align="right">
           </el-table-column>
           <el-table-column
             prop="vgrabada"
-            label="V. Grabada">
+            label="V. Grabada"
+             min-width="75"
+            align="right">
+          </el-table-column>
+          <el-table-column
+            prop="name"
+            min-width="80">
           </el-table-column>
         </el-table>
     </div>  
      </div>
-      <!-- sumas -->
+     
+     <!-- sumas -->
       <div class="grid grid-cols-12">
-        <div class="col-span-5 col-start-8 col-end-13  flex flex-col">
+        <div class="grid col-span-4 col-start-9 text-sm">
           <div class="divide-y divide-gray-300">
-            <div class=" flex flex-row space-x-12 justify-end">
-              <div class="text-blue-800 text-right">SUMAS:</div>
-              <div class="text-gray-800">hola</div>
+            <!-- espacio en blanco -->
+            <div class="grid grid-cols-12 gap-4">
+              <div class="col-span-5 col-start-5 ">
+               
             </div>
-            <div class=" flex flex-row space-x-12 justify-end">
-              <div class="text-blue-800 text-right">Subtotal:</div>
-              <div class="text-gray-800">hola</div>
             </div>
-            <div class="flex flex-row space-x-12 justify-end">
-              <div class="text-blue-800 text-right">Iva retenido:</div>
-              <div class="text-gray-800">hola</div>
+            <!-- first row -->
+            <div class="grid grid-cols-12 gap-4">
+              <div class="col-span-5 col-start-5 ">
+                <div class="text-right text-blue-800">
+                  SUMAS:
+                </div>
+              </div>
+                <div class="col-span-2 col-start-11 ">
+                <div class="text-right text-gray-800">
+                  $0.00
+                </div>
+              </div>
             </div>
-            <div class="flex flex-row space-x-12 justify-end">
-              <div class="text-blue-800 text-right">Ventas exentas:</div>
-              <div class="text-gray-800">hola</div>
+            <!-- second row -->
+            <div class="grid grid-cols-12 gap-4">
+              <div class="col-span-5 col-start-5 ">
+                <div class="text-right text-blue-800">
+                  Subtotal:
+                </div>
+              </div>
+                <div class="col-span-2 col-start-11 ">
+                <div class="text-right text-gray-800">
+                  $0.00
+                </div>
+              </div>
             </div>
-            <div class="flex flex-row space-x-12 justify-end">
-              <div class="text-blue-800 text-right">Ventas no sujetas:</div>
-              <div class="text-gray-800">hola</div>
+            <!-- third row -->
+            <div class="grid grid-cols-12 gap-4">
+              <div class="col-span-5 col-start-5 ">
+                <div class="text-right text-blue-800">
+                  Iva retenido:
+                </div>
+              </div>
+                <div class="col-span-2 col-start-11 ">
+                <div class="text-right text-gray-800">
+                  $0.00
+                </div>
+              </div>
             </div>
-            <div class="flex flex-row space-x-12 justify-end ">
-              <div class="text-blue-800 text-right font-semibold">Venta Total:</div>
-              <div class="text-gray-800">hola</div>
+             <!-- fourth row -->
+            <div class="grid grid-cols-12 gap-4">
+              <div class="col-span-5 col-start-5 ">
+                <div class="text-right text-blue-800">
+                  Ventas exentas:
+                </div>
+              </div>
+                <div class="col-span-2 col-start-11 ">
+                <div class="text-right text-gray-800">
+                  $0.00
+                </div>
+              </div>
+            </div>
+            <!-- fifth row -->
+            <div class="grid grid-cols-12 gap-4">
+              <div class="col-span-6 col-start-4 ">
+                <div class="text-right text-blue-800">
+                 Ventas no sujetas:
+                </div>
+              </div>
+                <div class="col-span-2 col-start-11 ">
+                <div class="text-right text-gray-800">
+                  $0.00
+                </div>
+              </div>
+            </div>
+            <!-- sixth row -->
+            <div class="grid grid-cols-12 gap-4">
+              <div class="col-span-5 col-start-5 ">
+                <div class="text-right text-blue-800 font-semibold ">
+                 Venta total:
+                </div>
+              </div>
+                <div class="col-span-2 col-start-11 ">
+                <div class="text-right text-gray-800">
+                  $0.00
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
+      </div>  
+      
+    
       <!-- boton guardar cancelar -->
       <div class="flex justify-end " >
         <el-button type="primary" size="small" native-type="submit"
@@ -379,18 +421,35 @@
 
 <script>
 import LayoutContent from "../../components/layout/Content";
-
+import {
+  inputValidation,
+  selectValidation,
+  checkBeforeLeave,
+  checkBeforeEnter,
+} from "../../tools";
 import Notification from "../../components/Notification";
 
-
+const storagekey = "new-invoices";
 
 export default {
   name: "InvoicesNew",
   components: { LayoutContent, Notification },
+  fetch() {
+   
+
   
+      
+
+    checkBeforeEnter(this, storagekey, "customersNewInvoice");
+  },
+  fetchOnServer: false,
+  beforeRouteLeave(to, from, next) {
+    checkBeforeLeave(this, storagekey, next);
+  },
   data() {
     
     return {
+      
       facturas:[
         {
           num: '1',
@@ -466,26 +525,24 @@ export default {
           {num:3},
               ],
           pickerOptions: {
-          disabledDate(time) {
-            return time.getTime() > Date.now();
-          },
+          
           shortcuts: [{
-            text: 'Today',
+            text: 'Ahora',
             onClick(picker) {
               picker.$emit('pick', new Date());
             }
           }, {
-            text: 'Yesterday',
+            text: 'Ayer',
             onClick(picker) {
               const date = new Date();
               date.setTime(date.getTime() - 3600 * 1000 * 24);
               picker.$emit('pick', date);
             }
           }, {
-            text: 'A week ago',
+            text: 'Mañana',
             onClick(picker) {
               const date = new Date();
-              date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+              date.setTime(date.getTime() + 3600 * 1000 * 24 );
               picker.$emit('pick', date);
             }
           }]
