@@ -201,7 +201,7 @@
             <!-- second row -->
             <div class="grid grid-cols-12 ">
               <!-- Cantidad -->
-              <div class="col-span-5 w-full ">
+              <div class="col-span-5 ">
                 
                 <el-form-item label="Cantidad" >
                     <el-input-number  :disabled="true" size="small" v-model="numcant" controls-position="right" :min="1" :max="10">
@@ -212,11 +212,11 @@
               </div>
 
               <!-- precio -->
-               <div class="col-span-7">
+               <div class="col-span-7 ">
             
                   <el-form-item label="Precio" >
                   
-                    <div class="flex w-full items-center">
+                    <div class="w-full flex items-center ">
                      <el-input-number  :disabled="true" size="small" v-model="numcant" controls-position="right"  :min="1" :max="10">
 
                     </el-input-number>
