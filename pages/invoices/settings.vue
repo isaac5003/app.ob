@@ -211,14 +211,13 @@ export default {
     // promesa que recibe los métodos con las peticiones http
     Promise.all([zones(), sellers()])
       .then((res) => {
-        // const [zones] = res;
-        const zones = res[0];
-        const sellers = res[1];
+        const [zones, sellers] = res;
+        // const zones = res[0];
+        // const sellers = res[1];
 
         this.zones = zones.data.zones;
-        // this.sellers = sellers.data;
         this.sellers = sellers.data.sellers;
-        console.log(sellers);
+        // console.log(sellers);
         this.loading = false;
       })
       .catch((err) => {
