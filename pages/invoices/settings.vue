@@ -72,10 +72,64 @@
           <div class="col-span-7 bg-red-500"></div>
         </div>
       </el-tab-pane>
-      <el-tab-pane
-        label="Condiciones de pago"
-        name="payment-conditions"
-      ></el-tab-pane>
+
+      <!-- Tabla de condiciones de pago -->
+      <el-tab-pane label="Condiciones de pago" name="payment-conditions">
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-6 flex flex-col space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="text-blue-900 font-semibold text-lg">CONDICIONES DE PAGO</span>
+              <el-button type="primary" size="mini" icon="el-icon-plus" />
+            </div>
+            <el-table :data="zones" stripe size="mini">
+              <el-table-column prop="index" min-width="40" />
+              <el-table-column label="Condicion de pago" prop="name" min-width="175" />
+              <el-table-column label="Estado" min-width="80">
+                <template slot-scope="scope">
+                  <el-tag size="small" type="success" v-if="scope.row.active"
+                    >Activo</el-tag
+                  >
+                  <el-tag size="small" type="danger" v-else>Inactivo</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column label min-width="60" align="center">
+                <template slot-scope="scope">
+                  <el-dropdown trigger="click" szie="mini">
+                    <el-button icon="el-icon-more" size="mini" />
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item
+                        @click.native="
+                          $router.push(`/invoices/edit?ref=${scope.row.id}`)
+                        "
+                      >
+                        <i class="el-icon-edit-outline"></i> Editar zona
+                      </el-dropdown-item>
+                      <el-dropdown-item @click.native="changeActive(scope.row)">
+                        <span v-if="scope.row.active">
+                          <i class="el-icon-close"></i> Desactivar
+                        </span>
+                        <span v-else>
+                          <i class="el-icon-check"></i> Activar
+                        </span>
+                        zona
+                      </el-dropdown-item>
+                      <el-dropdown-item
+                        :divided="true"
+                        class="text-red-500 font-semibold"
+                        @click.native="deleteInvoice(scope.row)"
+                      >
+                        <i class="el-icon-delete"></i> Eliminar zona
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+        </div>
+      </el-tab-pane>
+
+
       <el-tab-pane label="Correlativos" name="sequences"></el-tab-pane>
       <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
         <Notification
