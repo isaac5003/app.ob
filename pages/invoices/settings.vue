@@ -206,10 +206,12 @@ export default {
       return this.$axios.get("/invoices/zones");
     };
 
+    // método para hacer la petición a la url de vendedores
     const sellers = () => {
       return this.$axios.get("/invoices/sellers"); 
     };
 
+    // promesa que recibe los métodos con las peticiones http
     Promise.all([zones(), sellers()])
       .then((res) => {
         // const [zones] = res;
@@ -265,13 +267,13 @@ export default {
     fetchSellers(){
       let params = this.page;
       this.$axios
-          .get("/invoices/sellers")
-          .then((res) => {
-            this.sellers = res.data.sellers;
+        .get("/invoices/sellers")
+        .then((res) => {
+          this.sellers = res.data.sellers;
           })
-          .catch((err) => {
-            this.errorMessage = err.response.data.message;
-          })
+        .catch((err) => {
+          this.errorMessage = err.response.data.message;
+          });
     },
     changeActive({ id, active }) {
       const action = active ? "desactivar" : "activar";
