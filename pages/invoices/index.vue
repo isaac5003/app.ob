@@ -107,7 +107,7 @@
     </el-option>
   </el-select>
         </div>
-        <div class=" col-span-3 w-56">
+        <div class=" col-span-3 w-56"
           <span class="text-gray-700 text-xs" > Zona:</span>
           <el-select v-model="value" 
            size="small"
