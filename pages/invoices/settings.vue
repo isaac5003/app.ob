@@ -86,9 +86,7 @@
               <el-table-column label="Condicion de pago" prop="name" min-width="175" />
               <el-table-column label="Estado" min-width="80">
                 <template slot-scope="scope">
-                  <el-tag size="small" type="success" v-if="scope.row.active"
-                    >Activo</el-tag
-                  >
+                  <el-tag size="small" type="success" v-if="scope.row.active">Activo</el-tag>
                   <el-tag size="small" type="danger" v-else>Inactivo</el-tag>
                 </template>
               </el-table-column>
