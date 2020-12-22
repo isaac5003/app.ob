@@ -76,7 +76,83 @@
         label="Condiciones de pago"
         name="payment-conditions"
       ></el-tab-pane>
-      <el-tab-pane label="Correlativos" name="sequences"></el-tab-pane>
+
+
+      <el-tab-pane label="Correlativos" name="sequences">
+        <div class="grid grid-cols-12 ">
+          <!-- primer cuadro -->
+          <div class="col-span-4 bg-white">
+            <div class="border-2 p-4 border-blue-700 rounded-lg">
+              <el-form>
+                <!-- first row -->
+                <div class="grid grid-cols-12 gap-4  ">
+                   
+                    <div class="col-span-8 ">
+                      <el-label for="" class="font-semibold text-base text-blue-800 ">Consumidor final</el-label>
+                    </div>
+                      <div class="col-span-2">
+                      <el-form-item>
+                        <el-switch v-model="value1">
+                        </el-switch>
+                      </el-form-item>
+                    </div>
+
+                   <div class="col-span-2">
+                      <el-form-item>
+                         <el-button type="primary" icon="el-icon-plus" size="small"></el-button>
+                      </el-form-item>
+                    </div>
+                  </div>
+                <!-- second row -->
+                <div class="grd grid-cols-12 gap-4">
+                  <div class="col-span-12">
+                     <div class="isRequired">
+                        <el-form-item label="N° de autorización" >
+                            <el-input
+                              size="small"
+                              placeholder=""
+                              v-model="input"
+                              :disabled="true">
+                          </el-input>
+                        </el-form-item>
+                      </div>
+                  </div>
+                </div>
+
+                <!-- third row -->
+                <div class="grid grid-cols-12 gap-4">
+                  <div class="col-span-6">
+                     <el-form-item label="Inicial" >
+                    <el-input-number  :disabled="true" size="small" v-model="numcant" controls-position="right" @change="handleChange" :min="1" :max="10">
+
+                    </el-input-number>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-6">
+                    <el-form-item label="Final" >
+                    <el-input-number  :disabled="true" size="small" v-model="numcant" controls-position="right" @change="handleChange" :min="1" :max="10">
+
+                    </el-input-number>
+                    </el-form-item>
+                  </div>
+                </div>
+                  <!-- four row -->
+                  <div class="grid grid-cols-12">
+                    <div class="col-span-12">
+                      <el-form-item label="Actual" >
+                        <el-input  :disabled="true" size="small" v-model="numcant" >
+                        </el-input>
+                        </el-form-item>
+                    </div>
+                  </div>
+              </el-form>
+            </div>
+          </div>
+        </div>
+
+      </el-tab-pane>
+
+
       <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
         <Notification
           class="w-full"
