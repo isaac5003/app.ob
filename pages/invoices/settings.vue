@@ -79,10 +79,14 @@
               <el-button type="primary" size="mini" icon="el-icon-plus" />
             </div>
 
-            <el-table :data="vendedores" stripe size="mini">
-              <el-table-column label="ID" prop="id" min-width="40" />
-              <el-table-column label="Vendedor" prop="nombre" min-width="175" />
-              <el-table-column label="Zona" prop="zona" min-width="175" />
+            <el-table :data="sellers" stripe size="mini">
+              <el-table-column label="ID" prop="index" min-width="40" />
+              <el-table-column label="Vendedor" prop="name" min-width="175" />
+              <el-table-column label="Zona" min-width="180">
+                <template slot-scope="[]">
+                  <span>DATA</span>
+                </template>
+              </el-table-column>
 
               <el-table-column label="Estado" min-width="80">
                 <template slot-scope="scope">
@@ -124,8 +128,8 @@
             </el-table>
 
 
-          <!-- Fin del div vendedores -->
           </div>
+          <!-- Fin del div vendedores -->
 
 
 
@@ -202,10 +206,20 @@ export default {
       return this.$axios.get("/invoices/zones");
     };
 
-    Promise.all([zones()])
+    const sellers = () => {
+      return this.$axios.get("/invoices/sellers"); 
+    };
+
+    Promise.all([zones(), sellers()])
       .then((res) => {
-        const [zones] = res;
+        // const [zones] = res;
+        const zones = res[0];
+        const sellers = res[1];
+
         this.zones = zones.data.zones;
+        // this.sellers = sellers.data;
+        this.sellers = sellers.data.sellers;
+        console.log(sellers);
         this.loading = false;
       })
       .catch((err) => {
@@ -232,13 +246,7 @@ export default {
         },
       ],
       zones: [],
-      vendedores: [
-        {
-          id: '1',
-          nombre: 'Isaac',
-          zona: 'San Salvador'
-        },
-      ]
+      sellers: []
     };
     
   },
