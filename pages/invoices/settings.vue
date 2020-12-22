@@ -135,10 +135,7 @@
 
         </div>
       </el-tab-pane>
-      <el-tab-pane
-        label="Condiciones de pago"
-        name="payment-conditions"
-      ></el-tab-pane>
+      <el-tab-pane label="Condiciones de pago" name="payment-conditions"></el-tab-pane>
       <el-tab-pane label="Correlativos" name="sequences"></el-tab-pane>
       <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
         <Notification
