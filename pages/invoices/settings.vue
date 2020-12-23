@@ -147,7 +147,7 @@
               >
               <el-button type="primary" size="mini" icon="el-icon-plus" />
             </div>
-            <el-table :data="zones" stripe size="mini">
+            <el-table :data="payment" stripe size="mini">
               <el-table-column prop="index" min-width="40" />
               <el-table-column
                 label="Condicion de pago"
@@ -265,22 +265,22 @@ export default {
     const zones = () => {
       return this.$axios.get("/invoices/zones");
     };
-
     // método para hacer la petición a la url de vendedores
     const sellers = () => {
       return this.$axios.get("/invoices/sellers");
     };
-
+    //método para mostrar data en la tabla de pagos
+    const payment = () => {
+      return this.$axios.get("/invoices/payment-condition")
+    }
     // promesa que recibe los métodos con las peticiones http
-    Promise.all([zones(), sellers()])
+    Promise.all([zones(), sellers(), payment()])
       .then((res) => {
-        const [zones, sellers] = res;
-        // const zones = res[0];
-        // const sellers = res[1];
-
+        const [zones, sellers, payment] = res;
         this.zones = zones.data.zones;
         this.sellers = sellers.data.sellers;
-        console.log(sellers.data);
+        this.payment = payment.data.paymentConditions;
+        console.log(payment.data.paymentConditions);
         this.loading = false;
       })
       .catch((err) => {
@@ -308,6 +308,7 @@ export default {
       ],
       zones: [],
       sellers: [],
+      payment: []
     };
   },
   methods: {
