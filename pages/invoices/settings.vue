@@ -47,7 +47,7 @@
                       >
                         <i class="el-icon-edit-outline"></i> Editar zona
                       </el-dropdown-item>
-                      <el-dropdown-item @click.native="changeActive(scope.row)">
+                      <el-dropdown-item @click.native="changeActiveZone(scope.row)">
                         <span v-if="scope.row.active">
                           <i class="el-icon-close"></i> Desactivar
                         </span>
@@ -71,7 +71,6 @@
           </div>
 
           <!-- Inicio de tabla vendedores -->
-
           <div class="col-span-7 flex flex-col space-y-4">
             <div class="flex justify-between items-center">
               <span class="text-blue-900 font-semibold text-lg"
@@ -113,21 +112,20 @@
                       >
                         <i class="el-icon-edit-outline"></i> Editar vendedor
                       </el-dropdown-item>
-                      <el-dropdown-item @click.native="changeActive(scope.row)">
+                      <el-dropdown-item @click.native="changeActiveSellers(scope.row)">
                         <span v-if="scope.row.active">
                           <i class="el-icon-close"></i> Desactivar
                         </span>
                         <span v-else>
                           <i class="el-icon-check"></i> Activar
-                        </span>
-                        Vendedor
+                        </span>vendedor
                       </el-dropdown-item>
                       <el-dropdown-item
                         :divided="true"
                         class="text-red-500 font-semibold"
                         @click.native="deleteInvoice(scope.row)"
                       >
-                        <i class="el-icon-delete"></i> Eliminar Vendedor22
+                        <i class="el-icon-delete"></i> Eliminar Vendedor
                       </el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
@@ -335,7 +333,7 @@ export default {
           this.errorMessage = err.response.data.message;
         });
     },
-    changeActive({ id, active }) {
+    changeActiveZone({ id, active }) {
       const action = active ? "desactivar" : "activar";
       this.$confirm(
         `¿Estás seguro que deseas ${action} esta zona?`,
@@ -356,6 +354,46 @@ export default {
                     message: res.data.message,
                   });
                   this.fetchZones();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, ${action}`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
+    },
+    //Metodo para cambiar el estado de vendedores (Activar o Desactivar)
+    changeActiveSellers({ id, active }) {
+      const action = active ? "desactivar" : "activar";
+      this.$confirm(
+        `¿Estás seguro que deseas ${action} este vendedor?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, ${action}`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .put(`/invoices/sellers/status/${id}`, { status: !active })
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchSellers();
                 })
                 .catch((err) => {
                   this.$notify.error({
