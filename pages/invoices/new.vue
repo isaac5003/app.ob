@@ -8,14 +8,128 @@
       { name: 'Nueva factura', to: null },
     ]"
   >
+    <!-- dialogo -->
+        <el-dialog
+          title="Agregar Servicio"
+          :visible.sync="dialogVisible"
+          width="35%"
+           :close-on-click-modal="false"
+          :append-to-body="true"
+          @open="openDialog()"
+         
+          >
+          <el-form
+            :model="newServiceForm"
+            status-icon
+            :rules="newServiceFormRules"
+             ref="newServiceForm"
+            @submit.prevent.native="selectService(newServiceForm.service, 'edit')"
+            
+          >
+          
+            <!-- first row -->
+            <div class="grid grid-cols-12">
+              <!-- Servicio -->
+              <div class="col-span-12">
+                
+                <el-form-item label="Servicio" prop="service">
+                    <el-select v-model="newServiceForm.service" clearable filterable @change="selectService(newServiceForm.service, 'new')" size="small" class="w-full" placeholder="Seleccionar servicio">
+                      <el-option
+                        v-for="s in services"
+                        :key="s.id"
+                        :label="s.name"
+                        :value="s.id"
+                         
+                         >
+                      </el-option>
+                    </el-select>
+                </el-form-item>
+              
+              </div>
+
+            </div>
+            <!-- second row -->
+            <div class="grid grid-cols-12 gap-4 ">
+              <!-- Cantidad -->
+              <div class="col-span-6">
+                
+                <el-form-item label="Cantidad" >
+                   <el-input
+                        step="1"
+                        size="small"
+                        type="number"
+                        v-model="newServiceForm.quantity"
+                        :disabled="newServiceForm.service === ''"/>
+                </el-form-item>
+              </div>
+
+              <!-- precio -->
+               <div class="col-span-6">
+            
+                  <el-form-item label="Precio" >
+                  
+                    <div class="w-full flex items-center  ">
+                     <el-input
+                        v-model="newServiceForm.cost"
+                        step="0.01"
+                        size="small"
+                        type="number"
+                        value=""
+                        :disabled="newServiceForm.service === ''"/>
+                <el-checkbox
+                 
+                  border
+                  size="small"
+                  class="px-3"
+                  :disabled="newServiceForm.service === ''"
+                >IVA incl.</el-checkbox>
+                    </div>
+                 
+                  </el-form-item>
+               </div>
+            </div>
+
+            <!-- third row -->
+            <div class="grid grid-cols-12">
+              <!--Descripcion -->
+              <div class="col-span-12">
+                
+                <el-form-item label="Descripción" prop="description">
+                    <el-input
+                      type="textarea"
+                      :rows="5"
+                      size="small"
+                      v-model="newServiceForm.description"
+                      
+                      maxlength="1000"
+                      minlength="5"
+                      show-word-limit
+                      :disabled="newServiceForm.service === ''">
+                    </el-input>
+                </el-form-item>
+              
+              </div>
+
+            </div>
+          
+         
+           <!-- boton guardar cancelar -->
+            <div class="flex justify-end dialog-footer"  >
+                <el-button type="primary" size="small" 
+                 @click.native="selectService(newServiceForm.service, 'edit')" >Guardar</el-button
+                >
+                <el-button size="small" 
+                  @click="dialogVisible = false">Cancelar</el-button
+                >
+                
+            </div>
+          
+          </el-form>
+        </el-dialog>
     <el-form
       :model="invoicesNewForm"
       :rules="invoicesNewFormRules"
       status-icon
-      
-     
-     
-    
     >
    <div class="flex flex-col space-y-4">
     <div class="flex flex-col ">
@@ -72,7 +186,6 @@
             </el-form-item>
           </div>
         </div>
-
         <!-- second row -->
         <div class="grid grid-cols-12 gap-4">
           <!-- cliente -->
@@ -105,13 +218,13 @@
           </div>
           <!-- condiciones de pago -->
           <div class="col-span-3">
-            <el-form-item label="Condiciones de pago"  prop="paymants">
-              <el-select v-model="invoicesNewForm.paymants" size="small" class="w-full" clearable filterable default-first-option placeholder="Seleccionar">
+            <el-form-item label="Condiciones de pago"  prop="paymentConditions">
+              <el-select v-model="invoicesNewForm.paymentConditions" size="small" class="w-full" clearable filterable default-first-option placeholder="Seleccionar">
                     <el-option
-                      v-for="item in paymants"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
+                      v-for="p in paymentConditions"
+                      :key="p.value"
+                      :label="p.name"
+                      :value="p.id">
                     </el-option>
                   </el-select>
             </el-form-item>
@@ -119,13 +232,13 @@
           
           <!-- Venta a cuenta de -->
           <div class="col-span-3">
-            <el-form-item label="Venta a cuenta de" prop="sellfor">
-              <el-select v-model="invoicesNewForm.sellfor" class="w-full" size="small" clearable filterable default-first-option placeholder="Seleccionar">
+            <el-form-item label="Venta a cuenta de" prop="sellers">
+              <el-select v-model="invoicesNewForm.sellers" class="w-full" size="small" clearable filterable default-first-option placeholder="Seleccionar">
                 <el-option
-                  v-for="item in sellers"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
+                  v-for="s in sellers"
+                  :key="s.value"
+                  :label="s.name"
+                  :value="s.id">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -133,7 +246,6 @@
           
           
         </div>
-
         <!-- third row -->
         <div class="grid grid-cols-12 gap-4 text-xs">
          
@@ -162,121 +274,12 @@
             <span>Giro</span>
           </div>
         </div>
-
         <!-- fourth row btn agregarservicio -->
-        
-         <div  class="flex justify-end">
+        <div  class="flex justify-end">
               <el-button type="primary" size="small" @click="dialogVisible = true"
               >Agregar Servicio</el-button>
         </div>
-      
-
-        <!-- dialogo -->
-        <el-dialog
-          title="Agregar Servicio"
-          :visible.sync="dialogVisible"
-          width="35%"
-          :before-close="handleClose"
-          :append-to-body="true"
-          >
-          <el-form
-            :model="newServiceForm"
-            status-icon
-            :rules="newServiceFormRules"
-            
-            
-          >
-          
-            <!-- first row -->
-            <div class="grid grid-cols-12">
-              <!-- Servicio -->
-              <div class="col-span-12">
-                
-                <el-form-item label="Servicio" prop="service">
-                    <el-select v-model="value" clearable size="small" class="w-full" placeholder="Seleccionar servicio">
-                      <el-option
-                        v-for="item in services"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
-                      </el-option>
-                    </el-select>
-                </el-form-item>
-              
-              </div>
-
-            </div>
-            <!-- second row -->
-            <div class="grid grid-cols-12 gap-4 ">
-              <!-- Cantidad -->
-              <div class="col-span-6">
-                
-                <el-form-item label="Cantidad" >
-                   <el-input
-                        step="0.01"
-                        size="small"
-                        type="number"
-                        disabled/>
-                </el-form-item>
-              </div>
-
-              <!-- precio -->
-               <div class="col-span-6">
-            
-                  <el-form-item label="Precio" >
-                  
-                    <div class="w-full flex items-center  ">
-                     <el-input
-                        step="0.01"
-                        size="small"
-                        type="number"
-                        disabled/>
-                <el-checkbox
-                 
-                  border
-                  size="small"
-                  class="px-3"
-                  disabled
-                >IVA incl.</el-checkbox>
-                    </div>
-                 
-                  </el-form-item>
-               </div>
-            </div>
-
-            <!-- third row -->
-            <div class="grid grid-cols-12">
-              <!--Descripcion -->
-              <div class="col-span-12">
-                
-                <el-form-item label="Descripción" prop="description">
-                    <el-input
-                      type="textarea"
-                      :rows="5"
-                      size="small"
-                      v-model="descripcion"
-                      :disabled="true">
-                    </el-input>
-                </el-form-item>
-              
-              </div>
-
-            </div>
-          
-         
-           <!-- boton guardar cancelar -->
-            <div class="flex justify-end dialog-footer"  >
-                <el-button type="primary" size="small" 
-                @click="dialogVisible = false" >Guardar</el-button
-                >
-                <el-button size="small" 
-                  @click="dialogVisible = false">Cancelar</el-button
-                >
-                
-            </div>
-          
-          </el-form>
-        </el-dialog>
+        
 
      </div>
 
@@ -390,6 +393,7 @@
 </template>
 
 <script>
+
 import LayoutContent from "../../components/layout/Content";
 import {
   inputValidation,
@@ -405,12 +409,32 @@ export default {
   name: "InvoicesNew",
   components: { LayoutContent, Notification },
   fetch() {
+     const sellers = () => {
+      return this.$axios.get("/invoices/sellers");
+    };
+     const paymentsConditions = () => {
+      return this.$axios.get("/invoices/payment-condition");
+    };
    
+     
+     Promise.all([sellers(),paymentsConditions()])
+      .then((res) => {
+        const [sellers, paymentConditions] = res;
+       
+        this.sellers = sellers.data.sellers;
+        this.paymentConditions = paymentConditions.data.paymentConditions
+        this.loading = false;
+        
+      })
+      .catch((err) => {
+        console.log(err)
+        this.errorMessage = err.response.data.message;
+      });
 
-  
+      
       
 
-    checkBeforeEnter(this, storagekey, "invoicesNewForm");
+    // checkBeforeEnter(this, storagekey, "invoicesNewForm");
   },
   fetchOnServer: false,
   beforeRouteLeave(to, from, next) {
@@ -420,69 +444,33 @@ export default {
     
     return {
       
-      facturas:[
-        {
-          num: '1',
-          cant: '3',
-          details: "Hola k ase",
-          precuni: "45.55",
-          vnosujeta: "hola",
-          vexenta: "hola",
-          vgrabada: "hola"
-        },
-      ],
-      
-      loading: false,
-     
-      invoicesNewForm: {
-        document: "",
-        auth: "",
-        correlativo: "",
-        date: "",
-        costumer: "",
-        office: "",
-        paymants:"",
-        sellfor: "",
+        facturas:[],
+        loading: false,
+        invoicesNewForm: {
+          document: "",
+          auth: "",
+          correlativo: "",
+          date: "",
+          costumer: "",
+          office: "",
+          paymentConditions: null,
+          sellers: null,
 
 
-      },
-      invoicesNewFormRules: {
-        document: selectValidation(true),
-        date: selectValidation(true),
-        costumer: selectValidation(true),
-        office: selectValidation(true),
-        paymants: selectValidation(true),
-        sellfor: selectValidation(true),
-        
-        
-      
-      },
-      
-        sellers: [{
-          value: 'Option1',
-          label: 'Isaac'
-        }, {
-          value: 'Option2',
-          label: 'Jorbe'
         },
-        {
-          value: 'Option3',
-          label: 'Bryan'
-        }],
-        services: [{
-          value: 'Option1',
-          label: 'Servicio 1'
-        }, {
-          value: 'Option2',
-          label: 'Servicio 2'
-        }],
-       paymants: [{
-          value: 'Option1',
-          label: 'Contado'
-        }, {
-          value: 'Option2',
-          label: 'Credito'
-        }],
+        invoicesNewFormRules: {
+          document: selectValidation(true),
+          date: selectValidation(true),
+          costumer: selectValidation(true),
+          office: selectValidation(true),
+          paymentConditions: selectValidation(true),
+          sellers: selectValidation(true),
+          
+          
+        
+        },
+        sellers: [],
+        paymentConditions: [],
         sucursales: [{
           value: 'Option1',
           label: 'Sucursal 1'
@@ -497,15 +485,13 @@ export default {
           value: 'Option2',
           label: 'Cliente 2'
         }],
-      documents: [{
+        documents: [{
           value: 'Option1',
           label: 'FCF - Consumidor Final'
         }, {
           value: 'Option2',
           label: 'CFC - Crédito Fiscal'
         }],
-       
-        
         dialogVisible: false,
         numcant:[
           {num:1},
@@ -535,28 +521,116 @@ export default {
             }
           }]
         },
-         value2: '',
-         input: "",
-         chkSeller: "",
-         chkPaymants: "",
-         chkIva: "",
-         descripcion: "",
+        value2: '',
+        input: "",
+        chkSeller: "",
+        chkPaymants: "",
+        chkIva: "",
+        descripcion: "",
+        newServiceForm: {
+        service: "",
+        quantity: "",
+        cost: "",
+        description: "",
+        incTax: false
+      },
+      newServiceForm: {
+        service: "",
+        quantity: "",
+        cost: "",
+        description: "",
+        incTax: false
+      },
+      newServiceFormRules: {
+        service: selectValidation(true),
+        // quantity: amountValidate("blur", true, 1),
+        // cost: amountValidate("blur", true, 0),
+        description: inputValidation(true),
+      },
+      cost:"",
+      services: [],
+      description: "",
+       selectedService: null,
     };
   
   },
   
   methods: {
-    handleClose(done) {
-        this.$confirm('Are you sure to close this dialog?')
-          .then(_ => {
-            done();
-          })
-          .catch(_ => {});
-      },
+    
       setStorage(invoicesNewForm) {
       localStorage.setItem(storagekey, JSON.stringify(invoicesNewForm));
     },
-   
+     fetchSellers() {
+      let params = this.page;
+      this.$axios
+        .get("/invoices/sellers")
+        .then((res) => {
+          this.sellers = res.data.sellers;
+        })
+        .catch((err) => {
+          this.errorMessage = err.response.data.message;
+        });
+    },
+    fetchPaymentConditions() {
+          let params = this.page;
+          this.$axios
+            .get("/invoices/payment-condition")
+            .then((res) => {
+              this.paymentConditions = res.data.paymentConditions;
+            
+            })
+            .catch((err) => {
+              console.log(err)
+              this.errorMessage = err.response.data.message;
+            });
+    },
+    
+
+    openDialog() {
+      
+      const services = () => {
+      return this.$axios.get("/services");
+      };
+       
+     Promise.all([services()])
+      .then((res) => {
+        const [services] = res;
+       
+        this.services = services.data.services;
+        
+        
+        
+      })
+      .catch((err) => {
+        console.log(err)
+        this.errorMessage = err.response.data.message;
+      });
+ 
+    },
+    selectService(id, type) {
+     switch(type){
+       case "new":
+        this.$axios.get(`/services/${id}`)
+          .then(res => {
+            this.newServiceForm.cost = res.data.service.cost;
+            this.newServiceForm.description = res.data.service.description;
+          })
+          .catch(err => {  this.errorMessage = err.response.data.message;})
+        break;
+        case "edit":
+          let service = {
+            cost: 500,
+            description: "ELABORACIÓN DE REGLAMENTO INTERNO"
+          }
+          this.$axios.put(`/services/${id}`, service )
+                    .then((res) => { console.log(res)})
+
+        break;
+       
+     }    
+   },
+  
+      
 }
 }
 </script>
