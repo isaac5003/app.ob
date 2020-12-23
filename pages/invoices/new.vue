@@ -12,7 +12,7 @@
       :model="invoicesNewForm"
       :rules="invoicesNewFormRules"
       status-icon
-      ref="customersNewInvoice"
+      
      
      
     
@@ -36,7 +36,7 @@
             </el-form-item>
           </div>
           <!-- n° autorizacion -->
-          <div class="col-span-2 col-start-7">
+          <div class="col-span-2 col-start-7 ">
             <el-form-item label="N° de autorización" >
               <el-input
                 size="small"
@@ -76,9 +76,9 @@
         <!-- second row -->
         <div class="grid grid-cols-12 gap-4">
           <!-- cliente -->
-          <div class="col-span-3">
+          <div class="col-span-4">
            <el-form-item label="Cliente" prop="costumer">
-                <el-select v-model="invoicesNewForm.costumer" class="w-full" clearable filterable placeholder="Seleccionar">
+                <el-select v-model="invoicesNewForm.costumer" size="small" class="w-full" clearable filterable default-first-option placeholder="Seleccionar">
                   <el-option
                     v-for="item in clientes"
                     :key="item.value"
@@ -91,9 +91,9 @@
           
           </div>
           <!-- sucursal -->
-          <div class="col-span-3">
+          <div class="col-span-2">
             <el-form-item  label="Sucursal" prop="office">
-                <el-select v-model="invoicesNewForm.office" class="w-full" clearable filterable  size="small" placeholder="Seleccionar">
+                <el-select v-model="invoicesNewForm.office" class="w-full" clearable filterable default-first-option size="small" placeholder="Seleccionar">
                   <el-option
                     v-for="item in sucursales"
                     :key="item.value"
@@ -106,7 +106,7 @@
           <!-- condiciones de pago -->
           <div class="col-span-3">
             <el-form-item label="Condiciones de pago"  prop="paymants">
-              <el-select v-model="invoicesNewForm.paymants" size="small" class="w-full" clearable filterable  placeholder="Seleccionar">
+              <el-select v-model="invoicesNewForm.paymants" size="small" class="w-full" clearable filterable default-first-option placeholder="Seleccionar">
                     <el-option
                       v-for="item in paymants"
                       :key="item.value"
@@ -120,7 +120,7 @@
           <!-- Venta a cuenta de -->
           <div class="col-span-3">
             <el-form-item label="Venta a cuenta de" prop="sellfor">
-              <el-select v-model="invoicesNewForm.sellfor" class="w-full" size="small" clearable filterable placeholder="Seleccionar">
+              <el-select v-model="invoicesNewForm.sellfor" class="w-full" size="small" clearable filterable default-first-option placeholder="Seleccionar">
                 <el-option
                   v-for="item in sellers"
                   :key="item.value"
@@ -177,12 +177,20 @@
           :visible.sync="dialogVisible"
           width="35%"
           :before-close="handleClose"
+          :append-to-body="true"
           >
-          <div class="flex flex-col">
+          <el-form
+            :model="newServiceForm"
+            status-icon
+            :rules="newServiceFormRules"
+            
+            
+          >
+          
             <!-- first row -->
             <div class="grid grid-cols-12">
               <!-- Servicio -->
-              <div class="col-span-12 ">
+              <div class="col-span-12">
                 
                 <el-form-item label="Servicio" prop="service">
                     <el-select v-model="value" clearable size="small" class="w-full" placeholder="Seleccionar servicio">
@@ -199,32 +207,37 @@
 
             </div>
             <!-- second row -->
-            <div class="grid grid-cols-12 ">
+            <div class="grid grid-cols-12 gap-4 ">
               <!-- Cantidad -->
-              <div class="col-span-5 ">
+              <div class="col-span-6">
                 
                 <el-form-item label="Cantidad" >
-                    <el-input-number  :disabled="true" size="small" v-model="numcant" controls-position="right" :min="1" :max="10">
-
-                    </el-input-number>
+                   <el-input
+                        step="0.01"
+                        size="small"
+                        type="number"
+                        disabled/>
                 </el-form-item>
-              
               </div>
 
               <!-- precio -->
-               <div class="col-span-7 ">
+               <div class="col-span-6">
             
                   <el-form-item label="Precio" >
                   
-                    <div class="w-full flex items-center ">
-                     <el-input-number  :disabled="true" size="small" v-model="numcant" controls-position="right"  :min="1" :max="10">
-
-                    </el-input-number>
-                     
-                        <el-checkbox v-model="chkIva"  border class="mt-1 px-3" size="small" disabled>
-                           IVA incl.
-                        </el-checkbox>
-                      
+                    <div class="w-full flex items-center  ">
+                     <el-input
+                        step="0.01"
+                        size="small"
+                        type="number"
+                        disabled/>
+                <el-checkbox
+                 
+                  border
+                  size="small"
+                  class="px-3"
+                  disabled
+                >IVA incl.</el-checkbox>
                     </div>
                  
                   </el-form-item>
@@ -249,18 +262,20 @@
               </div>
 
             </div>
-          </div>
+          
          
            <!-- boton guardar cancelar -->
-      <div class="flex justify-end dialog-footer" slot="footer"  >
-       
-        <el-button size="small" 
-          @click="dialogVisible = false">Cancelar</el-button
-        >
-         <el-button type="primary" size="small" 
-         @click="dialogVisible = false" >Guardar</el-button
-        >
-     </div>
+            <div class="flex justify-end dialog-footer"  >
+                <el-button type="primary" size="small" 
+                @click="dialogVisible = false" >Guardar</el-button
+                >
+                <el-button size="small" 
+                  @click="dialogVisible = false">Cancelar</el-button
+                >
+                
+            </div>
+          
+          </el-form>
         </el-dialog>
 
      </div>
@@ -322,96 +337,41 @@
      </div>
      
      <!-- sumas -->
-      <div class="grid grid-cols-12">
-        <div class="grid col-span-4 col-start-9 text-sm">
-          <div class="divide-y divide-gray-300">
-            <!-- espacio en blanco -->
-            <div class="grid grid-cols-12 gap-4">
-              <div class="col-span-5 col-start-5 ">
-               
-            </div>
-            </div>
-            <!-- first row -->
-            <div class="grid grid-cols-12 gap-4">
-              <div class="col-span-5 col-start-5 ">
-                <div class="text-right text-blue-800">
-                  SUMAS:
-                </div>
-              </div>
-                <div class="col-span-2 col-start-11 ">
-                <div class="text-right text-gray-800">
-                  $0.00
-                </div>
-              </div>
-            </div>
-            <!-- second row -->
-            <div class="grid grid-cols-12 gap-4">
-              <div class="col-span-5 col-start-5 ">
-                <div class="text-right text-blue-800">
-                  Subtotal:
-                </div>
-              </div>
-                <div class="col-span-2 col-start-11 ">
-                <div class="text-right text-gray-800">
-                  $0.00
-                </div>
-              </div>
-            </div>
-            <!-- third row -->
-            <div class="grid grid-cols-12 gap-4">
-              <div class="col-span-5 col-start-5 ">
-                <div class="text-right text-blue-800">
-                  Iva retenido:
-                </div>
-              </div>
-                <div class="col-span-2 col-start-11 ">
-                <div class="text-right text-gray-800">
-                  $0.00
-                </div>
-              </div>
-            </div>
-             <!-- fourth row -->
-            <div class="grid grid-cols-12 gap-4">
-              <div class="col-span-5 col-start-5 ">
-                <div class="text-right text-blue-800">
-                  Ventas exentas:
-                </div>
-              </div>
-                <div class="col-span-2 col-start-11 ">
-                <div class="text-right text-gray-800">
-                  $0.00
-                </div>
-              </div>
-            </div>
-            <!-- fifth row -->
-            <div class="grid grid-cols-12 gap-4">
-              <div class="col-span-6 col-start-4 ">
-                <div class="text-right text-blue-800">
-                 Ventas no sujetas:
-                </div>
-              </div>
-                <div class="col-span-2 col-start-11 ">
-                <div class="text-right text-gray-800">
-                  $0.00
-                </div>
-              </div>
-            </div>
-            <!-- sixth row -->
-            <div class="grid grid-cols-12 gap-4">
-              <div class="col-span-5 col-start-5 ">
-                <div class="text-right text-blue-800 font-semibold ">
-                 Venta total:
-                </div>
-              </div>
-                <div class="col-span-2 col-start-11 ">
-                <div class="text-right text-gray-800">
-                  $0.00
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>  
+        <table class="flex justify-end">
+            <tbody class="text-sm divide-y divide-gray-300">
+
+              <tr class=" flex  space-x-16">
+                <td align="right" class="text-blue-900 w-50" >SUMAS:</td>
+                <td align="right" class="text-gray-800">$0.00</td>
+              </tr>
+              <!-- <tr class="border-t" v-if="newInvoiceForm.documentType === '2'">
+                <td align="right" class="text-blue-900" width="200px">13% Iva:</td>
+                <td align="right" class="pl-15 pr-2 text-gray-800">{{taxes | formatMoney}}</td>
+              </tr> -->
+              <tr class="flex  space-x-16">
+                <td align="right" class="text-blue-900 w-50" >Subtotal:</td>
+                <td align="right" class="text-gray-800">$0.00</td>
+              </tr>
+              <tr class="flex  space-x-16">
+                <td align="right" class="text-blue-900 w-50" >Iva retenido:</td>
+                <td align="right" class=" text-gray-800">$0.00</td>
+              </tr>
+              <tr class="flex  space-x-16">
+                <td align="right" class="text-blue-900 w-50" >Ventas exentas:</td>
+                <td align="right" class=" text-gray-800">$0.00</td>
+              </tr>
+              <tr class="flex  space-x-16">
+                <td align="right" class="text-blue-900 w-50" >Ventas no sujetas:</td>
+                <td align="right" class=" text-gray-800">$0.00</td>
+              </tr>
+              <tr class="flex  space-x-16">
+                <td align="right" class="text-blue-900 font-semibold w-50">Venta total:</td>
+                <td align="right" class="text-gray-800">$0.00</td>
+              </tr>
+            </tbody>
+          </table>
+          
+        
       
     
       <!-- boton guardar cancelar -->
@@ -493,8 +453,8 @@ export default {
         office: selectValidation(true),
         paymants: selectValidation(true),
         sellfor: selectValidation(true),
-        service: selectValidation(true),
-        description: inputValidation(true)
+        
+        
       
       },
       
@@ -544,7 +504,7 @@ export default {
           value: 'Option2',
           label: 'CFC - Crédito Fiscal'
         }],
-      
+       
         
         dialogVisible: false,
         numcant:[
