@@ -21,40 +21,100 @@
         />
       </div>
       
-      <el-form label-position="top" class="flex flex-col space-y-4">
-        <div class="grid grid-cols-12 gap-4">
+      <el-form label-position="top" class="flex flex-col ">
+        <div class="grid grid-cols-12 space-x-4">
 
           <div class="col-start-10 col-span-3">
-            <el-input
+            <el-form-item>
+                <el-input
               suffix-icon="el-icon-search"
               placeholder="Buscar..."
               v-model="searchValue"
               size="small"
-              style="margin-top: 26px"
               clearable
               v-debounce:500ms="fetchInvoices"
               @change="fetchInvoices"
             />
+               </el-form-item>
           </div>
         </div>
         <!-- Colocamos los input corespondientes-->
         <!--No hay etiquetas que agregar-->
-        <div class="flex   grid-cols-12 space-x-4  ">
-              <div class=" col-span-4 w-full ">
+        <div class="grid grid-cols-12 gap-x-4  ">
+              <div class="col-span-4 w-full">
     <span class="text-gray-700 text-xs">Rango de fechas:</span>
-    <el-date-picker
-      v-model="rangFech"
-       size="small"
+      <el-form-item>
+        <el-date-picker
+      v-model="value1"
+      style="width:100%"
+      size="small"
       type="datetimerange"
       range-separator="-"
-      start-placeholder="Fecha de Inicio"
-      end-placeholder="Fecha de final">
-    </el-date-picker> 
+      start-placeholder="Fecha inicial"
+      end-placeholder="Fecha final">
+    </el-date-picker>
+      </el-form-item>
     </div>
  
-       <div class="col-span-4 w-full  ">
+       <div class="col-span-4 w-full">
           <span class="text-gray-700 text-xs" > Cliente:</span>
-          <el-select v-model="clienV" 
+         <el-form-item>
+         <el-select 
+         v-model="clienV" 
+         size="small"
+          style="width:100%"
+        clearable placeholder="Todos los clientes:">
+   <el-option
+      v-for="item in options"
+      :key="item.value"
+      :label="item.label"
+      :value="item.value">
+    </el-option>
+  </el-select>
+         </el-form-item>
+  </div>
+
+   <div class="col-span-2 w-full ">
+         <span class="text-gray-700 text-xs" > Tipo fact:</span>
+         <el-form-item> 
+         <el-select 
+         v-model="TypeFact" 
+         size="small"
+        
+         clearable placeholder="Todos los tipos:">
+    <el-option
+      v-for="item in options"
+      :key="item.value"
+      :label="item.label"
+      :value="item.value">
+    </el-option>
+  </el-select>
+    
+       </el-form-item>  
+  </div>
+   <div class="col-span-2 w-full">
+     <span class="text-gray-700 text-xs" > Estado:</span>
+     <el-form-item>
+    <el-select v-model="status"
+           size="small"
+          
+           clearable placeholder="Todos los estados:">
+    <el-option
+      v-for="item in options"
+      :key="item.value"
+      :label="item.label"
+      :value="item.value">
+    </el-option>
+  </el-select>
+  </el-form-item>
+  </div>
+      </div>
+   <!-- div vendedor, zona-->
+      <div class="grid grid-cols-12 space-x-4 gap-x-4"  >
+        <div class="col-span-3  ">
+          <span class="text-gray-700 text-xs" > Vendedor:</span>
+          <el-form-item>
+            <el-select v-model="VendClie" 
            size="small"
            
           clearable placeholder="Todos los clientes:">
@@ -64,57 +124,18 @@
       :label="item.label"
       :value="item.value">
     </el-option>
-  </el-select>
-  </div>
-
-   <div class="col-span-4  ">
-          <span class="text-gray-700 text-xs" > Tipo fact:</span>
-          <el-select v-model="TypeFact" 
-           size="small"
-          clearable placeholder="Todos los tipos:">
-    <el-option
-      v-for="item in options"
-      :key="item.value"
-      :label="item.label"
-      :value="item.value">
-    </el-option>
-  </el-select>
-  </div>
-
-   <div class="col-span-4 ">
-          <span class="text-gray-700 text-xs" > Estado:</span>
-          <el-select v-model="status"
-           size="small"
-           clearable placeholder="Todos los estados:">
-    <el-option
-      v-for="item in options"
-      :key="item.value"
-      :label="item.label"
-      :value="item.value">
-    </el-option>
-  </el-select>
-  </div>
-      </div>
-   <!-- div vendedor, zona-->
-      <div class=" flex flex-row grid-cols-12 space-x-4" >
-        <div class=" grid cols-span-4 w-56">
-          <span class="text-gray-700 text-xs" > Vendedor:</span>
-          <el-select v-model="VendClie" 
-           size="small"
-          clearable placeholder="Todos los clientes:">
-    <el-option
-      v-for="item in options"
-      :key="item.value"
-      :label="item.label"
-      :value="item.value">
-    </el-option>
-  </el-select>
+    </el-select>
+          </el-form-item>
+            
+        
         </div>
-                <div class=" col-span-3 w-56">
+                <div class="col-span-3">
           <span class="text-gray-700 text-xs" > Zona:</span>
-          <el-select v-model="zonaValue" 
+          <el-form-item>
+                 <el-select v-model="zonaValue" 
            size="small"
-          clearable placeholder="Todos los Zona:">
+          
+          clearable placeholder="Todos las Zona:">
     <el-option
       v-for="item in options"
       :key="item.value"
@@ -122,11 +143,15 @@
       :value="item.value">
     </el-option>
   </el-select>
+          </el-form-item>
+
         </div>
-        <div class="col-span-3 w-56">
+        <div class=" col-span-3">
           <span class="text-gray-700 text-xs" > Servicio:</span>
-          <el-select v-model="servVlue" 
+          <el-form-item>
+            <el-select v-model="servVlue" 
            size="small"
+        
           clearable placeholder="Todos los servicio:">
     <el-option
       v-for="item in options"
@@ -135,6 +160,7 @@
       :value="item.value">
     </el-option>
   </el-select>
+          </el-form-item>
         </div>
       </div>
       </el-form>
@@ -238,14 +264,29 @@ export default {
       VendClie:"",
       zonaValue:"",
       servVlue:"",
-
-
-
-      invoices: {
+    
+    invoices: {
         invoices: [],
         count: 0,
       },
-
+      options: [{
+          value: 'Option1',
+          label: 'Option1'
+        }, {
+          value: 'Option2',
+          label: 'Option2'
+        }, {
+          value: 'Option3',
+          label: 'Option3'
+        }, {
+          value: 'Option4',
+          label: 'Option4'
+        }, {
+          value: 'Option5',
+          label: 'Option5'
+        }],
+        
+        value: '',
       page: {
         limit: 10,
         page: 1,
