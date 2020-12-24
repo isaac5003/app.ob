@@ -172,23 +172,23 @@
                           $router.push(`/invoices/edit?ref=${scope.row.id}`)
                         "
                       >
-                        <i class="el-icon-edit-outline"></i> Editar zona
+                        <i class="el-icon-edit-outline"></i> Editar pago
                       </el-dropdown-item>
-                      <el-dropdown-item @click.native="changeActive(scope.row)">
+                      <el-dropdown-item @click.native="changeActivePayment(scope.row)">
                         <span v-if="scope.row.active">
                           <i class="el-icon-close"></i> Desactivar
                         </span>
                         <span v-else>
                           <i class="el-icon-check"></i> Activar
                         </span>
-                        zona
+                        pago
                       </el-dropdown-item>
                       <el-dropdown-item
                         :divided="true"
                         class="text-red-500 font-semibold"
                         @click.native="deleteInvoice(scope.row)"
                       >
-                        <i class="el-icon-delete"></i> Eliminar zona
+                        <i class="el-icon-delete"></i> Eliminar pago
                       </el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
@@ -280,7 +280,6 @@ export default {
         this.zones = zones.data.zones;
         this.sellers = sellers.data.sellers;
         this.payment = payment.data.paymentConditions;
-        console.log(payment.data.paymentConditions);
         this.loading = false;
       })
       .catch((err) => {
@@ -333,6 +332,17 @@ export default {
         .catch((err) => {
           this.errorMessage = err.response.data.message;
         });
+    },
+    fetchPayments(){
+      let params = this.page;
+      this.$axios
+          .get("/invoices/payment-condition")
+          .then((res) => {
+            this.payment = res.data.paymentConditions;
+          })
+          .catch((err) => {
+            this.errorMessage = err.response.data.message;
+          });
     },
     changeActiveZone({ id, active }) {
       const action = active ? "desactivar" : "activar";
@@ -395,6 +405,46 @@ export default {
                     message: res.data.message,
                   });
                   this.fetchSellers();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, ${action}`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
+    },
+    //Metodo para camiar el estado de condiciones de pago
+    changeActivePayment({ id, active }) {
+      const action = active ? "desactivar" : "activar";
+      this.$confirm(
+        `¿Estás seguro que deseas ${action} este pago?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, ${action}`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .put(`/invoices/payment-condition/status/${id}`, { status: !active })
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchPayments();
                 })
                 .catch((err) => {
                   this.$notify.error({
