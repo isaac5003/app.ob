@@ -16,15 +16,14 @@
            :close-on-click-modal="false"
           :append-to-body="true"
           @open="openDialog()"
-         
+          @close="closeDialog(newServiceForm)"
           >
           <el-form
             :model="newServiceForm"
             status-icon
             :rules="newServiceFormRules"
-             ref="newServiceForm"
-            @submit.prevent.native="selectService(newServiceForm.service, 'edit')"
-            
+            ref="newServiceForm" 
+                   
           >
           
             <!-- first row -->
@@ -54,28 +53,39 @@
               <div class="col-span-6">
                 
                 <el-form-item label="Cantidad" >
-                   <el-input
-                        step="1"
-                        size="small"
-                        type="number"
-                        v-model="newServiceForm.quantity"
-                        :disabled="newServiceForm.service === ''"/>
+                   <el-input-number
+                      ref="quantity"
+                      type="number"
+                      :min="0"
+                      :step="1"
+                      v-model="newServiceForm.quantity"
+                      size="small"
+                      autocomplete="off"
+                      style="width: 100%"
+                      :disabled="newServiceForm.service === ''"
+                    />
                 </el-form-item>
               </div>
 
               <!-- precio -->
                <div class="col-span-6">
             
-                  <el-form-item label="Precio" >
+                  <el-form-item label="Precio">
                   
                     <div class="w-full flex items-center  ">
-                     <el-input
-                        v-model="newServiceForm.cost"
-                        step="0.01"
-                        size="small"
+                      <el-input-number
+                        class="w-full"
+                        ref="cost"
                         type="number"
-                        value=""
-                        :disabled="newServiceForm.service === ''"/>
+                        :min="0.00"
+                        :step="0.01"
+                        v-model="newServiceForm.cost"
+                        size="small"
+                        autocomplete="off"
+                        style="width: 100%"
+                        :disabled="newServiceForm.service === ''"
+                        :precision="2"
+                      />
                 <el-checkbox
                  
                   border
@@ -193,10 +203,10 @@
            <el-form-item label="Cliente" prop="costumer">
                 <el-select v-model="invoicesNewForm.costumer" size="small" class="w-full" clearable filterable default-first-option placeholder="Seleccionar">
                   <el-option
-                    v-for="item in clientes"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
+                    v-for="c in customers"
+                    :key="c.id"
+                    :label="c.name"
+                    :value="c.id"
                      @change="setStorage(invoicesNewForm)">
                   </el-option>
                 </el-select>
@@ -338,7 +348,6 @@
         </el-table>
     </div>  
      </div>
-     
      <!-- sumas -->
         <table class="flex justify-end">
             <tbody class="text-sm divide-y divide-gray-300">
@@ -373,11 +382,7 @@
               </tr>
             </tbody>
           </table>
-          
-        
-      
-    
-      <!-- boton guardar cancelar -->
+     <!-- boton guardar cancelar -->
       <div class="flex justify-end " >
         <el-button type="primary" size="small" native-type="submit"
           >Guardar</el-button
@@ -410,19 +415,24 @@ export default {
   components: { LayoutContent, Notification },
   fetch() {
      const sellers = () => {
-      return this.$axios.get("/invoices/sellers");
+      return this.$axios.get("/invoices/sellers",{params: {active: true}});
     };
      const paymentsConditions = () => {
       return this.$axios.get("/invoices/payment-condition");
     };
+
+    const customers = () => {
+        return this.$axios.get("/customers",{params: {isActiveCustomer: true}});
+    }
    
      
-     Promise.all([sellers(),paymentsConditions()])
+     Promise.all([sellers(),paymentsConditions(), customers()])
       .then((res) => {
-        const [sellers, paymentConditions] = res;
+        const [sellers, paymentConditions, customers] = res;
        
         this.sellers = sellers.data.sellers;
         this.paymentConditions = paymentConditions.data.paymentConditions
+        this.customers = customers.data.customers
         this.loading = false;
         
       })
@@ -478,13 +488,7 @@ export default {
           value: 'Option2',
           label: 'Sucursal 2'
         }],
-        clientes: [{
-          value: 'Option1',
-          label: 'Cliente 1'
-        }, {
-          value: 'Option2',
-          label: 'Cliente 2'
-        }],
+        customers: [],
         documents: [{
           value: 'Option1',
           label: 'FCF - Consumidor Final'
@@ -557,55 +561,48 @@ export default {
   
   methods: {
     
-      setStorage(invoicesNewForm) {
+    setStorage(invoicesNewForm) {
       localStorage.setItem(storagekey, JSON.stringify(invoicesNewForm));
     },
-     fetchSellers() {
-      let params = this.page;
-      this.$axios
-        .get("/invoices/sellers")
-        .then((res) => {
-          this.sellers = res.data.sellers;
-        })
-        .catch((err) => {
-          this.errorMessage = err.response.data.message;
-        });
-    },
-    fetchPaymentConditions() {
-          let params = this.page;
-          this.$axios
-            .get("/invoices/payment-condition")
-            .then((res) => {
-              this.paymentConditions = res.data.paymentConditions;
+    //  fetchSellers() {
+    //   let params = this.page;
+    //   this.$axios
+    //     .get("/invoices/sellers")
+    //     .then((res) => {
+    //       this.sellers = res.data.sellers;
+    //     })
+    //     .catch((err) => {
+    //       this.errorMessage = err.response.data.message;
+    //     });
+    // },
+    // fetchPaymentConditions() {
+    //       let params = this.page;
+    //       this.$axios
+    //         .get("/invoices/payment-condition")
+    //         .then((res) => {
+    //           this.paymentConditions = res.data.paymentConditions;
             
-            })
-            .catch((err) => {
-              console.log(err)
-              this.errorMessage = err.response.data.message;
-            });
-    },
+    //         })
+    //         .catch((err) => {
+    //           console.log(err)
+    //           this.errorMessage = err.response.data.message;
+    //         });
+    // },
     
+    closeDialog(){
+      this.$refs.newServiceForm.resetFields()
+      this.newServiceForm.cost = ""
+      this.newServiceForm.quantity = ""
+    },
 
     openDialog() {
-      
-      const services = () => {
-      return this.$axios.get("/services");
-      };
-       
-     Promise.all([services()])
-      .then((res) => {
-        const [services] = res;
-       
-        this.services = services.data.services;
-        
-        
-        
-      })
-      .catch((err) => {
-        console.log(err)
-        this.errorMessage = err.response.data.message;
-      });
- 
+      this.$axios.get('/services', {params: {active: true}})
+          .then(res => {
+            this.services = res.data.services;
+           
+          })
+          .catch(err => {  this.errorMessage = err.response.data.message;})
+          
     },
     selectService(id, type) {
      switch(type){
@@ -616,21 +613,9 @@ export default {
             this.newServiceForm.description = res.data.service.description;
           })
           .catch(err => {  this.errorMessage = err.response.data.message;})
-        break;
-        case "edit":
-          let service = {
-            cost: 500,
-            description: "ELABORACIÓN DE REGLAMENTO INTERNO"
-          }
-          this.$axios.put(`/services/${id}`, service )
-                    .then((res) => { console.log(res)})
-
-        break;
-       
+        break;       
      }    
-   },
-  
-      
+   },      
 }
 }
 </script>
