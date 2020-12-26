@@ -19,7 +19,11 @@ export default {
     "./plugins/filters.js",
     "./plugins/vue-debounce.js",
   ],
-  buildModules: ["@nuxtjs/tailwindcss", "@nuxtjs/google-fonts"],
+  buildModules: [
+    "@nuxtjs/tailwindcss",
+    "@nuxtjs/google-fonts",
+    "@nuxtjs/date-fns",
+  ],
   modules: ["@nuxtjs/axios", "@nuxtjs/auth-next"],
   router: {
     middleware: ["auth"],

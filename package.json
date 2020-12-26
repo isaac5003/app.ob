@@ -23,6 +23,7 @@
     "vue-debounce": "^2.5.7"
   },
   "devDependencies": {
+    "@nuxtjs/date-fns": "^1.4.3",
     "node-sass": "^4.14.1",
     "sass-loader": "^9.0.2"
   }
