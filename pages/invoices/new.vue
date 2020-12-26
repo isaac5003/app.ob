@@ -12,7 +12,7 @@
     <el-dialog
       title="Agregar Servicio"
       :visible.sync="dialogVisible"
-      width="35%"
+      width="550px"
       :close-on-click-modal="false"
       :append-to-body="true"
       @open="openDialog()"
@@ -58,22 +58,22 @@
                 ref="quantity"
                 type="number"
                 :min="0"
-                :step="1"
+                :step="0.01"
                 v-model="newServiceForm.quantity"
                 size="small"
                 autocomplete="off"
                 style="width: 100%"
                 :disabled="newServiceForm.service === ''"
+                :precision="2"
               />
             </el-form-item>
           </div>
-
           <!-- precio -->
           <div class="col-span-6">
             <el-form-item label="Precio">
-              <div class="w-full flex items-center  ">
+              <div class="w-full flex items-end">
                 <el-input-number
-                  class="w-full"
+                  class="w-full mt-1"
                   ref="cost"
                   type="number"
                   :min="0.0"
@@ -88,7 +88,7 @@
                 <el-checkbox
                   border
                   size="small"
-                  class="px-3"
+                  class="px-3 mt-1"
                   :disabled="newServiceForm.service === ''"
                   >IVA incl.</el-checkbox
                 >
@@ -131,9 +131,10 @@
         </div>
       </el-form>
     </el-dialog>
+
     <el-form :model="salesNewForm" :rules="salesNewFormRules" status-icon>
       <div class="flex flex-col space-y-4">
-        <div class="flex flex-col ">
+        <div class="flex flex-col">
           <!-- first row -->
           <div class="grid grid-cols-12 gap-4">
             <!-- tipo de documento -->
@@ -327,13 +328,11 @@
             >
           </div>
         </div>
-
         <!-- table row -->
         <div class="grid grid-cols-12">
           <div class="col-span-12">
             <el-table :data="sales" style="width: 100%" stripe size="small">
               <el-table-column type="index" label="#" />
-
               <el-table-column prop="quantity" label="Cant." min-width="50">
               </el-table-column>
               <el-table-column prop="details" label="Descripción" width="270">
@@ -385,21 +384,21 @@
               <td align="right" class="text-blue-900 w-50">Subtotal:</td>
               <td align="right" class="text-gray-800">$0.00</td>
             </tr>
-            <tr class="flex  space-x-16">
+            <tr class="flex space-x-16">
               <td align="right" class="text-blue-900 w-50">Iva retenido:</td>
               <td align="right" class=" text-gray-800">$0.00</td>
             </tr>
-            <tr class="flex  space-x-16">
+            <tr class="flex space-x-16">
               <td align="right" class="text-blue-900 w-50">Ventas exentas:</td>
               <td align="right" class=" text-gray-800">$0.00</td>
             </tr>
-            <tr class="flex  space-x-16">
+            <tr class="flex space-x-16">
               <td align="right" class="text-blue-900 w-50">
                 Ventas no sujetas:
               </td>
               <td align="right" class=" text-gray-800">$0.00</td>
             </tr>
-            <tr class="flex  space-x-16">
+            <tr class="flex space-x-16">
               <td align="right" class="text-blue-900 font-semibold w-50">
                 Venta total:
               </td>
@@ -492,27 +491,9 @@ export default {
       },
       sellers: [],
       paymentConditions: [],
-      branches: [
-        {
-          value: "Option1",
-          label: "Sucursal 1",
-        },
-        {
-          value: "Option2",
-          label: "Sucursal 2",
-        },
-      ],
+      branches: [],
       customers: [],
-      documents: [
-        {
-          value: "Option1",
-          label: "FCF - Consumidor Final",
-        },
-        {
-          value: "Option2",
-          label: "CFC - Crédito Fiscal",
-        },
-      ],
+      documents: [],
       dialogVisible: false,
       pickerOptions: {
         shortcuts: [
@@ -540,19 +521,6 @@ export default {
           },
         ],
       },
-      value2: "",
-      input: "",
-      chkSeller: "",
-      chkPaymants: "",
-      chkIva: "",
-      descripcion: "",
-      newServiceForm: {
-        service: "",
-        quantity: "",
-        cost: "",
-        description: "",
-        incTax: false,
-      },
       newServiceForm: {
         service: "",
         quantity: "",
@@ -566,13 +534,9 @@ export default {
         // cost: amountValidate("blur", true, 0),
         description: inputValidation(true),
       },
-      cost: "",
       services: [],
-      description: "",
-      selectedService: null,
     };
   },
-
   methods: {
     setStorage(salesNewForm) {
       localStorage.setItem(storagekey, JSON.stringify(salesNewForm));
@@ -601,13 +565,11 @@ export default {
     //           this.errorMessage = err.response.data.message;
     //         });
     // },
-
     closeDialog() {
       this.$refs.newServiceForm.resetFields();
       this.newServiceForm.cost = "";
       this.newServiceForm.quantity = "";
     },
-
     openDialog() {
       this.$axios
         .get("/services", { params: { active: true } })
