@@ -33,8 +33,15 @@ export default {
         confirmButtonText: "Cerrar sesión",
         cancelButtonText: "Cancelar",
         type: "warning",
-      }).then(() => {
-        this.$auth.logout();
+      }).then(async () => {
+        try {
+          this.$auth.logout();
+          setTimeout(() => {
+            this.$router.push("/auth/login");
+          }, 500);
+        } catch (error) {
+          console.log(error);
+        }
       });
     },
   },
