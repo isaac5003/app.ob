@@ -3,402 +3,423 @@
     v-loading="loading"
     page-title="Nueva Factura"
     :breadcrumb="[
-      { name: 'Facturas', to: '/invoices' },
-      
+      { name: 'Facturas', to: '/sales' },
+
       { name: 'Nueva factura', to: null },
     ]"
   >
     <!-- dialogo -->
-        <el-dialog
-          title="Agregar Servicio"
-          :visible.sync="dialogVisible"
-          width="35%"
-           :close-on-click-modal="false"
-          :append-to-body="true"
-          @open="openDialog()"
-          @close="closeDialog(newServiceForm)"
-          >
-          <el-form
-            :model="newServiceForm"
-            status-icon
-            :rules="newServiceFormRules"
-            ref="newServiceForm" 
-                   
-          >
-          
-            <!-- first row -->
-            <div class="grid grid-cols-12">
-              <!-- Servicio -->
-              <div class="col-span-12">
-                
-                <el-form-item label="Servicio" prop="service">
-                    <el-select v-model="newServiceForm.service" clearable filterable @change="selectService(newServiceForm.service, 'new')" size="small" class="w-full" placeholder="Seleccionar servicio">
-                      <el-option
-                        v-for="s in services"
-                        :key="s.id"
-                        :label="s.name"
-                        :value="s.id"
-                         
-                         >
-                      </el-option>
-                    </el-select>
-                </el-form-item>
-              
-              </div>
+    <el-dialog
+      title="Agregar Servicio"
+      :visible.sync="dialogVisible"
+      width="35%"
+      :close-on-click-modal="false"
+      :append-to-body="true"
+      @open="openDialog()"
+      @close="closeDialog(newServiceForm)"
+    >
+      <el-form
+        :model="newServiceForm"
+        status-icon
+        :rules="newServiceFormRules"
+        ref="newServiceForm"
+      >
+        <!-- first row -->
+        <div class="grid grid-cols-12">
+          <!-- Servicio -->
+          <div class="col-span-12">
+            <el-form-item label="Servicio" prop="service">
+              <el-select
+                v-model="newServiceForm.service"
+                clearable
+                filterable
+                @change="selectService(newServiceForm.service, 'new')"
+                size="small"
+                class="w-full"
+                placeholder="Seleccionar servicio"
+              >
+                <el-option
+                  v-for="s in services"
+                  :key="s.id"
+                  :label="s.name"
+                  :value="s.id"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </div>
+        </div>
+        <!-- second row -->
+        <div class="grid grid-cols-12 gap-4 ">
+          <!-- Cantidad -->
+          <div class="col-span-6">
+            <el-form-item label="Cantidad">
+              <el-input-number
+                ref="quantity"
+                type="number"
+                :min="0"
+                :step="1"
+                v-model="newServiceForm.quantity"
+                size="small"
+                autocomplete="off"
+                style="width: 100%"
+                :disabled="newServiceForm.service === ''"
+              />
+            </el-form-item>
+          </div>
 
-            </div>
-            <!-- second row -->
-            <div class="grid grid-cols-12 gap-4 ">
-              <!-- Cantidad -->
-              <div class="col-span-6">
-                
-                <el-form-item label="Cantidad" >
-                   <el-input-number
-                      ref="quantity"
-                      type="number"
-                      :min="0"
-                      :step="1"
-                      v-model="newServiceForm.quantity"
-                      size="small"
-                      autocomplete="off"
-                      style="width: 100%"
-                      :disabled="newServiceForm.service === ''"
-                    />
-                </el-form-item>
-              </div>
-
-              <!-- precio -->
-               <div class="col-span-6">
-            
-                  <el-form-item label="Precio">
-                  
-                    <div class="w-full flex items-center  ">
-                      <el-input-number
-                        class="w-full"
-                        ref="cost"
-                        type="number"
-                        :min="0.00"
-                        :step="0.01"
-                        v-model="newServiceForm.cost"
-                        size="small"
-                        autocomplete="off"
-                        style="width: 100%"
-                        :disabled="newServiceForm.service === ''"
-                        :precision="2"
-                      />
+          <!-- precio -->
+          <div class="col-span-6">
+            <el-form-item label="Precio">
+              <div class="w-full flex items-center  ">
+                <el-input-number
+                  class="w-full"
+                  ref="cost"
+                  type="number"
+                  :min="0.0"
+                  :step="0.01"
+                  v-model="newServiceForm.cost"
+                  size="small"
+                  autocomplete="off"
+                  style="width: 100%"
+                  :disabled="newServiceForm.service === ''"
+                  :precision="2"
+                />
                 <el-checkbox
-                 
                   border
                   size="small"
                   class="px-3"
                   :disabled="newServiceForm.service === ''"
-                >IVA incl.</el-checkbox>
-                    </div>
-                 
-                  </el-form-item>
-               </div>
-            </div>
-
-            <!-- third row -->
-            <div class="grid grid-cols-12">
-              <!--Descripcion -->
-              <div class="col-span-12">
-                
-                <el-form-item label="Descripción" prop="description">
-                    <el-input
-                      type="textarea"
-                      :rows="5"
-                      size="small"
-                      v-model="newServiceForm.description"
-                      
-                      maxlength="1000"
-                      minlength="5"
-                      show-word-limit
-                      :disabled="newServiceForm.service === ''">
-                    </el-input>
-                </el-form-item>
-              
+                  >IVA incl.</el-checkbox
+                >
               </div>
+            </el-form-item>
+          </div>
+        </div>
 
-            </div>
-          
-         
-           <!-- boton guardar cancelar -->
-            <div class="flex justify-end dialog-footer"  >
-                <el-button type="primary" size="small" 
-                 @click.native="selectService(newServiceForm.service, 'edit')" >Guardar</el-button
+        <!-- third row -->
+        <div class="grid grid-cols-12">
+          <!--Descripcion -->
+          <div class="col-span-12">
+            <el-form-item label="Descripción" prop="description">
+              <el-input
+                type="textarea"
+                :rows="5"
+                size="small"
+                v-model="newServiceForm.description"
+                maxlength="1000"
+                minlength="5"
+                show-word-limit
+                :disabled="newServiceForm.service === ''"
+              >
+              </el-input>
+            </el-form-item>
+          </div>
+        </div>
+
+        <!-- boton guardar cancelar -->
+        <div class="flex justify-end dialog-footer">
+          <el-button
+            type="primary"
+            size="small"
+            @click.native="selectService(newServiceForm.service, 'edit')"
+            >Guardar</el-button
+          >
+          <el-button size="small" @click="dialogVisible = false"
+            >Cancelar</el-button
+          >
+        </div>
+      </el-form>
+    </el-dialog>
+    <el-form :model="salesNewForm" :rules="salesNewFormRules" status-icon>
+      <div class="flex flex-col space-y-4">
+        <div class="flex flex-col ">
+          <!-- first row -->
+          <div class="grid grid-cols-12 gap-4">
+            <!-- tipo de documento -->
+            <div class="col-span-3">
+              <el-form-item label="Tipo de documento" prop="document">
+                <el-select
+                  v-model="salesNewForm.document"
+                  class="w-full"
+                  size="small"
+                  clearable
+                  placeholder="Seleccionar"
                 >
-                <el-button size="small" 
-                  @click="dialogVisible = false">Cancelar</el-button
-                >
-                
-            </div>
-          
-          </el-form>
-        </el-dialog>
-    <el-form
-      :model="invoicesNewForm"
-      :rules="invoicesNewFormRules"
-      status-icon
-    >
-   <div class="flex flex-col space-y-4">
-    <div class="flex flex-col ">
-        <!-- first row -->
-        <div class="grid grid-cols-12 gap-4">
-          <!-- tipo de documento -->
-          <div class="col-span-3">
-            <el-form-item label="Tipo de documento" prop="document">
-                <el-select v-model="invoicesNewForm.document" class="w-full" size="small" clearable placeholder="Seleccionar">
                   <el-option
                     v-for="item in documents"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value"
-                     @change="setStorage(invoicesNewForm)">
+                    @change="setStorage(salesNewForm)"
+                  >
                   </el-option>
                 </el-select>
-            </el-form-item>
+              </el-form-item>
+            </div>
+            <!-- n° autorizacion -->
+            <div class="col-span-2 col-start-7 ">
+              <el-form-item label="N° de autorización">
+                <el-input
+                  size="small"
+                  placeholder=""
+                  v-model="salesNewForm.auth"
+                  :disabled="true"
+                >
+                </el-input>
+              </el-form-item>
+            </div>
+            <!-- n° Correlativo -->
+            <div class="col-span-2">
+              <el-form-item label="N° de correlativo">
+                <el-input
+                  size="small"
+                  placeholder=""
+                  v-model="salesNewForm.correlativo"
+                  :disabled="true"
+                >
+                </el-input>
+              </el-form-item>
+            </div>
+            <!-- Fecha Factura -->
+            <div class="col-span-2">
+              <el-form-item label="Fecha de factura" prop="date">
+                <el-date-picker
+                  v-model="salesNewForm.date"
+                  size="small"
+                  type="date"
+                  placeholder=""
+                  :picker-options="pickerOptions"
+                  style="width: 100%;"
+                  @change="setStorage(salesNewForm)"
+                >
+                </el-date-picker>
+              </el-form-item>
+            </div>
           </div>
-          <!-- n° autorizacion -->
-          <div class="col-span-2 col-start-7 ">
-            <el-form-item label="N° de autorización" >
-              <el-input
-                size="small"
-                placeholder=""
-                v-model="invoicesNewForm.auth"
-                :disabled="true">
-              </el-input>
-             </el-form-item>
-          </div>
-           <!-- n° Correlativo -->
-          <div class="col-span-2">
-            <el-form-item label="N° de correlativo" >
-              <el-input
-                size="small"
-                placeholder=""
-                v-model="invoicesNewForm.correlativo"
-                :disabled="true">
-              </el-input>
-            </el-form-item>
-          </div>
-          <!-- Fecha Factura -->
-          <div class="col-span-2">
-            <el-form-item label="Fecha de factura" prop="date">
-              <el-date-picker
-                v-model="invoicesNewForm.date"
-                size="small"
-                type="date"
-                placeholder=""
-                :picker-options="pickerOptions"
-                style="width: 100%;"
-                @change="setStorage(invoicesNewForm)">
-              </el-date-picker>
-            </el-form-item>
-          </div>
-        </div>
-        <!-- second row -->
-        <div class="grid grid-cols-12 gap-4">
-          <!-- cliente -->
-          <div class="col-span-4">
-           <el-form-item label="Cliente" prop="costumer">
-                <el-select v-model="invoicesNewForm.costumer" size="small" class="w-full" clearable filterable default-first-option placeholder="Seleccionar">
+          <!-- second row -->
+          <div class="grid grid-cols-12 gap-4">
+            <!-- cliente -->
+            <div class="col-span-4">
+              <el-form-item label="Cliente" prop="costumer">
+                <el-select
+                  v-model="salesNewForm.costumer"
+                  size="small"
+                  class="w-full"
+                  clearable
+                  filterable
+                  default-first-option
+                  placeholder="Seleccionar"
+                >
                   <el-option
                     v-for="c in customers"
                     :key="c.id"
                     :label="c.name"
                     :value="c.id"
-                     @change="setStorage(invoicesNewForm)">
+                    @change="setStorage(salesNewForm)"
+                  >
                   </el-option>
                 </el-select>
-             </el-form-item>
-          
-          </div>
-          <!-- sucursal -->
-          <div class="col-span-2">
-            <el-form-item  label="Sucursal" prop="office">
-                <el-select v-model="invoicesNewForm.office" class="w-full" clearable filterable default-first-option size="small" placeholder="Seleccionar">
+              </el-form-item>
+            </div>
+            <!-- sucursal -->
+            <div class="col-span-2">
+              <el-form-item label="Sucursal" prop="office">
+                <el-select
+                  v-model="salesNewForm.office"
+                  class="w-full"
+                  clearable
+                  filterable
+                  default-first-option
+                  size="small"
+                  placeholder="Seleccionar"
+                >
                   <el-option
-                    v-for="item in sucursales"
+                    v-for="item in branches"
                     :key="item.value"
                     :label="item.label"
-                    :value="item.value">
+                    :value="item.value"
+                  >
                   </el-option>
                 </el-select>
-             </el-form-item>
-          </div>
-          <!-- condiciones de pago -->
-          <div class="col-span-3">
-            <el-form-item label="Condiciones de pago"  prop="paymentConditions">
-              <el-select v-model="invoicesNewForm.paymentConditions" size="small" class="w-full" clearable filterable default-first-option placeholder="Seleccionar">
-                    <el-option
-                      v-for="p in paymentConditions"
-                      :key="p.value"
-                      :label="p.name"
-                      :value="p.id">
-                    </el-option>
-                  </el-select>
-            </el-form-item>
-          </div>
-          
-          <!-- Venta a cuenta de -->
-          <div class="col-span-3">
-            <el-form-item label="Venta a cuenta de" prop="sellers">
-              <el-select v-model="invoicesNewForm.sellers" class="w-full" size="small" clearable filterable default-first-option placeholder="Seleccionar">
-                <el-option
-                  v-for="s in sellers"
-                  :key="s.value"
-                  :label="s.name"
-                  :value="s.id">
-                </el-option>
-              </el-select>
-            </el-form-item>
-          </div>
-          
-          
-        </div>
-        <!-- third row -->
-        <div class="grid grid-cols-12 gap-4 text-xs">
-         
-          <!-- NRC -->
-          <div class="col-span-1">
-            <span>NRC</span>
-          </div>
-          <!-- NIT -->
-          <div class="col-span-2"> 
-            <span>NIT</span>
-          </div>
-          <!-- Direccion -->
-          <div class="col-span-3">
-            <span>Dirección</span>
-          </div>
-          <!-- departamento -->
-          <div class="col-span-2">
-            <span>Departamento</span>
-          </div>
-          <!-- Municipio -->
-          <div class="col-span-2">
-            <span>Municipio</span>
-          </div>
-          <!-- Giro -->
-          <div class="col-span-2">
-            <span>Giro</span>
-          </div>
-        </div>
-        <!-- fourth row btn agregarservicio -->
-        <div  class="flex justify-end">
-              <el-button type="primary" size="small" @click="dialogVisible = true"
-              >Agregar Servicio</el-button>
-        </div>
-        
+              </el-form-item>
+            </div>
+            <!-- condiciones de pago -->
+            <div class="col-span-3">
+              <el-form-item
+                label="Condiciones de pago"
+                prop="paymentConditions"
+              >
+                <el-select
+                  v-model="salesNewForm.paymentConditions"
+                  size="small"
+                  class="w-full"
+                  clearable
+                  filterable
+                  default-first-option
+                  placeholder="Seleccionar"
+                >
+                  <el-option
+                    v-for="p in paymentConditions"
+                    :key="p.value"
+                    :label="p.name"
+                    :value="p.id"
+                  >
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </div>
 
-     </div>
+            <!-- Venta a cuenta de -->
+            <div class="col-span-3">
+              <el-form-item label="Venta a cuenta de" prop="sellers">
+                <el-select
+                  v-model="salesNewForm.sellers"
+                  class="w-full"
+                  size="small"
+                  clearable
+                  filterable
+                  default-first-option
+                  placeholder="Seleccionar"
+                >
+                  <el-option
+                    v-for="s in sellers"
+                    :key="s.value"
+                    :label="s.name"
+                    :value="s.id"
+                  >
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </div>
+          </div>
+          <!-- third row -->
+          <div class="grid grid-cols-12 gap-4 text-xs">
+            <!-- NRC -->
+            <div class="col-span-1">
+              <span>NRC</span>
+            </div>
+            <!-- NIT -->
+            <div class="col-span-2">
+              <span>NIT</span>
+            </div>
+            <!-- Direccion -->
+            <div class="col-span-3">
+              <span>Dirección</span>
+            </div>
+            <!-- departamento -->
+            <div class="col-span-2">
+              <span>Departamento</span>
+            </div>
+            <!-- Municipio -->
+            <div class="col-span-2">
+              <span>Municipio</span>
+            </div>
+            <!-- Giro -->
+            <div class="col-span-2">
+              <span>Giro</span>
+            </div>
+          </div>
+          <!-- fourth row btn agregarservicio -->
+          <div class="flex justify-end">
+            <el-button type="primary" size="small" @click="dialogVisible = true"
+              >Agregar Servicio</el-button
+            >
+          </div>
+        </div>
 
-      <!-- table row -->
-     <div class="grid grid-cols-12">
-      <div class="col-span-12">
-        <el-table
-          :data="facturas"
-          style="width: 100%"
-          stripe
-          size="small">
-          <el-table-column
-            type="index"
-            label="#"
-          />
-          
-          <el-table-column
-            prop="quantity"
-            label="Cant."
-            min-width="50">
-          </el-table-column>
-          <el-table-column
-            prop="details"
-            label="Descripción"
-            width="270">
-            
-          </el-table-column>
-          <el-table-column
-            prop="precuni"
-            label="Precio Unit."
-            min-width="75"
-            align="right">
-          </el-table-column>
-          <el-table-column
-            prop="vnosujeta"
-            label="V. No sujeta"
-             min-width="75"
-            align="right">
-          </el-table-column>
-          <el-table-column
-            prop="vexenta"
-            label="V. Exenta"
-             min-width="75"
-            align="right">
-          </el-table-column>
-          <el-table-column
-            prop="vgrabada"
-            label="V. Grabada"
-             min-width="75"
-            align="right">
-          </el-table-column>
-          <el-table-column
-            prop="name"
-            min-width="80">
-          </el-table-column>
-        </el-table>
-    </div>  
-     </div>
-     <!-- sumas -->
+        <!-- table row -->
+        <div class="grid grid-cols-12">
+          <div class="col-span-12">
+            <el-table :data="sales" style="width: 100%" stripe size="small">
+              <el-table-column type="index" label="#" />
+
+              <el-table-column prop="quantity" label="Cant." min-width="50">
+              </el-table-column>
+              <el-table-column prop="details" label="Descripción" width="270">
+              </el-table-column>
+              <el-table-column
+                prop="precuni"
+                label="Precio Unit."
+                min-width="75"
+                align="right"
+              >
+              </el-table-column>
+              <el-table-column
+                prop="vnosujeta"
+                label="V. No sujeta"
+                min-width="75"
+                align="right"
+              >
+              </el-table-column>
+              <el-table-column
+                prop="vexenta"
+                label="V. Exenta"
+                min-width="75"
+                align="right"
+              >
+              </el-table-column>
+              <el-table-column
+                prop="vgrabada"
+                label="V. Grabada"
+                min-width="75"
+                align="right"
+              >
+              </el-table-column>
+              <el-table-column prop="name" min-width="80"> </el-table-column>
+            </el-table>
+          </div>
+        </div>
+        <!-- sumas -->
         <table class="flex justify-end">
-            <tbody class="text-sm divide-y divide-gray-300">
-
-              <tr class=" flex  space-x-16">
-                <td align="right" class="text-blue-900 w-50" >SUMAS:</td>
-                <td align="right" class="text-gray-800">$0.00</td>
-              </tr>
-              <!-- <tr class="border-t" v-if="newInvoiceForm.documentType === '2'">
+          <tbody class="text-sm divide-y divide-gray-300">
+            <tr class=" flex  space-x-16">
+              <td align="right" class="text-blue-900 w-50">SUMAS:</td>
+              <td align="right" class="text-gray-800">$0.00</td>
+            </tr>
+            <!-- <tr class="border-t" v-if="newInvoiceForm.documentType === '2'">
                 <td align="right" class="text-blue-900" width="200px">13% Iva:</td>
                 <td align="right" class="pl-15 pr-2 text-gray-800">{{taxes | formatMoney}}</td>
               </tr> -->
-              <tr class="flex  space-x-16">
-                <td align="right" class="text-blue-900 w-50" >Subtotal:</td>
-                <td align="right" class="text-gray-800">$0.00</td>
-              </tr>
-              <tr class="flex  space-x-16">
-                <td align="right" class="text-blue-900 w-50" >Iva retenido:</td>
-                <td align="right" class=" text-gray-800">$0.00</td>
-              </tr>
-              <tr class="flex  space-x-16">
-                <td align="right" class="text-blue-900 w-50" >Ventas exentas:</td>
-                <td align="right" class=" text-gray-800">$0.00</td>
-              </tr>
-              <tr class="flex  space-x-16">
-                <td align="right" class="text-blue-900 w-50" >Ventas no sujetas:</td>
-                <td align="right" class=" text-gray-800">$0.00</td>
-              </tr>
-              <tr class="flex  space-x-16">
-                <td align="right" class="text-blue-900 font-semibold w-50">Venta total:</td>
-                <td align="right" class="text-gray-800">$0.00</td>
-              </tr>
-            </tbody>
-          </table>
-     <!-- boton guardar cancelar -->
-      <div class="flex justify-end " >
-        <el-button type="primary" size="small" native-type="submit"
-          >Guardar</el-button
-        >
-        <el-button size="small" 
-          >Cancelar</el-button
-        >
-     </div>
-   </div>
+            <tr class="flex  space-x-16">
+              <td align="right" class="text-blue-900 w-50">Subtotal:</td>
+              <td align="right" class="text-gray-800">$0.00</td>
+            </tr>
+            <tr class="flex  space-x-16">
+              <td align="right" class="text-blue-900 w-50">Iva retenido:</td>
+              <td align="right" class=" text-gray-800">$0.00</td>
+            </tr>
+            <tr class="flex  space-x-16">
+              <td align="right" class="text-blue-900 w-50">Ventas exentas:</td>
+              <td align="right" class=" text-gray-800">$0.00</td>
+            </tr>
+            <tr class="flex  space-x-16">
+              <td align="right" class="text-blue-900 w-50">
+                Ventas no sujetas:
+              </td>
+              <td align="right" class=" text-gray-800">$0.00</td>
+            </tr>
+            <tr class="flex  space-x-16">
+              <td align="right" class="text-blue-900 font-semibold w-50">
+                Venta total:
+              </td>
+              <td align="right" class="text-gray-800">$0.00</td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- boton guardar cancelar -->
+        <div class="flex justify-end ">
+          <el-button type="primary" size="small" native-type="submit"
+            >Guardar</el-button
+          >
+          <el-button size="small">Cancelar</el-button>
+        </div>
+      </div>
     </el-form>
-    
   </layout-content>
 </template>
 
 <script>
-
 import LayoutContent from "../../components/layout/Content";
 import {
   inputValidation,
@@ -408,142 +429,136 @@ import {
 } from "../../tools";
 import Notification from "../../components/Notification";
 
-const storagekey = "new-invoices";
+const storagekey = "new-sales";
 
 export default {
   name: "InvoicesNew",
   components: { LayoutContent, Notification },
   fetch() {
-     const sellers = () => {
-      return this.$axios.get("/invoices/sellers",{params: {active: true}});
+    const sellers = () => {
+      return this.$axios.get("/sales/sellers", { params: { active: true } });
     };
-     const paymentsConditions = () => {
-      return this.$axios.get("/invoices/payment-condition");
+    const paymentsConditions = () => {
+      return this.$axios.get("/sales/payment-condition");
     };
 
     const customers = () => {
-        return this.$axios.get("/customers",{params: {isActiveCustomer: true}});
-    }
-   
-     
-     Promise.all([sellers(),paymentsConditions(), customers()])
+      return this.$axios.get("/customers", {
+        params: { isActiveCustomer: true },
+      });
+    };
+
+    Promise.all([sellers(), paymentsConditions(), customers()])
       .then((res) => {
         const [sellers, paymentConditions, customers] = res;
-       
+
         this.sellers = sellers.data.sellers;
-        this.paymentConditions = paymentConditions.data.paymentConditions
-        this.customers = customers.data.customers
+        this.paymentConditions = paymentConditions.data.paymentConditions;
+        this.customers = customers.data.customers;
         this.loading = false;
-        
       })
       .catch((err) => {
-        console.log(err)
+        console.log(err);
         this.errorMessage = err.response.data.message;
       });
 
-      
-      
-
-    // checkBeforeEnter(this, storagekey, "invoicesNewForm");
+    // checkBeforeEnter(this, storagekey, "salesNewForm");
   },
   fetchOnServer: false,
   beforeRouteLeave(to, from, next) {
     checkBeforeLeave(this, storagekey, next);
   },
   data() {
-    
     return {
-      
-        facturas:[],
-        loading: false,
-        invoicesNewForm: {
-          document: "",
-          auth: "",
-          correlativo: "",
-          date: "",
-          costumer: "",
-          office: "",
-          paymentConditions: null,
-          sellers: null,
-
-
+      sales: [],
+      loading: false,
+      salesNewForm: {
+        document: "",
+        auth: "",
+        correlativo: "",
+        date: "",
+        costumer: "",
+        office: "",
+        paymentConditions: null,
+        sellers: null,
+      },
+      salesNewFormRules: {
+        document: selectValidation(true),
+        date: selectValidation(true),
+        costumer: selectValidation(true),
+        office: selectValidation(true),
+        paymentConditions: selectValidation(true),
+        sellers: selectValidation(true),
+      },
+      sellers: [],
+      paymentConditions: [],
+      branches: [
+        {
+          value: "Option1",
+          label: "Sucursal 1",
         },
-        invoicesNewFormRules: {
-          document: selectValidation(true),
-          date: selectValidation(true),
-          costumer: selectValidation(true),
-          office: selectValidation(true),
-          paymentConditions: selectValidation(true),
-          sellers: selectValidation(true),
-          
-          
-        
+        {
+          value: "Option2",
+          label: "Sucursal 2",
         },
-        sellers: [],
-        paymentConditions: [],
-        sucursales: [{
-          value: 'Option1',
-          label: 'Sucursal 1'
-        }, {
-          value: 'Option2',
-          label: 'Sucursal 2'
-        }],
-        customers: [],
-        documents: [{
-          value: 'Option1',
-          label: 'FCF - Consumidor Final'
-        }, {
-          value: 'Option2',
-          label: 'CFC - Crédito Fiscal'
-        }],
-        dialogVisible: false,
-        numcant:[
-          {num:1},
-          {num:2},
-          {num:3},
-              ],
-          pickerOptions: {
-          
-          shortcuts: [{
-            text: 'Ahora',
+      ],
+      customers: [],
+      documents: [
+        {
+          value: "Option1",
+          label: "FCF - Consumidor Final",
+        },
+        {
+          value: "Option2",
+          label: "CFC - Crédito Fiscal",
+        },
+      ],
+      dialogVisible: false,
+      pickerOptions: {
+        shortcuts: [
+          {
+            text: "Ahora",
             onClick(picker) {
-              picker.$emit('pick', new Date());
-            }
-          }, {
-            text: 'Ayer',
+              picker.$emit("pick", new Date());
+            },
+          },
+          {
+            text: "Ayer",
             onClick(picker) {
               const date = new Date();
               date.setTime(date.getTime() - 3600 * 1000 * 24);
-              picker.$emit('pick', date);
-            }
-          }, {
-            text: 'Mañana',
+              picker.$emit("pick", date);
+            },
+          },
+          {
+            text: "Mañana",
             onClick(picker) {
               const date = new Date();
-              date.setTime(date.getTime() + 3600 * 1000 * 24 );
-              picker.$emit('pick', date);
-            }
-          }]
-        },
-        value2: '',
-        input: "",
-        chkSeller: "",
-        chkPaymants: "",
-        chkIva: "",
-        descripcion: "",
-        newServiceForm: {
+              date.setTime(date.getTime() + 3600 * 1000 * 24);
+              picker.$emit("pick", date);
+            },
+          },
+        ],
+      },
+      value2: "",
+      input: "",
+      chkSeller: "",
+      chkPaymants: "",
+      chkIva: "",
+      descripcion: "",
+      newServiceForm: {
         service: "",
         quantity: "",
         cost: "",
         description: "",
-        incTax: false
+        incTax: false,
       },
       newServiceForm: {
         service: "",
         quantity: "",
         cost: "",
         description: "",
-        incTax: false
+        incTax: false,
       },
       newServiceFormRules: {
         service: selectValidation(true),
@@ -551,23 +566,21 @@ export default {
         // cost: amountValidate("blur", true, 0),
         description: inputValidation(true),
       },
-      cost:"",
+      cost: "",
       services: [],
       description: "",
-       selectedService: null,
+      selectedService: null,
     };
-  
   },
-  
+
   methods: {
-    
-    setStorage(invoicesNewForm) {
-      localStorage.setItem(storagekey, JSON.stringify(invoicesNewForm));
+    setStorage(salesNewForm) {
+      localStorage.setItem(storagekey, JSON.stringify(salesNewForm));
     },
     //  fetchSellers() {
     //   let params = this.page;
     //   this.$axios
-    //     .get("/invoices/sellers")
+    //     .get("/sales/sellers")
     //     .then((res) => {
     //       this.sellers = res.data.sellers;
     //     })
@@ -578,44 +591,48 @@ export default {
     // fetchPaymentConditions() {
     //       let params = this.page;
     //       this.$axios
-    //         .get("/invoices/payment-condition")
+    //         .get("/sales/payment-condition")
     //         .then((res) => {
     //           this.paymentConditions = res.data.paymentConditions;
-            
+
     //         })
     //         .catch((err) => {
     //           console.log(err)
     //           this.errorMessage = err.response.data.message;
     //         });
     // },
-    
-    closeDialog(){
-      this.$refs.newServiceForm.resetFields()
-      this.newServiceForm.cost = ""
-      this.newServiceForm.quantity = ""
+
+    closeDialog() {
+      this.$refs.newServiceForm.resetFields();
+      this.newServiceForm.cost = "";
+      this.newServiceForm.quantity = "";
     },
 
     openDialog() {
-      this.$axios.get('/services', {params: {active: true}})
-          .then(res => {
-            this.services = res.data.services;
-           
-          })
-          .catch(err => {  this.errorMessage = err.response.data.message;})
-          
+      this.$axios
+        .get("/services", { params: { active: true } })
+        .then((res) => {
+          this.services = res.data.services;
+        })
+        .catch((err) => {
+          this.errorMessage = err.response.data.message;
+        });
     },
     selectService(id, type) {
-     switch(type){
-       case "new":
-        this.$axios.get(`/services/${id}`)
-          .then(res => {
-            this.newServiceForm.cost = res.data.service.cost;
-            this.newServiceForm.description = res.data.service.description;
-          })
-          .catch(err => {  this.errorMessage = err.response.data.message;})
-        break;       
-     }    
-   },      
-}
-}
+      switch (type) {
+        case "new":
+          this.$axios
+            .get(`/services/${id}`)
+            .then((res) => {
+              this.newServiceForm.cost = res.data.service.cost;
+              this.newServiceForm.description = res.data.service.description;
+            })
+            .catch((err) => {
+              this.errorMessage = err.response.data.message;
+            });
+          break;
+      }
+    },
+  },
+};
 </script>
