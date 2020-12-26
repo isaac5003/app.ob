@@ -47,7 +47,7 @@
                       >
                         <i class="el-icon-edit-outline"></i> Editar zona
                       </el-dropdown-item>
-                      <el-dropdown-item @click.native="changeActive(scope.row)">
+                      <el-dropdown-item @click.native="changeActiveZone(scope.row)">
                         <span v-if="scope.row.active">
                           <i class="el-icon-close"></i> Desactivar
                         </span>
@@ -71,7 +71,6 @@
           </div>
 
           <!-- Inicio de tabla vendedores -->
-
           <div class="col-span-7 flex flex-col space-y-4">
             <div class="flex justify-between items-center">
               <span class="text-blue-900 font-semibold text-lg"
@@ -113,21 +112,20 @@
                       >
                         <i class="el-icon-edit-outline"></i> Editar vendedor
                       </el-dropdown-item>
-                      <el-dropdown-item @click.native="changeActive(scope.row)">
+                      <el-dropdown-item @click.native="changeActiveSellers(scope.row)">
                         <span v-if="scope.row.active">
                           <i class="el-icon-close"></i> Desactivar
                         </span>
                         <span v-else>
                           <i class="el-icon-check"></i> Activar
-                        </span>
-                        Vendedor
+                        </span>vendedor
                       </el-dropdown-item>
                       <el-dropdown-item
                         :divided="true"
                         class="text-red-500 font-semibold"
                         @click.native="deleteInvoice(scope.row)"
                       >
-                        <i class="el-icon-delete"></i> Eliminar Vendedor22
+                        <i class="el-icon-delete"></i> Eliminar Vendedor
                       </el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
@@ -149,7 +147,7 @@
               >
               <el-button type="primary" size="mini" icon="el-icon-plus" />
             </div>
-            <el-table :data="zones" stripe size="mini">
+            <el-table :data="payment" stripe size="mini">
               <el-table-column prop="index" min-width="40" />
               <el-table-column
                 label="Condicion de pago"
@@ -174,23 +172,23 @@
                           $router.push(`/invoices/edit?ref=${scope.row.id}`)
                         "
                       >
-                        <i class="el-icon-edit-outline"></i> Editar zona
+                        <i class="el-icon-edit-outline"></i> Editar pago
                       </el-dropdown-item>
-                      <el-dropdown-item @click.native="changeActive(scope.row)">
+                      <el-dropdown-item @click.native="changeActivePayment(scope.row)">
                         <span v-if="scope.row.active">
                           <i class="el-icon-close"></i> Desactivar
                         </span>
                         <span v-else>
                           <i class="el-icon-check"></i> Activar
                         </span>
-                        zona
+                        pago
                       </el-dropdown-item>
                       <el-dropdown-item
                         :divided="true"
                         class="text-red-500 font-semibold"
                         @click.native="deleteInvoice(scope.row)"
                       >
-                        <i class="el-icon-delete"></i> Eliminar zona
+                        <i class="el-icon-delete"></i> Eliminar pago
                       </el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
@@ -267,22 +265,21 @@ export default {
     const zones = () => {
       return this.$axios.get("/invoices/zones");
     };
-
     // método para hacer la petición a la url de vendedores
     const sellers = () => {
       return this.$axios.get("/invoices/sellers");
     };
-
+    //método para mostrar data en la tabla de pagos
+    const payment = () => {
+      return this.$axios.get("/invoices/payment-condition")
+    }
     // promesa que recibe los métodos con las peticiones http
-    Promise.all([zones(), sellers()])
+    Promise.all([zones(), sellers(), payment()])
       .then((res) => {
-        const [zones, sellers] = res;
-        // const zones = res[0];
-        // const sellers = res[1];
-
+        const [zones, sellers, payment] = res;
         this.zones = zones.data.zones;
         this.sellers = sellers.data.sellers;
-        console.log(sellers.data);
+        this.payment = payment.data.paymentConditions;
         this.loading = false;
       })
       .catch((err) => {
@@ -310,6 +307,7 @@ export default {
       ],
       zones: [],
       sellers: [],
+      payment: []
     };
   },
   methods: {
@@ -335,7 +333,18 @@ export default {
           this.errorMessage = err.response.data.message;
         });
     },
-    changeActive({ id, active }) {
+    fetchPayments(){
+      let params = this.page;
+      this.$axios
+          .get("/invoices/payment-condition")
+          .then((res) => {
+            this.payment = res.data.paymentConditions;
+          })
+          .catch((err) => {
+            this.errorMessage = err.response.data.message;
+          });
+    },
+    changeActiveZone({ id, active }) {
       const action = active ? "desactivar" : "activar";
       this.$confirm(
         `¿Estás seguro que deseas ${action} esta zona?`,
@@ -356,6 +365,86 @@ export default {
                     message: res.data.message,
                   });
                   this.fetchZones();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, ${action}`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
+    },
+    //Metodo para cambiar el estado de vendedores (Activar o Desactivar)
+    changeActiveSellers({ id, active }) {
+      const action = active ? "desactivar" : "activar";
+      this.$confirm(
+        `¿Estás seguro que deseas ${action} este vendedor?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, ${action}`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .put(`/invoices/sellers/status/${id}`, { status: !active })
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchSellers();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, ${action}`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
+    },
+    //Metodo para camiar el estado de condiciones de pago
+    changeActivePayment({ id, active }) {
+      const action = active ? "desactivar" : "activar";
+      this.$confirm(
+        `¿Estás seguro que deseas ${action} este pago?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, ${action}`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .put(`/invoices/payment-condition/status/${id}`, { status: !active })
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchPayments();
                 })
                 .catch((err) => {
                   this.$notify.error({
