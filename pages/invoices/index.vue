@@ -21,7 +21,7 @@
         />
       </div>
       <el-form label-position="top" class="flex flex-col ">
-        <div class="grid grid-cols-12 space-x-4">
+        <div class="grid grid-cols-12 gap-4">
           <div class="col-start-10 col-span-3">
             <el-form-item>
               <el-input
@@ -53,26 +53,39 @@
               </el-date-picker>
             </el-form-item>
           </div>
-          <div class="col-span-4 w-full">
+          <div class="col-span-4">
             <el-form-item label="Cliente:">
               <el-select
                 v-model="clienV"
                 size="small"
-                style="width:100%"
+                class="w-full"
                 clearable
+                filterable
+                default-first-option
                 placeholder="Todos los clientes:"
               >
-                <el-option
-                  v-for="item in options"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                >
-                </el-option>
+                <el-option-group key="ACTIVOS" label="ACTIVOS">
+                  <el-option
+                    v-for="item in activeCustomers"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                  </el-option>
+                </el-option-group>
+                <el-option-group key="INACTIVOS" label="INACTIVOS">
+                  <el-option
+                    v-for="item in inactiveCustomers"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                  </el-option>
+                </el-option-group>
               </el-select>
             </el-form-item>
           </div>
-          <div class="col-span-2 w-full ">
+          <div class="col-span-2">
             <el-form-item label="Tipo fact:">
               <el-select
                 v-model="TypeFact"
@@ -82,16 +95,16 @@
                 class="w-full"
               >
                 <el-option
-                  v-for="item in options"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
+                  v-for="item in documentTypes"
+                  :key="item.id"
+                  :label="`${item.code} - ${item.name}`"
+                  :value="item.id"
                 >
                 </el-option>
               </el-select>
             </el-form-item>
           </div>
-          <div class="col-span-2 w-full">
+          <div class="col-span-2">
             <el-form-item label="Estado:">
               <el-select
                 v-model="status"
@@ -245,14 +258,18 @@ export default {
   name: "InvoicesIndex",
   components: { LayoutContent, Notification },
   fetch() {
-    const invoices = () => {
-      return this.$axios.get("/invoices", { params: this.page });
-    };
+    const activeCustomers = () =>
+      this.$axios.get("/customers", { params: { active: true } });
+    const inactiveCustomers = () =>
+      this.$axios.get("/customers", { params: { active: false } });
+    const documentTypes = () => this.$axios.get("/invoices/document-types");
 
-    Promise.all([invoices()])
+    Promise.all([activeCustomers(), inactiveCustomers(), documentTypes()])
       .then((res) => {
-        const [invoices] = res;
-        this.invoices = invoices.data;
+        const [activeCustomers, inactiveCustomers, documentTypes] = res;
+        this.activeCustomers = activeCustomers.data.customers;
+        this.inactiveCustomers = inactiveCustomers.data.customers;
+        this.documentTypes = documentTypes.data.documentTypes;
         this.loading = false;
       })
       .catch((err) => {
@@ -272,7 +289,6 @@ export default {
       VendClie: "",
       zonaValue: "",
       servVlue: "",
-
       invoices: {
         invoices: [],
         count: 0,
@@ -299,13 +315,11 @@ export default {
           label: "Option5",
         },
       ],
-
       value: "",
       page: {
         limit: 10,
         page: 1,
       },
-
       resultados: [
         {
           nombre: "Isaac",
@@ -316,6 +330,9 @@ export default {
           nrc: "12322",
         },
       ],
+      activeCustomers: [],
+      inactiveCustomers: [],
+      documentTypes: [],
     };
   },
   methods: {
