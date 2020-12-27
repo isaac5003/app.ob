@@ -186,7 +186,7 @@
                       <el-dropdown-item
                         :divided="true"
                         class="text-red-500 font-semibold"
-                        @click.native="deleteInvoice(scope.row)"
+                        @click.native="deletePayment(scope.row)"
                       >
                         <i class="el-icon-delete"></i> Eliminar pago
                       </el-dropdown-item>
@@ -525,6 +525,45 @@ export default {
                     message: res.data.message,
                   });
                   this.fetchSellers();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, ${action}`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
+    },
+    deletePayment({ id }) {
+      const action = "eliminar" ;
+      this.$confirm(
+        `¿Estás seguro que deseas ${action} este pago?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, ${action}`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .delete(`/invoices/payment-condition/${id}`)
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchPayments();
                 })
                 .catch((err) => {
                   this.$notify.error({
