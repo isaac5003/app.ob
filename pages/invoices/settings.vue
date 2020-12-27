@@ -2,7 +2,7 @@
   <layout-content
     page-title="Configuraciones"
     :breadcrumb="[
-      { name: 'Clientes', to: '/invoices' },
+      { name: 'Ventas', to: '/invoices' },
       { name: 'Configuraciones', to: null },
     ]"
   >
