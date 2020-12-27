@@ -21,8 +21,25 @@
         />
       </div>
       <el-form class="flex flex-col" label-position="top">
+        <div class="grid grid-cols-12 gap-4" >
+        <div class="col-start-10 col-span-3 ">
+            <el-form-item>
+            <el-input
+              suffix-icon="el-icon-search"
+              placeholder="Buscar..."
+              v-model="searchValue"
+              size="small"
+              style="margin-top: 26px"
+              clearable
+              v-debounce:500ms="fetchEntries"
+              @change="fetchEntries"
+            />
+          </el-form-item>
+        </div>
+        
+        </div>
         <div class="grid grid-cols-12 gap-4">
-          <div class="col-span-3">
+          <div class="col-span-4">
             <el-form-item label="Rango de fechas:">
               <el-date-picker
                 style="width: 100%;"
@@ -59,18 +76,28 @@
               </el-select>
             </el-form-item>
           </div>
-          <div class="col-start-10 col-span-3">
-            <el-input
-              suffix-icon="el-icon-search"
-              placeholder="Buscar..."
-              v-model="searchValue"
-              size="small"
-              style="margin-top: 26px"
-              clearable
-              v-debounce:500ms="fetchEntries"
-              @change="fetchEntries"
-            />
-          </div>
+            <div class="col-span-2">
+              <el-form-item label="Opciones de partidad">
+                <el-checkbox 
+                v-model="checked1" 
+                size="small"
+                class="w-full"
+                label="Cuadrada" 
+                border>
+               </el-checkbox>
+              </el-form-item>
+             </div>
+             <div class="col-span-2">
+              <el-form-item label=" ">
+                <el-checkbox 
+                v-model="checked1" 
+                size="small"
+                class="w-full"
+                label="Contabilizadad" 
+                border>
+               </el-checkbox>
+              </el-form-item>
+             </div>
         </div>
       </el-form>
       <el-table :data="entries.entries" stripe size="mini">
