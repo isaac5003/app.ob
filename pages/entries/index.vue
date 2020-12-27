@@ -77,7 +77,7 @@
             </el-form-item>
           </div>
             <div class="col-span-2">
-              <el-form-item label="Opciones de partidad">
+              <el-form-item label="Opciones de partidad:">
                 <el-checkbox 
                 v-model="checked1" 
                 size="small"
