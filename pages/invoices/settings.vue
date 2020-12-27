@@ -59,7 +59,7 @@
                       <el-dropdown-item
                         :divided="true"
                         class="text-red-500 font-semibold"
-                        @click.native="deleteInvoice(scope.row)"
+                        @click.native="deleteZone(scope.row)"
                       >
                         <i class="el-icon-delete"></i> Eliminar zona
                       </el-dropdown-item>
@@ -123,7 +123,7 @@
                       <el-dropdown-item
                         :divided="true"
                         class="text-red-500 font-semibold"
-                        @click.native="deleteInvoice(scope.row)"
+                        @click.native="deleteSeller(scope.row)"
                       >
                         <i class="el-icon-delete"></i> Eliminar Vendedor
                       </el-dropdown-item>
@@ -249,6 +249,7 @@
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
 import { getIcon, hasModule } from "../../tools";
+import * as R from "ramda";
 
 export default {
   name: "InvoicesSettings",
@@ -445,6 +446,46 @@ export default {
                     message: res.data.message,
                   });
                   this.fetchPayments();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, ${action}`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
+    },
+
+    deleteZone({ id }) {
+      const action = "eliminar" ;
+      this.$confirm(
+        `¿Estás seguro que deseas ${action} esta zona?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, ${action}`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .delete(`/invoices/zones/${id}`)
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchZones();
                 })
                 .catch((err) => {
                   this.$notify.error({
