@@ -148,10 +148,10 @@
                   placeholder="Seleccionar"
                 >
                   <el-option
-                    v-for="item in documents"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
+                    v-for="d in documents"
+                    :key="d.id"
+                    :label="d.code + ' - ' + d.name"
+                    :value="d.id"
                     @change="setStorage(salesNewForm)"
                   >
                   </el-option>
@@ -211,6 +211,7 @@
                   filterable
                   default-first-option
                   placeholder="Seleccionar"
+                  @change="getBranch(salesNewForm.costumer)"
                 >
                   <el-option
                     v-for="c in customers"
@@ -225,9 +226,9 @@
             </div>
             <!-- sucursal -->
             <div class="col-span-2">
-              <el-form-item label="Sucursal" prop="office">
+              <el-form-item label="Sucursal" prop="branch">
                 <el-select
-                  v-model="salesNewForm.office"
+                  v-model="salesNewForm.branch"
                   class="w-full"
                   clearable
                   filterable
@@ -236,10 +237,10 @@
                   placeholder="Seleccionar"
                 >
                   <el-option
-                    v-for="item in branches"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
+                    v-for="br in branches"
+                    :key="br.id"
+                    :label="br.name"
+                    :value="br.id"
                   >
                   </el-option>
                 </el-select>
@@ -434,26 +435,22 @@ export default {
   name: "InvoicesNew",
   components: { LayoutContent, Notification },
   fetch() {
-    const sellers = () => {
-      return this.$axios.get("/sales/sellers", { params: { active: true } });
+    const sellers = () => { return this.$axios.get("/invoices/sellers", { params: { active: true } });
     };
-    const paymentsConditions = () => {
-      return this.$axios.get("/sales/payment-condition");
+    const paymentsConditions = () => { return this.$axios.get("/invoices/payment-condition");
     };
+    const customers = () => {return this.$axios.get("/customers", {params: { isActiveCustomer: true }});
+   };
+   const documentTypes = () => { return this.$axios.get("/invoices/document-types");};
 
-    const customers = () => {
-      return this.$axios.get("/customers", {
-        params: { isActiveCustomer: true },
-      });
-    };
-
-    Promise.all([sellers(), paymentsConditions(), customers()])
+    Promise.all([sellers(), paymentsConditions(), customers(), documentTypes()])
       .then((res) => {
-        const [sellers, paymentConditions, customers] = res;
-
+        const [sellers, paymentConditions, customers, documents] = res;
+       
         this.sellers = sellers.data.sellers;
         this.paymentConditions = paymentConditions.data.paymentConditions;
         this.customers = customers.data.customers;
+        this.documents = documents.data.documentTypes;
         this.loading = false;
       })
       .catch((err) => {
@@ -474,10 +471,10 @@ export default {
       salesNewForm: {
         document: "",
         auth: "",
-        correlativo: "",
+        next: "",
         date: "",
         costumer: "",
-        office: "",
+        branch: null,
         paymentConditions: null,
         sellers: null,
       },
@@ -485,7 +482,7 @@ export default {
         document: selectValidation(true),
         date: selectValidation(true),
         costumer: selectValidation(true),
-        office: selectValidation(true),
+        branch: selectValidation(true),
         paymentConditions: selectValidation(true),
         sellers: selectValidation(true),
       },
@@ -535,36 +532,13 @@ export default {
         description: inputValidation(true),
       },
       services: [],
+      branches:[],
     };
   },
   methods: {
     setStorage(salesNewForm) {
       localStorage.setItem(storagekey, JSON.stringify(salesNewForm));
     },
-    //  fetchSellers() {
-    //   let params = this.page;
-    //   this.$axios
-    //     .get("/sales/sellers")
-    //     .then((res) => {
-    //       this.sellers = res.data.sellers;
-    //     })
-    //     .catch((err) => {
-    //       this.errorMessage = err.response.data.message;
-    //     });
-    // },
-    // fetchPaymentConditions() {
-    //       let params = this.page;
-    //       this.$axios
-    //         .get("/sales/payment-condition")
-    //         .then((res) => {
-    //           this.paymentConditions = res.data.paymentConditions;
-
-    //         })
-    //         .catch((err) => {
-    //           console.log(err)
-    //           this.errorMessage = err.response.data.message;
-    //         });
-    // },
     closeDialog() {
       this.$refs.newServiceForm.resetFields();
       this.newServiceForm.cost = "";
@@ -595,6 +569,19 @@ export default {
           break;
       }
     },
+    getBranch(id){
+      if(id != "")
+       this.$axios.get(`/customers/${id}/branches`).then((res) => {
+              this.branches = res.data.branches;
+            })
+            .catch((err) => {
+              this.errorMessage = err.response.data.message;
+            });
+      else{
+        console.log("no hay nada")
+        this.branches = ""
+      }
+    }
   },
 };
 </script>
