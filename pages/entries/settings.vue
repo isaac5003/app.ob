@@ -46,24 +46,24 @@
               />
             </el-form-item>
           </div> 
-          <div class="col-span-2 flex items-center">
+          <div class="col-span-2">
             <el-form-item label=" ">
               <el-checkbox 
-                size="small" border class=" w-full">
+                size="small" border class="mt-5" style="width: 100%;">
                 Acreedora
               </el-checkbox>
             </el-form-item>
           </div>
-          <div class="col-span-2 flex items-center">
+          <div class="col-span-2">
             <el-form-item label=" ">
-              <el-checkbox size="small" border class="w-full" >
+              <el-checkbox size="small" border class="mt-5" style="width: 100%;" >
                 Balance
               </el-checkbox>
             </el-form-item>
           </div>
           <div class="col-span-1 flex items-center">
             <el-button
-                class="w-full"
+                class="w-full mt-5"
                 type="danger"
                 icon="el-icon-delete"
                 :disabled="mayorAccountForm.items.length === 1"
@@ -198,9 +198,125 @@
       <el-tab-pane
         label="Balance General"
         name="balance-general"
-      ></el-tab-pane>
+      >
+    <!-- noticication -->
+     <div class="grid grid-cols-12">
+       <div class="col-span-12">
+        <Notification
+          class=" mb-4 w-full"  type="info"
+          title="Información"
+          message="Acá puedes configurar las cuentas a incluir en el balance general asi como el nombre para cada sección que deseas que aparezca."   
+       />
+     </div>
+    </div>
+    <!-- second row -->
+    <el-form>
+    <div class="grid grid-cols-12 gap-4">
+      
+        <div class="col-span-3">
+          <el-form-item label="Utilidad ejercicios anteriores">
+            <el-select
+            size="small"
+            class="w-full"
+            placeholder="Escriba el numero o el nombre"
+            filterable
+            clereable
+            default-first-option>
+
+            </el-select>
+          </el-form-item>
+        </div>
+        <div class="col-span-3">
+          <el-form-item label="Utilidad ejercicios anteriores">
+            <el-select
+            size="small"
+            class="w-full"
+            placeholder="Escribe el numero o el nombre"
+             filterable
+            clereable
+            default-first-option>
+
+            </el-select>
+          </el-form-item>
+        </div>
+        <div class="col-span-3">
+          <el-form-item label="utilidad presente ejercicio">
+            <el-select
+            size="small"
+            class="w-full"
+            placeholder="Escriba el numero o el nombre"
+            filterable
+            clereable
+            default-first-option>
+            
+            </el-select>
+          </el-form-item>
+        </div>
+        <div class="col-span-3">
+          <el-form-item label="Perdida presente ejercicio">
+            <el-select
+            size="small"
+            class="w-full"
+            placeholder="Escriba el numero o el nombre"
+            filterable
+            clereable
+            default-first-option>
+
+            </el-select>
+          </el-form-item>
+        </div>
+        
+    </div>
+    </el-form>  
+    <!-- table row -->
+    <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-12">
+         <el-table :data="[]" row-key="id" border  size="small">
+            <el-table-colum label="Cuenta" prop="cuenta" min-widht="200"></el-table-colum>
+            <el-table-colum prop="nombrereporte" label="Nombre en reporte" min-width="170"></el-table-colum>
+            <el-table-colum prop="display" align="center" min-width="40"></el-table-colum>
+        </el-table>
+      </div>
+    </div>
+    <!-- botones de guardar y cancelar -->
+    <div class="flex justify-end mt-4 ">
+      <el-button type="primary" size="small" native-type="submit">Guardar</el-button>
+      <el-button size="small">Cancelar</el-button>
+    </div>
+
+   </el-tab-pane>
       <!-- tab estado resultados -->
-      <el-tab-pane label="Estado de resultados" name="estado resultados"></el-tab-pane>
+      <el-tab-pane label="Estado de resultados" name="estado resultados">
+                <!-- noticication -->
+            <div class="grid grid-cols-12">
+              <div class="col-span-12">
+                <Notification
+                  class=" mb-4 w-full"  type="info"
+                  title="Información"
+                  message="Acá puedes configurar los detalles que deseas que aparezcan en el estado de resultados, asi como definir si deseas que aparezca desglosado o solo sus totales."   
+              />
+            </div>
+            </div>
+             
+            <!-- table row -->
+            <div class="grid grid-cols-12 gap-4">
+              <div class="col-span-12">
+                <el-table :data="[]" row-key="id" border  size="small">
+                    <el-table-colum label="Nombre" min-width="300"></el-table-colum>
+                    <el-table-colum  align="center" min-width="40"></el-table-colum>
+                    <el-table-colum label="Incluir en reporte" align="center" min-width="65"></el-table-colum>
+                    <el-table-colum  label="Mostrar detalle" align="center" min-width="65"></el-table-colum>
+                    <el-table-colum align="center" min-width="35"></el-table-colum>
+                </el-table>
+              </div>
+            </div>
+            <!-- botones de guardar y cancelar -->
+            <div class="flex justify-end mt-4 ">
+              <el-button type="primary" size="small" native-type="submit">Guardar</el-button>
+              <el-button size="small">Cancelar</el-button>
+            </div>
+
+      </el-tab-pane>
       <!-- tab integraciones -->
       <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
         <Notification
@@ -287,6 +403,7 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+      
       tab: "catalog",
       utab: "invoicing",
       integrations: [
