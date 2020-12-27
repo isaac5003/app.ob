@@ -6,8 +6,7 @@
       { name: 'Facturas', to: '/sales' },
 
       { name: 'Nueva factura', to: null },
-    ]"
-  >
+    ]">
     <!-- dialogo -->
     <el-dialog
       title="Agregar Servicio"
@@ -16,14 +15,12 @@
       :close-on-click-modal="false"
       :append-to-body="true"
       @open="openDialog()"
-      @close="closeDialog(newServiceForm)"
-    >
+      @close="closeDialog(newServiceForm)">
       <el-form
         :model="newServiceForm"
         status-icon
         :rules="newServiceFormRules"
-        ref="newServiceForm"
-      >
+        ref="newServiceForm">
         <!-- first row -->
         <div class="grid grid-cols-12">
           <!-- Servicio -->
@@ -36,14 +33,12 @@
                 @change="selectService(newServiceForm.service, 'new')"
                 size="small"
                 class="w-full"
-                placeholder="Seleccionar servicio"
-              >
+                placeholder="Seleccionar servicio">
                 <el-option
                   v-for="s in services"
                   :key="s.id"
                   :label="s.name"
-                  :value="s.id"
-                >
+                  :value="s.id">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -58,13 +53,12 @@
                 ref="quantity"
                 type="number"
                 :min="0"
-                :step="0.01"
+                :step="1"
                 v-model="newServiceForm.quantity"
                 size="small"
                 autocomplete="off"
                 style="width: 100%"
-                :disabled="newServiceForm.service === ''"
-                :precision="2"
+                :disabled="newServiceForm.service === ''"           
               />
             </el-form-item>
           </div>
@@ -96,7 +90,6 @@
             </el-form-item>
           </div>
         </div>
-
         <!-- third row -->
         <div class="grid grid-cols-12">
           <!--Descripcion -->
@@ -107,7 +100,7 @@
                 :rows="5"
                 size="small"
                 v-model="newServiceForm.description"
-                maxlength="1000"
+                maxlength="5000"
                 minlength="5"
                 show-word-limit
                 :disabled="newServiceForm.service === ''"
@@ -116,7 +109,6 @@
             </el-form-item>
           </div>
         </div>
-
         <!-- boton guardar cancelar -->
         <div class="flex justify-end dialog-footer">
           <el-button
@@ -131,7 +123,19 @@
         </div>
       </el-form>
     </el-dialog>
-
+    <!-- noticication -->
+  <div class="grid grid-cols-12">
+    <div class="col-span-12">
+      <Notification
+        v-if="activeNotification"
+        class=" mb-4 w-full"
+        type="danger"
+        title="Atención"
+        message="No puede dar crédito fiscal a un cliente que no declare IVA."
+        
+      />
+    </div>
+    </div>
     <el-form :model="salesNewForm" :rules="salesNewFormRules" status-icon>
       <div class="flex flex-col space-y-4">
         <div class="flex flex-col">
@@ -146,13 +150,14 @@
                   size="small"
                   clearable
                   placeholder="Seleccionar"
+                  @change="validateDocumentType(salesNewForm.document, tributary)"
                 >
                   <el-option
                     v-for="d in documents"
                     :key="d.id"
                     :label="d.code + ' - ' + d.name"
                     :value="d.id"
-                    @change="setStorage(salesNewForm)"
+                    
                   >
                   </el-option>
                 </el-select>
@@ -202,16 +207,16 @@
           <div class="grid grid-cols-12 gap-4">
             <!-- cliente -->
             <div class="col-span-4">
-              <el-form-item label="Cliente" prop="costumer">
+              <el-form-item label="Cliente" prop="customer">
                 <el-select
-                  v-model="salesNewForm.costumer"
+                  v-model="salesNewForm.customer"
                   size="small"
                   class="w-full"
                   clearable
                   filterable
                   default-first-option
                   placeholder="Seleccionar"
-                  @change="getBranch(salesNewForm.costumer)"
+                  @change="getCustomerDetails(salesNewForm.customer)"
                 >
                   <el-option
                     v-for="c in customers"
@@ -296,7 +301,7 @@
             </div>
           </div>
           <!-- third row -->
-          <div class="grid grid-cols-12 gap-4 text-xs">
+         <div class="grid grid-cols-12 gap-4 text-xs">
             <!-- NRC -->
             <div class="col-span-1">
               <span>NRC</span>
@@ -322,9 +327,36 @@
               <span>Giro</span>
             </div>
           </div>
+          <div v-if="!activeNotification" class="grid grid-cols-12 gap-4 text-xs">
+            
+            <!-- NRC -->
+            <div class="col-span-1">
+              <span>{{tributary != null ? tributary.nrc : ''}}</span>
+            </div>
+            <!-- NIT -->
+            <div class="col-span-2">
+              <span>{{tributary != null ? tributary.nit : ''}}</span>
+            </div>
+            <!-- Direccion -->
+            <div class="col-span-3">
+              <span>{{branches != null ? branches[0].address1 : ''}}</span>
+            </div>
+            <!-- departamento -->
+            <div class="col-span-2">
+              <span>{{branches != null ? branches[0].state.name :""}}</span>
+            </div>
+            <!-- Municipio -->
+            <div class="col-span-2">
+             <span>{{branches != null ? branches[0].city.name : ''}}</span>
+            </div>
+            <!-- Giro -->
+            <div class="col-span-2">
+               <span>{{tributary != null ? tributary.giro : ''}}</span>
+            </div>
+        </div>
           <!-- fourth row btn agregarservicio -->
           <div class="flex justify-end">
-            <el-button type="primary" size="small" @click="dialogVisible = true"
+            <el-button type="primary" size="small" @click="dialogVisible = true" 
               >Agregar Servicio</el-button
             >
           </div>
@@ -409,7 +441,7 @@
         </table>
         <!-- boton guardar cancelar -->
         <div class="flex justify-end ">
-          <el-button type="primary" size="small" native-type="submit"
+          <el-button v-if="!activeNotification" type="primary" size="small" native-type="submit" 
             >Guardar</el-button
           >
           <el-button size="small">Cancelar</el-button>
@@ -466,6 +498,7 @@ export default {
   },
   data() {
     return {
+      activeNotification: false,
       sales: [],
       loading: false,
       salesNewForm: {
@@ -473,7 +506,7 @@ export default {
         auth: "",
         next: "",
         date: "",
-        costumer: "",
+        customer: "",
         branch: null,
         paymentConditions: null,
         sellers: null,
@@ -481,14 +514,14 @@ export default {
       salesNewFormRules: {
         document: selectValidation(true),
         date: selectValidation(true),
-        costumer: selectValidation(true),
+        customer: selectValidation(true),
         branch: selectValidation(true),
         paymentConditions: selectValidation(true),
         sellers: selectValidation(true),
       },
       sellers: [],
       paymentConditions: [],
-      branches: [],
+      branches: null,
       customers: [],
       documents: [],
       dialogVisible: false,
@@ -532,7 +565,7 @@ export default {
         description: inputValidation(true),
       },
       services: [],
-      branches:[],
+      tributary:null,
     };
   },
   methods: {
@@ -569,18 +602,46 @@ export default {
           break;
       }
     },
-    getBranch(id){
-      if(id != "")
-       this.$axios.get(`/customers/${id}/branches`).then((res) => {
-              this.branches = res.data.branches;
-            })
-            .catch((err) => {
-              this.errorMessage = err.response.data.message;
-            });
-      else{
-        console.log("no hay nada")
-        this.branches = ""
+    getCustomerDetails(id){
+      if(id){
+        const branches = () =>  { return this.$axios.get(`/customers/${id}/branches`);};
+        const tributary = () => {return this.$axios.get(`/customers/${id}/tributary`)};
+        Promise.all([branches(),tributary()])
+        .then((res) => {
+        const [branches, tributary] = res;
+        this.branches = branches.data.branches;
+        this.tributary = tributary.data.customer;
+        this.loading = false;
+        console.log(this.branches)
+        this.validateDocumentType(this.salesNewForm.document, this.tributary)
+      })
+      .catch((err) => {
+        console.log(err);
+        this.errorMessage = err.response.data.message;
+      });
+      }else{
+         this.salesNewForm.branch = ""
       }
+    
+    },
+    validateDocumentType(id, tributary){
+     this.setStorage(this.salesNewForm)
+     if(tributary){
+      switch(id){
+          case 2:
+            if(tributary.customerType.name == "Persona Natural" && tributary.customerTypeNatural.name == "No declara IVA"){
+              this.activeNotification = true
+            }else{
+              this.activeNotification = false
+              
+            }
+          break;
+          case 1:
+            this.activeNotification = false
+          break;
+        }
+      }
+      
     }
   },
 };
