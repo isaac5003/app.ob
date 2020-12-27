@@ -125,7 +125,7 @@
                         class="text-red-500 font-semibold"
                         @click.native="deleteSeller(scope.row)"
                       >
-                        <i class="el-icon-delete"></i> Eliminar Vendedor
+                        <i class="el-icon-delete"></i> Eliminar vendedor
                       </el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
@@ -486,6 +486,45 @@ export default {
                     message: res.data.message,
                   });
                   this.fetchZones();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, ${action}`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
+    },
+    deleteSeller({ id }) {
+      const action = "eliminar" ;
+      this.$confirm(
+        `¿Estás seguro que deseas ${action} este vendedor?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, ${action}`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .delete(`/invoices/sellers/${id}`)
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchSellers();
                 })
                 .catch((err) => {
                   this.$notify.error({
