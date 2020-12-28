@@ -124,7 +124,7 @@
             </el-form-item>
           </div>
         </div>
-        <!-- div vendedor, zona-->
+        <!-- div vendedor, zona servicio-->
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-3">
             <el-form-item label="Vendedor:">
@@ -132,16 +132,29 @@
                 v-model="VendClie"
                 size="small"
                 clearable
+                filterable
+                default-first-option
                 placeholder="Todos los clientes:"
                 class="w-full"
               >
-                <el-option
-                  v-for="item in options"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                >
-                </el-option>
+                <el-option-group key="ACTIVOS" label="ACTIVOS">
+                  <el-option
+                    v-for="item in activeSellers"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                  </el-option>
+                </el-option-group>
+                <el-option-group key="INACTIVOS" label="INACTIVOS">
+                  <el-option
+                    v-for="item in inactiveSellers"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                  </el-option>
+                </el-option-group>
               </el-select>
             </el-form-item>
           </div>
@@ -151,16 +164,29 @@
                 v-model="zonaValue"
                 size="small"
                 clearable
+                filterable
+                default-first-option
                 placeholder="Todos las Zona:"
                 class="w-full"
               >
-                <el-option
-                  v-for="item in options"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                >
-                </el-option>
+               <el-option-group key="ACTIVOS" label="ACTIVOS">
+                  <el-option
+                    v-for="item in activeZones"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                  </el-option>
+                </el-option-group>
+                <el-option-group key="INACTIVOS" label="INACTIVOS">
+                  <el-option
+                    v-for="item in inactiveZones"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                  </el-option>
+                </el-option-group>
               </el-select>
             </el-form-item>
           </div>
@@ -170,65 +196,87 @@
                 v-model="servVlue"
                 size="small"
                 clearable
+                filterable
+                default-first-option
                 placeholder="Todos los servicio:"
                 class="w-full"
               >
-                <el-option
-                  v-for="item in options"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                >
-                </el-option>
+                <el-option-group key="ACTIVOS" label="ACTIVOS">
+                  <el-option
+                    v-for="item in activeService"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                  </el-option>
+                </el-option-group>
+                <el-option-group key="INACTIVOS" label="INACTIVOS">
+                  <el-option
+                    v-for="item in inactiveService"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                  </el-option>
+                </el-option-group>
               </el-select>
             </el-form-item>
           </div>
         </div>
       </el-form>
-      <el-table :data="resultados" stripe size="mini">
+    
+
+        <el-table  :data="resultados" stripe size="small" >
         <el-table-column prop="index" min-width="40" />
-        <el-table-column label="Nombre" prop="nombre" min-width="350" />
-        <el-table-column label="Tipo" prop="tipo" min-width="120" />
-        <el-table-column label="NIT" prop="nit" min-width="160" />
-        <el-table-column label="NRC" prop="nrc" min-width="90" />
-        <el-table-column label="NIT" prop="nit" min-width="160" />
-        <el-table-column label="NRC" prop="nrc" min-width="90" />
-        <el-table-column label="Estado" min-width="90">
+        <el-table-column label="# Factura" prop="factura" min-width="120" />
+        <el-table-column label="Tipo fact." prop="tipof" min-width="75" />
+        <el-table-column label="Fecha" prop="fecha" min-width="100" />
+        <el-table-column label="Cliente" prop="cliente" min-width="350" />
+        <el-table-column label="Estado"  prop=true min-width="80">
           <template slot-scope="scope">
             <el-tag size="small" type="success" v-if="scope.row.isActiveInvoice"
               >Activo</el-tag
             >
             <el-tag size="small" type="warning" v-else>Inactivo</el-tag>
           </template>
+
         </el-table-column>
+         <el-table-column label="total" prop="total" min-width="80" />
         <el-table-column label min-width="60" align="center">
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item @click.native="openInvoicePreview(scope.row)">
-                  <i class="el-icon-view"></i> Vista previa
+                  <i class="el-icon-view"></i> Vista previa 
                 </el-dropdown-item>
                 <el-dropdown-item
                   @click.native="
                     $router.push(`/invoices/edit?ref=${scope.row.id}`)
                   "
                 >
-                  <i class="el-icon-edit-outline"></i> Editar cliente
+                  <i class="el-icon-edit-outline"></i>   Editar factura
                 </el-dropdown-item>
-                <el-dropdown-item @click.native="changeActive(scope.row)">
+                  <el-dropdown-item
+                  @click.native="
+                    $router.push(`/invoices/edit?ref=${scope.row.id}`)
+                  "
+                >
+                  <i class="el-icon-printer"></i>Imprimir factura
+                </el-dropdown-item>
+                <!-- <el-dropdown-item @click.native="changeActive(scope.row)">
                   <span v-if="scope.row.isActiveInvoice">
                     <i class="el-icon-close"></i> Desactivar
                   </span>
                   <span v-else> <i class="el-icon-check"></i> Activar </span>
                   cliente
-                </el-dropdown-item>
+                </el-dropdown-item> -->
                 <el-dropdown-item
                   :divided="true"
                   class="text-red-500 font-semibold"
                   @click.native="deleteInvoice(scope.row)"
                 >
-                  <i class="el-icon-delete"></i> Eliminar cliente
+                  <i class="el-icon-delete"></i>Eliminar factura
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -262,14 +310,36 @@ export default {
       this.$axios.get("/customers", { params: { active: true } });
     const inactiveCustomers = () =>
       this.$axios.get("/customers", { params: { active: false } });
-    const documentTypes = () => this.$axios.get("/invoices/document-types");
+        const documentTypes = () => this.$axios.get("/invoices/document-types");
+      const  activeSellers = () =>
+     this.$axios.get("/invoices/sellers",  {params: {active:true} });
+     const inactiveSellers = () =>
+     this.$axios.get("/invoices/sellers",  {params: {active:false} });
+    const activeZones = () =>
+  this.$axios.get("/invoices/zones", {params: { active: true}});
+   const inactiveZones = () =>
+    this.$axios.get("/invoices/zones", {params: { active: false}});
 
-    Promise.all([activeCustomers(), inactiveCustomers(), documentTypes()])
+   const activeService =  () => 
+   this.$axios.get("/services", {params: {active:true} });
+
+   const inactiveService = () =>
+   this.$axios.get("/services", {params: {active:false}});
+
+
+    Promise.all([activeCustomers(), inactiveCustomers(), activeSellers(), inactiveSellers(), activeZones(), inactiveZones(), activeService(), inactiveService(), documentTypes()])
       .then((res) => {
-        const [activeCustomers, inactiveCustomers, documentTypes] = res;
+        const [activeCustomers, inactiveCustomers, activeSellers, inactiveSellers, activeZones, inactiveZones, activeService, inactiveService, documentTypes] = res;
         this.activeCustomers = activeCustomers.data.customers;
         this.inactiveCustomers = inactiveCustomers.data.customers;
         this.documentTypes = documentTypes.data.documentTypes;
+        this.activeSellers = activeSellers.data.sellers;
+        this.inactiveSellers = inactiveSellers.data.sellers;
+        this.activeZones = activeZones.data.zones;
+        this.inactiveZones = inactiveZones.data.zones;
+        this.activeService = activeService.data.services;
+        this.inactiveService = inactiveService.data.services;
+
         this.loading = false;
       })
       .catch((err) => {
@@ -291,30 +361,10 @@ export default {
       servVlue: "",
       invoices: {
         invoices: [],
+        zones:[],
         count: 0,
       },
-      options: [
-        {
-          value: "Option1",
-          label: "Option1",
-        },
-        {
-          value: "Option2",
-          label: "Option2",
-        },
-        {
-          value: "Option3",
-          label: "Option3",
-        },
-        {
-          value: "Option4",
-          label: "Option4",
-        },
-        {
-          value: "Option5",
-          label: "Option5",
-        },
-      ],
+     
       value: "",
       page: {
         limit: 10,
@@ -322,17 +372,53 @@ export default {
       },
       resultados: [
         {
-          nombre: "Isaac",
-          tipo: "moreno",
-          nit: "123434",
-          nrc: "123",
-          nit: "1223",
-          nrc: "12322",
+            "index": 1,
+            "factura": "16SD000C - 156",
+            "tipof": "CFC",
+            "fecha": "21/12/2020",
+            "cliente": "INSTITUTO SALVADOREÑO DE FORMACION PROFESIONAL",
+            "Estado": true ,
+             "total": '$300.00'
         },
-      ],
+          {
+            "index": 1,
+            "factura": "16SD000C - 156",
+            "tipof": "CFC",
+            "fecha": "21/12/2020",
+            "cliente": "INSTITUTO SALVADOREÑO DE FORMACION PROFESIONAL",
+            "Estado": true,
+             "total": '$300.00'
+        },
+          {
+            "index": 1,
+            "factura": "16SD000C - 156",
+            "tipof": "CFC",
+            "fecha": "21/12/2020",
+            "cliente": "INSTITUTO SALVADOREÑO DE FORMACION PROFESIONAL",
+            "Estado": true,
+             "total": '$300.00'
+        },
+          {
+            "index": 1,
+            "factura": "16SD000C - 156",
+            "tipof": "CFC",
+            "fecha": "21/12/2020",
+            "cliente": "INSTITUTO SALVADOREÑO DE FORMACION PROFESIONAL",
+            "Estado": true,
+             "total": '$300.00'
+        },
+      
+    ],
+
       activeCustomers: [],
       inactiveCustomers: [],
-      documentTypes: [],
+       documentTypes:[],
+       activeSellers: [],
+       inactiveSellers: [],
+       activeZones: [],
+       inactiveZones: [],
+       activeService: [],
+       inactiveService: [],
     };
   },
   methods: {
