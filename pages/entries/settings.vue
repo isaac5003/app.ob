@@ -114,8 +114,7 @@
         <!-- first row -->
         <el-form>
           <div class="grid grid-cols-12 gap-4">
-            
-              <div class="col-span-3 ">
+           <div class="col-span-3 ">
                 <el-form-item>
                   <el-button
                     type="primary"
@@ -160,19 +159,13 @@
                 align="center"
               ></el-table-column>
               <el-table-column prop="name" min-width="150">
-                <template slot-scope="">
-                  <el-button
-                      size="mini"
-                      type="primary"
-                    
-                      icon="el-icon-plus"
+                
+                  <el-button size="mini" type="primary" icon="el-icon-plus"
                     />
                 <el-dropdown trigger="click" szie="mini">
                   <el-button icon="el-icon-more" size="mini" />
                   <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item
-                     
-                    >
+                    <el-dropdown-item>
                       <i class="el-icon-edit-outline"></i> Editar Cuenta
                     </el-dropdown-item>
                     <el-dropdown-item
@@ -185,10 +178,7 @@
                     </el-dropdown-item>
                   </el-dropdown-menu>
                 </el-dropdown>
-              </template>
-               
-             
-                      
+              
               </el-table-column>
             </el-table>
           </div>
