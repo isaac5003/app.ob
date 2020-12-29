@@ -39,7 +39,7 @@
           <el-button @click="showNewZone = false" size="small">Cancelar</el-button>
         </span>
       </el-dialog>
-        
+
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-5 flex flex-col space-y-4">
             <div class="flex justify-between items-center">
@@ -92,18 +92,64 @@
             </el-table>
           </div>
 
-          <!-- Inicio de tabla vendedores -->
+          <!-- Inicio de tabla vendedores y dialogos -->
+          <el-dialog :append-to-body="true" title="Nuevo vendedor" :visible.sync="showNewSeller" width="30%"
+        @close="closeDialog('newSellerForm')">
+        <el-form
+        :model="newSellerForm"
+        :rules="newzoneRules"
+        status-icon
+        ref="newSellerForm"
+        @submit.prevent.native="submitZone('newSellerForm', newSellerForm)"
+      >
+        <div>
+          <el-row :gutter="15">
+            <el-col :span="15">
+              <el-form-item label="Nombre del vendedor" prop="name">
+                <el-input clearable v-model="newSellerForm.name" size="small" auto-complete="off" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="9">
+              <el-form-item label="Zona asignada" prop="zone">
+                <el-select
+                v-model="newSellerForm.zone"
+                placeholder="Seleccionar"
+                size="small"
+                class="w-full"
+                clearable
+                filterable
+                default-first-option
+              >
+              <el-option
+                v-for="z in activeZones"
+                :key="z.id"
+                :label="z.name"
+                :value="z.id"
+                class="w.full"
+              />
+                </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </div>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button type="primary" size="small"  @click.native="submitSeller('newSellerForm', newSellerForm)">Guardar</el-button>
+          <el-button @click="showNewSeller = false" size="small">Cancelar</el-button>
+        </span>
+          </el-dialog>
+
           <div class="col-span-7 flex flex-col space-y-4">
             <div class="flex justify-between items-center">
               <span class="text-blue-900 font-semibold text-lg"
                 >VENDEDORES</span
               >
-              <el-button type="primary" size="mini" icon="el-icon-plus" />
+              <el-button @click="showNewSeller = true" type="primary" size="mini" icon="el-icon-plus" />
             </div>
 
             <el-table :data="sellers" stripe size="mini">
               <el-table-column label="ID" prop="index" min-width="40" />
-              <el-table-column label="Vendedor"  min-width="170" />
+              <el-table-column label="Vendedor" prop="name"  min-width="170" />
               <el-table-column label="Zona" min-width="175">
                 <template slot-scope="scope">
                   <span
@@ -161,13 +207,35 @@
 
       <!-- Tabla de condiciones de pago -->
       <el-tab-pane label="Condiciones de pago" name="payment-conditions">
+
+        <el-dialog :append-to-body="true" title="Nueva condición de pago" :visible.sync="showNewPayment" width="30%"
+        @close="closeDialog('newPaymentForm')">
+        <el-form
+        :model="newPaymentForm"
+        :rules="newzoneRules"
+        status-icon
+        ref="newPaymentForm"
+        @submit.prevent.native="submitPayment('newPaymentForm', newPaymentForm)"
+      >
+        <div>
+          <el-form-item label="Nombre de la condición de pago" prop="name">
+            <el-input v-model="newPaymentForm.name" clearable type="text"  maxlength="100" minlength="5" show-word-limit></el-input>
+          </el-form-item>
+        </div>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button type="primary" size="small"  @click.native="submitPayment('newPaymentForm', newPaymentForm)">Guardar</el-button>
+          <el-button @click="showNewPayment = false" size="small">Cancelar</el-button>
+        </span>
+      </el-dialog>
+
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-6 flex flex-col space-y-4">
             <div class="flex justify-between items-center">
               <span class="text-blue-900 font-semibold text-lg"
                 >CONDICIONES DE PAGO</span
               >
-              <el-button type="primary" size="mini" icon="el-icon-plus" />
+              <el-button @click="showNewPayment = true" type="primary" size="mini" icon="el-icon-plus" />
             </div>
             <el-table :data="payment" stripe size="mini">
               <el-table-column prop="index" min-width="40" />
@@ -312,6 +380,7 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+      rawZones: [],
       tab: "zones-sellers",
       utab: "invoicing",
       integrations: [
@@ -332,8 +401,13 @@ export default {
       sellers: [],
       payment: [],
       showNewZone: false,
+      showNewSeller: false,
+      showNewPayment: false,
       dialogFormVisible: false,
       newZoneForm: {
+        name: ""
+      },
+      newPaymentForm: {
         name: ""
       },
       newzoneRules: {
@@ -342,8 +416,17 @@ export default {
         // cost: amountValidate("blur", true, 0),
         // description: inputValidation(true),
       },
+      newSellerForm:{
+        name: "",
+        zone: ""
+      },
 
     };
+  },
+  watch:{
+    zones() {
+      this.rawZones = this.zones;
+    }
   },
   methods: {
     closeDialog(name) {
@@ -668,12 +751,117 @@ export default {
 
 
       });
-    }
+    },
+    submitSeller( formName, data ){
+      console.log('Hola data')
+      const action = "guardar" ;
+      this.$refs[formName].validate( async valid =>{
+        if(!valid){
+          return false;
+        }
+
+        this.$confirm(
+        `¿Estás seguro que deseas ${action} este vendedor?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, ${action}`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .post('/invoices/sellers',{
+                  name: data.name,
+                  invoicesZone: data.activeZones.id
+                })
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchSellers();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, ${action}`;
+                  done();
+                });
+            }
+            done();
+            this.showNewZone = false;
+          },
+        }
+      );
+
+
+      });
+    },
+    submitPayment( formName, data ){
+      const action = "guardar" ;
+      this.$refs[formName].validate( async valid =>{
+        if(!valid){
+          return false;
+        }
+
+        this.$confirm(
+        `¿Estás seguro que deseas ${action} esta condición de pago?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, ${action}`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .post('/invoices/payment-condition',{
+                  name: data.name
+                })
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchPayments();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, ${action}`;
+                  done();
+                });
+            }
+            done();
+            this.showNewPayment = false;
+          },
+        }
+      );
+
+
+      });
+    },
   },
   computed: {
     filteredIntegrations() {
       return this.integrations.filter((i) => hasModule(i.ref, this.$auth.user));
     },
+    activeZones() {
+      return this.rawZones.filter( zone => zone.active );
+    }
   },
 };
 </script>
