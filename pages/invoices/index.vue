@@ -8,18 +8,13 @@
     ]"
   >
     <div class="flex flex-col space-y-4">
-      <div class="flex justify-center" v-if="errorMessage">
-        <Notification
-          class="w-1/2"
-          type="danger"
-          title="Error de comunicación"
-          :message="errorMessage"
-          :action="{
-            title: 'Intentar nuevamente',
-            function: () => $router.go(),
-          }"
-        />
-      </div>
+      <Notification
+        v-if="errorMessage"
+        class="w-full"
+        type="danger"
+        title="Error de comunicación"
+        :message="errorMessage"
+      />
       <el-form label-position="top" class="flex flex-col ">
         <div class="grid grid-cols-12 gap-4">
           <div class="col-start-10 col-span-3">
@@ -169,7 +164,7 @@
                 placeholder="Todos las Zona:"
                 class="w-full"
               >
-               <el-option-group key="ACTIVOS" label="ACTIVOS">
+                <el-option-group key="ACTIVOS" label="ACTIVOS">
                   <el-option
                     v-for="item in activeZones"
                     :key="item.id"
@@ -224,40 +219,38 @@
           </div>
         </div>
       </el-form>
-    
 
-        <el-table  :data="resultados" stripe size="small" >
+      <el-table :data="invoicesS" stripe size="small">
         <el-table-column prop="index" min-width="40" />
         <el-table-column label="# Factura" prop="factura" min-width="120" />
         <el-table-column label="Tipo fact." prop="tipof" min-width="75" />
         <el-table-column label="Fecha" prop="fecha" min-width="100" />
         <el-table-column label="Cliente" prop="cliente" min-width="350" />
-        <el-table-column label="Estado"  prop=true min-width="80">
+        <el-table-column label="Estado" prop="true" min-width="80">
           <template slot-scope="scope">
             <el-tag size="small" type="success" v-if="scope.row.isActiveInvoice"
               >Activo</el-tag
             >
             <el-tag size="small" type="warning" v-else>Inactivo</el-tag>
           </template>
-
         </el-table-column>
-         <el-table-column label="total" prop="total" min-width="80" />
+        <el-table-column label="total" prop="total" min-width="80" />
         <el-table-column label min-width="60" align="center">
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item @click.native="openInvoicePreview(scope.row)">
-                  <i class="el-icon-view"></i> Vista previa 
+                  <i class="el-icon-view"></i> Vista previa
                 </el-dropdown-item>
                 <el-dropdown-item
                   @click.native="
                     $router.push(`/invoices/edit?ref=${scope.row.id}`)
                   "
                 >
-                  <i class="el-icon-edit-outline"></i>   Editar factura
+                  <i class="el-icon-edit-outline"></i> Editar factura
                 </el-dropdown-item>
-                  <el-dropdown-item
+                <el-dropdown-item
                   @click.native="
                     $router.push(`/invoices/edit?ref=${scope.row.id}`)
                   "
@@ -310,26 +303,43 @@ export default {
       this.$axios.get("/customers", { params: { active: true } });
     const inactiveCustomers = () =>
       this.$axios.get("/customers", { params: { active: false } });
-        const documentTypes = () => this.$axios.get("/invoices/document-types");
-      const  activeSellers = () =>
-     this.$axios.get("/invoices/sellers",  {params: {active:true} });
-     const inactiveSellers = () =>
-     this.$axios.get("/invoices/sellers",  {params: {active:false} });
+    const documentTypes = () => this.$axios.get("/invoices/document-types");
+    const activeSellers = () =>
+      this.$axios.get("/invoices/sellers", { params: { active: true } });
+    const inactiveSellers = () =>
+      this.$axios.get("/invoices/sellers", { params: { active: false } });
     const activeZones = () =>
-  this.$axios.get("/invoices/zones", {params: { active: true}});
-   const inactiveZones = () =>
-    this.$axios.get("/invoices/zones", {params: { active: false}});
+      this.$axios.get("/invoices/zones", { params: { active: true } });
+    const inactiveZones = () =>
+      this.$axios.get("/invoices/zones", { params: { active: false } });
+    const activeService = () =>
+      this.$axios.get("/services", { params: { active: true } });
+    const inactiveService = () =>
+      this.$axios.get("/services", { params: { active: false } });
 
-   const activeService =  () => 
-   this.$axios.get("/services", {params: {active:true} });
-
-   const inactiveService = () =>
-   this.$axios.get("/services", {params: {active:false}});
-
-
-    Promise.all([activeCustomers(), inactiveCustomers(), activeSellers(), inactiveSellers(), activeZones(), inactiveZones(), activeService(), inactiveService(), documentTypes()])
+    Promise.all([
+      activeCustomers(),
+      inactiveCustomers(),
+      activeSellers(),
+      inactiveSellers(),
+      activeZones(),
+      inactiveZones(),
+      activeService(),
+      inactiveService(),
+      documentTypes(),
+    ])
       .then((res) => {
-        const [activeCustomers, inactiveCustomers, activeSellers, inactiveSellers, activeZones, inactiveZones, activeService, inactiveService, documentTypes] = res;
+        const [
+          activeCustomers,
+          inactiveCustomers,
+          activeSellers,
+          inactiveSellers,
+          activeZones,
+          inactiveZones,
+          activeService,
+          inactiveService,
+          documentTypes,
+        ] = res;
         this.activeCustomers = activeCustomers.data.customers;
         this.inactiveCustomers = inactiveCustomers.data.customers;
         this.documentTypes = documentTypes.data.documentTypes;
@@ -339,11 +349,12 @@ export default {
         this.inactiveZones = inactiveZones.data.zones;
         this.activeService = activeService.data.services;
         this.inactiveService = inactiveService.data.services;
-
         this.loading = false;
       })
       .catch((err) => {
-        this.errorMessage = err.response.data.message;
+        this.errorMessage = err.response.data.message
+          ? err.response.data.message
+          : "Comunicate con el administrador del sistema.";
       });
   },
   fetchOnServer: false,
@@ -359,172 +370,65 @@ export default {
       VendClie: "",
       zonaValue: "",
       servVlue: "",
-      invoices: {
-        invoices: [],
-        zones:[],
-        count: 0,
-      },
-     
+
       value: "",
       page: {
         limit: 10,
         page: 1,
       },
-      resultados: [
+      invoices: [
         {
-            "index": 1,
-            "factura": "16SD000C - 156",
-            "tipof": "CFC",
-            "fecha": "21/12/2020",
-            "cliente": "INSTITUTO SALVADOREÑO DE FORMACION PROFESIONAL",
-            "Estado": true ,
-             "total": '$300.00'
+          index: 1,
+          factura: "16SD000C - 156",
+          tipof: "CFC",
+          fecha: "21/12/2020",
+          cliente: "INSTITUTO SALVADOREÑO DE FORMACION PROFESIONAL",
+          Estado: true,
+          total: "$300.00",
         },
-          {
-            "index": 1,
-            "factura": "16SD000C - 156",
-            "tipof": "CFC",
-            "fecha": "21/12/2020",
-            "cliente": "INSTITUTO SALVADOREÑO DE FORMACION PROFESIONAL",
-            "Estado": true,
-             "total": '$300.00'
+        {
+          index: 1,
+          factura: "16SD000C - 156",
+          tipof: "CFC",
+          fecha: "21/12/2020",
+          cliente: "INSTITUTO SALVADOREÑO DE FORMACION PROFESIONAL",
+          Estado: true,
+          total: "$300.00",
         },
-          {
-            "index": 1,
-            "factura": "16SD000C - 156",
-            "tipof": "CFC",
-            "fecha": "21/12/2020",
-            "cliente": "INSTITUTO SALVADOREÑO DE FORMACION PROFESIONAL",
-            "Estado": true,
-             "total": '$300.00'
+        {
+          index: 1,
+          factura: "16SD000C - 156",
+          tipof: "CFC",
+          fecha: "21/12/2020",
+          cliente: "INSTITUTO SALVADOREÑO DE FORMACION PROFESIONAL",
+          Estado: true,
+          total: "$300.00",
         },
-          {
-            "index": 1,
-            "factura": "16SD000C - 156",
-            "tipof": "CFC",
-            "fecha": "21/12/2020",
-            "cliente": "INSTITUTO SALVADOREÑO DE FORMACION PROFESIONAL",
-            "Estado": true,
-             "total": '$300.00'
+        {
+          index: 1,
+          factura: "16SD000C - 156",
+          tipof: "CFC",
+          fecha: "21/12/2020",
+          cliente: "INSTITUTO SALVADOREÑO DE FORMACION PROFESIONAL",
+          Estado: true,
+          total: "$300.00",
         },
-      
-    ],
+      ],
 
       activeCustomers: [],
       inactiveCustomers: [],
-       documentTypes:[],
-       activeSellers: [],
-       inactiveSellers: [],
-       activeZones: [],
-       inactiveZones: [],
-       activeService: [],
-       inactiveService: [],
+      documentTypes: [],
+      activeSellers: [],
+      inactiveSellers: [],
+      activeZones: [],
+      inactiveZones: [],
+      activeService: [],
+      inactiveService: [],
     };
   },
   methods: {
-    fetchInvoices() {
-      let params = this.page;
-      if (this.status !== "") {
-        params = { ...params, active: this.status };
-      }
-      if (this.searchValue !== "") {
-        params = { ...params, search: this.searchValue.toLowerCase() };
-      }
-
-      this.$axios
-        .get("/invoices", { params })
-        .then((res) => {
-          this.invoices = res.data;
-        })
-        .catch((err) => {
-          this.errorMessage = err.response.data.message;
-        });
-    },
     handleSizeChange(val) {
       this.page.limit = val;
-      this.fetchInvoices();
-    },
-    changeActive({ id, isActiveInvoice }) {
-      const action = isActiveInvoice ? "desactivar" : "activar";
-      this.$confirm(
-        `¿Estás seguro que deseas ${action} este cliente?`,
-        "Confirmación",
-        {
-          confirmButtonText: `Si, ${action}`,
-          cancelButtonText: "Cancelar",
-          type: "warning",
-          beforeClose: (action, instance, done) => {
-            if (action === "confirm") {
-              instance.confirmButtonLoading = true;
-              instance.confirmButtonText = "Procesando...";
-              this.$axios
-                .put(`/invoices/status/${id}`, { status: !isActiveInvoice })
-                .then((res) => {
-                  this.$notify.success({
-                    title: "Éxito",
-                    message: res.data.message,
-                  });
-                  this.fetchInvoices();
-                })
-                .catch((err) => {
-                  this.$notify.error({
-                    title: "Error",
-                    message: err.response.data.message,
-                  });
-                })
-                .then((alw) => {
-                  instance.confirmButtonLoading = false;
-                  instance.confirmButtonText = `Si, ${action}`;
-                  done();
-                });
-            }
-            done();
-          },
-        }
-      );
-    },
-    deleteInvoice({ id }) {
-      this.$confirm(
-        `¿Estás seguro que deseas eliminar este cliente?`,
-        "Confirmación",
-        {
-          confirmButtonText: `Si, eliminar`,
-          cancelButtonText: "Cancelar",
-          type: "warning",
-          beforeClose: (action, instance, done) => {
-            if (action === "confirm") {
-              instance.confirmButtonLoading = true;
-              instance.confirmButtonText = "Procesando...";
-              this.$axios
-                .delete(`/invoices/${id}`)
-                .then((res) => {
-                  this.$notify.success({
-                    title: "Éxito",
-                    message: res.data.message,
-                  });
-                  this.fetchInvoices();
-                })
-                .catch((err) => {
-                  this.$notify.error({
-                    title: "Error",
-                    message: err.response.data.message,
-                  });
-                })
-                .then((alw) => {
-                  instance.confirmButtonLoading = false;
-                  instance.confirmButtonText = `Si, eliminar`;
-                  done();
-                });
-            }
-            done();
-          },
-        }
-      );
-    },
-    async openInvoicePreview({ id }) {
-      const { data } = await this.$axios.get(`/invoices/${id}`);
-      this.selectedInvoice = data.invoice;
-      this.showInvoicePreview = true;
     },
   },
 };
