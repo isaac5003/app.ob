@@ -37,10 +37,10 @@
           <div class="col-span-4">
             <el-form-item label="Rango de fechas:">
               <el-date-picker
-                v-model="value1"
+                v-model="filter.dateRange"
                 style="width:100%"
                 size="small"
-                type="datetimerange"
+                type="daterange"
                 range-separator="-"
                 start-placeholder="Fecha inicial"
                 end-placeholder="Fecha final"
@@ -51,7 +51,7 @@
           <div class="col-span-4">
             <el-form-item label="Cliente:">
               <el-select
-                v-model="clienV"
+                v-model="filter.customer"
                 size="small"
                 class="w-full"
                 clearable
@@ -60,6 +60,9 @@
                 placeholder="Todos los clientes:"
               >
                 <el-option-group key="ACTIVOS" label="ACTIVOS">
+                  <el-option
+                  label="Todos los clientes"
+                  value=""/>
                   <el-option
                     v-for="item in activeCustomers"
                     :key="item.id"
@@ -83,12 +86,13 @@
           <div class="col-span-2">
             <el-form-item label="Tipo fact:">
               <el-select
-                v-model="TypeFact"
+                v-model="filter.invoiceType"
                 size="small"
                 clearable
                 placeholder="Todos los tipos:"
                 class="w-full"
               >
+              <el-option label="Todos los tipos" value=""/>
                 <el-option
                   v-for="item in documentTypes"
                   :key="item.id"
@@ -102,7 +106,7 @@
           <div class="col-span-2">
             <el-form-item label="Estado:">
               <el-select
-                v-model="status"
+                v-model="filter.status"
                 size="small"
                 clearable
                 placeholder="Todos los estados:"
@@ -124,7 +128,7 @@
           <div class="col-span-3">
             <el-form-item label="Vendedor:">
               <el-select
-                v-model="VendClie"
+                v-model="filter.seller"
                 size="small"
                 clearable
                 filterable
@@ -133,6 +137,7 @@
                 class="w-full"
               >
                 <el-option-group key="ACTIVOS" label="ACTIVOS">
+                    <el-option label="Todos los clientes" value=""/>
                   <el-option
                     v-for="item in activeSellers"
                     :key="item.id"
@@ -156,15 +161,16 @@
           <div class="col-span-3">
             <el-form-item label="Zona:">
               <el-select
-                v-model="zonaValue"
+                v-model="filter.zone"
                 size="small"
                 clearable
                 filterable
                 default-first-option
-                placeholder="Todos las Zona:"
+                placeholder="Todos las Zonas"
                 class="w-full"
               >
                 <el-option-group key="ACTIVOS" label="ACTIVOS">
+                    <el-option label="Tados las zonas" value=""/>
                   <el-option
                     v-for="item in activeZones"
                     :key="item.id"
@@ -186,17 +192,17 @@
             </el-form-item>
           </div>
           <div class=" col-span-3">
-            <el-form-item label="Servicio:">
+            <el-form-item label="Servicios:">
               <el-select
-                v-model="servVlue"
+                v-model="filter.service"
                 size="small"
                 clearable
-                filterable
                 default-first-option
-                placeholder="Todos los servicio:"
+                placeholder="Todos los servicios"
                 class="w-full"
               >
                 <el-option-group key="ACTIVOS" label="ACTIVOS">
+                    <el-option label="Todos los servicios" value=""/>
                   <el-option
                     v-for="item in activeService"
                     :key="item.id"
@@ -220,7 +226,7 @@
         </div>
       </el-form>
 
-      <el-table :data="invoicesS" stripe size="small">
+      <el-table :data="invoices" stripe size="small">
         <el-table-column prop="index" min-width="40" />
         <el-table-column label="# Factura" prop="factura" min-width="120" />
         <el-table-column label="Tipo fact." prop="tipof" min-width="75" />
@@ -361,15 +367,16 @@ export default {
   data() {
     return {
       loading: false,
-      errorMessage: "",
-      searchValue: "",
-      rangFech: "",
-      clienV: "",
-      TypeFact: "",
-      status: "",
-      VendClie: "",
-      zonaValue: "",
-      servVlue: "",
+      errorMessage:  "",
+      filter:{
+      dateRange:"",
+      customer:"",
+      invoiceType:"",
+      status:"",
+      seller:"",
+      zone:"",
+      service:"",
+      },
 
       value: "",
       page: {
@@ -415,15 +422,15 @@ export default {
         },
       ],
 
-      activeCustomers: [],
+      activeCustomers:   [],
       inactiveCustomers: [],
-      documentTypes: [],
-      activeSellers: [],
-      inactiveSellers: [],
-      activeZones: [],
-      inactiveZones: [],
-      activeService: [],
-      inactiveService: [],
+      documentTypes:     [],
+      activeSellers:     [],
+      inactiveSellers:   [],
+      activeZones:       [],
+      inactiveZones:     [],
+      activeService:     [],
+      inactiveService:   [],
     };
   },
   methods: {
