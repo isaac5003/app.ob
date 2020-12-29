@@ -261,11 +261,33 @@
     <!-- table row -->
     <div class="grid grid-cols-12 gap-4">
       <div class="col-span-12">
-         <el-table :data="[]" row-key="id" border  size="small">
-            <el-table-colum label="Cuenta" prop="cuenta" min-widht="200"></el-table-colum>
-            <el-table-colum prop="nombrereporte" label="Nombre en reporte" min-width="170"></el-table-colum>
-            <el-table-colum prop="display" align="center" min-width="40"></el-table-colum>
-        </el-table>
+         <el-table
+              :data="balance"
+              style="width: 100%"
+              stripe
+              size="small"
+              border
+            >
+             
+              <el-table-column prop="cuenta" label="Cuenta" min-width="200" />
+              <el-table-column prop="nombrereporte" label="Nombre en reporte" min-width="170">
+                <template slot-scope="scope">
+                <div class="flex justify-between items-center">
+                <span>{{ scope.row.nombrereporte }}</span>
+                <el-tooltip
+                  :open-delay="600"
+                  class="item"
+                  effect="dark"
+                  content="Editar nombre a mostrar en reporte"
+                  placement="top"
+                >
+                  <el-button icon="el-icon-edit" size="mini"  />
+                </el-tooltip>
+              </div>
+            </template></el-table-column>
+              <el-table-column  min-width="40"></el-table-column>
+            
+            </el-table>
       </div>
     </div>
     <!-- botones de guardar y cancelar -->
@@ -290,16 +312,63 @@
              
             <!-- table row -->
             <div class="grid grid-cols-12 gap-4">
-              <div class="col-span-12">
-                <el-table :data="[]" row-key="id" border  size="small">
-                    <el-table-colum label="Nombre" min-width="300"></el-table-colum>
-                    <el-table-colum  align="center" min-width="40"></el-table-colum>
-                    <el-table-colum label="Incluir en reporte" align="center" min-width="65"></el-table-colum>
-                    <el-table-colum  label="Mostrar detalle" align="center" min-width="65"></el-table-colum>
-                    <el-table-colum align="center" min-width="35"></el-table-colum>
-                </el-table>
-              </div>
-            </div>
+      <div class="col-span-12">
+         <el-table
+              :data="balance"
+              style="width: 100%"
+              stripe
+              size="small"
+              border
+            >
+             
+            <el-table-column prop="cuenta" label="Nombre" min-width="300" />
+            <el-table-column align="center"  min-width="40">
+              <el-tooltip
+                :open-delay="600"
+               
+                class="item"
+                effect="dark"
+                content="Agregar nueva cuenta"
+                placement="top"
+              >
+                <el-button
+                  type="primary"
+                  icon="el-icon-edit"
+                  size="small"
+                  @click="openAddAccount(scope.row)"
+                />
+              </el-tooltip>
+            </el-table-column>
+            <el-table-column   align="center" label="Incluir en reporte" min-width="70">
+              <template slot-scope="scope">
+              <el-switch v-model="scope.row.show" />
+            </template>
+            </el-table-column>
+            <el-table-column align="center" label="Mostrar detalle" min-width="65">
+                <template  slot-scope="scope">
+              <el-switch v-model="scope.row.show" />
+            </template>
+            </el-table-column>
+            <el-table-column  min-width="35">
+               <el-tooltip
+                :open-delay="600"
+               
+                class="item"
+                effect="dark"
+                content="Agregar nueva cuenta"
+                placement="top"
+              >
+                <el-button
+                  type="primary"
+                  icon="el-icon-plus"
+                  size="small"
+                  @click="openAddAccount(scope.row)"
+                />
+              </el-tooltip>
+            </el-table-column>
+            </el-table>
+      </div>
+    </div>
             <!-- botones de guardar y cancelar -->
             <div class="flex justify-end mt-4 ">
               <el-button type="primary" size="small" native-type="submit">Guardar</el-button>
@@ -393,7 +462,12 @@ export default {
   fetchOnServer: false,
   data() {
     return {
-      
+      balance:[
+        {cuenta: "Activo",
+         nombrereporte: "hola que ase en un dia caluroso"
+        }
+
+      ],
       tab: "catalog",
       utab: "invoicing",
       integrations: [
