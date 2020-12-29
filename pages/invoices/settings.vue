@@ -846,6 +846,7 @@ export default {
                 });
             }
             done();
+            //Cambio de valor en variable showNewPayment
             this.showNewPayment = false;
           },
         }
