@@ -18,11 +18,33 @@
       "
     >
       <el-tab-pane label="Zonas y vendedores" name="zones-sellers">
+
+      <el-dialog :append-to-body="true" title="Nueva zona" :visible.sync="showNewZone" width="30%"
+        @close="closeDialog('newZoneForm')">
+        <el-form
+        :model="newZoneForm"
+        :rules="newzoneRules"
+        status-icon
+        ref="newZoneForm"
+        @submit.prevent.native="submitZone('newZoneForm', newZoneForm)"
+      >
+        <div>
+          <el-form-item label="Nombre de la zona" prop="name">
+            <el-input v-model="newZoneForm.name" clearable type="text"  maxlength="100" minlength="5" show-word-limit></el-input>
+          </el-form-item>
+        </div>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button type="primary" size="small"  @click.native="submitZone('newZoneForm', newZoneForm)">Guardar</el-button>
+          <el-button @click="showNewZone = false" size="small">Cancelar</el-button>
+        </span>
+      </el-dialog>
+        
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-5 flex flex-col space-y-4">
             <div class="flex justify-between items-center">
               <span class="text-blue-900 font-semibold text-lg">ZONAS</span>
-              <el-button type="primary" size="mini" icon="el-icon-plus" />
+              <el-button @click="showNewZone = true" type="primary" size="mini" icon="el-icon-plus" />
             </div>
             <el-table :data="zones" stripe size="mini">
               <el-table-column prop="index" min-width="40" />
@@ -81,7 +103,7 @@
 
             <el-table :data="sellers" stripe size="mini">
               <el-table-column label="ID" prop="index" min-width="40" />
-              <el-table-column label="Vendedor" prop="name" min-width="170" />
+              <el-table-column label="Vendedor"  min-width="170" />
               <el-table-column label="Zona" min-width="175">
                 <template slot-scope="scope">
                   <span
@@ -248,7 +270,7 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import { getIcon, hasModule } from "../../tools";
+import { getIcon, hasModule, inputValidation, selectValidation  } from "../../tools";
 import * as R from "ramda";
 
 export default {
@@ -308,10 +330,25 @@ export default {
       ],
       zones: [],
       sellers: [],
-      payment: []
+      payment: [],
+      showNewZone: false,
+      dialogFormVisible: false,
+      newZoneForm: {
+        name: ""
+      },
+      newzoneRules: {
+        name: inputValidation(true, 5, 100),
+        // service: selectValidation(true),
+        // cost: amountValidate("blur", true, 0),
+        // description: inputValidation(true),
+      },
+
     };
   },
   methods: {
+    closeDialog(name) {
+      this.$refs[name].resetFields();
+    },
     fetchZones() {
       let params = this.page;
       this.$axios
@@ -582,6 +619,56 @@ export default {
         }
       );
     },
+    submitZone( formName, data ){
+      const action = "guardar" ;
+      this.$refs[formName].validate( async valid =>{
+        if(!valid){
+          return false;
+        }
+
+        this.$confirm(
+        `¿Estás seguro que deseas ${action} esta zona?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, ${action}`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .post('/invoices/zones',{
+                  name: data.name
+                })
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchZones();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, ${action}`;
+                  done();
+                });
+            }
+            done();
+            this.showNewZone = false;
+          },
+        }
+      );
+
+
+      });
+    }
   },
   computed: {
     filteredIntegrations() {
