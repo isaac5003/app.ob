@@ -8,7 +8,7 @@
       { name: 'Nueva factura', to: null },
     ]"
   >
-    <!-- dialogo -->
+    <!-- dialogo addservicio-->
     <el-dialog
       title="Agregar Servicio"
       :visible.sync="showAddService"
@@ -16,7 +16,7 @@
       :close-on-click-modal="false"
       :append-to-body="true"
       @open="openDialog()"
-      @close="closeDialog(newServiceForm)"
+      @close="closeDialog('newServiceForm')"
     >
       <el-form
         :model="newServiceForm"
@@ -121,11 +121,7 @@
             type="primary"
             size="small"
             @click.native="
-              addToDetails(
-                'service',
-                'newServiceForm',
-                newServiceForm
-              )
+              addToDetails('service', 'newServiceForm', newServiceForm)
             "
             >Guardar</el-button
           >
@@ -135,6 +131,130 @@
         </div>
       </el-form>
     </el-dialog>
+    <!-- dialogo editservicio -->
+    <el-dialog
+      title="Editar servicio"
+      :visible.sync="showEditService"
+      width="35%"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+    >
+      <el-form
+        :model="editServiceForm"
+        status-icon
+        :rules="newServiceFormRules"
+        ref="editServiceForm"
+        @submit.prevent.native="
+          updateDetail(editingDetail, 'editServiceForm', editServiceForm)
+        "
+      >
+        <!-- first row -->
+        <div class="grid grid-cols-12">
+          <!-- Servicio -->
+          <div class="col-span-12">
+            <el-form-item label="Servicio" prop="service">
+              <el-select
+                v-model="editServiceForm.service"
+                clearable
+                filterable
+                @change="selectService(editServiceForm.service, 'edit')"
+                size="small"
+                class="w-full"
+                placeholder="Seleccionar servicio"
+              >
+                <el-option
+                  v-for="s in services"
+                  :key="s.id"
+                  :label="s.name"
+                  :value="s.id"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </div>
+        </div>
+        <!-- second row -->
+        <div class="grid grid-cols-12 gap-4">
+          <!-- Cantidad -->
+          <div class="col-span-6">
+            <el-form-item label="Cantidad">
+              <el-input-number
+                ref="quantity"
+                type="number"
+                :min="0"
+                :step="1"
+                v-model="editServiceForm.quantity"
+                size="small"
+                autocomplete="off"
+                style="width: 100%"
+                :disabled="editServiceForm.service === ''"
+              />
+            </el-form-item>
+          </div>
+          <!-- precio -->
+          <div class="col-span-6">
+            <el-form-item label="Precio">
+              <div class="w-full flex items-end">
+                <el-input-number
+                  class="w-full mt-1"
+                  ref="cost"
+                  type="number"
+                  :min="0.0"
+                  :step="0.01"
+                  v-model="editServiceForm.cost"
+                  size="small"
+                  autocomplete="off"
+                  style="width: 100%"
+                  :disabled="editServiceForm.service === ''"
+                  :precision="2"
+                />
+                <el-checkbox
+                  border
+                  v-model="editServiceForm.incTax"
+                  size="small"
+                  class="px-3 mt-1"
+                  :disabled="editServiceForm.service === ''"
+                  >IVA incl.</el-checkbox
+                >
+              </div>
+            </el-form-item>
+          </div>
+        </div>
+        <!-- third row -->
+        <div class="grid grid-cols-12">
+          <!--Descripcion -->
+          <div class="col-span-12">
+            <el-form-item label="Descripción" prop="description">
+              <el-input
+                type="textarea"
+                :rows="5"
+                size="small"
+                v-model="editServiceForm.description"
+                maxlength="5000"
+                minlength="5"
+                show-word-limit
+                :disabled="editServiceForm.service === ''"
+              >
+              </el-input>
+            </el-form-item>
+          </div>
+        </div>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button
+          type="primary"
+          size="small"
+          @click.native="
+            updateDetail(editingDetail, 'editServiceForm', editServiceForm)
+          "
+          >Guardar</el-button
+        >
+        <el-button @click="showEditService = false" size="small"
+          >Cancelar</el-button
+        >
+      </span>
+    </el-dialog>
+
     <!-- noticication -->
     <div class="grid grid-cols-12">
       <div class="col-span-12">
@@ -383,7 +503,7 @@
           <div class="col-span-12">
             <el-table :data="details" style="width: 100%" stripe size="small">
               <el-table-column type="index" label="#" />
-              <el-table-column prop="quantity" label="Cant." min-width="50"/>
+              <el-table-column prop="quantity" label="Cant." min-width="50" />
               <el-table-column
                 prop="description"
                 label="Descripción"
@@ -394,9 +514,12 @@
                 min-width="75"
                 align="right"
               >
-              <template slot-scope="scope">
-                <span>{{ calcUnitPrice(salesNewForm.documentType, scope.row) | formatMoney }}</span>
-              </template>
+                <template slot-scope="scope">
+                  <span>{{
+                    calcUnitPrice(salesNewForm.documentType, scope.row)
+                      | formatMoney
+                  }}</span>
+                </template>
               </el-table-column>
               <el-table-column
                 prop="vnosujeta"
@@ -404,9 +527,12 @@
                 min-width="75"
                 align="right"
               >
-              <template slot-scope="scope">
-                <span v-if="scope.row.type.id == 1">{{ calcSujeta(salesNewForm.documentType, scope.row) | formatMoney }}</span>
-              </template>
+                <template slot-scope="scope">
+                  <span v-if="scope.row.sellingType.id == 1">{{
+                    calcSujeta(salesNewForm.documentType, scope.row)
+                      | formatMoney
+                  }}</span>
+                </template>
               </el-table-column>
               <el-table-column
                 prop="vexenta"
@@ -414,9 +540,12 @@
                 min-width="75"
                 align="right"
               >
-              <template slot-scope="scope">
-                <span v-if="scope.row.type.id == 2">{{ calcExenta(salesNewForm.documentType, scope.row) | formatMoney }}</span>
-              </template>
+                <template slot-scope="scope">
+                  <span v-if="scope.row.sellingType.id == 2">{{
+                    calcExenta(salesNewForm.documentType, scope.row)
+                      | formatMoney
+                  }}</span>
+                </template>
               </el-table-column>
               <el-table-column
                 prop="vgrabada"
@@ -424,11 +553,33 @@
                 min-width="75"
                 align="right"
               >
-              <template slot-scope="scope">
-                <span v-if="scope.row.type.id == 3">{{ calcGravada(salesNewForm.documentType, scope.row) | formatMoney}}</span>
-              </template>
+                <template slot-scope="scope">
+                  <span v-if="scope.row.sellingType.id == 3">{{
+                    calcGravada(salesNewForm.documentType, scope.row)
+                      | formatMoney
+                  }}</span>
+                </template>
               </el-table-column>
-              <el-table-column min-width="80"> </el-table-column>
+              <el-table-column min-width="80">
+                <template slot-scope="scope">
+                  <div class="flex flex-row items-center justify-center">
+                    <el-button
+                      type="primary"
+                      @click="openEditDetail(scope.$index, scope.row)"
+                      size="small"
+                      icon="el-icon-edit"
+                      circle
+                    ></el-button>
+                    <el-button
+                      type="danger"
+                      @click="deleteDetail(scope.$index)"
+                      size="small"
+                      icon="el-icon-delete"
+                      circle
+                    ></el-button>
+                  </div>
+                </template>
+              </el-table-column>
             </el-table>
           </div>
         </div>
@@ -437,35 +588,49 @@
           <tbody class="text-sm divide-y divide-gray-300">
             <tr class="flex space-x-16">
               <td align="right" class="text-blue-900 w-50">SUMAS:</td>
-              <td align="right" class="text-gray-800">{{ sumas | formatMoney }}</td>
+              <td align="right" class="text-gray-800">
+                {{ sumas | formatMoney }}
+              </td>
             </tr>
             <tr class="flex space-x-16" v-if="salesNewForm.documentType === 2">
-                <td align="right" class="text-blue-900 w-50">13% Iva:</td>
-                <td align="right" class="text-gray-800">{{taxes | formatMoney}}</td>
-              </tr>
+              <td align="right" class="text-blue-900 w-50">13% Iva:</td>
+              <td align="right" class="text-gray-800">
+                {{ taxes | formatMoney }}
+              </td>
+            </tr>
             <tr class="flex space-x-16">
               <td align="right" class="text-blue-900 w-50">Subtotal:</td>
-              <td align="right" class="text-gray-800">{{subtotal | formatMoney}}</td>
+              <td align="right" class="text-gray-800">
+                {{ subtotal | formatMoney }}
+              </td>
             </tr>
             <tr class="flex space-x-16">
               <td align="right" class="text-blue-900 w-50">Iva retenido:</td>
-              <td align="right" class="text-gray-800">$0.00</td>
+              <td align="right" class="text-gray-800">
+                {{ ivaRetenido | formatMoney }}
+              </td>
             </tr>
             <tr class="flex space-x-16">
               <td align="right" class="text-blue-900 w-50">Ventas exentas:</td>
-              <td align="right" class="text-gray-800">{{  ventasExentas | formatMoney}}</td>
+              <td align="right" class="text-gray-800">
+                {{ ventasExentas | formatMoney }}
+              </td>
             </tr>
             <tr class="flex space-x-16">
               <td align="right" class="text-blue-900 w-50">
                 Ventas no sujetas:
               </td>
-              <td align="right" class="text-gray-800">{{ ventasNoSujetas | formatMoney}}</td>
+              <td align="right" class="text-gray-800">
+                {{ ventasNoSujetas | formatMoney }}
+              </td>
             </tr>
             <tr class="flex space-x-16">
               <td align="right" class="text-blue-900 font-semibold w-50">
                 Venta total:
               </td>
-              <td align="right" class="text-gray-800">{{ ventaTotal | formatMoney}}</td>
+              <td align="right" class="text-gray-800">
+                {{ ventaTotal | formatMoney }}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -594,13 +759,21 @@ export default {
         ],
       },
       newServiceForm: {
-        service: '',
+        service: "",
         quantity: null,
         cost: null,
         description: null,
         incTax: false,
-        type: null,
+        sellingType: null,
         unitPrice: null,
+      },
+      editServiceForm: {
+        service: "",
+        quantity: null,
+        cost: null,
+        description: null,
+        incTax: false,
+        sellingType: null,
       },
       newServiceFormRules: {
         service: selectValidation(true),
@@ -613,16 +786,17 @@ export default {
       documentInfo: null,
       showAddService: false,
       service: null,
+      showEditService: false,
     };
   },
   methods: {
     setStorage(salesNewForm) {
       localStorage.setItem(storagekey, JSON.stringify(salesNewForm));
     },
-    closeDialog() {
-      this.$refs.newServiceForm.resetFields();
-      this.newServiceForm.cost = "";
-      this.newServiceForm.quantity = "";
+    closeDialog(formName) {
+      this.$refs[formName].resetFields();
+      this[formName].cost = "";
+      this[formName].quantity = "";
     },
     openDialog() {
       this.$axios
@@ -642,7 +816,19 @@ export default {
             .then((res) => {
               this.newServiceForm.cost = res.data.service.cost;
               this.newServiceForm.description = res.data.service.description;
-              this.newServiceForm.type = res.data.service.sellingType;
+              this.newServiceForm.sellingType = res.data.service.sellingType;
+            })
+            .catch((err) => {
+              this.errorMessage = err.response.data.message;
+            });
+          break;
+        case "edit":
+          this.$axios
+            .get(`/services/${id}`)
+            .then((res) => {
+              this.editServiceForm.cost = res.data.service.cost;
+              this.editServiceForm.description = res.data.service.description;
+              this.editServiceForm.sellingType = res.data.service.sellingType;
             })
             .catch((err) => {
               this.errorMessage = err.response.data.message;
@@ -658,15 +844,15 @@ export default {
         const tributary = () => {
           return this.$axios.get(`/customers/${id}/tributary`);
         };
+
         Promise.all([branches(), tributary()])
           .then((res) => {
-            const [branches, tributary] = res;
+            const [branches, tributary, taxerType] = res;
             this.branches = branches.data.branches;
             this.tributary = tributary.data.customer;
             this.loading = false;
-            console.log(this.branches);
             this.validateDocumentType(
-              this.salesNewForm.document,
+              this.salesNewForm.documentType,
               this.tributary
             );
           })
@@ -713,96 +899,120 @@ export default {
         }
       }
     },
-    addToDetails(type, formName, data) {
+    addToDetails(types, formName, data) {
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
         }
         this.details.push({
-          type, 
+          types,
           ...data,
         });
         this.showAddService = false;
-        
-        
       });
     },
-     calcUnitPrice(documentType, { cost, incTax, type }) {
-     
-     let unitPrice = null;
+    openEditDetail(index, details) {
+      const { types } = details;
+      this.editingDetail = index;
+      switch (types) {
+        case "service":
+          this.editServiceForm = details;
+          this.showEditService = true;
+          break;
+      }
+    },
+    deleteDetail(index) {
+      this.$confirm(
+        "¿Estás seguro que deseas eliminar este detalle?",
+        "Confirmación",
+        {
+          confirmButtonText: "Si, eliminar",
+          cancelButtonText: "Cancelar",
+          type: "warning",
+        }
+      ).then(() => {
+        this.details.splice(index, 1);
+      });
+    },
+    updateDetail(index, formName, form) {
+   
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+        const types = this.details[index].types;
+        const sellingType = this.details[index].sellingType;
+        this.details.splice(index, 1, { ...form, sellingType, types });
+        this.showEditService = false;
+      });
+    },
+    calcUnitPrice(documentType, { cost, incTax, sellingType }) {
+      let unitPrice = null;
       const amount = parseFloat(cost);
-      console.log(documentType, { cost, incTax, type })
-       if(type.id == 1 | type.id ==2){
-         unitPrice = amount;
-       }
-       else{
-          switch (documentType) {
+
+      if ((sellingType.id == 1) | (sellingType.id == 2)) {
+        unitPrice = amount;
+      } else {
+        switch (documentType) {
           case 1:
             unitPrice = amount * (incTax ? 1 : 1.13);
-            this.newServiceForm.unitPrice = unitPrice
+            this.newServiceForm.unitPrice = unitPrice;
             break;
           case 2:
-           
             unitPrice = amount / (incTax ? 1.13 : 1);
-            this.newServiceForm.cost = unitPrice
+            this.newServiceForm.cost = unitPrice;
             break;
         }
-      
-       }
+      }
       return unitPrice;
     },
-    calcSujeta(documentType, { cost, incTax, type,quantity }) {
-     
-     let unitPrice = null;
+    calcSujeta(documentType, { cost, incTax, sellingType, quantity }) {
+      let unitPrice = null;
       const amount = parseFloat(cost);
-      console.log(documentType, { cost, incTax, type })
-       if(type.id == 1 | type.id ==2){
-         unitPrice = amount*quantity;
-       }
-      
+      console.log(documentType, { cost, incTax, sellingType });
+      if ((sellingType.id == 1) | (sellingType.id == 2)) {
+        unitPrice = amount * quantity;
+      }
+
       return unitPrice;
     },
-    calcGravada(documentType, { cost, incTax, type,quantity }) {
-     
-     let unitPrice = null;
+    calcGravada(documentType, { cost, incTax, sellingType, quantity }) {
+      let unitPrice = null;
       const amount = parseFloat(cost);
       switch (documentType) {
-          case 1:
-            unitPrice =( amount * (incTax ? 1 : 1.13))*quantity;
-           
-            break;
-          case 2:
-           
-            unitPrice = (amount / (incTax ? 1.13 : 1)) * quantity;
-            
-            break;
-        }
-      
-      
+        case 1:
+          unitPrice = amount * (incTax ? 1 : 1.13) * quantity;
+
+          break;
+        case 2:
+          unitPrice = (amount / (incTax ? 1.13 : 1)) * quantity;
+
+          break;
+      }
+
       return unitPrice;
     },
-     calcExenta(documentType, { cost, incTax, type,quantity }) {
-     
-     let unitPrice = null;
+    calcExenta(documentType, { cost, incTax, sellingType, quantity }) {
+      let unitPrice = null;
       const amount = parseFloat(cost);
-      console.log(documentType, { cost, incTax, type })
-       if(type.id == 1 | type.id ==2){
-         unitPrice = amount*quantity;
-       }
-           
-       
+      console.log(documentType, { cost, incTax, sellingType });
+      if ((sellingType.id == 1) | (sellingType.id == 2)) {
+        unitPrice = amount * quantity;
+      }
+
       return unitPrice;
     },
   },
-  computed:{
-      sumas() {
+  computed: {
+    sumas() {
+
       const details = this.details;
       let sumas = 0;
       if (details) {
         switch (this.salesNewForm.documentType) {
           case 1:
             for (const d of details) {
-              if (d.type.id === 3) {
+              if (d.sellingType.id === 3) {
                 sumas +=
                   parseInt(d.quantity) *
                   parseFloat(d.cost) *
@@ -812,7 +1022,7 @@ export default {
             break;
           case 2:
             for (const d of details) {
-              if (d.type.id === 3) {
+              if (d.sellingType.id === 3) {
                 sumas +=
                   (parseInt(d.quantity) * parseFloat(d.cost)) /
                   (d.incTax ? 1.13 : 1);
@@ -823,14 +1033,14 @@ export default {
       }
       return sumas;
     },
-     taxes() {
+    taxes() {
       const details = this.details;
       let taxes = 0;
       if (details) {
         switch (this.salesNewForm.documentType) {
           case 2:
             for (const d of details) {
-              if (d.type.id === 3) {
+              if (d.sellingType.id === 3) {
                 if (d.incTax) {
                   const total = parseInt(d.quantity) * parseFloat(d.cost);
                   taxes += total - total / 1.13;
@@ -848,49 +1058,34 @@ export default {
     subtotal() {
       return this.sumas + this.taxes;
     },
-    //  ivaRetenido() {
-    //   let ivaRetenido = 0;
-    //   const customer = this.customer;
-    //   if (
-    //     !R.isNil(customer) &&
-    //     !R.isNil(customer.customerTaxerType) &&
-    //     customer.customerTaxerType.id === "3"
-    //   ) {
-    //     switch (this.newInvoiceForm.documentType) {
-    //       case "1":
-    //         ivaRetenido = this.sumas > 100 ? (this.sumas / 1.13) * 0.01 : 0;
-    //         break;
-    //       case "2":
-    //         ivaRetenido = this.sumas * (this.sumas > 100 ? 0.01 : 0);
-    //         break;
-    //     }
-    //   }
-    //   return ivaRetenido;
-    // },
-     ventasExentas() {
-      const details = this.details.filter(d => d.type.id == 2)
-      return details.reduce((a,b) => {
-        return {
-          total: a.total + (b.cost * b.quantity)
-        }
-      }, {total: 0}).total
+    ivaRetenido() {
+      let ivaRetenido = 0;
+    },
+    ventasExentas() {
+      const details = this.details.filter((d) => d.sellingType.id == 2);
+      return details.reduce(
+        (a, b) => {
+          return {
+            total: a.total + b.cost * b.quantity,
+          };
+        },
+        { total: 0 }
+      ).total;
     },
     ventasNoSujetas() {
-      const details = this.details.filter(d => d.type.id == 1)
-      return details.reduce((a,b) => {
-        return {
-          total: a.total + (b.cost * b.quantity)
-        }
-      }, {total: 0}).total
+      const details = this.details.filter((d) => d.sellingType.id == 1);
+      return details.reduce(
+        (a, b) => {
+          return {
+            total: a.total + b.cost * b.quantity,
+          };
+        },
+        { total: 0 }
+      ).total;
     },
     ventaTotal() {
-      return (
-        this.subtotal +
-        this.ventasExentas + 
-        this.ventasNoSujetas
-      );
+      return this.subtotal + this.ventasExentas + this.ventasNoSujetas;
     },
-   
-  }
+  },
 };
 </script>
