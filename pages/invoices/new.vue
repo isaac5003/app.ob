@@ -6,21 +6,24 @@
       { name: 'Facturas', to: '/sales' },
 
       { name: 'Nueva factura', to: null },
-    ]">
+    ]"
+  >
     <!-- dialogo -->
     <el-dialog
       title="Agregar Servicio"
-      :visible.sync="dialogVisible"
+      :visible.sync="showAddService"
       width="550px"
       :close-on-click-modal="false"
       :append-to-body="true"
       @open="openDialog()"
-      @close="closeDialog(newServiceForm)">
+      @close="closeDialog(newServiceForm)"
+    >
       <el-form
         :model="newServiceForm"
         status-icon
         :rules="newServiceFormRules"
-        ref="newServiceForm">
+        ref="newServiceForm"
+      >
         <!-- first row -->
         <div class="grid grid-cols-12">
           <!-- Servicio -->
@@ -33,19 +36,21 @@
                 @change="selectService(newServiceForm.service, 'new')"
                 size="small"
                 class="w-full"
-                placeholder="Seleccionar servicio">
+                placeholder="Seleccionar servicio"
+              >
                 <el-option
                   v-for="s in services"
                   :key="s.id"
                   :label="s.name"
-                  :value="s.id">
+                  :value="s.id"
+                >
                 </el-option>
               </el-select>
             </el-form-item>
           </div>
         </div>
         <!-- second row -->
-        <div class="grid grid-cols-12 gap-4 ">
+        <div class="grid grid-cols-12 gap-4">
           <!-- Cantidad -->
           <div class="col-span-6">
             <el-form-item label="Cantidad">
@@ -58,7 +63,7 @@
                 size="small"
                 autocomplete="off"
                 style="width: 100%"
-                :disabled="newServiceForm.service === ''"           
+                :disabled="newServiceForm.service === ''"
               />
             </el-form-item>
           </div>
@@ -81,6 +86,7 @@
                 />
                 <el-checkbox
                   border
+                  v-model="newServiceForm.incTax"
                   size="small"
                   class="px-3 mt-1"
                   :disabled="newServiceForm.service === ''"
@@ -114,27 +120,32 @@
           <el-button
             type="primary"
             size="small"
-            @click.native="selectService(newServiceForm.service, 'edit')"
+            @click.native="
+              addToDetails(
+                'service',
+                'newServiceForm',
+                newServiceForm
+              )
+            "
             >Guardar</el-button
           >
-          <el-button size="small" @click="dialogVisible = false"
+          <el-button @click="showAddService = false" size="small"
             >Cancelar</el-button
           >
         </div>
       </el-form>
     </el-dialog>
     <!-- noticication -->
-  <div class="grid grid-cols-12">
-    <div class="col-span-12">
-      <Notification
-        v-if="activeNotification"
-        class=" mb-4 w-full"
-        type="danger"
-        title="Atención"
-        message="No puede dar crédito fiscal a un cliente que no declare IVA."
-        
-      />
-    </div>
+    <div class="grid grid-cols-12">
+      <div class="col-span-12">
+        <Notification
+          v-if="activeNotification"
+          class="mb-4 w-full"
+          type="danger"
+          title="Atención"
+          message="No puede dar crédito fiscal a un cliente que no declare IVA."
+        />
+      </div>
     </div>
     <el-form :model="salesNewForm" :rules="salesNewFormRules" status-icon>
       <div class="flex flex-col space-y-4">
@@ -143,28 +154,29 @@
           <div class="grid grid-cols-12 gap-4">
             <!-- tipo de documento -->
             <div class="col-span-3">
-              <el-form-item label="Tipo de documento" prop="document">
+              <el-form-item label="Tipo de documento" prop="documentType">
                 <el-select
-                  v-model="salesNewForm.document"
+                  v-model="salesNewForm.documentType"
                   class="w-full"
                   size="small"
                   clearable
                   placeholder="Seleccionar"
-                  @change="validateDocumentType(salesNewForm.document, tributary)"
+                  @change="
+                    validateDocumentType(salesNewForm.document, tributary)
+                  "
                 >
                   <el-option
                     v-for="d in documents"
                     :key="d.id"
                     :label="d.code + ' - ' + d.name"
                     :value="d.id"
-                    
                   >
                   </el-option>
                 </el-select>
               </el-form-item>
             </div>
             <!-- n° autorizacion -->
-            <div class="col-span-2 col-start-7 ">
+            <div class="col-span-2 col-start-7">
               <el-form-item label="N° de autorización">
                 <el-input
                   size="small"
@@ -181,7 +193,7 @@
                 <el-input
                   size="small"
                   placeholder=""
-                  v-model="salesNewForm.correlativo"
+                  v-model="salesNewForm.next"
                   :disabled="true"
                 >
                 </el-input>
@@ -196,7 +208,7 @@
                   type="date"
                   placeholder=""
                   :picker-options="pickerOptions"
-                  style="width: 100%;"
+                  style="width: 100%"
                   @change="setStorage(salesNewForm)"
                 >
                 </el-date-picker>
@@ -301,7 +313,7 @@
             </div>
           </div>
           <!-- third row -->
-         <div class="grid grid-cols-12 gap-4 text-xs">
+          <div class="grid grid-cols-12 gap-4 text-xs">
             <!-- NRC -->
             <div class="col-span-1">
               <span>NRC</span>
@@ -327,36 +339,41 @@
               <span>Giro</span>
             </div>
           </div>
-          <div v-if="!activeNotification" class="grid grid-cols-12 gap-4 text-xs">
-            
+          <div
+            v-if="!activeNotification"
+            class="grid grid-cols-12 gap-4 text-xs text-gray-700"
+          >
             <!-- NRC -->
             <div class="col-span-1">
-              <span>{{tributary != null ? tributary.nrc : ''}}</span>
+              <span>{{ tributary != null ? tributary.nrc : "" }}</span>
             </div>
             <!-- NIT -->
             <div class="col-span-2">
-              <span>{{tributary != null ? tributary.nit : ''}}</span>
+              <span>{{ tributary != null ? tributary.nit : "" }}</span>
             </div>
             <!-- Direccion -->
             <div class="col-span-3">
-              <span>{{branches != null ? branches[0].address1 : ''}}</span>
+              <span>{{ branches != null ? branches[0].address1 : "" }}</span>
             </div>
             <!-- departamento -->
             <div class="col-span-2">
-              <span>{{branches != null ? branches[0].state.name :""}}</span>
+              <span>{{ branches != null ? branches[0].state.name : "" }}</span>
             </div>
             <!-- Municipio -->
             <div class="col-span-2">
-             <span>{{branches != null ? branches[0].city.name : ''}}</span>
+              <span>{{ branches != null ? branches[0].city.name : "" }}</span>
             </div>
             <!-- Giro -->
             <div class="col-span-2">
-               <span>{{tributary != null ? tributary.giro : ''}}</span>
+              <span>{{ tributary != null ? tributary.giro : "" }}</span>
             </div>
-        </div>
+          </div>
           <!-- fourth row btn agregarservicio -->
           <div class="flex justify-end">
-            <el-button type="primary" size="small" @click="dialogVisible = true" 
+            <el-button
+              type="primary"
+              size="small"
+              @click="showAddService = true"
               >Agregar Servicio</el-button
             >
           </div>
@@ -364,18 +381,22 @@
         <!-- table row -->
         <div class="grid grid-cols-12">
           <div class="col-span-12">
-            <el-table :data="sales" style="width: 100%" stripe size="small">
+            <el-table :data="details" style="width: 100%" stripe size="small">
               <el-table-column type="index" label="#" />
-              <el-table-column prop="quantity" label="Cant." min-width="50">
-              </el-table-column>
-              <el-table-column prop="details" label="Descripción" width="270">
-              </el-table-column>
+              <el-table-column prop="quantity" label="Cant." min-width="50"/>
               <el-table-column
-                prop="precuni"
+                prop="description"
+                label="Descripción"
+                width="270"
+              />
+              <el-table-column
                 label="Precio Unit."
                 min-width="75"
                 align="right"
               >
+              <template slot-scope="scope">
+                <span>{{ calcUnitPrice(salesNewForm.documentType, scope.row) | formatMoney }}</span>
+              </template>
               </el-table-column>
               <el-table-column
                 prop="vnosujeta"
@@ -383,6 +404,9 @@
                 min-width="75"
                 align="right"
               >
+              <template slot-scope="scope">
+                <span v-if="scope.row.type.id == 1">{{ calcSujeta(salesNewForm.documentType, scope.row) | formatMoney }}</span>
+              </template>
               </el-table-column>
               <el-table-column
                 prop="vexenta"
@@ -390,6 +414,9 @@
                 min-width="75"
                 align="right"
               >
+              <template slot-scope="scope">
+                <span v-if="scope.row.type.id == 2">{{ calcExenta(salesNewForm.documentType, scope.row) | formatMoney }}</span>
+              </template>
               </el-table-column>
               <el-table-column
                 prop="vgrabada"
@@ -397,51 +424,58 @@
                 min-width="75"
                 align="right"
               >
+              <template slot-scope="scope">
+                <span v-if="scope.row.type.id == 3">{{ calcGravada(salesNewForm.documentType, scope.row) | formatMoney}}</span>
+              </template>
               </el-table-column>
-              <el-table-column prop="name" min-width="80"> </el-table-column>
+              <el-table-column min-width="80"> </el-table-column>
             </el-table>
           </div>
         </div>
         <!-- sumas -->
         <table class="flex justify-end">
           <tbody class="text-sm divide-y divide-gray-300">
-            <tr class=" flex  space-x-16">
+            <tr class="flex space-x-16">
               <td align="right" class="text-blue-900 w-50">SUMAS:</td>
-              <td align="right" class="text-gray-800">$0.00</td>
+              <td align="right" class="text-gray-800">{{ sumas | formatMoney }}</td>
             </tr>
-            <!-- <tr class="border-t" v-if="newInvoiceForm.documentType === '2'">
-                <td align="right" class="text-blue-900" width="200px">13% Iva:</td>
-                <td align="right" class="pl-15 pr-2 text-gray-800">{{taxes | formatMoney}}</td>
-              </tr> -->
-            <tr class="flex  space-x-16">
+            <tr class="flex space-x-16" v-if="salesNewForm.documentType === 2">
+                <td align="right" class="text-blue-900 w-50">13% Iva:</td>
+                <td align="right" class="text-gray-800">{{taxes | formatMoney}}</td>
+              </tr>
+            <tr class="flex space-x-16">
               <td align="right" class="text-blue-900 w-50">Subtotal:</td>
-              <td align="right" class="text-gray-800">$0.00</td>
+              <td align="right" class="text-gray-800">{{subtotal | formatMoney}}</td>
             </tr>
             <tr class="flex space-x-16">
               <td align="right" class="text-blue-900 w-50">Iva retenido:</td>
-              <td align="right" class=" text-gray-800">$0.00</td>
+              <td align="right" class="text-gray-800">$0.00</td>
             </tr>
             <tr class="flex space-x-16">
               <td align="right" class="text-blue-900 w-50">Ventas exentas:</td>
-              <td align="right" class=" text-gray-800">$0.00</td>
+              <td align="right" class="text-gray-800">{{  ventasExentas | formatMoney}}</td>
             </tr>
             <tr class="flex space-x-16">
               <td align="right" class="text-blue-900 w-50">
                 Ventas no sujetas:
               </td>
-              <td align="right" class=" text-gray-800">$0.00</td>
+              <td align="right" class="text-gray-800">{{ ventasNoSujetas | formatMoney}}</td>
             </tr>
             <tr class="flex space-x-16">
               <td align="right" class="text-blue-900 font-semibold w-50">
                 Venta total:
               </td>
-              <td align="right" class="text-gray-800">$0.00</td>
+              <td align="right" class="text-gray-800">{{ ventaTotal | formatMoney}}</td>
             </tr>
           </tbody>
         </table>
         <!-- boton guardar cancelar -->
-        <div class="flex justify-end ">
-          <el-button v-if="!activeNotification" type="primary" size="small" native-type="submit" 
+        <div class="flex justify-end">
+          <el-button
+            v-if="!activeNotification"
+            type="primary"
+            size="small"
+            native-type="submit"
             >Guardar</el-button
           >
           <el-button size="small">Cancelar</el-button>
@@ -467,18 +501,25 @@ export default {
   name: "InvoicesNew",
   components: { LayoutContent, Notification },
   fetch() {
-    const sellers = () => { return this.$axios.get("/invoices/sellers", { params: { active: true } });
+    const sellers = () => {
+      return this.$axios.get("/invoices/sellers", { params: { active: true } });
     };
-    const paymentsConditions = () => { return this.$axios.get("/invoices/payment-condition");
+    const paymentsConditions = () => {
+      return this.$axios.get("/invoices/payment-condition");
     };
-    const customers = () => {return this.$axios.get("/customers", {params: { isActiveCustomer: true }});
-   };
-   const documentTypes = () => { return this.$axios.get("/invoices/document-types");};
+    const customers = () => {
+      return this.$axios.get("/customers", {
+        params: { isActiveCustomer: true },
+      });
+    };
+    const documentTypes = () => {
+      return this.$axios.get("/invoices/document-types");
+    };
 
     Promise.all([sellers(), paymentsConditions(), customers(), documentTypes()])
       .then((res) => {
         const [sellers, paymentConditions, customers, documents] = res;
-       
+
         this.sellers = sellers.data.sellers;
         this.paymentConditions = paymentConditions.data.paymentConditions;
         this.customers = customers.data.customers;
@@ -498,11 +539,12 @@ export default {
   },
   data() {
     return {
+      details: [],
       activeNotification: false,
       sales: [],
       loading: false,
       salesNewForm: {
-        document: "",
+        documentType: "",
         auth: "",
         next: "",
         date: "",
@@ -512,7 +554,7 @@ export default {
         sellers: null,
       },
       salesNewFormRules: {
-        document: selectValidation(true),
+        documentType: selectValidation(true),
         date: selectValidation(true),
         customer: selectValidation(true),
         branch: selectValidation(true),
@@ -552,11 +594,13 @@ export default {
         ],
       },
       newServiceForm: {
-        service: "",
-        quantity: "",
-        cost: "",
-        description: "",
+        service: '',
+        quantity: null,
+        cost: null,
+        description: null,
         incTax: false,
+        type: null,
+        unitPrice: null,
       },
       newServiceFormRules: {
         service: selectValidation(true),
@@ -565,7 +609,10 @@ export default {
         description: inputValidation(true),
       },
       services: [],
-      tributary:null,
+      tributary: null,
+      documentInfo: null,
+      showAddService: false,
+      service: null,
     };
   },
   methods: {
@@ -595,6 +642,7 @@ export default {
             .then((res) => {
               this.newServiceForm.cost = res.data.service.cost;
               this.newServiceForm.description = res.data.service.description;
+              this.newServiceForm.type = res.data.service.sellingType;
             })
             .catch((err) => {
               this.errorMessage = err.response.data.message;
@@ -602,47 +650,247 @@ export default {
           break;
       }
     },
-    getCustomerDetails(id){
-      if(id){
-        const branches = () =>  { return this.$axios.get(`/customers/${id}/branches`);};
-        const tributary = () => {return this.$axios.get(`/customers/${id}/tributary`)};
-        Promise.all([branches(),tributary()])
-        .then((res) => {
-        const [branches, tributary] = res;
-        this.branches = branches.data.branches;
-        this.tributary = tributary.data.customer;
-        this.loading = false;
-        console.log(this.branches)
-        this.validateDocumentType(this.salesNewForm.document, this.tributary)
-      })
-      .catch((err) => {
-        console.log(err);
-        this.errorMessage = err.response.data.message;
-      });
-      }else{
-         this.salesNewForm.branch = ""
+    getCustomerDetails(id) {
+      if (id) {
+        const branches = () => {
+          return this.$axios.get(`/customers/${id}/branches`);
+        };
+        const tributary = () => {
+          return this.$axios.get(`/customers/${id}/tributary`);
+        };
+        Promise.all([branches(), tributary()])
+          .then((res) => {
+            const [branches, tributary] = res;
+            this.branches = branches.data.branches;
+            this.tributary = tributary.data.customer;
+            this.loading = false;
+            console.log(this.branches);
+            this.validateDocumentType(
+              this.salesNewForm.document,
+              this.tributary
+            );
+          })
+          .catch((err) => {
+            console.log(err);
+            this.errorMessage = err.response.data.message;
+          });
+      } else {
+        this.salesNewForm.branch = "";
       }
-    
     },
-    validateDocumentType(id, tributary){
-     this.setStorage(this.salesNewForm)
-     if(tributary){
-      switch(id){
+    validateDocumentType(id, tributary) {
+      this.setStorage(this.salesNewForm);
+      if (id) {
+        this.$axios
+          .get("/invoices/documents", { params: { type: id } })
+          .then((res) => {
+            this.documentInfo = res.data.documents;
+            this.salesNewForm.auth = res.data.documents[0].authorization;
+            this.salesNewForm.next = res.data.documents[0].next;
+          })
+          .catch((err) => {
+            this.errorMessage = err.response.data.message;
+          });
+      } else {
+        this.salesNewForm.auth = "";
+        this.salesNewForm.next = "";
+      }
+      if (tributary) {
+        switch (id) {
           case 2:
-            if(tributary.customerType.name == "Persona Natural" && tributary.customerTypeNatural.name == "No declara IVA"){
-              this.activeNotification = true
-            }else{
-              this.activeNotification = false
-              
+            if (
+              tributary.customerType.name == "Persona Natural" &&
+              tributary.customerTypeNatural.name == "No declara IVA"
+            ) {
+              this.activeNotification = true;
+            } else {
+              this.activeNotification = false;
             }
-          break;
+            break;
           case 1:
-            this.activeNotification = false
-          break;
+            this.activeNotification = false;
+            break;
         }
       }
+    },
+    addToDetails(type, formName, data) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+        this.details.push({
+          type, 
+          ...data,
+        });
+        this.showAddService = false;
+        
+        
+      });
+    },
+     calcUnitPrice(documentType, { cost, incTax, type }) {
+     
+     let unitPrice = null;
+      const amount = parseFloat(cost);
+      console.log(documentType, { cost, incTax, type })
+       if(type.id == 1 | type.id ==2){
+         unitPrice = amount;
+       }
+       else{
+          switch (documentType) {
+          case 1:
+            unitPrice = amount * (incTax ? 1 : 1.13);
+            this.newServiceForm.unitPrice = unitPrice
+            break;
+          case 2:
+           
+            unitPrice = amount / (incTax ? 1.13 : 1);
+            this.newServiceForm.cost = unitPrice
+            break;
+        }
       
-    }
+       }
+      return unitPrice;
+    },
+    calcSujeta(documentType, { cost, incTax, type,quantity }) {
+     
+     let unitPrice = null;
+      const amount = parseFloat(cost);
+      console.log(documentType, { cost, incTax, type })
+       if(type.id == 1 | type.id ==2){
+         unitPrice = amount*quantity;
+       }
+      
+      return unitPrice;
+    },
+    calcGravada(documentType, { cost, incTax, type,quantity }) {
+     
+     let unitPrice = null;
+      const amount = parseFloat(cost);
+      switch (documentType) {
+          case 1:
+            unitPrice =( amount * (incTax ? 1 : 1.13))*quantity;
+           
+            break;
+          case 2:
+           
+            unitPrice = (amount / (incTax ? 1.13 : 1)) * quantity;
+            
+            break;
+        }
+      
+      
+      return unitPrice;
+    },
+     calcExenta(documentType, { cost, incTax, type,quantity }) {
+     
+     let unitPrice = null;
+      const amount = parseFloat(cost);
+      console.log(documentType, { cost, incTax, type })
+       if(type.id == 1 | type.id ==2){
+         unitPrice = amount*quantity;
+       }
+           
+       
+      return unitPrice;
+    },
   },
+  computed:{
+      sumas() {
+      const details = this.details;
+      let sumas = 0;
+      if (details) {
+        switch (this.salesNewForm.documentType) {
+          case 1:
+            for (const d of details) {
+              if (d.type.id === 3) {
+                sumas +=
+                  parseInt(d.quantity) *
+                  parseFloat(d.cost) *
+                  (d.incTax ? 1 : 1.13);
+              }
+            }
+            break;
+          case 2:
+            for (const d of details) {
+              if (d.type.id === 3) {
+                sumas +=
+                  (parseInt(d.quantity) * parseFloat(d.cost)) /
+                  (d.incTax ? 1.13 : 1);
+              }
+            }
+            break;
+        }
+      }
+      return sumas;
+    },
+     taxes() {
+      const details = this.details;
+      let taxes = 0;
+      if (details) {
+        switch (this.salesNewForm.documentType) {
+          case 2:
+            for (const d of details) {
+              if (d.type.id === 3) {
+                if (d.incTax) {
+                  const total = parseInt(d.quantity) * parseFloat(d.cost);
+                  taxes += total - total / 1.13;
+                } else {
+                  const total = parseInt(d.quantity) * parseFloat(d.cost);
+                  taxes += total * 1.13 - total;
+                }
+              }
+            }
+            break;
+        }
+      }
+      return taxes;
+    },
+    subtotal() {
+      return this.sumas + this.taxes;
+    },
+    //  ivaRetenido() {
+    //   let ivaRetenido = 0;
+    //   const customer = this.customer;
+    //   if (
+    //     !R.isNil(customer) &&
+    //     !R.isNil(customer.customerTaxerType) &&
+    //     customer.customerTaxerType.id === "3"
+    //   ) {
+    //     switch (this.newInvoiceForm.documentType) {
+    //       case "1":
+    //         ivaRetenido = this.sumas > 100 ? (this.sumas / 1.13) * 0.01 : 0;
+    //         break;
+    //       case "2":
+    //         ivaRetenido = this.sumas * (this.sumas > 100 ? 0.01 : 0);
+    //         break;
+    //     }
+    //   }
+    //   return ivaRetenido;
+    // },
+     ventasExentas() {
+      const details = this.details.filter(d => d.type.id == 2)
+      return details.reduce((a,b) => {
+        return {
+          total: a.total + (b.cost * b.quantity)
+        }
+      }, {total: 0}).total
+    },
+    ventasNoSujetas() {
+      const details = this.details.filter(d => d.type.id == 1)
+      return details.reduce((a,b) => {
+        return {
+          total: a.total + (b.cost * b.quantity)
+        }
+      }, {total: 0}).total
+    },
+    ventaTotal() {
+      return (
+        this.subtotal +
+        this.ventasExentas + 
+        this.ventasNoSujetas
+      );
+    },
+   
+  }
 };
 </script>
