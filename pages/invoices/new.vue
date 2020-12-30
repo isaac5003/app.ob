@@ -33,7 +33,7 @@
                 v-model="newServiceForm.service"
                 clearable
                 filterable
-                @change="selectService(newServiceForm.service, 'new')"
+                @change="selectService(newServiceForm.service, 'new', services)"
                 size="small"
                 class="w-full"
                 placeholder="Seleccionar servicio"
@@ -157,7 +157,7 @@
                 v-model="editServiceForm.service"
                 clearable
                 filterable
-                @change="selectService(editServiceForm.service, 'edit')"
+                @change="selectService(editServiceForm.service, 'edit', services)"
                 size="small"
                 class="w-full"
                 placeholder="Seleccionar servicio"
@@ -281,14 +281,13 @@
                   size="small"
                   clearable
                   placeholder="Seleccionar"
-                  @change="
-                    validateDocumentType(salesNewForm.document, tributary)
-                  "
+                  @change="validateDocumentType(salesNewForm.document, tributary)"
+                 
                 >
                   <el-option
                     v-for="d in documents"
                     :key="d.id"
-                    :label="d.code + ' - ' + d.name"
+                    :label="`${d.code} - ${d.name}`"
                     :value="d.id"
                   >
                   </el-option>
@@ -330,6 +329,7 @@
                   :picker-options="pickerOptions"
                   style="width: 100%"
                   @change="setStorage(salesNewForm)"
+                   format="dd/MM/yyyy"
                 >
                 </el-date-picker>
               </el-form-item>
@@ -372,6 +372,7 @@
                   default-first-option
                   size="small"
                   placeholder="Seleccionar"
+                  @change="selectBranch(salesNewForm.branch, branches)"
                 >
                   <el-option
                     v-for="br in branches"
@@ -459,8 +460,7 @@
               <span>Giro</span>
             </div>
           </div>
-          <div
-            v-if="!activeNotification"
+           <div v-if="!activeNotification"
             class="grid grid-cols-12 gap-4 text-xs text-gray-700"
           >
             <!-- NRC -->
@@ -473,21 +473,22 @@
             </div>
             <!-- Direccion -->
             <div class="col-span-3">
-              <span>{{ branches != null ? branches[0].address1 : "" }}</span>
+              <span>{{ Object.keys(branch).length > 0 ? branch.address1 : "" }}</span>
             </div>
             <!-- departamento -->
             <div class="col-span-2">
-              <span>{{ branches != null ? branches[0].state.name : "" }}</span>
+              <span>{{ Object.keys(branch).length > 0 ? branch.state.name : "" }}</span>
             </div>
             <!-- Municipio -->
             <div class="col-span-2">
-              <span>{{ branches != null ? branches[0].city.name : "" }}</span>
+              <span>{{ Object.keys(branch).length > 0 ? branch.city.name : "" }}</span>
             </div>
             <!-- Giro -->
             <div class="col-span-2">
               <span>{{ tributary != null ? tributary.giro : "" }}</span>
             </div>
           </div>
+
           <!-- fourth row btn agregarservicio -->
           <div class="flex justify-end">
             <el-button
@@ -515,7 +516,7 @@
                 align="right"
               >
                 <template slot-scope="scope">
-                  <span>{{
+                  <span >{{
                     calcUnitPrice(salesNewForm.documentType, scope.row)
                       | formatMoney
                   }}</span>
@@ -690,6 +691,7 @@ export default {
         this.customers = customers.data.customers;
         this.documents = documents.data.documentTypes;
         this.loading = false;
+       
       })
       .catch((err) => {
         console.log(err);
@@ -704,17 +706,18 @@ export default {
   },
   data() {
     return {
+      branch: {},
       details: [],
       activeNotification: false,
       sales: [],
       loading: false,
       salesNewForm: {
-        documentType: "",
+        documentType: 1,
         auth: "",
         next: "",
         date: "",
         customer: "",
-        branch: null,
+        branch: "",
         paymentConditions: null,
         sellers: null,
       },
@@ -808,33 +811,31 @@ export default {
           this.errorMessage = err.response.data.message;
         });
     },
-    selectService(id, type) {
+    selectService(id, type, services) {
+      const service = services.find((s) => s.id == id);
       switch (type) {
         case "new":
-          this.$axios
-            .get(`/services/${id}`)
-            .then((res) => {
-              this.newServiceForm.cost = res.data.service.cost;
-              this.newServiceForm.description = res.data.service.description;
-              this.newServiceForm.sellingType = res.data.service.sellingType;
-            })
-            .catch((err) => {
-              this.errorMessage = err.response.data.message;
-            });
-          break;
+          this.newServiceForm.cost = service.cost;
+          this.newServiceForm.description = service.description;
+          this.newServiceForm.sellingType = service.sellingType;
+        break;
         case "edit":
-          this.$axios
-            .get(`/services/${id}`)
-            .then((res) => {
-              this.editServiceForm.cost = res.data.service.cost;
-              this.editServiceForm.description = res.data.service.description;
-              this.editServiceForm.sellingType = res.data.service.sellingType;
-            })
-            .catch((err) => {
-              this.errorMessage = err.response.data.message;
-            });
-          break;
+          this.editServiceForm.cost = service.cost;
+          this.editServiceForm.description = service.description;
+          this.editServiceForm.sellingType = service.sellingType;
+         
+        break;
       }
+    },
+    selectBranch(id, branches){
+      if(id){
+         const branch = branches.find((b) => b.id == id);
+         this.branch = {...branch}
+         console.log(this.branch)
+      }else{
+        this.branch = {}
+      }
+
     },
     getCustomerDetails(id) {
       if (id) {
@@ -849,6 +850,7 @@ export default {
           .then((res) => {
             const [branches, tributary, taxerType] = res;
             this.branches = branches.data.branches;
+            
             this.tributary = tributary.data.customer;
             this.loading = false;
             this.validateDocumentType(
@@ -916,7 +918,7 @@ export default {
       this.editingDetail = index;
       switch (types) {
         case "service":
-          this.editServiceForm = details;
+          this.editServiceForm = {...details};
           this.showEditService = true;
           break;
       }
@@ -949,11 +951,12 @@ export default {
     calcUnitPrice(documentType, { cost, incTax, sellingType }) {
       let unitPrice = null;
       const amount = parseFloat(cost);
-
+      let message = null;
       if ((sellingType.id == 1) | (sellingType.id == 2)) {
         unitPrice = amount;
-      } else {
-        switch (documentType) {
+      } else{
+       if(documentType){
+          switch (documentType) {
           case 1:
             unitPrice = amount * (incTax ? 1 : 1.13);
             this.newServiceForm.unitPrice = unitPrice;
@@ -962,7 +965,11 @@ export default {
             unitPrice = amount / (incTax ? 1.13 : 1);
             this.newServiceForm.cost = unitPrice;
             break;
+          }
+        }else{
+         message="Debe seleccionar un tipo de docuemnto"
         }
+       
       }
       return unitPrice;
     },
@@ -1084,7 +1091,25 @@ export default {
       ).total;
     },
     ventaTotal() {
-      return this.subtotal + this.ventasExentas + this.ventasNoSujetas;
+      return this.subtotal + this.ventasExentas + this.ventasNoSujetas + this.ivaRetenido;
+    },
+    ivaRetenido() {
+      let ivaRetenido = 0;
+      const tributary = this.tributary;
+      
+      if (tributary != null && tributary.customerTaxerType!=null && tributary.customerTaxerType.id === 3) {
+        
+        switch (this.salesNewForm.documentType) {
+          
+          case 1:
+            ivaRetenido = this.sumas > 100 ? (this.sumas / 1.13) * 0.01 : 0;
+           break;
+          case 2:
+            ivaRetenido = this.sumas * (this.sumas > 100 ? 0.01 : 0);
+            break;
+        }
+      }
+      return ivaRetenido;
     },
   },
 };
