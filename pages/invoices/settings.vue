@@ -208,6 +208,7 @@
       <!-- Tabla de condiciones de pago -->
       <el-tab-pane label="Condiciones de pago" name="payment-conditions">
 
+        <!-- Dialogo para agregar nueva condicion de pago -->
         <el-dialog :append-to-body="true" title="Nueva condición de pago" :visible.sync="showNewPayment" width="30%"
         @close="closeDialog('newPaymentForm')">
         <el-form
@@ -227,7 +228,29 @@
           <el-button type="primary" size="small"  @click.native="submitPayment('newPaymentForm', newPaymentForm)">Guardar</el-button>
           <el-button @click="showNewPayment = false" size="small">Cancelar</el-button>
         </span>
-      </el-dialog>
+        </el-dialog>
+
+        <!-- Dialogo para editar condicion de pago -->
+        <el-dialog :append-to-body="true" title="Editar condición de pago" :visible.sync="showEditPayment" width="30%"
+        @close="closeDialog('editPaymentForm')">
+        <el-form
+        :model="editPaymentForm"
+        :rules="newzoneRules"
+        status-icon
+        ref="editPaymentForm"
+        @submit.prevent.native="submitPayment('editPaymentForm', tempConditionId, editPaymentForm)"
+      >
+        <div>
+          <el-form-item label="Nombre la condición de pago" prop="name">
+            <el-input v-model="editPaymentForm.name" clearable type="text"  maxlength="100" minlength="5" show-word-limit></el-input>
+          </el-form-item>
+        </div>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button type="primary" size="small"  @click.native="submitEditCondition('editPaymentForm', tempConditionId, editPaymentForm)">Guardar</el-button>
+          <el-button @click="showEditPayment = false" size="small">Cancelar</el-button>
+        </span>
+        </el-dialog>
 
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-6 flex flex-col space-y-4">
@@ -258,11 +281,8 @@
                     <el-button icon="el-icon-more" size="mini" />
                     <el-dropdown-menu slot="dropdown">
                       <el-dropdown-item
-                        @click.native="
-                          $router.push(`/invoices/edit?ref=${scope.row.id}`)
-                        "
-                      >
-                        <i class="el-icon-edit-outline"></i> Editar pago
+                        @click.native="editCondition(scope.row)">
+                        <i class="el-icon-edit-outline" ></i> Editar pago
                       </el-dropdown-item>
                       <el-dropdown-item @click.native="changeActivePayment(scope.row)">
                         <span v-if="scope.row.active">
@@ -404,6 +424,8 @@ export default {
       showNewSeller: false,
       showNewPayment: false,
       dialogFormVisible: false,
+      showEditPayment: false,
+      tempConditionId: null,
       newZoneForm: {
         name: ""
       },
@@ -420,6 +442,9 @@ export default {
         name: "",
         zone: ""
       },
+      editPaymentForm:{
+        name: ""
+      }
 
     };
   },
@@ -855,6 +880,63 @@ export default {
 
       });
     },
+    editCondition( { id, name } ){
+      this.tempConditionId = id;
+      this.editPaymentForm.name = name;
+      this.showEditPayment = true;
+    },
+    submitEditCondition( formName, conditionId, {name} ){
+      console.log(formName)
+      const action = "editar" ;
+      this.$refs[formName].validate( async valid =>{
+        if(!valid){
+          return false;
+        }
+
+        this.$confirm(
+        `¿Estás seguro que deseas ${action} esta condición de pago?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, ${action}`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "editar") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .put(`/invoices/payment-condition/${conditionId}`, {
+                  name: name
+                })
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchPayments();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, ${action}`;
+                  done();
+                });
+            }
+            done();
+            //Cambio de valor en variable showNewPayment
+            this.showEditPayment = false;
+          },
+        }
+      );
+
+
+      });
+    }
   },
   computed: {
     filteredIntegrations() {
