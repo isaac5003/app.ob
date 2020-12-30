@@ -753,6 +753,7 @@ export default {
       });
     },
     submitSeller( formName, data ){
+      console.log(data)
       const action = "guardar" ;
       this.$refs[formName].validate( async valid =>{
         if(!valid){
@@ -773,7 +774,7 @@ export default {
               this.$axios
                 .post('/invoices/sellers',{
                   name: data.name,
-                  invoicesZone: data.activeZones.id
+                  invoicesZone: data.zone
                 })
                 .then((res) => {
                   this.$notify.success({
@@ -795,7 +796,7 @@ export default {
                 });
             }
             done();
-            this.showNewZone = false;
+            this.showNewSeller = false;
           },
         }
       );
