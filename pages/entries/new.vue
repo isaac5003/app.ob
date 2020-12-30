@@ -3,9 +3,9 @@
     v-loading="loading"
     page-title="Nuevo cliente"
     :breadcrumb="[
-      { name: 'Clientes', to: '/customers' },
-      { name: 'Listado de clientes', to: '/customers' },
-      { name: 'Nuevo cliente', to: null },
+      { name: 'New', to: '/entries' },
+      { name: 'Nueva partida', to: '/entries' },
+      { name: 'Nueva partida', to: null },
     ]"
   >
     <el-form
