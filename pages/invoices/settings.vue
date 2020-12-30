@@ -753,7 +753,6 @@ export default {
       });
     },
     submitSeller( formName, data ){
-      console.log('Hola data')
       const action = "guardar" ;
       this.$refs[formName].validate( async valid =>{
         if(!valid){
