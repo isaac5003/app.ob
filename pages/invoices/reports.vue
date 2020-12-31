@@ -15,6 +15,7 @@
       <el-form 
       label-position="top"
        :model="filterForm"
+      :rules="rulesInputData"
        status-icon
        ref="reportsForm"
        @submit.native.prevent="generateReport('reportsForm')"
@@ -45,15 +46,17 @@
       <div class="flex flex-col " v-if="filterForm.reportType !='' ">
       <div class="grid grid-cols-12 gap-4">
           <div class="col-span-4">
-            <el-form-item label="Rango de fechas:">
+            <el-form-item label="Rango de fechas:" prop="dateRange">
               <el-date-picker
                 v-model="filterForm.dateRange"
                 style="width:100%"
                 size="small"
                 type="daterange"
+                required
                 range-separator="-"
                 start-placeholder="Fecha inicial"
                 end-placeholder="Fecha final"
+                editable="false"
               >
               </el-date-picker>
             </el-form-item>
@@ -247,12 +250,24 @@
 
           <el-form-item>
             <el-button 
-            size="small" >
+            size="small"
+                       >
             Cancelar
             </el-button>
           </el-form-item>
         </div>
-
+            <!-- prueba de dialogo -->
+            <!-- <el-dialog
+              title="Confirmación"
+              :visible.sync="dialogVisible"
+              width="30%"
+              :before-close="handleClose">
+              <span>¿Estás seguro que deseas salir?</span>
+              <span slot="footer" class="dialog-footer">
+                <el-button @click="dialogVisible = false">Cancel</el-button>
+                <el-button type="primary" @click="dialogVisible = false"><a href="/invoice">Si, salir</a></el-button>
+              </span>
+            </el-dialog> -->
       </el-form>
     </div>
   </layout-content>
@@ -260,6 +275,7 @@
 <script>
   import LayoutContent from "../../components/layout/Content";
   import Notification from "../../components/Notification";
+  import { inputValidation, selectValidation } from "../../tools";
   export default {
     name: "InvoicesIndex",
     components: {
@@ -267,30 +283,77 @@
       Notification
     },
     fetch() {
-      const invoices = () => {
-        return this.$axios.get("/invoices", {
-          params: this.page
-        });
-      };
+    const activeCustomers = () =>
+      this.$axios.get("/customers", { params: { active: true } });
+    const inactiveCustomers = () =>
+      this.$axios.get("/customers", { params: { active: false } });
+    const documentTypes = () => this.$axios.get("/invoices/document-types");
+    const activeSellers = () =>
+      this.$axios.get("/invoices/sellers", { params: { active: true } });
+    const inactiveSellers = () =>
+      this.$axios.get("/invoices/sellers", { params: { active: false } });
+    const activeZones = () =>
+      this.$axios.get("/invoices/zones", { params: { active: true } });
+    const inactiveZones = () =>
+      this.$axios.get("/invoices/zones", { params: { active: false } });
+    const activeService = () =>
+      this.$axios.get("/services", { params: { active: true } });
+    const inactiveService = () =>
+      this.$axios.get("/services", { params: { active: false } });
 
-      Promise.all([invoices()])
-        .then((res) => {
-          const [invoices] = res;
-          this.invoices = invoices.data;
-          this.loading = false;
-        })
-        .catch((err) => {
-          this.errorMessage = err.response.data.message;
-        });
-    },
-    fetchOnServer: false,
+    Promise.all([
+      activeCustomers(),
+      inactiveCustomers(),
+      activeSellers(),
+      inactiveSellers(),
+      activeZones(),
+      inactiveZones(),
+      activeService(),
+      inactiveService(),
+      documentTypes(),
+    ])
+      .then((res) => {
+        const [
+          activeCustomers,
+          inactiveCustomers,
+          activeSellers,
+          inactiveSellers,
+          activeZones,
+          inactiveZones,
+          activeService,
+          inactiveService,
+          documentTypes,
+        ] = res;
+        this.activeCustomers = activeCustomers.data.customers;
+        this.inactiveCustomers = inactiveCustomers.data.customers;
+        this.documentTypes = documentTypes.data.documentTypes;
+        this.activeSellers = activeSellers.data.sellers;
+        this.inactiveSellers = inactiveSellers.data.sellers;
+        this.activeZones = activeZones.data.zones;
+        this.inactiveZones = inactiveZones.data.zones;
+        this.activeService = activeService.data.services;
+        this.inactiveService = inactiveService.data.services;
+        this.loading = false;
+      })
+      .catch((err) => {
+        this.errorMessage = err.response.data.message
+          ? err.response.data.message
+          : "Comunicate con el administrador del sistema.";
+      });
+  },
+  fetchOnServer: false,
     data() {
       return {
+       // dialogVisible: false,
+        rulesInputData:{ 
+          dateRange: inputValidation("blur", true)
+        },
+        centerDialogVisible: false,
         loading: false,
         errorMessage: "",
 
-        filterForm:{
-          reportType:"",
+     filterForm:{
+     reportType:"",
       dateRange:"",
       customer:"",
       invoiceType:"",
@@ -323,6 +386,14 @@
       activeService:     [],
       inactiveService:   [],
     methods: {
+      // andleClose(done) {
+      //   this.$confirm('Are you sure to close this dialog?')
+      //     .then(_ => {
+      //       done();
+      //     })
+      //     .catch(_ => {});
+      // },
+      
       fetchInvoices() {
         let params = this.page;
         if (this.status !== "") {
@@ -447,5 +518,4 @@
     },
   };
 </script>
-
 </template>
