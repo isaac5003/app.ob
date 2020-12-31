@@ -25,7 +25,13 @@
               v-model="filterForm.reportType" 
               placeholder="Select"
               size="small"
-              class="w-full">
+              class="w-full"
+              default-first-option
+               filterable
+              clearable
+              
+              >
+              
     <el-option
         v-for="report in reports"
                 :key="report.id"
@@ -39,7 +45,8 @@
           <div class="flex flex-col " v-if="filterForm.reportType !='' ">
                <div class="grid grid-cols-12 gap-4">
           <div class="col-span-4">
-             <el-form-item label="Rango de fechas:">
+             <el-form-item label="Seleccione la fechas:"
+              >
               <el-date-picker
                 v-model="filterForm.dateRange"
                 style="width:100%"
