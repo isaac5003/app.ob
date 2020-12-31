@@ -18,33 +18,120 @@
       "
     >
       <el-tab-pane label="Zonas y vendedores" name="zones-sellers">
-
-      <el-dialog :append-to-body="true" title="Nueva zona" :visible.sync="showNewZone" width="30%"
-        @close="closeDialog('newZoneForm')">
-        <el-form
-        :model="newZoneForm"
-        :rules="newzoneRules"
-        status-icon
-        ref="newZoneForm"
-        @submit.prevent.native="submitZone('newZoneForm', newZoneForm)"
-      >
-        <div>
-          <el-form-item label="Nombre de la zona" prop="name">
-            <el-input v-model="newZoneForm.name" clearable type="text"  maxlength="100" minlength="5" show-word-limit></el-input>
-          </el-form-item>
-        </div>
-        </el-form>
-        <span slot="footer" class="dialog-footer">
-          <el-button type="primary" size="small"  @click.native="submitZone('newZoneForm', newZoneForm)">Guardar</el-button>
-          <el-button @click="showNewZone = false" size="small">Cancelar</el-button>
-        </span>
-      </el-dialog>
+        <!-- dialogo zonas -->
+        <el-dialog
+          :append-to-body="true"
+          title="Nueva zona"
+          :visible.sync="showNewZone"
+          width="30%"
+          @close="closeDialog('newZoneForm')"
+        >
+          <el-form
+            :model="newZoneForm"
+            :rules="newzoneRules"
+            status-icon
+            ref="newZoneForm"
+            @submit.prevent.native="submitZone('newZoneForm', newZoneForm)"
+          >
+            <div>
+              <el-form-item label="Nombre de la zona" prop="name">
+                <el-input
+                  v-model="newZoneForm.name"
+                  clearable
+                  type="text"
+                  maxlength="100"
+                  minlength="5"
+                  show-word-limit
+                ></el-input>
+              </el-form-item>
+            </div>
+          </el-form>
+          <span slot="footer" class="dialog-footer">
+            <el-button
+              type="primary"
+              size="small"
+              @click.native="submitZone('newZoneForm', newZoneForm)"
+              >Guardar</el-button
+            >
+            <el-button @click="showNewZone = false" size="small"
+              >Cancelar</el-button
+            >
+          </span>
+        </el-dialog>
+        <!-- Inicio de tabla vendedores y dialogos -->
+        <el-dialog
+          :append-to-body="true"
+          title="Nuevo vendedor"
+          :visible.sync="showNewSeller"
+          width="30%"
+          @close="closeDialog('newSellerForm')"
+        >
+          <el-form
+            :model="newSellerForm"
+            :rules="newzoneRules"
+            status-icon
+            ref="newSellerForm"
+            @submit.prevent.native="submitZone('newSellerForm', newSellerForm)"
+          >
+            <div>
+              <el-row :gutter="15">
+                <el-col :span="15">
+                  <el-form-item label="Nombre del vendedor" prop="name">
+                    <el-input
+                      clearable
+                      v-model="newSellerForm.name"
+                      size="small"
+                      auto-complete="off"
+                    />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="9">
+                  <el-form-item label="Zona asignada" prop="zone">
+                    <el-select
+                      v-model="newSellerForm.zone"
+                      placeholder="Seleccionar"
+                      size="small"
+                      class="w-full"
+                      clearable
+                      filterable
+                      default-first-option
+                    >
+                      <el-option
+                        v-for="z in activeZones"
+                        :key="z.id"
+                        :label="z.name"
+                        :value="z.id"
+                        class="w.full"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </div>
+          </el-form>
+          <span slot="footer" class="dialog-footer">
+            <el-button
+              type="primary"
+              size="small"
+              @click.native="submitSeller('newSellerForm', newSellerForm)"
+              >Guardar</el-button
+            >
+            <el-button @click="showNewSeller = false" size="small"
+              >Cancelar</el-button
+            >
+          </span>
+        </el-dialog>
 
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-5 flex flex-col space-y-4">
             <div class="flex justify-between items-center">
               <span class="text-blue-900 font-semibold text-lg">ZONAS</span>
-              <el-button @click="showNewZone = true" type="primary" size="mini" icon="el-icon-plus" />
+              <el-button
+                @click="showNewZone = true"
+                type="primary"
+                size="mini"
+                icon="el-icon-plus"
+              />
             </div>
             <el-table :data="zones" stripe size="mini">
               <el-table-column prop="index" min-width="40" />
@@ -69,7 +156,9 @@
                       >
                         <i class="el-icon-edit-outline"></i> Editar zona
                       </el-dropdown-item>
-                      <el-dropdown-item @click.native="changeActiveZone(scope.row)">
+                      <el-dropdown-item
+                        @click.native="changeActiveZone(scope.row)"
+                      >
                         <span v-if="scope.row.active">
                           <i class="el-icon-close"></i> Desactivar
                         </span>
@@ -92,64 +181,22 @@
             </el-table>
           </div>
 
-          <!-- Inicio de tabla vendedores y dialogos -->
-          <el-dialog :append-to-body="true" title="Nuevo vendedor" :visible.sync="showNewSeller" width="30%"
-        @close="closeDialog('newSellerForm')">
-        <el-form
-        :model="newSellerForm"
-        :rules="newzoneRules"
-        status-icon
-        ref="newSellerForm"
-        @submit.prevent.native="submitZone('newSellerForm', newSellerForm)"
-      >
-        <div>
-          <el-row :gutter="15">
-            <el-col :span="15">
-              <el-form-item label="Nombre del vendedor" prop="name">
-                <el-input clearable v-model="newSellerForm.name" size="small" auto-complete="off" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="9">
-              <el-form-item label="Zona asignada" prop="zone">
-                <el-select
-                v-model="newSellerForm.zone"
-                placeholder="Seleccionar"
-                size="small"
-                class="w-full"
-                clearable
-                filterable
-                default-first-option
-              >
-              <el-option
-                v-for="z in activeZones"
-                :key="z.id"
-                :label="z.name"
-                :value="z.id"
-                class="w.full"
-              />
-                </el-select>
-              </el-form-item>
-            </el-col>
-          </el-row>
-        </div>
-        </el-form>
-        <span slot="footer" class="dialog-footer">
-          <el-button type="primary" size="small"  @click.native="submitSeller('newSellerForm', newSellerForm)">Guardar</el-button>
-          <el-button @click="showNewSeller = false" size="small">Cancelar</el-button>
-        </span>
-          </el-dialog>
-
           <div class="col-span-7 flex flex-col space-y-4">
             <div class="flex justify-between items-center">
               <span class="text-blue-900 font-semibold text-lg"
                 >VENDEDORES</span
               >
-              <el-button @click="showNewSeller = true" type="primary" size="mini" icon="el-icon-plus" />
+              <el-button
+                @click="showNewSeller = true"
+                type="primary"
+                size="mini"
+                icon="el-icon-plus"
+              />
             </div>
 
             <el-table :data="sellers" stripe size="mini">
               <el-table-column label="ID" prop="index" min-width="40" />
-              <el-table-column label="Vendedor" prop="name"  min-width="170" />
+              <el-table-column label="Vendedor" prop="name" min-width="170" />
               <el-table-column label="Zona" min-width="175">
                 <template slot-scope="scope">
                   <span
@@ -180,13 +227,15 @@
                       >
                         <i class="el-icon-edit-outline"></i> Editar vendedor
                       </el-dropdown-item>
-                      <el-dropdown-item @click.native="changeActiveSellers(scope.row)">
+                      <el-dropdown-item
+                        @click.native="changeActiveSellers(scope.row)"
+                      >
                         <span v-if="scope.row.active">
                           <i class="el-icon-close"></i> Desactivar
                         </span>
                         <span v-else>
-                          <i class="el-icon-check"></i> Activar
-                        </span>vendedor
+                          <i class="el-icon-check"></i> Activar </span
+                        >vendedor
                       </el-dropdown-item>
                       <el-dropdown-item
                         :divided="true"
@@ -207,49 +256,88 @@
 
       <!-- Tabla de condiciones de pago -->
       <el-tab-pane label="Condiciones de pago" name="payment-conditions">
-
         <!-- Dialogo para agregar nueva condicion de pago -->
-        <el-dialog :append-to-body="true" title="Nueva condición de pago" :visible.sync="showNewPayment" width="30%"
-        @close="closeDialog('newPaymentForm')">
-        <el-form
-        :model="newPaymentForm"
-        :rules="newzoneRules"
-        status-icon
-        ref="newPaymentForm"
-        @submit.prevent.native="submitPayment('newPaymentForm', newPaymentForm)"
-      >
-        <div>
-          <el-form-item label="Nombre de la condición de pago" prop="name">
-            <el-input v-model="newPaymentForm.name" clearable type="text"  maxlength="100" minlength="5" show-word-limit></el-input>
-          </el-form-item>
-        </div>
-        </el-form>
-        <span slot="footer" class="dialog-footer">
-          <el-button type="primary" size="small"  @click.native="submitPayment('newPaymentForm', newPaymentForm)">Guardar</el-button>
-          <el-button @click="showNewPayment = false" size="small">Cancelar</el-button>
-        </span>
+        <el-dialog
+          :append-to-body="true"
+          title="Nueva condición de pago"
+          :visible.sync="showNewPayment"
+          width="30%"
+          @close="closeDialog('newPaymentForm')"
+        >
+          <el-form
+            :model="newPaymentForm"
+            :rules="newzoneRules"
+            status-icon
+            ref="newPaymentForm"
+            @submit.prevent.native="
+              submitPayment('newPaymentForm', newPaymentForm)
+            "
+          >
+            <div>
+              <el-form-item label="Nombre de la condición de pago" prop="name">
+                <el-input
+                  v-model="newPaymentForm.name"
+                  clearable
+                  type="text"
+                  maxlength="100"
+                  minlength="5"
+                  show-word-limit
+                ></el-input>
+              </el-form-item>
+            </div>
+          </el-form>
+          <span slot="footer" class="dialog-footer">
+            <el-button
+              type="primary"
+              size="small"
+              @click.native="submitPayment('newPaymentForm', newPaymentForm)"
+              >Guardar</el-button
+            >
+            <el-button @click="showNewPayment = false" size="small"
+              >Cancelar</el-button
+            >
+          </span>
         </el-dialog>
 
         <!-- Dialogo para editar condicion de pago -->
-        <el-dialog :append-to-body="true" title="Editar condición de pago" :visible.sync="showEditPayment" width="30%"
-        @close="closeDialog('editPaymentForm')">
-        <el-form
-        :model="editPaymentForm"
-        :rules="newzoneRules"
-        status-icon
-        ref="editPaymentForm"
-        @submit.prevent.native="submitPayment('editPaymentForm', tempConditionId, editPaymentForm)"
-      >
-        <div>
-          <el-form-item label="Nombre la condición de pago" prop="name">
-            <el-input v-model="editPaymentForm.name" clearable type="text"  maxlength="100" minlength="5" show-word-limit></el-input>
-          </el-form-item>
-        </div>
-        </el-form>
-        <span slot="footer" class="dialog-footer">
-          <el-button type="primary" size="small"  @click.native="submitEditCondition('editPaymentForm', tempConditionId, editPaymentForm)">Guardar</el-button>
-          <el-button @click="showEditPayment = false" size="small">Cancelar</el-button>
-        </span>
+        <el-dialog
+          :append-to-body="true"
+          title="Editar condición de pago"
+          :visible.sync="showEditPayment"
+          width="30%"
+          @close="closeDialog('editPaymentForm')"
+        >
+          <el-form
+            :model="editPaymentForm"
+            :rules="newzoneRules"
+            status-icon
+            ref="editPaymentForm"
+            @submit.prevent.native="
+              submitPayment('editPaymentForm', editPaymentForm)
+            "
+          >
+            <el-form-item label="Nombre la condición de pago" prop="name">
+              <el-input
+                v-model="editPaymentForm.name"
+                clearable
+                type="text"
+                maxlength="100"
+                minlength="5"
+                show-word-limit
+              ></el-input>
+            </el-form-item>
+          </el-form>
+          <span slot="footer" class="dialog-footer">
+            <el-button
+              type="primary"
+              size="small"
+              @click.native="submitPayment('editPaymentForm', editPaymentForm)"
+              >Guardar</el-button
+            >
+            <el-button @click="showEditPayment = false" size="small"
+              >Cancelar</el-button
+            >
+          </span>
         </el-dialog>
 
         <div class="grid grid-cols-12 gap-4">
@@ -258,9 +346,14 @@
               <span class="text-blue-900 font-semibold text-lg"
                 >CONDICIONES DE PAGO</span
               >
-              <el-button @click="showNewPayment = true" type="primary" size="mini" icon="el-icon-plus" />
+              <el-button
+                @click="showNewPayment = true"
+                type="primary"
+                size="mini"
+                icon="el-icon-plus"
+              />
             </div>
-            <el-table :data="payment" stripe size="mini">
+            <el-table :data="payments" stripe size="mini">
               <el-table-column prop="index" min-width="40" />
               <el-table-column
                 label="Condicion de pago"
@@ -281,10 +374,13 @@
                     <el-button icon="el-icon-more" size="mini" />
                     <el-dropdown-menu slot="dropdown">
                       <el-dropdown-item
-                        @click.native="editCondition(scope.row)">
-                        <i class="el-icon-edit-outline" ></i> Editar pago
+                        @click.native="editCondition(scope.row)"
+                      >
+                        <i class="el-icon-edit-outline"></i> Editar pago
                       </el-dropdown-item>
-                      <el-dropdown-item @click.native="changeActivePayment(scope.row)">
+                      <el-dropdown-item
+                        @click.native="changeActivePayment(scope.row)"
+                      >
                         <span v-if="scope.row.active">
                           <i class="el-icon-close"></i> Desactivar
                         </span>
@@ -358,7 +454,12 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import { getIcon, hasModule, inputValidation, selectValidation  } from "../../tools";
+import {
+  getIcon,
+  hasModule,
+  inputValidation,
+  selectValidation,
+} from "../../tools";
 import * as R from "ramda";
 
 export default {
@@ -382,15 +483,15 @@ export default {
     };
     //método para mostrar data en la tabla de pagos
     const payment = () => {
-      return this.$axios.get("/invoices/payment-condition")
-    }
+      return this.$axios.get("/invoices/payment-condition");
+    };
     // promesa que recibe los métodos con las peticiones http
     Promise.all([zones(), sellers(), payment()])
       .then((res) => {
         const [zones, sellers, payment] = res;
         this.zones = zones.data.zones;
         this.sellers = sellers.data.sellers;
-        this.payment = payment.data.paymentConditions;
+        this.payments = payment.data.paymentConditions;
         this.loading = false;
       })
       .catch((err) => {
@@ -400,7 +501,6 @@ export default {
   fetchOnServer: false,
   data() {
     return {
-      rawZones: [],
       tab: "zones-sellers",
       utab: "invoicing",
       integrations: [
@@ -419,18 +519,20 @@ export default {
       ],
       zones: [],
       sellers: [],
-      payment: [],
+      payments: [],
       showNewZone: false,
       showNewSeller: false,
       showNewPayment: false,
-      dialogFormVisible: false,
       showEditPayment: false,
-      tempConditionId: null,
       newZoneForm: {
-        name: ""
+        name: "",
       },
       newPaymentForm: {
-        name: ""
+        name: "",
+      },
+      newSellerForm: {
+        name: "",
+        zone: "",
       },
       newzoneRules: {
         name: inputValidation(true, 5, 100),
@@ -438,27 +540,16 @@ export default {
         // cost: amountValidate("blur", true, 0),
         // description: inputValidation(true),
       },
-      newSellerForm:{
+      editPaymentForm: {
         name: "",
-        zone: ""
       },
-      editPaymentForm:{
-        name: ""
-      }
-
     };
-  },
-  watch:{
-    zones() {
-      this.rawZones = this.zones;
-    }
   },
   methods: {
     closeDialog(name) {
       this.$refs[name].resetFields();
     },
     fetchZones() {
-      let params = this.page;
       this.$axios
         .get("/invoices/zones")
         .then((res) => {
@@ -469,7 +560,6 @@ export default {
         });
     },
     fetchSellers() {
-      let params = this.page;
       this.$axios
         .get("/invoices/sellers")
         .then((res) => {
@@ -479,16 +569,15 @@ export default {
           this.errorMessage = err.response.data.message;
         });
     },
-    fetchPayments(){
-      let params = this.page;
+    fetchPayments() {
       this.$axios
-          .get("/invoices/payment-condition")
-          .then((res) => {
-            this.payment = res.data.paymentConditions;
-          })
-          .catch((err) => {
-            this.errorMessage = err.response.data.message;
-          });
+        .get("/invoices/payment-condition")
+        .then((res) => {
+          this.payments = res.data.paymentConditions;
+        })
+        .catch((err) => {
+          this.errorMessage = err.response.data.message;
+        });
     },
     changeActiveZone({ id, active }) {
       const action = active ? "desactivar" : "activar";
@@ -584,7 +673,9 @@ export default {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
               this.$axios
-                .put(`/invoices/payment-condition/status/${id}`, { status: !active })
+                .put(`/invoices/payment-condition/status/${id}`, {
+                  status: !active,
+                })
                 .then((res) => {
                   this.$notify.success({
                     title: "Éxito",
@@ -611,12 +702,11 @@ export default {
     },
 
     deleteZone({ id }) {
-      const action = "eliminar" ;
       this.$confirm(
-        `¿Estás seguro que deseas ${action} esta zona?`,
+        `¿Estás seguro que deseas eliminar esta zona?`,
         "Confirmación",
         {
-          confirmButtonText: `Si, ${action}`,
+          confirmButtonText: `Si, eliminar`,
           cancelButtonText: "Cancelar",
           type: "warning",
           beforeClose: (action, instance, done) => {
@@ -640,7 +730,7 @@ export default {
                 })
                 .then((alw) => {
                   instance.confirmButtonLoading = false;
-                  instance.confirmButtonText = `Si, ${action}`;
+                  instance.confirmButtonText = `Si, eliminar`;
                   done();
                 });
             }
@@ -650,12 +740,11 @@ export default {
       );
     },
     deleteSeller({ id }) {
-      const action = "eliminar" ;
       this.$confirm(
-        `¿Estás seguro que deseas ${action} este vendedor?`,
+        `¿Estás seguro que deseas eliminar este vendedor?`,
         "Confirmación",
         {
-          confirmButtonText: `Si, ${action}`,
+          confirmButtonText: `Si, eliminar`,
           cancelButtonText: "Cancelar",
           type: "warning",
           beforeClose: (action, instance, done) => {
@@ -679,7 +768,7 @@ export default {
                 })
                 .then((alw) => {
                   instance.confirmButtonLoading = false;
-                  instance.confirmButtonText = `Si, ${action}`;
+                  instance.confirmButtonText = `Si, eliminar`;
                   done();
                 });
             }
@@ -689,12 +778,11 @@ export default {
       );
     },
     deletePayment({ id }) {
-      const action = "eliminar" ;
       this.$confirm(
-        `¿Estás seguro que deseas ${action} este pago?`,
+        `¿Estás seguro que deseas eliminar este pago?`,
         "Confirmación",
         {
-          confirmButtonText: `Si, ${action}`,
+          confirmButtonText: `Si, eliminar`,
           cancelButtonText: "Cancelar",
           type: "warning",
           beforeClose: (action, instance, done) => {
@@ -718,7 +806,7 @@ export default {
                 })
                 .then((alw) => {
                   instance.confirmButtonLoading = false;
-                  instance.confirmButtonText = `Si, ${action}`;
+                  instance.confirmButtonText = `Si, eliminar`;
                   done();
                 });
             }
@@ -727,224 +815,167 @@ export default {
         }
       );
     },
-    submitZone( formName, data ){
-      const action = "guardar" ;
-      this.$refs[formName].validate( async valid =>{
-        if(!valid){
+    submitZone(formName, { name }) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
           return false;
         }
 
         this.$confirm(
-        `¿Estás seguro que deseas ${action} esta zona?`,
-        "Confirmación",
-        {
-          confirmButtonText: `Si, ${action}`,
-          cancelButtonText: "Cancelar",
-          type: "warning",
-          beforeClose: (action, instance, done) => {
-            if (action === "confirm") {
-              instance.confirmButtonLoading = true;
-              instance.confirmButtonText = "Procesando...";
-              this.$axios
-                .post('/invoices/zones',{
-                  name: data.name
-                })
-                .then((res) => {
-                  this.$notify.success({
-                    title: "Éxito",
-                    message: res.data.message,
+          `¿Estás seguro que deseas guardar esta zona?`,
+          "Confirmación",
+          {
+            confirmButtonText: `Si, guardar`,
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                this.$axios
+                  .post("/invoices/zones", {
+                    name,
+                  })
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Éxito",
+                      message: res.data.message,
+                    });
+                    this.fetchZones();
+                  })
+                  .catch((err) => {
+                    this.$notify.error({
+                      title: "Error",
+                      message: err.response.data.message,
+                    });
+                  })
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = `Si, guardar`;
+                    done();
                   });
-                  this.fetchZones();
-                })
-                .catch((err) => {
-                  this.$notify.error({
-                    title: "Error",
-                    message: err.response.data.message,
-                  });
-                })
-                .then((alw) => {
-                  instance.confirmButtonLoading = false;
-                  instance.confirmButtonText = `Si, ${action}`;
-                  done();
-                });
-            }
-            done();
-            this.showNewZone = false;
-          },
-        }
-      );
-
-
+              }
+              done();
+              this.showNewZone = false;
+            },
+          }
+        );
       });
     },
-    submitSeller( formName, data ){
-      console.log(data)
-      const action = "guardar" ;
-      this.$refs[formName].validate( async valid =>{
-        if(!valid){
+    submitSeller(formName, { name, zone }) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
           return false;
         }
 
         this.$confirm(
-        `¿Estás seguro que deseas ${action} este vendedor?`,
-        "Confirmación",
-        {
-          confirmButtonText: `Si, ${action}`,
-          cancelButtonText: "Cancelar",
-          type: "warning",
-          beforeClose: (action, instance, done) => {
-            if (action === "confirm") {
-              instance.confirmButtonLoading = true;
-              instance.confirmButtonText = "Procesando...";
-              this.$axios
-                .post('/invoices/sellers',{
-                  name: data.name,
-                  invoicesZone: data.zone
-                })
-                .then((res) => {
-                  this.$notify.success({
-                    title: "Éxito",
-                    message: res.data.message,
+          `¿Estás seguro que deseas guardar este vendedor?`,
+          "Confirmación",
+          {
+            confirmButtonText: `Si, guardar`,
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                this.$axios
+                  .post("/invoices/sellers", {
+                    name,
+                    invoicesZone,
+                  })
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Éxito",
+                      message: res.data.message,
+                    });
+                    this.fetchSellers();
+                  })
+                  .catch((err) => {
+                    this.$notify.error({
+                      title: "Error",
+                      message: err.response.data.message,
+                    });
+                  })
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = `Si, guardar`;
+                    done();
                   });
-                  this.fetchSellers();
-                })
-                .catch((err) => {
-                  this.$notify.error({
-                    title: "Error",
-                    message: err.response.data.message,
-                  });
-                })
-                .then((alw) => {
-                  instance.confirmButtonLoading = false;
-                  instance.confirmButtonText = `Si, ${action}`;
-                  done();
-                });
-            }
-            done();
-            this.showNewSeller = false;
-          },
-        }
-      );
-
-
+              }
+              done();
+              this.showNewSeller = false;
+            },
+          }
+        );
       });
     },
-    submitPayment( formName, data ){
-      const action = "guardar" ;
-      this.$refs[formName].validate( async valid =>{
-        if(!valid){
+    submitPayment(formName, { id, name }) {
+      console.log(id);
+      const action = id ? "actualizar" : "guardar";
+      const method = id ? "PUT" : "POST";
+      const url = `/invoices/payment-condition/${id ? id : ""}`;
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
           return false;
         }
 
         this.$confirm(
-        `¿Estás seguro que deseas ${action} esta condición de pago?`,
-        "Confirmación",
-        {
-          confirmButtonText: `Si, ${action}`,
-          cancelButtonText: "Cancelar",
-          type: "warning",
-          beforeClose: (action, instance, done) => {
-            if (action === "confirm") {
-              instance.confirmButtonLoading = true;
-              instance.confirmButtonText = "Procesando...";
-              this.$axios
-                .post('/invoices/payment-condition',{
-                  name: data.name
+          `¿Estás seguro que deseas ${action} esta condición de pago?`,
+          "Confirmación",
+          {
+            confirmButtonText: `Si, ${action}`,
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                this.$axios({
+                  method,
+                  url,
+                  data: { name },
                 })
-                .then((res) => {
-                  this.$notify.success({
-                    title: "Éxito",
-                    message: res.data.message,
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Éxito",
+                      message: res.data.message,
+                    });
+                    this.fetchPayments();
+                  })
+                  .catch((err) => {
+                    this.$notify.error({
+                      title: "Error",
+                      message: err.response.data.message,
+                    });
+                  })
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = `Si, ${action}`;
+                    done();
                   });
-                  this.fetchPayments();
-                })
-                .catch((err) => {
-                  this.$notify.error({
-                    title: "Error",
-                    message: err.response.data.message,
-                  });
-                })
-                .then((alw) => {
-                  instance.confirmButtonLoading = false;
-                  instance.confirmButtonText = `Si, ${action}`;
-                  done();
-                });
-            }
-            done();
-            //Cambio de valor en variable showNewPayment
-            this.showNewPayment = false;
-          },
-        }
-      );
-
-
+              }
+              done();
+              //Cambio de valor en variable showNewPayment
+              this.showNewPayment = false;
+              this.showEditPayment = false;
+            },
+          }
+        );
       });
     },
-    editCondition( { id, name } ){
-      this.tempConditionId = id;
-      this.editPaymentForm.name = name;
+    editCondition(condition) {
+      this.editPaymentForm = { ...condition };
       this.showEditPayment = true;
     },
-    submitEditCondition( formName, conditionId, {name} ){
-      console.log(formName)
-      const action = "editar" ;
-      this.$refs[formName].validate( async valid =>{
-        if(!valid){
-          return false;
-        }
-
-        this.$confirm(
-        `¿Estás seguro que deseas ${action} esta condición de pago?`,
-        "Confirmación",
-        {
-          confirmButtonText: `Si, ${action}`,
-          cancelButtonText: "Cancelar",
-          type: "warning",
-          beforeClose: (action, instance, done) => {
-            if (action === "editar") {
-              instance.confirmButtonLoading = true;
-              instance.confirmButtonText = "Procesando...";
-              this.$axios
-                .put(`/invoices/payment-condition/${conditionId}`, {
-                  name: name
-                })
-                .then((res) => {
-                  this.$notify.success({
-                    title: "Éxito",
-                    message: res.data.message,
-                  });
-                  this.fetchPayments();
-                })
-                .catch((err) => {
-                  this.$notify.error({
-                    title: "Error",
-                    message: err.response.data.message,
-                  });
-                })
-                .then((alw) => {
-                  instance.confirmButtonLoading = false;
-                  instance.confirmButtonText = `Si, ${action}`;
-                  done();
-                });
-            }
-            done();
-            //Cambio de valor en variable showNewPayment
-            this.showEditPayment = false;
-          },
-        }
-      );
-
-
-      });
-    }
   },
   computed: {
     filteredIntegrations() {
       return this.integrations.filter((i) => hasModule(i.ref, this.$auth.user));
     },
     activeZones() {
-      return this.rawZones.filter( zone => zone.active );
-    }
+      return this.zones.filter((zone) => zone.active);
+    },
   },
 };
 </script>
