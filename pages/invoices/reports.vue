@@ -52,7 +52,6 @@
                 style="width:100%"
                 size="small"
                 type="daterange"
-                required
                 range-separator="-"
                 start-placeholder="Fecha inicial"
                 end-placeholder="Fecha final"
@@ -243,31 +242,21 @@
             <el-button 
             type="primary" 
             size="small" 
-            icon="el-icon-download" 
+            icon="el-icon-download"
+            :disabled="filterForm.reportType == null" 
             :loading="generating">Descargar
             </el-button>
           </el-form-item>
 
           <el-form-item>
             <el-button 
+            @click="cancel"
             size="small"
                        >
             Cancelar
             </el-button>
           </el-form-item>
         </div>
-            <!-- prueba de dialogo -->
-            <!-- <el-dialog
-              title="Confirmación"
-              :visible.sync="dialogVisible"
-              width="30%"
-              :before-close="handleClose">
-              <span>¿Estás seguro que deseas salir?</span>
-              <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogVisible = false">Cancel</el-button>
-                <el-button type="primary" @click="dialogVisible = false"><a href="/invoice">Si, salir</a></el-button>
-              </span>
-            </el-dialog> -->
       </el-form>
     </div>
   </layout-content>
@@ -344,10 +333,7 @@
   fetchOnServer: false,
     data() {
       return {
-       // dialogVisible: false,
-        rulesInputData:{ 
-          dateRange: inputValidation("blur", true)
-        },
+       
         centerDialogVisible: false,
         loading: false,
         errorMessage: "",
@@ -362,7 +348,9 @@
       zone:"",
       service:"",
       },
-
+      rulesInputData:{ 
+       dateRange: selectValidation("blur", true),
+        },
       reports:[
         {
           id: 1,
@@ -385,15 +373,18 @@
       inactiveZones:     [],
       activeService:     [],
       inactiveService:   [],
-    methods: {
-      // andleClose(done) {
-      //   this.$confirm('Are you sure to close this dialog?')
-      //     .then(_ => {
-      //       done();
-      //     })
-      //     .catch(_ => {});
-      // },
-      
+    methods: {  
+      cancel(){
+        this.$confirm('¿Estás seguro que deseas salir?', 'Confirmación',{
+          confirmButtonText: 'Si, salir',
+          cancelButtonText:  'Cancel',
+          type: 'warning'
+          
+          }).then(()=>{
+            this.$router.push("/invoices");
+          });
+
+      },
       fetchInvoices() {
         let params = this.page;
         if (this.status !== "") {
@@ -518,4 +509,3 @@
     },
   };
 </script>
-</template>
