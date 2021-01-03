@@ -58,7 +58,47 @@
             >
           </span>
         </el-dialog>
-        <!-- Inicio de tabla vendedores y dialogos -->
+        <!-- dialogo para editar zona -->
+        <el-dialog
+          :append-to-body="true"
+          title="Editar zona zona"
+          :visible.sync="showEditZone"
+          width="30%"
+          @close="closeDialog('editZoneForm')"
+        >
+          <el-form
+            :model="editZoneForm"
+            :rules="newzoneRules"
+            status-icon
+            ref="editZoneForm"
+            @submit.prevent.native="submitZone('editZoneForm', editZoneForm)"
+          >
+            <div>
+              <el-form-item label="Nombre de la zona" prop="name">
+                <el-input
+                  v-model="editZoneForm.name"
+                  clearable
+                  type="text"
+                  maxlength="100"
+                  minlength="5"
+                  show-word-limit
+                ></el-input>
+              </el-form-item>
+            </div>
+          </el-form>
+          <span slot="footer" class="dialog-footer">
+            <el-button
+              type="primary"
+              size="small"
+              @click.native="submitZone('editZoneForm', editZoneForm)"
+              >Guardar</el-button
+            >
+            <el-button @click="showEditZone = false" size="small"
+              >Cancelar</el-button
+            >
+          </span>
+        </el-dialog>
+        <!-- dialogo nuevo vendedor -->
         <el-dialog
           :append-to-body="true"
           title="Nuevo vendedor"
@@ -93,7 +133,6 @@
                       size="small"
                       class="w-full"
                       clearable
-                      filterable
                       default-first-option
                     >
                       <el-option
@@ -121,8 +160,74 @@
             >
           </span>
         </el-dialog>
+        <!-- dialogo editar vendedores -->
+        <el-dialog
+          :append-to-body="true"
+          title="Editar vendedor"
+          :visible.sync="showEditSeller"
+          width="30%"
+          @close="closeDialog('editSellerForm')"
+        >
+          <el-form
+            :model="editSellerForm"
+            :rules="newzoneRules"
+            status-icon
+            ref="editSellerForm"
+            @submit.prevent.native="
+              submitZone('editSellerForm', editSellerForm)
+            "
+          >
+            <div>
+              <el-row :gutter="15">
+                <el-col :span="15">
+                  <el-form-item label="Nombre del vendedor" prop="name">
+                    <el-input
+                      clearable
+                      v-model="editSellerForm.name"
+                      size="small"
+                      auto-complete="off"
+                    />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="9">
+                  <el-form-item label="Zona asignada" prop="zone">
+                    <el-select
+                      v-model="editSellerForm.zone"
+                      placeholder="Selecionar"
+                      size="small"
+                      class="w-full"
+                      clearable
+                      default-first-option
+                    >
+                      <el-option
+                        v-for="z in activeZones"
+                        :key="z.id"
+                        :label="z.name"
+                        :value="z.id"
+                        class="w.full"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </div>
+          </el-form>
 
+          <span slot="footer" class="dialog-footer">
+            <el-button
+              type="primary"
+              size="small"
+              @click.native="submitZone('editSellerForm', editSellerForm)"
+              >Guardar</el-button
+            >
+            <el-button @click="showEditSeller = false" size="small"
+              >Cancelar</el-button
+            >
+          </span>
+        </el-dialog>
+        <!-- Inicio de tablas zonas y vendedores -->
         <div class="grid grid-cols-12 gap-4">
+          <!-- tabla de zonas -->
           <div class="col-span-5 flex flex-col space-y-4">
             <div class="flex justify-between items-center">
               <span class="text-blue-900 font-semibold text-lg">ZONAS</span>
@@ -149,11 +254,7 @@
                   <el-dropdown trigger="click" szie="mini">
                     <el-button icon="el-icon-more" size="mini" />
                     <el-dropdown-menu slot="dropdown">
-                      <el-dropdown-item
-                        @click.native="
-                          $router.push(`/invoices/edit?ref=${scope.row.id}`)
-                        "
-                      >
+                      <el-dropdown-item @click.native="editZone(scope.row)">
                         <i class="el-icon-edit-outline"></i> Editar zona
                       </el-dropdown-item>
                       <el-dropdown-item
@@ -180,7 +281,7 @@
               </el-table-column>
             </el-table>
           </div>
-
+          <!-- tabla de vendedores -->
           <div class="col-span-7 flex flex-col space-y-4">
             <div class="flex justify-between items-center">
               <span class="text-blue-900 font-semibold text-lg"
@@ -220,11 +321,7 @@
                   <el-dropdown trigger="click" szie="mini">
                     <el-button icon="el-icon-more" size="mini" />
                     <el-dropdown-menu slot="dropdown">
-                      <el-dropdown-item
-                        @click.native="
-                          $router.push(`/invoices/edit?ref=${scope.row.id}`)
-                        "
-                      >
+                      <el-dropdown-item @click.native="editSeller(scope.row)">
                         <i class="el-icon-edit-outline"></i> Editar vendedor
                       </el-dropdown-item>
                       <el-dropdown-item
@@ -524,6 +621,8 @@ export default {
       showNewSeller: false,
       showNewPayment: false,
       showEditPayment: false,
+      showEditZone: false,
+      showEditSeller: false,
       newZoneForm: {
         name: "",
       },
@@ -536,12 +635,16 @@ export default {
       },
       newzoneRules: {
         name: inputValidation(true, 5, 100),
-        // service: selectValidation(true),
-        // cost: amountValidate("blur", true, 0),
-        // description: inputValidation(true),
       },
       editPaymentForm: {
         name: "",
+      },
+      editZoneForm: {
+        name: "",
+      },
+      editSellerForm: {
+        name: "",
+        zone: "",
       },
     };
   },
@@ -815,27 +918,31 @@ export default {
         }
       );
     },
-    submitZone(formName, { name }) {
+    submitZone(formName, { id, name }) {
+      const action = id ? "actualizar" : "guardar";
+      const method = id ? "PUT" : "POST";
+      const url = `/invoices/zones/${id ? id : ""}`;
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
         }
 
         this.$confirm(
-          `¿Estás seguro que deseas guardar esta zona?`,
+          `¿Estás seguro que deseas ${action} esta zona?`,
           "Confirmación",
           {
-            confirmButtonText: `Si, guardar`,
+            confirmButtonText: `Si, ${action}`,
             cancelButtonText: "Cancelar",
             type: "warning",
             beforeClose: (action, instance, done) => {
               if (action === "confirm") {
                 instance.confirmButtonLoading = true;
                 instance.confirmButtonText = "Procesando...";
-                this.$axios
-                  .post("/invoices/zones", {
-                    name,
-                  })
+                this.$axios({
+                  method,
+                  url,
+                  data: { name },
+                })
                   .then((res) => {
                     this.$notify.success({
                       title: "Éxito",
@@ -851,12 +958,14 @@ export default {
                   })
                   .then((alw) => {
                     instance.confirmButtonLoading = false;
-                    instance.confirmButtonText = `Si, guardar`;
+                    instance.confirmButtonText = `Si, ${action}`;
                     done();
                   });
               }
               done();
+              //Cambio de valor en variable showNewPayment
               this.showNewZone = false;
+              this.showEditZone = false;
             },
           }
         );
@@ -911,7 +1020,6 @@ export default {
       });
     },
     submitPayment(formName, { id, name }) {
-      console.log(id);
       const action = id ? "actualizar" : "guardar";
       const method = id ? "PUT" : "POST";
       const url = `/invoices/payment-condition/${id ? id : ""}`;
@@ -967,6 +1075,17 @@ export default {
     editCondition(condition) {
       this.editPaymentForm = { ...condition };
       this.showEditPayment = true;
+    },
+    editZone(zone) {
+      this.editZoneForm = { ...zone };
+      this.showEditZone = true;
+    },
+    editSeller({ id, name, ...zone }) {
+      this.sellerId = id;
+      this.editSellerForm.name = name;
+      this.editSellerForm.zone = zone.invoicesZone.name;
+      console.log(zone.invoicesZone.name);
+      this.showEditSeller = true;
     },
   },
   computed: {
