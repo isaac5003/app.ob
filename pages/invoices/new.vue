@@ -282,7 +282,7 @@
                   size="small"
                   clearable
                   placeholder="Seleccionar"
-                  @change="validateDocumentType(salesNewForm.document, tributary)"
+                  @change="validateDocumentType(salesNewForm.document)"
                  
                 >
                   <el-option
@@ -659,6 +659,7 @@ import {
   selectValidation,
   checkBeforeLeave,
   checkBeforeEnter,
+  amountValidate,
 } from "../../tools";
 import Notification from "../../components/Notification";
 
@@ -782,8 +783,8 @@ export default {
       },
       newServiceFormRules: {
         service: selectValidation(true),
-        // quantity: inputValidation(blur,true),
-        // // cost: inputValidation( true),
+        // quantity: amountValidate( true, 1),
+        // cost: amountValidate( true, 0),
         description: inputValidation(true, 5, 5000),
       },
       services: [],
@@ -870,26 +871,8 @@ export default {
         this.branch = {}
         this.tributary = {}
       }
-    },
-    validateDocumentType(id, tributary) {
-      this.setStorage(this.salesNewForm);
-      if (id) {
-        this.$axios
-          .get("/invoices/documents", { params: { type: id } })
-          .then((res) => {
-            this.documentInfo = res.data.documents;
-            // this.salesNewForm.auth = res.data.documents[0].authorization;
-            // this.salesNewForm.next = res.data.documents[0].next;
-          })
-          .catch((err) => {
-            this.errorMessage = err.response.data.message;
-          });
-      } else {
-        this.salesNewForm.auth = "";
-        this.salesNewForm.next = "";
-      }
-      if (tributary) {
-        switch (id) {
+       if (this.tributary) {
+        switch (this.documentType) {
           case 2:
             if (
               tributary.customerType.name == "Persona Natural" &&
@@ -905,6 +888,41 @@ export default {
             break;
         }
       }
+    },
+    validateDocumentType(id) {
+      this.setStorage(this.salesNewForm);
+      if (id) {
+        this.$axios
+          .get("/invoices/documents", { params: { type: id } })
+          .then((res) => {
+            this.documentInfo = res.data.documents;
+            this.salesNewForm.auth = res.data.documents[0].authorization;
+            this.salesNewForm.next = res.data.documents[0].next;
+          })
+          .catch((err) => {
+            this.errorMessage = err.response.data.message;
+          });
+      } else {
+        this.salesNewForm.auth = "";
+        this.salesNewForm.next = "";
+      }
+      // if (tributary) {
+      //   switch (id) {
+      //     case 2:
+      //       if (
+      //         tributary.customerType.name == "Persona Natural" &&
+      //         tributary.customerTypeNatural.name == "No declara IVA"
+      //       ) {
+      //         this.activeNotification = true;
+      //       } else {
+      //         this.activeNotification = false;
+      //       }
+      //       break;
+      //     case 1:
+      //       this.activeNotification = false;
+      //       break;
+      //   }
+      // }
     },
     addToDetails(types, formName, data) {
       this.$refs[formName].validate(async (valid) => {
