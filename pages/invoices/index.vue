@@ -7,34 +7,40 @@
       { name: 'Listado de ventas', to: null },
     ]"
   >
-    <div class="flex flex-col space-y-4">
-      <Notification
-        v-if="errorMessage"
-        class="w-full"
-        type="danger"
-        title="Error de comunicación"
-        :message="errorMessage"
-      />
-      <el-form label-position="top" class="flex flex-col ">
-        <div class="grid grid-cols-12 gap-4">
-          <div class="col-start-10 col-span-3">
+    <div class="flex flex-col">
+      <div class="flex justify-center" v-if="errorMessage">
+        <Notification
+          class="w-1/2"
+          type="danger"
+          title="Error de comunicación"
+          :message="errorMessage"
+          :action="{
+            title: 'Intentar nuevamente', 
+            function: () => $router.go(),
+          }"
+        />
+      </div>
+      <el-form label-position="top">
+        <div class="grid grid-cols-12">
+          <div class=" col-start-10 col-span-4">
             <el-form-item>
-              <el-input
-                suffix-icon="el-icon-search"
-                placeholder="Buscar..."
-                v-model="searchValue"
-                size="small"
-                clearable
-                v-debounce:500ms="fetchInvoices"
-                @change="fetchInvoices"
-              />
+                 <el-input
+              suffix-icon="el-icon-search"
+              placeholder="Buscar..."
+              v-model="searchValue.searchValue"
+              size="small"
+              style="margin-top: 26px"
+              clearable
+              class="w-full"
+              v-debounce:500ms="fetchInvoices"
+              @change="fetchInvoices"
+            />
             </el-form-item>
           </div>
         </div>
-        <!-- Colocamos los input corespondientes-->
-        <!--No hay etiquetas que agregar-->
+        <div class="flex flex-col">
         <div class="grid grid-cols-12 gap-4">
-          <div class="col-span-4">
+            <div class=" col-span-4">
             <el-form-item label="Rango de fechas:">
               <el-date-picker
                 v-model="filter.dateRange"
@@ -48,7 +54,7 @@
               </el-date-picker>
             </el-form-item>
           </div>
-          <div class="col-span-4">
+           <div class="col-span-4">
             <el-form-item label="Cliente:">
               <el-select
                 v-model="filter.customer"
@@ -58,7 +64,8 @@
                 filterable
                 default-first-option
                 placeholder="Todos los clientes:"
-                  @change="fetchInvoices"
+              v-debounce:500ms="fetchInvoices"
+              @change="fetchInvoices"
               >
                 <el-option-group key="ACTIVOS" label="ACTIVOS">
                   <el-option
@@ -92,7 +99,8 @@
                 clearable
                 placeholder="Todos los tipos:"
                 class="w-full"
-                  @change="fetchInvoices"
+              v-debounce:500ms="fetchInvoices"
+              @change="fetchInvoices"
               >
               <el-option label="Todos los tipos" value=""/>
                 <el-option
@@ -105,7 +113,7 @@
               </el-select>
             </el-form-item>
           </div>
-          <!-- <div class="col-span-2">
+          <div class="col-span-2">
             <el-form-item label="Estado:">
               <el-select
                 v-model="filter.status"
@@ -113,6 +121,8 @@
                 clearable
                 placeholder="Todos los estados:"
                 class="w-full"
+                v-debounce:500ms="fetchInvoices"
+              @change="fetchInvoices"
               >
                 <el-option
                   v-for="item in options"
@@ -123,9 +133,8 @@
                 </el-option>
               </el-select>
             </el-form-item>
-          </div> -->
+          </div>
         </div>
-        <!-- div vendedor, zona servicio-->
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-3">
             <el-form-item label="Vendedor:">
@@ -137,7 +146,8 @@
                 default-first-option
                 placeholder="Todos los clientes:"
                 class="w-full"
-                  @change="fetchInvoices"
+                v-debounce:500ms="fetchInvoices"
+              @change="fetchInvoices"
               >
                 <el-option-group key="ACTIVOS" label="ACTIVOS">
                     <el-option label="Todos los clientes" value=""/>
@@ -171,7 +181,8 @@
                 default-first-option
                 placeholder="Todos las Zonas"
                 class="w-full"
-                  @change="fetchInvoices"
+               v-debounce:500ms="fetchInvoices"
+              @change="fetchInvoices"
               >
                 <el-option-group key="ACTIVOS" label="ACTIVOS">
                     <el-option label="Tados las zonas" value=""/>
@@ -204,7 +215,8 @@
                 default-first-option
                 placeholder="Todos los servicios"
                 class="w-full"
-                  @change="fetchInvoices"
+                v-debounce:500ms="fetchInvoices"
+              @change="fetchInvoices"
               >
                 <el-option-group key="ACTIVOS" label="ACTIVOS">
                     <el-option label="Todos los servicios" value=""/>
@@ -229,9 +241,9 @@
             </el-form-item>
           </div>
         </div>
+        </div>
       </el-form>
-
-      <el-table :data="getInvoices" stripe size="small">
+        <el-table :data="invoices.invoices" stripe size="small">
         <el-table-column prop="index" min-width="40" />
         <el-table-column label="# Factura"   min-width="120">
          <template slot-scope="scope">
@@ -240,7 +252,7 @@
            </span>
           </template> 
         </el-table-column>
-        <el-table-column label="Tipo fact." prop="tipof" min-width="75" />
+        <!-- <el-table-column label="Tipo fact." prop="tipof" min-width="75" /> -->
         <el-table-column label="Fecha" prop="invoiceDate" min-width="90" />
         <el-table-column label="Cliente" prop="customerName" min-width="350" />
         <el-table-column label="Estado" prop="true" min-width="80">
@@ -251,7 +263,7 @@
             <el-tag size="small" type="warning" v-else>Inactivo</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="total" prop="ventaTotal" min-width="80" />
+         <el-table-column label="total" prop="ventaTotal" min-width="80" />
         <el-table-column label min-width="60" align="center">
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
@@ -265,43 +277,36 @@
                     $router.push(`/invoices/edit?ref=${scope.row.id}`)
                   "
                 >
-                  <i class="el-icon-edit-outline"></i> Editar factura
+                  <i class="el-icon-edit-outline"></i> Editar cliente
                 </el-dropdown-item>
-                <el-dropdown-item
-                  @click.native="
-                    $router.push(`/invoices/edit?ref=${scope.row.id}`)
-                  "
-                >
-                  <i class="el-icon-printer"></i>Imprimir factura
-                </el-dropdown-item>
-                 <el-dropdown-item @click.native="changeActive(scope.row)">
+                <el-dropdown-item @click.native="changeActive(scope.row)">
                   <span v-if="scope.row.isActiveInvoice">
                     <i class="el-icon-close"></i> Desactivar
                   </span>
                   <span v-else> <i class="el-icon-check"></i> Activar </span>
                   cliente
-                </el-dropdown-item> -->
+                </el-dropdown-item>
                 <el-dropdown-item
                   :divided="true"
                   class="text-red-500 font-semibold"
                   @click.native="deleteInvoice(scope.row)"
                 >
-                  <i class="el-icon-delete"></i>Eliminar factura
+                  <i class="el-icon-delete"></i> Eliminar cliente
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </template>
         </el-table-column>
       </el-table>
-       <div class="flex justify-end">
+      <div class="flex justify-end">
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="fetchInvoices"
-          :current-page.sync="filter.page.page"
+          :current-page.sync="page.page"
           :page-sizes="[5, 10, 15, 25, 50, 100]"
-          :page-size="filter.page.size"
+          :page-size="page.size"
           layout="total, sizes, prev, pager, next"
-          :total="parseInt(filter.getInvoices.count)"
+          :total="invoicesTotal"
           :pager-count="5"
         />
       </div>
@@ -333,12 +338,14 @@ export default {
       this.$axios.get("/services", { params: { active: true } });
     const inactiveService = () =>
       this.$axios.get("/services", { params: { active: false } });
-       
-    const getInvoices = () => this.$axios.get("/invoices", {params: this.page});
-       
-    
 
-    Promise.all([
+      const invoices = () =>
+        this.$axios.get("/invoices", {params: this.page});
+
+        const invoicesTotal = () =>
+        this.$axios.get("/invoices");
+
+   Promise.all([
       activeCustomers(),
       inactiveCustomers(),
       activeSellers(),
@@ -348,7 +355,9 @@ export default {
       activeService(),
       inactiveService(),
       documentTypes(),
-      getInvoices(),
+      invoices(),
+      invoicesTotal(),
+     
     ])
       .then((res) => {
         const [
@@ -361,7 +370,8 @@ export default {
           activeService,
           inactiveService,
           documentTypes,
-          getInvoices,
+          invoices,
+          invoicesTotal,
         ] = res;
         this.activeCustomers = activeCustomers.data.customers;
         this.inactiveCustomers = inactiveCustomers.data.customers;
@@ -372,8 +382,8 @@ export default {
         this.inactiveZones = inactiveZones.data.zones;
         this.activeService = activeService.data.services;
         this.inactiveService = inactiveService.data.services;
-        this.getInvoices = getInvoices.data.invoices;
-      //  console.log(getInvoices.data.invoices);
+        this.invoices=invoices.data;
+        this.invoicesTotal=invoicesTotal.data.count;
         this.loading = false;
       })
       .catch((err) => {
@@ -382,29 +392,12 @@ export default {
           : "Comunicate con el administrador del sistema.";
       });
   },
-  fetchOnServer: false,
+   fetchOnServer: false,
   data() {
     return {
       loading: false,
-      errorMessage:  "",
-      filter:{
-        searchValue:"",
-      dateRange:"",
-      customer:"",
-      invoiceType:"",
-      status:"",
-      seller:"",
-      zone:"",
-      service:"",
-      getInvoices:{
-      getInvoices:[],
-      count:0,
-       },
-      page: {
-      limit: 10,
-       page:1,
-      }
-      }, 
+      errorMessage: "",
+      searchValue:"",
       activeCustomers:   [],
       inactiveCustomers: [],
       documentTypes:     [],
@@ -414,20 +407,35 @@ export default {
       inactiveZones:     [],
       activeService:     [],
       inactiveService:   [],
+      invoicesTotal:[],
+      options:[],
+      invoices: {
+        invoices: [],
+        count: 0,
+      },
+      page: {
+        limit: 10,
+        page: 1,
+      },
+       filter:{
+      dateRange:"",
+      customer:"",
+      invoiceType:"",
+      status:"",
+      seller:"",
+      zone:"",
+      service:"",
+       },
     };
   },
- methods: {
-    handleSizeChange(val) {
-      this.filter.page.limit = val;
-      this.fetchInvoices();
-    },
+  methods: {
     fetchInvoices() {
       let params = this.page;
       if (this.status !== "") {
         params = { ...params, active: this.status };
       }
       if (this.searchValue !== "") {
-        params = { ...params, search: this.filter.searchValue.toLowerCase() };
+        params = { ...params, search: this.searchValue.toLowerCase() };
       }
 
       this.$axios
@@ -439,7 +447,10 @@ export default {
           this.errorMessage = err.response.data.message;
         });
     },
-   
+    handleSizeChange(val) {
+      this.page.limit = val;
+      this.fetchInvoices();
+    },
     changeActive({ id, isActiveInvoice }) {
       const action = isActiveInvoice ? "desactivar" : "activar";
       this.$confirm(
