@@ -98,13 +98,13 @@ function selectValidation(required = true) {
 
 function amountValidate(trigger, required = false, min = null, max = null) {
   const validation = (rule, value, callback) => {
-    if (R.isEmpty(value) && required) {
+    if (value == "" && required) {
       callback(new Error("Este campo es requerido."));
     } else if (typeof parseFloat(value) !== "number") {
       callback(new Error("Ingresa un número valido."));
-    } else if (!R.isNil(min) && parseFloat(value) < min) {
+    } else if (min != null && parseFloat(value) < min) {
       callback(new Error(`El número debe ser mayor a ${min}`));
-    } else if (!R.isNil(max) && parseFloat(value) > max) {
+    } else if (max != null && parseFloat(value) > max) {
       callback(new Error(`El número debe ser menor a ${max}`));
     } else {
       callback();
