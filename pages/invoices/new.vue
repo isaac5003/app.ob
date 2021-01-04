@@ -53,7 +53,7 @@
         <div class="grid grid-cols-12 gap-4">
           <!-- Cantidad -->
           <div class="col-span-6">
-            <el-form-item label="Cantidad">
+            <el-form-item label="Cantidad" prop="quantity">
               <el-input-number
                 ref="quantity"
                 type="number"
@@ -64,12 +64,12 @@
                 autocomplete="off"
                 style="width: 100%"
                 :disabled="newServiceForm.service === ''"
-              />
+              > </el-input-number>
             </el-form-item>
           </div>
           <!-- precio -->
           <div class="col-span-6">
-            <el-form-item label="Precio">
+            <el-form-item label="Precio" prop="cost">
               <div class="w-full flex items-end">
                 <el-input-number
                   class="w-full mt-1"
@@ -83,7 +83,8 @@
                   style="width: 100%"
                   :disabled="newServiceForm.service === ''"
                   :precision="2"
-                />
+                >
+                </el-input-number>
                 <el-checkbox
                   border
                   v-model="newServiceForm.incTax"
@@ -363,7 +364,7 @@
             </div>
             <!-- sucursal -->
             <div class="col-span-2">
-              <el-form-item label="Sucursal" prop="branch">
+              <el-form-item label="Sucursal" prop="branch" ref="branch">
                 <el-select
                   v-model="salesNewForm.branch"
                   class="w-full"
@@ -691,6 +692,7 @@ export default {
         this.customers = customers.data.customers;
         this.documents = documents.data.documentTypes;
         this.loading = false;
+        this.salesNewForm.documentType = 1
        
       })
       .catch((err) => {
@@ -712,7 +714,7 @@ export default {
       sales: [],
       loading: false,
       salesNewForm: {
-        documentType: 1,
+        documentType: "",
         auth: "",
         next: "",
         date: "",
@@ -780,9 +782,9 @@ export default {
       },
       newServiceFormRules: {
         service: selectValidation(true),
-        // quantity: amountValidate("blur", true, 1),
-        // cost: amountValidate("blur", true, 0),
-        description: inputValidation(true),
+        // quantity: inputValidation(blur,true),
+        // // cost: inputValidation( true),
+        description: inputValidation(true, 5, 5000),
       },
       services: [],
       tributary: null,
@@ -853,10 +855,10 @@ export default {
             
             this.tributary = tributary.data.customer;
             this.loading = false;
-            this.validateDocumentType(
-              this.salesNewForm.documentType,
-              this.tributary
-            );
+            this.validateDocumentType(this.salesNewForm.documentType, this.tributary);
+            this.$refs.branch.resetField()
+            this.branch = {}
+            this.selectBranch(this.salesNewForm-customer, this.branches);
           })
           .catch((err) => {
             console.log(err);
@@ -864,6 +866,9 @@ export default {
           });
       } else {
         this.salesNewForm.branch = "";
+        this.branches = null
+        this.branch = {}
+        this.tributary = {}
       }
     },
     validateDocumentType(id, tributary) {
@@ -873,8 +878,8 @@ export default {
           .get("/invoices/documents", { params: { type: id } })
           .then((res) => {
             this.documentInfo = res.data.documents;
-            this.salesNewForm.auth = res.data.documents[0].authorization;
-            this.salesNewForm.next = res.data.documents[0].next;
+            // this.salesNewForm.auth = res.data.documents[0].authorization;
+            // this.salesNewForm.next = res.data.documents[0].next;
           })
           .catch((err) => {
             this.errorMessage = err.response.data.message;
