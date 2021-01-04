@@ -53,7 +53,7 @@
         <div class="grid grid-cols-12 gap-4">
           <!-- Cantidad -->
           <div class="col-span-6">
-            <el-form-item label="Cantidad" prop="quantity">
+            <el-form-item label="Cantidad" prop="quantity" ref="quantity">
               <el-input-number
                 ref="quantity"
                 type="number"
@@ -69,7 +69,7 @@
           </div>
           <!-- precio -->
           <div class="col-span-6">
-            <el-form-item label="Precio" prop="cost">
+            <el-form-item label="Precio" prop="cost" ref="cost">
               <div class="w-full flex items-end">
                 <el-input-number
                   class="w-full mt-1"
@@ -178,7 +178,7 @@
         <div class="grid grid-cols-12 gap-4">
           <!-- Cantidad -->
           <div class="col-span-6">
-            <el-form-item label="Cantidad">
+            <el-form-item label="Cantidad" prop="quantity">
               <el-input-number
                 ref="quantity"
                 type="number"
@@ -194,7 +194,7 @@
           </div>
           <!-- precio -->
           <div class="col-span-6">
-            <el-form-item label="Precio">
+            <el-form-item label="Precio" prop="cost">
               <div class="w-full flex items-end">
                 <el-input-number
                   class="w-full mt-1"
@@ -282,7 +282,7 @@
                   size="small"
                   clearable
                   placeholder="Seleccionar"
-                  @change="validateDocumentType(salesNewForm.document)"
+                  @change="validateDocumentType(salesNewForm.documentType, tributary)"
                  
                 >
                   <el-option
@@ -694,7 +694,7 @@ export default {
         this.documents = documents.data.documentTypes;
         this.loading = false;
         this.salesNewForm.documentType = 1
-       
+        this.validateDocumentType(this.salesNewForm.documentType, this.tributary)
       })
       .catch((err) => {
         console.log(err);
@@ -783,8 +783,8 @@ export default {
       },
       newServiceFormRules: {
         service: selectValidation(true),
-        // quantity: amountValidate( true, 1),
-        // cost: amountValidate( true, 0),
+        quantity: amountValidate("blur", true, 1),
+        cost: amountValidate("blur", true, 0),
         description: inputValidation(true, 5, 5000),
       },
       services: [],
@@ -801,8 +801,8 @@ export default {
     },
     closeDialog(formName) {
       this.$refs[formName].resetFields();
-      this[formName].cost = "";
-      this[formName].quantity = "";
+      this.$refs.cost.resetField()
+      this.$refs.quantity.resetField()
     },
     openDialog() {
       this.$axios
@@ -834,7 +834,7 @@ export default {
       if(id){
          const branch = branches.find((b) => b.id == id);
          this.branch = {...branch}
-         console.log(this.branch)
+         
       }else{
         this.branch = {}
       }
@@ -859,11 +859,10 @@ export default {
             this.validateDocumentType(this.salesNewForm.documentType, this.tributary);
             this.$refs.branch.resetField()
             this.branch = {}
-            this.selectBranch(this.salesNewForm-customer, this.branches);
+            this.selectBranch(this.salesNewForm.customer, this.branches);
           })
           .catch((err) => {
-            console.log(err);
-            this.errorMessage = err.response.data.message;
+           this.errorMessage = err.response.data.message;
           });
       } else {
         this.salesNewForm.branch = "";
@@ -871,25 +870,10 @@ export default {
         this.branch = {}
         this.tributary = {}
       }
-       if (this.tributary) {
-        switch (this.documentType) {
-          case 2:
-            if (
-              tributary.customerType.name == "Persona Natural" &&
-              tributary.customerTypeNatural.name == "No declara IVA"
-            ) {
-              this.activeNotification = true;
-            } else {
-              this.activeNotification = false;
-            }
-            break;
-          case 1:
-            this.activeNotification = false;
-            break;
-        }
-      }
+       
+      
     },
-    validateDocumentType(id) {
+    validateDocumentType(id, tributary) {
       this.setStorage(this.salesNewForm);
       if (id) {
         this.$axios
@@ -906,23 +890,23 @@ export default {
         this.salesNewForm.auth = "";
         this.salesNewForm.next = "";
       }
-      // if (tributary) {
-      //   switch (id) {
-      //     case 2:
-      //       if (
-      //         tributary.customerType.name == "Persona Natural" &&
-      //         tributary.customerTypeNatural.name == "No declara IVA"
-      //       ) {
-      //         this.activeNotification = true;
-      //       } else {
-      //         this.activeNotification = false;
-      //       }
-      //       break;
-      //     case 1:
-      //       this.activeNotification = false;
-      //       break;
-      //   }
-      // }
+      if (tributary) {
+       switch (id) {
+          case 2:
+            if (
+              tributary.customerType.id == 2 &&
+              tributary.customerTypeNatural.id == 1
+            ) {
+              this.activeNotification = true;
+            } else {
+              this.activeNotification = false;
+            }
+            break;
+          case 1:
+            this.activeNotification = false;
+            break;
+        }
+      }
     },
     addToDetails(types, formName, data) {
       this.$refs[formName].validate(async (valid) => {
@@ -999,7 +983,7 @@ export default {
     calcSujeta(documentType, { cost, incTax, sellingType, quantity }) {
       let unitPrice = null;
       const amount = parseFloat(cost);
-      console.log(documentType, { cost, incTax, sellingType });
+     
       if ((sellingType.id == 1) | (sellingType.id == 2)) {
         unitPrice = amount * quantity;
       }
