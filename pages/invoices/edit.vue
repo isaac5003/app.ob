@@ -505,7 +505,7 @@
               <el-table-column type="index" label="#" />
               <el-table-column prop="quantity" label="Cant." min-width="50" />
               <el-table-column
-                prop="description"
+                prop="chargeDescription"
                 label="Descripción"
                 width="270"
               />
@@ -516,7 +516,7 @@
               >
                 <template slot-scope="scope">
                   <span >{{
-                    calcUnitPrice(salesNewForm.documentType, scope.row)
+                    calcUniPrice(salesNewForm.documentType, scope.row)
                       | formatMoney
                   }}</span>
                 </template>
@@ -682,17 +682,35 @@ export default {
       return this.$axios.get("/invoices/document-types");
     };
 
-    Promise.all([sellers(), paymentsConditions(), customers(), documentTypes()])
+    const selectedInvoice = () => {return this.$axios.get("/invoices/32de7a11-9a21-4355-8cdf-e6d8111bbda6");};
+
+    Promise.all([sellers(), paymentsConditions(), customers(), documentTypes(), selectedInvoice()])
       .then((res) => {
-        const [sellers, paymentConditions, customers, documents] = res;
+        const [sellers, paymentConditions, customers, documents, selectedInvoice] = res;
 
         this.sellers = sellers.data.sellers;
         this.paymentConditions = paymentConditions.data.paymentConditions;
         this.customers = customers.data.customers;
         this.documents = documents.data.documentTypes;
+
+        this.selectedInvoice = selectedInvoice.data.invoice;
+        this.salesNewForm.documentType = selectedInvoice.data.invoice.documentType.id;
+        this.salesNewForm.auth = selectedInvoice.data.invoice.authorization
+        this.salesNewForm.next = selectedInvoice.data.invoice.sequence
+        this.salesNewForm.date = selectedInvoice.data.invoice.invoiceDate
+        this.salesNewForm.customer = selectedInvoice.data.invoice.customer.id
+        this.salesNewForm.paymentsConditions = selectedInvoice.data.invoice.invoicesPaymentsCondition.id
+        this.salesNewForm.sellers = selectedInvoice.data.invoice.invoicesSeller
+        this.details =  selectedInvoice.data.invoice.details
+         
         this.loading = false;
-        this.salesNewForm.documentType = 1
+        const branchId = selectedInvoice.data.invoice.customerbranch
+
         this.validateDocumentType(this.salesNewForm.documentType, this.tributary)
+        this.getCustomerDetails(this.salesNewForm.customer)
+        this.selectBranch(branchId, this.branches)
+        
+
       })
       .catch((err) => {
         console.log(err);
@@ -712,6 +730,7 @@ export default {
       activeNotification: false,
       sales: [],
       loading: false,
+      selectedInvoice: {},
       salesNewForm: {
         documentType: "",
         auth: "",
@@ -832,7 +851,7 @@ export default {
       if(id){
          const branch = branches.find((b) => b.id == id);
          this.branch = {...branch}
-         
+         this.salesNewForm.branch = this.branch
       }else{
         this.branch = {}
       }
@@ -953,9 +972,9 @@ export default {
         this.showEditService = false;
       });
     },
-    calcUnitPrice(documentType, { cost, incTax, sellingType }) {
-      let unitPrice = null;
-      const amount = parseFloat(cost);
+    calcUniPrice(documentType, { unitPrice, incTax, sellingType }) {
+      let uniPrice = null;
+      const amount = parseFloat(unitPrice);
       let message = null;
       if ((sellingType.id == 1) | (sellingType.id == 2)) {
         unitPrice = amount;
@@ -978,41 +997,41 @@ export default {
       }
       return unitPrice;
     },
-    calcSujeta(documentType, { cost, incTax, sellingType, quantity }) {
-      let unitPrice = null;
-      const amount = parseFloat(cost);
+    calcSujeta(documentType, { unitPrice, incTax, sellingType, quantity }) {
+      let uniPrice = null;
+      const amount = parseFloat(unitPrice);
      
       if ((sellingType.id == 1) | (sellingType.id == 2)) {
-        unitPrice = amount * quantity;
+        uniPrice = amount * quantity;
       }
 
       return unitPrice;
     },
-    calcGravada(documentType, { cost, incTax, sellingType, quantity }) {
-      let unitPrice = null;
-      const amount = parseFloat(cost);
+    calcGravada(documentType, { unitPrice, incTax, sellingType, quantity }) {
+      let uniPrice = null;
+      const amount = parseFloat(unitPrice);
       switch (documentType) {
         case 1:
-          unitPrice = amount * (incTax ? 1 : 1.13) * quantity;
+          uniPrice = amount * (incTax ? 1 : 1.13) * quantity;
 
           break;
         case 2:
-          unitPrice = (amount / (incTax ? 1.13 : 1)) * quantity;
+          uniPrice = (amount / (incTax ? 1.13 : 1)) * quantity;
 
           break;
       }
 
-      return unitPrice;
+      return uniPrice;
     },
-    calcExenta(documentType, { cost, incTax, sellingType, quantity }) {
-      let unitPrice = null;
-      const amount = parseFloat(cost);
-      console.log(documentType, { cost, incTax, sellingType });
+    calcExenta(documentType, { unitPrice, incTax, sellingType, quantity }) {
+      let uniPrice = null;
+      const amount = parseFloat(unitPrice);
+      console.log(documentType, { unitPrice, incTax, sellingType });
       if ((sellingType.id == 1) | (sellingType.id == 2)) {
-        unitPrice = amount * quantity;
+        uniPrice = amount * quantity;
       }
 
-      return unitPrice;
+      return uniPrice;
     },
   },
    computed: {
