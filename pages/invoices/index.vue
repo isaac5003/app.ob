@@ -58,6 +58,7 @@
                 filterable
                 default-first-option
                 placeholder="Todos los clientes:"
+                  @change="fetchInvoices"
               >
                 <el-option-group key="ACTIVOS" label="ACTIVOS">
                   <el-option
@@ -91,19 +92,20 @@
                 clearable
                 placeholder="Todos los tipos:"
                 class="w-full"
+                  @change="fetchInvoices"
               >
               <el-option label="Todos los tipos" value=""/>
                 <el-option
                   v-for="item in documentTypes"
                   :key="item.id"
-                  :label="`${item.code} - ${item.name}`"
+                  :label="`${item.code} - ${item.name}` "
                   :value="item.id"
                 >
                 </el-option>
               </el-select>
             </el-form-item>
           </div>
-          <div class="col-span-2">
+          <!-- <div class="col-span-2">
             <el-form-item label="Estado:">
               <el-select
                 v-model="filter.status"
@@ -121,7 +123,7 @@
                 </el-option>
               </el-select>
             </el-form-item>
-          </div>
+          </div> -->
         </div>
         <!-- div vendedor, zona servicio-->
         <div class="grid grid-cols-12 gap-4">
@@ -135,6 +137,7 @@
                 default-first-option
                 placeholder="Todos los clientes:"
                 class="w-full"
+                  @change="fetchInvoices"
               >
                 <el-option-group key="ACTIVOS" label="ACTIVOS">
                     <el-option label="Todos los clientes" value=""/>
@@ -168,6 +171,7 @@
                 default-first-option
                 placeholder="Todos las Zonas"
                 class="w-full"
+                  @change="fetchInvoices"
               >
                 <el-option-group key="ACTIVOS" label="ACTIVOS">
                     <el-option label="Tados las zonas" value=""/>
@@ -200,6 +204,7 @@
                 default-first-option
                 placeholder="Todos los servicios"
                 class="w-full"
+                  @change="fetchInvoices"
               >
                 <el-option-group key="ACTIVOS" label="ACTIVOS">
                     <el-option label="Todos los servicios" value=""/>
@@ -226,12 +231,18 @@
         </div>
       </el-form>
 
-      <el-table :data="invoices" stripe size="small">
+      <el-table :data="getInvoices" stripe size="small">
         <el-table-column prop="index" min-width="40" />
-        <el-table-column label="# Factura" prop="factura" min-width="120" />
+        <el-table-column label="# Factura"   min-width="120">
+         <template slot-scope="scope">
+           <span>
+             {{ scope.row.authorization }} - {{ scope.row.sequence }}
+           </span>
+          </template> 
+        </el-table-column>
         <el-table-column label="Tipo fact." prop="tipof" min-width="75" />
-        <el-table-column label="Fecha" prop="fecha" min-width="100" />
-        <el-table-column label="Cliente" prop="cliente" min-width="350" />
+        <el-table-column label="Fecha" prop="invoiceDate" min-width="90" />
+        <el-table-column label="Cliente" prop="customerName" min-width="350" />
         <el-table-column label="Estado" prop="true" min-width="80">
           <template slot-scope="scope">
             <el-tag size="small" type="success" v-if="scope.row.isActiveInvoice"
@@ -240,7 +251,7 @@
             <el-tag size="small" type="warning" v-else>Inactivo</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="total" prop="total" min-width="80" />
+        <el-table-column label="total" prop="ventaTotal" min-width="80" />
         <el-table-column label min-width="60" align="center">
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
@@ -263,7 +274,7 @@
                 >
                   <i class="el-icon-printer"></i>Imprimir factura
                 </el-dropdown-item>
-                <!-- <el-dropdown-item @click.native="changeActive(scope.row)">
+                 <el-dropdown-item @click.native="changeActive(scope.row)">
                   <span v-if="scope.row.isActiveInvoice">
                     <i class="el-icon-close"></i> Desactivar
                   </span>
@@ -282,15 +293,15 @@
           </template>
         </el-table-column>
       </el-table>
-      <div class="flex justify-end">
+       <div class="flex justify-end">
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="fetchInvoices"
-          :current-page.sync="page.page"
+          :current-page.sync="filter.page.page"
           :page-sizes="[5, 10, 15, 25, 50, 100]"
-          :page-size="page.size"
+          :page-size="filter.page.size"
           layout="total, sizes, prev, pager, next"
-          :total="parseInt(invoices.count)"
+          :total="parseInt(filter.getInvoices.count)"
           :pager-count="5"
         />
       </div>
@@ -322,6 +333,10 @@ export default {
       this.$axios.get("/services", { params: { active: true } });
     const inactiveService = () =>
       this.$axios.get("/services", { params: { active: false } });
+       
+    const getInvoices = () => this.$axios.get("/invoices", {params: this.page});
+       
+    
 
     Promise.all([
       activeCustomers(),
@@ -333,6 +348,7 @@ export default {
       activeService(),
       inactiveService(),
       documentTypes(),
+      getInvoices(),
     ])
       .then((res) => {
         const [
@@ -345,6 +361,7 @@ export default {
           activeService,
           inactiveService,
           documentTypes,
+          getInvoices,
         ] = res;
         this.activeCustomers = activeCustomers.data.customers;
         this.inactiveCustomers = inactiveCustomers.data.customers;
@@ -355,6 +372,8 @@ export default {
         this.inactiveZones = inactiveZones.data.zones;
         this.activeService = activeService.data.services;
         this.inactiveService = inactiveService.data.services;
+        this.getInvoices = getInvoices.data.invoices;
+      //  console.log(getInvoices.data.invoices);
         this.loading = false;
       })
       .catch((err) => {
@@ -369,6 +388,7 @@ export default {
       loading: false,
       errorMessage:  "",
       filter:{
+        searchValue:"",
       dateRange:"",
       customer:"",
       invoiceType:"",
@@ -376,52 +396,15 @@ export default {
       seller:"",
       zone:"",
       service:"",
-      },
-
-      value: "",
+      getInvoices:{
+      getInvoices:[],
+      count:0,
+       },
       page: {
-        limit: 10,
-        page: 1,
-      },
-      invoices: [
-        {
-          index: 1,
-          factura: "16SD000C - 156",
-          tipof: "CFC",
-          fecha: "21/12/2020",
-          cliente: "INSTITUTO SALVADOREÑO DE FORMACION PROFESIONAL",
-          Estado: true,
-          total: "$300.00",
-        },
-        {
-          index: 1,
-          factura: "16SD000C - 156",
-          tipof: "CFC",
-          fecha: "21/12/2020",
-          cliente: "INSTITUTO SALVADOREÑO DE FORMACION PROFESIONAL",
-          Estado: true,
-          total: "$300.00",
-        },
-        {
-          index: 1,
-          factura: "16SD000C - 156",
-          tipof: "CFC",
-          fecha: "21/12/2020",
-          cliente: "INSTITUTO SALVADOREÑO DE FORMACION PROFESIONAL",
-          Estado: true,
-          total: "$300.00",
-        },
-        {
-          index: 1,
-          factura: "16SD000C - 156",
-          tipof: "CFC",
-          fecha: "21/12/2020",
-          cliente: "INSTITUTO SALVADOREÑO DE FORMACION PROFESIONAL",
-          Estado: true,
-          total: "$300.00",
-        },
-      ],
-
+      limit: 10,
+       page:1,
+      }
+      }, 
       activeCustomers:   [],
       inactiveCustomers: [],
       documentTypes:     [],
@@ -433,9 +416,111 @@ export default {
       inactiveService:   [],
     };
   },
-  methods: {
+ methods: {
     handleSizeChange(val) {
-      this.page.limit = val;
+      this.filter.page.limit = val;
+      this.fetchInvoices();
+    },
+    fetchInvoices() {
+      let params = this.page;
+      if (this.status !== "") {
+        params = { ...params, active: this.status };
+      }
+      if (this.searchValue !== "") {
+        params = { ...params, search: this.filter.searchValue.toLowerCase() };
+      }
+
+      this.$axios
+        .get("/invoices", { params })
+        .then((res) => {
+          this.invoices = res.data;
+        })
+        .catch((err) => {
+          this.errorMessage = err.response.data.message;
+        });
+    },
+   
+    changeActive({ id, isActiveInvoice }) {
+      const action = isActiveInvoice ? "desactivar" : "activar";
+      this.$confirm(
+        `¿Estás seguro que deseas ${action} este cliente?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, ${action}`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .put(`/invoices/status/${id}`, { status: !isActiveInvoice })
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchInvoices();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, ${action}`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
+    },
+    deleteInvoice({ id }) {
+      this.$confirm(
+        `¿Estás seguro que deseas eliminar este cliente?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, eliminar`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .delete(`/invoices/${id}`)
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchInvoices();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, eliminar`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
+    },
+    async openInvoicePreview({ id }) {
+      const { data } = await this.$axios.get(`/invoices/${id}`);
+      this.selectedInvoice = data.invoice;
+      this.showInvoicePreview = true;
     },
   },
 };
