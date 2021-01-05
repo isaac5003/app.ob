@@ -111,7 +111,9 @@
             :rules="newzoneRules"
             status-icon
             ref="newSellerForm"
-            @submit.prevent.native="submitZone('newSellerForm', newSellerForm)"
+            @submit.prevent.native="
+              submitSeller('newSellerForm', newSellerForm)
+            "
           >
             <div>
               <el-row :gutter="15">
@@ -126,9 +128,9 @@
                   </el-form-item>
                 </el-col>
                 <el-col :span="9">
-                  <el-form-item label="Zona asignada" prop="zone">
+                  <el-form-item label="Zona asignada" prop="invoicesZone">
                     <el-select
-                      v-model="newSellerForm.zone"
+                      v-model="newSellerForm.invoicesZone"
                       placeholder="Seleccionar"
                       size="small"
                       class="w-full"
@@ -174,7 +176,7 @@
             status-icon
             ref="editSellerForm"
             @submit.prevent.native="
-              submitZone('editSellerForm', editSellerForm)
+              submitEditSeller('editSellerForm', sellerId, editSellerForm)
             "
           >
             <div>
@@ -190,9 +192,9 @@
                   </el-form-item>
                 </el-col>
                 <el-col :span="9">
-                  <el-form-item label="Zona asignada" prop="zone">
+                  <el-form-item label="Zona asignada" prop="invoicesZone">
                     <el-select
-                      v-model="editSellerForm.zone"
+                      v-model="editSellerForm.invoicesZone"
                       placeholder="Selecionar"
                       size="small"
                       class="w-full"
@@ -217,7 +219,9 @@
             <el-button
               type="primary"
               size="small"
-              @click.native="submitZone('editSellerForm', editSellerForm)"
+              @click.native="
+                submitEditSeller('editSellerForm', sellerId, editSellerForm)
+              "
               >Guardar</el-button
             >
             <el-button @click="showEditSeller = false" size="small"
@@ -631,7 +635,7 @@ export default {
       },
       newSellerForm: {
         name: "",
-        zone: "",
+        invoicesZone: "",
       },
       newzoneRules: {
         name: inputValidation(true, 5, 100),
@@ -644,7 +648,7 @@ export default {
       },
       editSellerForm: {
         name: "",
-        zone: "",
+        invoicesZone: "",
       },
     };
   },
@@ -971,7 +975,8 @@ export default {
         );
       });
     },
-    submitSeller(formName, { name, zone }) {
+    submitSeller(formName, { name, invoicesZone }) {
+      console.log(name, invoicesZone);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -1014,6 +1019,61 @@ export default {
               }
               done();
               this.showNewSeller = false;
+            },
+          }
+        );
+      });
+    },
+    editSeller({ id, name, ...zone }) {
+      this.sellerId = id;
+      this.editSellerForm.name = name;
+      this.editSellerForm.invoicesZone = zone.invoicesZone.id;
+      this.showEditSeller = true;
+    },
+    submitEditSeller(formName, sellerId, { name, invoicesZone }) {
+      console.log(name, invoicesZone);
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+
+        this.$confirm(
+          `¿Estás seguro que deseas guardar este vendedor?`,
+          "Confirmación",
+          {
+            confirmButtonText: `Si, guardar`,
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                this.$axios
+                  .put(`/invoices/sellers/${sellerId}`, {
+                    name,
+                    invoicesZone,
+                  })
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Éxito",
+                      message: res.data.message,
+                    });
+                    this.fetchSellers();
+                  })
+                  .catch((err) => {
+                    this.$notify.error({
+                      title: "Error",
+                      message: err.response.data.message,
+                    });
+                  })
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = `Si, guardar`;
+                    done();
+                  });
+              }
+              done();
+              this.showEditSeller = false;
             },
           }
         );
@@ -1079,13 +1139,6 @@ export default {
     editZone(zone) {
       this.editZoneForm = { ...zone };
       this.showEditZone = true;
-    },
-    editSeller({ id, name, ...zone }) {
-      this.sellerId = id;
-      this.editSellerForm.name = name;
-      this.editSellerForm.zone = zone.invoicesZone.name;
-      console.log(zone.invoicesZone.name);
-      this.showEditSeller = true;
     },
   },
   computed: {
