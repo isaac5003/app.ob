@@ -639,6 +639,7 @@ export default {
       },
       newzoneRules: {
         name: inputValidation(true, 5, 100),
+        invoicesZone: selectValidation(true),
       },
       editPaymentForm: {
         name: "",
