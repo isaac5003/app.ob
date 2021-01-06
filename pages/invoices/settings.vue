@@ -506,48 +506,93 @@
         </div>
       </el-tab-pane>
 
-      <el-tab-pane label="Correlativos" name="sequences"></el-tab-pane>
-      <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
-        <Notification
-          class="w-full"
-          type="info"
-          title="Integraciones"
-          message="En esta sección se realizan las configuraciones de integración con otros modulos de manera general. Estas configuraciones se aplicarán a todos los zonas que no tengan una configuración individual."
-        />
-        <el-tabs
-          tab-position="left"
-          v-model="utab"
-          @tab-click="
-            $router
-              .replace({
-                path: `/invoices/settings`,
-                query: { tab, utab },
-              })
-              .catch(() => {})
-          "
-        >
-          <el-tab-pane
-            v-for="(integration, k) of filteredIntegrations"
-            :key="k"
-            :name="integration.id"
-          >
-            <span slot="label" class="flex items-center justify-between"
-              ><svg
-                class="w-5 h-5 mr-2"
-                fill="none"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="1.5"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                v-html="integration.icon"
-              />
-              {{ integration.name }}</span
-            >
-            {{ integration.name }}
-          </el-tab-pane>
-        </el-tabs>
-      </el-tab-pane> -->
+      <el-tab-pane label="Correlativos" name="sequences">
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-4 bg-white">
+            <div class="border-2 p-5 border-blue-800 rounded-md">
+              <el-form>
+                <!-- Consumidor final, Switch y Button -->
+                <div class="grid grid-cols-12 gap-4">
+                  <div class="col-span-8">
+                    <el-form-item class="font-semibold text-blue-800"
+                      >Consumidor Final</el-form-item
+                    >
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item>
+                      <el-switch v-model="model"></el-switch>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item>
+                      <el-button
+                        type="primary"
+                        icon="el-icon-plus"
+                        size="mini"
+                        disabled="true"
+                      ></el-button>
+                    </el-form-item>
+                  </div>
+                </div>
+                <!-- Autorización -->
+                <div class="grid grid-cols-12 gap-4">
+                  <div class="col-span-12">
+                    <el-form-item label="N° Autorización">
+                      <el-input
+                        class="w-full"
+                        size="small"
+                        disabled="true"
+                        placeholder="44fd4fd5dg4"
+                      ></el-input>
+                    </el-form-item>
+                  </div>
+                </div>
+                <!-- Inicial, Final -->
+                <div class="grid grid-cols-12 gap-4">
+                  <div class="col-span-6">
+                    <el-form-item label="Inicial">
+                      <el-input
+                        class="w-full"
+                        size="small"
+                        disabled="true"
+                        placeholder="1"
+                      ></el-input>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-6">
+                    <el-form-item label="Final">
+                      <el-input
+                        class="w-full"
+                        size="small"
+                        disabled="true"
+                        placeholder="100"
+                      ></el-input>
+                    </el-form-item>
+                  </div>
+                </div>
+                <!-- Actual -->
+                <div class="grid grid-cols-12 gap-4">
+                  <div class="col-span-12">
+                    <el-form-item label="Actual">
+                      <el-input
+                        class="w-full"
+                        size="small"
+                        disabled="true"
+                        placeholder="27"
+                      ></el-input>
+                    </el-form-item>
+                  </div>
+                </div>
+              </el-form>
+            </div>
+          </div>
+        </div>
+        <!-- Botones Guardar y Cancelar -->
+        <div class="flex justify-end dialog-footer mt-4">
+          <el-button type="primary" size="small">Guardar</el-button>
+          <el-button size="small">Cancelar</el-button>
+        </div>
+      </el-tab-pane>
     </el-tabs>
   </layout-content>
 </template>
