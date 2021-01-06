@@ -1,13 +1,13 @@
 <template>
   <layout-content
     v-loading="loading"
-    page-title="Listado de facturas"
+    page-title="Listado de ventas"
     :breadcrumb="[
-      { name: 'Facturación', to: '/invoices' },
-      { name: 'Listado de facturas', to: null },
+      { name: 'Ventas', to: '/invoices' },
+      { name: 'Listado de ventas', to: null },
     ]"
   >
-    <div class="flex flex-col space-y-2">
+    <div class="flex flex-col space-y-4">
       <div class="flex justify-center" v-if="errorMessage">
         <Notification
           class="w-1/2"
@@ -20,26 +20,175 @@
           }"
         />
       </div>
-      <el-form label-position="top">
-        <div class="flex justify-end">
-          <div class="w-75">
-            <el-input
-              suffix-icon="el-icon-search"
-              placeholder="Buscar..."
-              v-model="searchValue"
-              size="small"
-              style="margin-top: 26px"
-              clearable
-              v-debounce:500ms="fetchInvoices"
-              @change="fetchInvoices"
-            />
+      <el-form label-position="top" class="flex flex-col ">
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-start-10 col-span-3">
+            <el-form-item>
+              <el-input
+                suffix-icon="el-icon-search"
+                placeholder="Buscar..."
+                v-model="searchValue"
+                size="small"
+                clearable
+                v-debounce:500ms="fetchInvoices"
+                @change="fetchInvoices"
+              />
+            </el-form-item>
+          </div>
+        </div>
+        <!-- Colocamos los input corespondientes-->
+        <!--No hay etiquetas que agregar-->
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-4">
+            <el-form-item label="Rango de fechas:">
+              <el-date-picker
+                v-model="value1"
+                style="width:100%"
+                size="small"
+                type="datetimerange"
+                range-separator="-"
+                start-placeholder="Fecha inicial"
+                end-placeholder="Fecha final"
+              >
+              </el-date-picker>
+            </el-form-item>
+          </div>
+          <div class="col-span-4">
+            <el-form-item label="Cliente:">
+              <el-select
+                v-model="clienV"
+                size="small"
+                class="w-full"
+                clearable
+                filterable
+                default-first-option
+                placeholder="Todos los clientes:"
+              >
+                <el-option-group key="ACTIVOS" label="ACTIVOS">
+                  <el-option
+                    v-for="item in activeCustomers"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                  </el-option>
+                </el-option-group>
+                <el-option-group key="INACTIVOS" label="INACTIVOS">
+                  <el-option
+                    v-for="item in inactiveCustomers"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                  </el-option>
+                </el-option-group>
+              </el-select>
+            </el-form-item>
+          </div>
+          <div class="col-span-2">
+            <el-form-item label="Tipo fact:">
+              <el-select
+                v-model="TypeFact"
+                size="small"
+                clearable
+                placeholder="Todos los tipos:"
+                class="w-full"
+              >
+                <el-option
+                  v-for="item in documentTypes"
+                  :key="item.id"
+                  :label="`${item.code} - ${item.name}`"
+                  :value="item.id"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </div>
+          <div class="col-span-2">
+            <el-form-item label="Estado:">
+              <el-select
+                v-model="status"
+                size="small"
+                clearable
+                placeholder="Todos los estados:"
+                class="w-full"
+              >
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </div>
+        </div>
+        <!-- div vendedor, zona-->
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-3">
+            <el-form-item label="Vendedor:">
+              <el-select
+                v-model="VendClie"
+                size="small"
+                clearable
+                placeholder="Todos los clientes:"
+                class="w-full"
+              >
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </div>
+          <div class="col-span-3">
+            <el-form-item label="Zona:">
+              <el-select
+                v-model="zonaValue"
+                size="small"
+                clearable
+                placeholder="Todos las Zona:"
+                class="w-full"
+              >
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </div>
+          <div class=" col-span-3">
+            <el-form-item label="Servicio:">
+              <el-select
+                v-model="servVlue"
+                size="small"
+                clearable
+                placeholder="Todos los servicio:"
+                class="w-full"
+              >
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
           </div>
         </div>
       </el-form>
-      <el-table :data="invoices.invoices" stripe size="mini">
+      <el-table :data="resultados" stripe size="mini">
         <el-table-column prop="index" min-width="40" />
-        <el-table-column label="Nombre" prop="name" min-width="350" />
-        <el-table-column label="Tipo" prop="invoiceType.name" min-width="120" />
+        <el-table-column label="Nombre" prop="nombre" min-width="350" />
+        <el-table-column label="Tipo" prop="tipo" min-width="120" />
         <el-table-column label="NIT" prop="nit" min-width="160" />
         <el-table-column label="NRC" prop="nrc" min-width="90" />
         <el-table-column label="NIT" prop="nit" min-width="160" />
@@ -109,14 +258,18 @@ export default {
   name: "InvoicesIndex",
   components: { LayoutContent, Notification },
   fetch() {
-    const invoices = () => {
-      return this.$axios.get("/invoices", { params: this.page });
-    };
+    const activeCustomers = () =>
+      this.$axios.get("/customers", { params: { active: true } });
+    const inactiveCustomers = () =>
+      this.$axios.get("/customers", { params: { active: false } });
+    const documentTypes = () => this.$axios.get("/invoices/document-types");
 
-    Promise.all([invoices()])
+    Promise.all([activeCustomers(), inactiveCustomers(), documentTypes()])
       .then((res) => {
-        const [invoices] = res;
-        this.invoices = invoices.data;
+        const [activeCustomers, inactiveCustomers, documentTypes] = res;
+        this.activeCustomers = activeCustomers.data.customers;
+        this.inactiveCustomers = inactiveCustomers.data.customers;
+        this.documentTypes = documentTypes.data.documentTypes;
         this.loading = false;
       })
       .catch((err) => {
@@ -129,14 +282,57 @@ export default {
       loading: false,
       errorMessage: "",
       searchValue: "",
+      rangFech: "",
+      clienV: "",
+      TypeFact: "",
+      status: "",
+      VendClie: "",
+      zonaValue: "",
+      servVlue: "",
       invoices: {
         invoices: [],
         count: 0,
       },
+      options: [
+        {
+          value: "Option1",
+          label: "Option1",
+        },
+        {
+          value: "Option2",
+          label: "Option2",
+        },
+        {
+          value: "Option3",
+          label: "Option3",
+        },
+        {
+          value: "Option4",
+          label: "Option4",
+        },
+        {
+          value: "Option5",
+          label: "Option5",
+        },
+      ],
+      value: "",
       page: {
         limit: 10,
         page: 1,
       },
+      resultados: [
+        {
+          nombre: "Isaac",
+          tipo: "moreno",
+          nit: "123434",
+          nrc: "123",
+          nit: "1223",
+          nrc: "12322",
+        },
+      ],
+      activeCustomers: [],
+      inactiveCustomers: [],
+      documentTypes: [],
     };
   },
   methods: {

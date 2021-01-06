@@ -1,11 +1,10 @@
 <template>
   <layout-content
     v-loading="loading"
-    page-title="Nuevo cliente"
+    page-title="Nueva partida"
     :breadcrumb="[
-      { name: 'Clientes', to: '/customers' },
-      { name: 'Listado de clientes', to: '/customers' },
-      { name: 'Nuevo cliente', to: null },
+      { name: 'Contabilidad', to: '/entries' },
+      { name: 'Nueva partida', to: null },
     ]"
   >
     <el-form
