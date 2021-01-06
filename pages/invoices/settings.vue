@@ -507,16 +507,20 @@
       </el-tab-pane>
 
       <el-tab-pane label="Correlativos" name="sequences">
-        <div class="grid grid-cols-12 gap-4">
-          <div class="col-span-4 bg-white">
-            <div class="border-2 p-5 border-blue-800 rounded-md">
-              <el-form>
+        <el-form v-model="documents">
+          <div class="grid grid-cols-12 gap-4">
+            <div
+              v-for="(d, i) of documents"
+              :key="i"
+              class="col-span-4 bg-white"
+            >
+              <div class="border-2 p-5 border-blue-800 rounded-md">
                 <!-- Consumidor final, Switch y Button -->
                 <div class="grid grid-cols-12 gap-4">
                   <div class="col-span-8">
-                    <el-form-item class="font-semibold text-blue-800"
-                      >Consumidor Final</el-form-item
-                    >
+                    <el-form-item class="font-semibold text-blue-800">{{
+                      d.documentType.name
+                    }}</el-form-item>
                   </div>
                   <div class="col-span-2">
                     <el-form-item>
@@ -542,7 +546,7 @@
                         class="w-full"
                         size="small"
                         disabled="true"
-                        placeholder="44fd4fd5dg4"
+                        v-model="d.authorization"
                       ></el-input>
                     </el-form-item>
                   </div>
@@ -555,7 +559,7 @@
                         class="w-full"
                         size="small"
                         disabled="true"
-                        placeholder="1"
+                        v-model="d.initial"
                       ></el-input>
                     </el-form-item>
                   </div>
@@ -565,7 +569,7 @@
                         class="w-full"
                         size="small"
                         disabled="true"
-                        placeholder="100"
+                        v-model="d.final"
                       ></el-input>
                     </el-form-item>
                   </div>
@@ -578,15 +582,15 @@
                         class="w-full"
                         size="small"
                         disabled="true"
-                        placeholder="27"
+                        v-model="d.current"
                       ></el-input>
                     </el-form-item>
                   </div>
                 </div>
-              </el-form>
+              </div>
             </div>
           </div>
-        </div>
+        </el-form>
         <!-- Botones Guardar y Cancelar -->
         <div class="flex justify-end dialog-footer mt-4">
           <el-button type="primary" size="small">Guardar</el-button>
@@ -631,13 +635,18 @@ export default {
     const payment = () => {
       return this.$axios.get("/invoices/payment-condition");
     };
+    const documents = () => {
+      return this.$axios.get("/invoices/documents");
+    };
     // promesa que recibe los métodos con las peticiones http
-    Promise.all([zones(), sellers(), payment()])
+    Promise.all([zones(), sellers(), payment(), documents()])
       .then((res) => {
-        const [zones, sellers, payment] = res;
+        const [zones, sellers, payment, documents] = res;
         this.zones = zones.data.zones;
         this.sellers = sellers.data.sellers;
         this.payments = payment.data.paymentConditions;
+        this.documents = documents.data.documents;
+        console.log(documents.data.documents);
         this.loading = false;
       })
       .catch((err) => {
@@ -666,6 +675,11 @@ export default {
       zones: [],
       sellers: [],
       payments: [],
+      documents: {
+        documentType: {
+          name: [],
+        },
+      },
       showNewZone: false,
       showNewSeller: false,
       showNewPayment: false,
@@ -732,6 +746,16 @@ export default {
           this.errorMessage = err.response.data.message;
         });
     },
+    // fetchDocuments() {
+    //   this.$axios
+    //     .get("/invoices/documents")
+    //     .then((res) => {
+    //       this.documents = res.data;
+    //     })
+    //     .catch((err) => {
+    //       this.errorMessage = err.response.data.message;
+    //     });
+    // },
     changeActiveZone({ id, active }) {
       const action = active ? "desactivar" : "activar";
       this.$confirm(
@@ -853,7 +877,6 @@ export default {
         }
       );
     },
-
     deleteZone({ id }) {
       this.$confirm(
         `¿Estás seguro que deseas eliminar esta zona?`,
