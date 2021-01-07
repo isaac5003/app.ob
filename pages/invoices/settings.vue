@@ -1017,6 +1017,7 @@ export default {
                       message: res.data.message,
                     });
                     this.fetchZones();
+                    this.fetchSellers();
                   })
                   .catch((err) => {
                     this.$notify.error({
