@@ -994,7 +994,10 @@ export default {
                       documentType: formData.documentType,
                       authorization: formData.authorization,
                       sequence: formData.sequence,
-                      invoiceDate: formData.invoiceDate,
+                      invoiceDate: this.$dateFns.format(
+                        formData.invoiceDate,
+                        "yyyy-MM-dd"
+                      ),
                       customer: formData.customer,
                       customerBranch: formData.customerBranch,
                       invoicesPaymentsCondition:
@@ -1041,6 +1044,7 @@ export default {
                         .then(() => {
                           this.resetForm("salesNewForm");
                           this.salesNewForm.documentType = 1;
+                          this.salesNewForm.customerBranch = "";
                           this.details = [];
                           this.branches = [];
                           this.branch = {};
