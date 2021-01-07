@@ -29,6 +29,9 @@
                 placeholder="Buscar..."
                 v-model="searchValue"
                 size="small"
+                clearable
+                v-debounce:500ms="fetchInvoices"
+                @change="fetchInvoices"
               />
             </el-form-item>
           </div>
@@ -52,14 +55,13 @@
             <div class="col-span-4">
               <el-form-item label="Cliente:">
                 <el-select
-                  v-model="filter.customer"
+                  v-model="searchCliente"
                   size="small"
                   class="w-full"
                   clearable
                   filterable
                   default-first-option
                   placeholder="Todos los clientes:"
-                  v-debounce:500ms="fetchInvoices"
                   @change="fetchInvoices"
                 >
                   <el-option-group key="ACTIVOS" label="ACTIVOS">
@@ -109,7 +111,7 @@
             <div class="col-span-2">
               <el-form-item label="Estado:">
                 <el-select
-                  v-model="filter.statuses"
+                  v-model="filter.status"
                   size="small"
                   clearable
                   placeholder="Todos los estados:"
@@ -118,7 +120,7 @@
                   @change="fetchInvoices"
                 >
                   <el-option
-                    v-for="s in statuses"
+                    v-for="s in status"
                     :key="s.id"
                     :label="s.name"
                     :value="s.id"
@@ -132,7 +134,7 @@
             <div class="col-span-3">
               <el-form-item label="Vendedor:">
                 <el-select
-                  v-model="filter.seller"
+                  v-model="cliente"
                   size="small"
                   clearable
                   filterable
@@ -592,7 +594,7 @@ export default {
 
     const invoicesTotal = () => this.$axios.get("/invoices");
 
-    const statuses = () => this.$axios.get("/invoices/status");
+    const status = () => this.$axios.get("/invoices/status");
 
     Promise.all([
       activeCustomers(),
@@ -606,7 +608,7 @@ export default {
       documentTypes(),
       invoices(),
       invoicesTotal(),
-      statuses(),
+      status(),
     ])
       .then((res) => {
         const [
@@ -621,7 +623,7 @@ export default {
           documentTypes,
           invoices,
           invoicesTotal,
-          statuses,
+          status,
         ] = res;
         this.activeCustomers = activeCustomers.data.customers;
         this.inactiveCustomers = inactiveCustomers.data.customers;
@@ -634,7 +636,7 @@ export default {
         this.inactiveService = inactiveService.data.services;
         this.invoices = invoices.data;
         this.invoicesTotal = invoicesTotal.data.count;
-        this.statuses = statuses.data.statuses;
+        this.status = status.data.statuses;
         this.loading = false;
       })
       .catch((err) => {
@@ -650,6 +652,8 @@ export default {
       loading: false,
       errorMessage: "",
       searchValue: "",
+      searchCliente: "",
+      cliente: "",
       activeCustomers: [],
       inactiveCustomers: [],
       documentTypes: [],
@@ -660,7 +664,7 @@ export default {
       activeService: [],
       inactiveService: [],
       invoicesTotal: [],
-      statuses: [],
+      status: [],
       options: [],
       showInvoicePreview: false,
       selectedInvoice: {},
@@ -677,7 +681,7 @@ export default {
         dateRange: "",
         customer: "",
         invoiceType: "",
-        statuses: "",
+        status: "",
         seller: "",
         zone: "",
         service: "",
@@ -687,13 +691,12 @@ export default {
   methods: {
     fetchInvoices() {
       let params = this.page;
-      if (this.status !== "") {
-        params = { ...params, active: this.status };
+      if (this.searchCliente !== "") {
+        params = { ...params, customer: this.searchCliente };
       }
       if (this.searchValue !== "") {
         params = { ...params, search: this.searchValue.toLowerCase() };
       }
-
       this.$axios
         .get("/invoices", { params })
         .then((res) => {
