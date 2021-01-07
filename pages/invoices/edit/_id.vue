@@ -330,9 +330,9 @@
             </div>
             <!-- Fecha Factura -->
             <div class="col-span-2">
-              <el-form-item label="Fecha de factura" prop="invoiceDate">
+              <el-form-item label="Fecha de factura" prop="invoiceRawDate">
                 <el-date-picker
-                  v-model="salesEditForm.invoiceDate"
+                  v-model="salesEditForm.invoiceRawDate"
                   size="small"
                   type="date"
                   placeholder=""
@@ -561,8 +561,8 @@
                 </template>
               </el-table-column>
               <el-table-column
-                prop="vgrabada"
-                label="V. Grabada"
+                prop="vgravada"
+                label="V. Gravada"
                 min-width="75"
                 align="right"
               >
@@ -677,7 +677,7 @@ import Notification from "../../../components/Notification";
 const storagekey = "Edit-sales";
 
 export default {
-  name: "InvoicesNew",
+  name: "InvoicesEdit",
   components: { LayoutContent, Notification },
   fetch() {
     this.$axios
@@ -784,10 +784,11 @@ export default {
         customerBranch: "",
         invoicesPaymentsCondition: null,
         invoicesSellers: null,
+        invoiceRawDate: "",
       },
       salesEditFormRules: {
         documentType: selectValidation(true),
-        invoiceDate: selectValidation(true),
+        invoiceRawDate: selectValidation(true),
         customer: selectValidation(true),
         customerBranch: selectValidation(true),
         invoicesPaymentsCondition: selectValidation(true),
@@ -1010,6 +1011,7 @@ export default {
       });
     },
     saveUpdateInvoice(formName, formData, details) {
+      console.log(formData);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -1032,10 +1034,8 @@ export default {
                       documentType: formData.documentType,
                       authorization: formData.authorization,
                       sequence: formData.sequence,
-                      invoiceDate: this.$dateFns.format(
-                        formData.invoiceDate,
-                        "yyyy-MM-dd"
-                      ),
+                      invoiceDate: formData.invoiceRawDate,
+
                       customer: formData.customer,
                       customerBranch: formData.customerBranch.id,
                       invoicesPaymentsCondition:
