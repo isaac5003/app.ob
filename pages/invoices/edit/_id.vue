@@ -1067,7 +1067,11 @@ export default {
                       message: res.data.message,
                     });
                     localStorage.removeItem(storagekey);
+                    setTimeout(() => {
+                      this.$router.push("/invoices");
+                    }, 300);
                   })
+
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
@@ -1077,10 +1081,6 @@ export default {
                   .then((alw) => {
                     instance.confirmButtonLoading = false;
                     instance.confirmButtonText = "Si, guardar";
-
-                    setTimeout(() => {
-                      this.$router.push("/invoices");
-                    }, 500);
 
                     done();
                   });
