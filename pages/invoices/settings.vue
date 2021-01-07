@@ -741,16 +741,6 @@ export default {
           this.errorMessage = err.response.data.message;
         });
     },
-    // fetchDocuments() {
-    //   this.$axios
-    //     .get("/invoices/documents")
-    //     .then((res) => {
-    //       this.documents = res.data;
-    //     })
-    //     .catch((err) => {
-    //       this.errorMessage = err.response.data.message;
-    //     });
-    // },
     changeActiveZone({ id, active }) {
       const action = active ? "desactivar" : "activar";
       this.$confirm(
@@ -1103,10 +1093,10 @@ export default {
         }
 
         this.$confirm(
-          `¿Estás seguro que deseas guardar este vendedor?`,
+          `¿Estás seguro que deseas actualizar este vendedor?`,
           "Confirmación",
           {
-            confirmButtonText: `Si, guardar`,
+            confirmButtonText: `Si, actualizar`,
             cancelButtonText: "Cancelar",
             type: "warning",
             beforeClose: (action, instance, done) => {
@@ -1133,7 +1123,7 @@ export default {
                   })
                   .then((alw) => {
                     instance.confirmButtonLoading = false;
-                    instance.confirmButtonText = `Si, guardar`;
+                    instance.confirmButtonText = `Si, actualizar`;
                     done();
                   });
               }
