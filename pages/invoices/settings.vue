@@ -477,7 +477,7 @@
                       <el-dropdown-item
                         @click.native="editCondition(scope.row)"
                       >
-                        <i class="el-icon-edit-outline"></i> Editar pago
+                        <i class="el-icon-edit-outline"></i> Editar condición
                       </el-dropdown-item>
                       <el-dropdown-item
                         @click.native="changeActivePayment(scope.row)"
@@ -488,14 +488,14 @@
                         <span v-else>
                           <i class="el-icon-check"></i> Activar
                         </span>
-                        pago
+                        condición
                       </el-dropdown-item>
                       <el-dropdown-item
                         :divided="true"
-                        class="text-red-500 font-semibold"
+                        class="font-semibold"
                         @click.native="deletePayment(scope.row)"
                       >
-                        <i class="el-icon-delete"></i> Eliminar pago
+                        <i class="el-icon-delete"></i> Eliminar condición
                       </el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
