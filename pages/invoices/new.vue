@@ -721,13 +721,8 @@ export default {
         console.log(err);
         this.errorMessage = err.response.data.message;
       });
-
-    // checkBeforeEnter(this, storagekey, "salesNewForm");
   },
   fetchOnServer: false,
-  beforeRouteLeave(to, from, next) {
-    checkBeforeLeave(this, storagekey, next);
-  },
   data() {
     return {
       branch: {},
@@ -816,9 +811,6 @@ export default {
     };
   },
   methods: {
-    setStorage(salesNewForm) {
-      localStorage.setItem(storagekey, JSON.stringify(salesNewForm));
-    },
     closeDialog(formName) {
       this.$refs[formName].resetFields();
     },
@@ -893,7 +885,6 @@ export default {
       }
     },
     validateDocumentType(id, tributary) {
-      this.setStorage(this.salesNewForm);
       if (id) {
         this.$axios
           .get("/invoices/documents", { params: { type: id } })
