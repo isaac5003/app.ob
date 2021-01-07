@@ -15,8 +15,7 @@
       width="550px"
       :close-on-click-modal="false"
       :append-to-body="true"
-      @open="openDialog()"
-      @close="closeDialog('newServiceForm')"
+      @open="resetForm('newServiceForm')"
     >
       <el-form
         :model="newServiceForm"
@@ -70,11 +69,10 @@
           </div>
           <!-- precio -->
           <div class="col-span-6">
-            <el-form-item label="Precio" prop="unitPrice" ref="cost">
+            <el-form-item label="Precio" prop="unitPrice">
               <div class="w-full flex items-end">
                 <el-input-number
                   class="w-full mt-1"
-                  ref="cost"
                   type="number"
                   :min="0.0"
                   :step="0.01"
@@ -87,6 +85,7 @@
                 >
                 </el-input-number>
                 <el-checkbox
+                  v-if="newServiceForm.sellingType == 3"
                   border
                   v-model="newServiceForm.incTax"
                   size="small"
@@ -102,11 +101,7 @@
         <div class="grid grid-cols-12">
           <!--Descripcion -->
           <div class="col-span-12">
-            <el-form-item
-              label="Descripción"
-              prop="chargeDescription"
-              ref="description"
-            >
+            <el-form-item label="Descripción" prop="chargeDescription">
               <el-input
                 type="textarea"
                 :rows="5"
@@ -218,6 +213,7 @@
                 />
                 <el-checkbox
                   border
+                  v-if="editServiceForm.sellingType == 3"
                   v-model="editServiceForm.incTax"
                   size="small"
                   class="px-3 mt-1"
@@ -274,7 +270,15 @@
         />
       </div>
     </div> -->
-    <el-form :model="salesEditForm" :rules="salesEditFormRules" status-icon>
+    <el-form
+      :model="salesEditForm"
+      :rules="salesEditFormRules"
+      status-icon
+      @submit.prevent.native="
+        saveUpdateInvoice('salesEditForm', salesEditForm, details)
+      "
+      ref="salesEditForm"
+    >
       <div class="flex flex-col space-y-4">
         <div class="flex flex-col">
           <!-- first row -->
@@ -326,7 +330,7 @@
             </div>
             <!-- Fecha Factura -->
             <div class="col-span-2">
-              <el-form-item label="Fecha de factura" prop="date">
+              <el-form-item label="Fecha de factura" prop="invoiceDate">
                 <el-date-picker
                   v-model="salesEditForm.invoiceDate"
                   size="small"
@@ -334,7 +338,6 @@
                   placeholder=""
                   :picker-options="pickerOptions"
                   style="width: 100%"
-                  @change="setStorage(salesEditForm)"
                   format="dd/MM/yyyy"
                 >
                 </el-date-picker>
@@ -368,7 +371,7 @@
             </div>
             <!-- sucursal -->
             <div class="col-span-2">
-              <el-form-item label="Sucursal" prop="branch" ref="branch">
+              <el-form-item label="Sucursal" prop="customerBranch">
                 <el-select
                   v-model="salesEditForm.customerBranch"
                   class="w-full"
@@ -393,10 +396,10 @@
             <div class="col-span-3">
               <el-form-item
                 label="Condiciones de pago"
-                prop="paymentConditions"
+                prop="invoicesPaymentsCondition"
               >
                 <el-select
-                  v-model="salesEditForm.invoicesPaymentsConditions"
+                  v-model="salesEditForm.invoicesPaymentsCondition"
                   size="small"
                   class="w-full"
                   clearable
@@ -417,7 +420,7 @@
 
             <!-- Venta a cuenta de -->
             <div class="col-span-3">
-              <el-form-item label="Venta a cuenta de" prop="sellers">
+              <el-form-item label="Venta a cuenta de" prop="invoicesSellers">
                 <el-select
                   v-model="salesEditForm.invoicesSellers"
                   class="w-full"
@@ -503,10 +506,7 @@
 
           <!-- fourth row btn agregarservicio -->
           <div class="flex justify-end">
-            <el-button
-              type="primary"
-              size="small"
-              @click="showAddService = true"
+            <el-button type="primary" size="small" @click="openDialog('new')"
               >Agregar Servicio</el-button
             >
           </div>
@@ -541,7 +541,7 @@
                 align="right"
               >
                 <template slot-scope="scope">
-                  <span v-if="scope.row.sellingType.id == 1">{{
+                  <span v-if="scope.row.sellingType == 1">{{
                     calcSujeta(salesEditForm.documentType, scope.row)
                       | formatMoney
                   }}</span>
@@ -554,7 +554,7 @@
                 align="right"
               >
                 <template slot-scope="scope">
-                  <span v-if="scope.row.sellingType.id == 2">{{
+                  <span v-if="scope.row.sellingType == 2">{{
                     calcExenta(salesEditForm.documentType, scope.row)
                       | formatMoney
                   }}</span>
@@ -567,7 +567,7 @@
                 align="right"
               >
                 <template slot-scope="scope">
-                  <span v-if="scope.row.sellingType.id == 3">{{
+                  <span v-if="scope.row.sellingType == 3">{{
                     calcGravada(salesEditForm.documentType, scope.row)
                       | formatMoney
                   }}</span>
@@ -683,8 +683,6 @@ export default {
     this.$axios
       .get(`/invoices/${this.$route.params.id}`)
       .then(({ data }) => {
-        console.log(data);
-
         const customer = () =>
           this.$axios.get(`/customers/${data.invoice.customer.id}`, {
             params: { isActiveCustomer: true },
@@ -739,7 +737,10 @@ export default {
             this.details = data.invoice.details.map((de) => {
               return {
                 ...de,
+
                 types: de.service ? "service" : "",
+                sellingType: de.sellingType.id,
+                service: de.service.id,
               };
             });
             this.branch = {
@@ -756,7 +757,6 @@ export default {
           });
       })
       .catch((err) => {
-        console.log(err);
         this.errorMessage = err.response.data.message;
       });
 
@@ -782,15 +782,15 @@ export default {
         invoiceDate: "",
         customer: "",
         customerBranch: "",
-        invoicesPaymentsConditions: null,
+        invoicesPaymentsCondition: null,
         invoicesSellers: null,
       },
       salesEditFormRules: {
         documentType: selectValidation(true),
-        invocieDate: selectValidation(true),
+        invoiceDate: selectValidation(true),
         customer: selectValidation(true),
         customerBranch: selectValidation(true),
-        invoicesPaymentsConditions: selectValidation(true),
+        invoicesPaymentsCondition: selectValidation(true),
         invoicesSellers: selectValidation(true),
       },
       sellers: [],
@@ -856,19 +856,25 @@ export default {
     };
   },
   methods: {
-    setStorage(salesEditForm) {
-      localStorage.setItem(storagekey, JSON.stringify(salesEditForm));
+    resetForm(formName) {
+      if (this.$refs[formName]) {
+        this.$refs[formName].resetFields();
+        this.newServiceForm.incTax = false;
+      }
     },
-    closeDialog(formName) {
-      this.$refs[formName].resetFields();
-      this.$refs.description.resetField();
-      // this.$refs.cost.resetField();
-    },
-    openDialog() {
+    openDialog(type) {
       this.$axios
         .get("/services", { params: { active: true } })
         .then((res) => {
           this.services = res.data.services;
+          switch (type) {
+            case "new":
+              this.showAddService = true;
+              break;
+            case "edit":
+              this.showAddService = false;
+              break;
+          }
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
@@ -880,12 +886,12 @@ export default {
         case "new":
           this.newServiceForm.unitPrice = service.cost;
           this.newServiceForm.chargeDescription = service.description;
-          this.newServiceForm.sellingType = service.sellingType;
+          this.newServiceForm.sellingType = service.sellingType.id;
           break;
         case "edit":
           this.editServiceForm.unitPrice = service.cost;
           this.editServiceForm.chargeDescription = service.description;
-          this.editServiceForm.sellingType = service.sellingType;
+          this.editServiceForm.sellingType = service.sellingType.id;
 
           break;
       }
@@ -963,12 +969,13 @@ export default {
         this.details.push({
           types,
           ...data,
+          ventaPrice: data.unitPrice * data.quantity,
         });
         this.showAddService = false;
       });
     },
     openEditDetail(index, details) {
-      this.openDialog();
+      this.openDialog("edit");
       const { types } = details;
       this.editingDetail = index;
       switch (types) {
@@ -1002,39 +1009,121 @@ export default {
         this.showEditService = false;
       });
     },
+    saveUpdateInvoice(formName, formData, details) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+
+        this.$confirm(
+          "¿Estás seguro que deseas actualizar esta  venta?",
+          "Confirmación",
+          {
+            confirmButtonText: "Si, guardar",
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                this.$axios
+                  .put(`/invoices/${this.$route.params.id}`, {
+                    header: {
+                      documentType: formData.documentType,
+                      authorization: formData.authorization,
+                      sequence: formData.sequence,
+                      invoiceDate: this.$dateFns.format(
+                        formData.invoiceDate,
+                        "yyyy-MM-dd"
+                      ),
+                      customer: formData.customer,
+                      customerBranch: formData.customerBranch.id,
+                      invoicesPaymentsCondition:
+                        formData.invoicesPaymentsCondition.id,
+                      invoicesSeller: formData.invoicesSellers,
+                      sum: this.sumas,
+                      iva: this.taxes,
+                      subtotal: this.subtotal,
+                      ivaRetenido: this.ivaRetenido,
+                      ventasExentas: this.ventasExentas,
+                      ventasNoSujetas: this.ventasNoSujetas,
+                      ventaTotal: this.ventaTotal,
+                    },
+                    details: details.map((d) => {
+                      return {
+                        chargeDescription: d.chargeDescription,
+                        quantity: d.quantity,
+                        unitPrice: d.unitPrice,
+                        incTax: d.incTax,
+                        ventaPrice: d.ventaPrice,
+                        service: d.service,
+                        sellingType: d.sellingType,
+                      };
+                    }),
+                  })
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Exito",
+                      message: res.data.message,
+                    });
+                    localStorage.removeItem(storagekey);
+                  })
+                  .catch((err) => {
+                    this.$notify.error({
+                      title: "Error",
+                      message: err.response.data.message,
+                    });
+                  })
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = "Si, guardar";
+
+                    setTimeout(() => {
+                      this.$router.push("/invoices");
+                    }, 500);
+
+                    done();
+                  });
+              } else {
+                done();
+              }
+            },
+          }
+        );
+      });
+    },
+
     calcUniPrice(documentType, { unitPrice, incTax, sellingType }) {
       let uniPrice = null;
       const amount = parseFloat(unitPrice);
       let message = null;
-      if ((sellingType.id == 1) | (sellingType.id == 2)) {
-        unitPrice = amount;
+      if ((sellingType == 1) | (sellingType == 2)) {
+        uniPrice = amount;
       } else {
         if (documentType) {
           switch (documentType) {
             case 1:
-              unitPrice = amount * (incTax ? 1 : 1.13);
-              this.newServiceForm.unitPrice = unitPrice;
+              uniPrice = amount * (incTax ? 1 : 1.13);
+
               break;
             case 2:
-              unitPrice = amount / (incTax ? 1.13 : 1);
-              this.newServiceForm.cost = unitPrice;
+              uniPrice = amount / (incTax ? 1.13 : 1);
+
               break;
           }
-        } else {
-          message = "Debe seleccionar un tipo de docuemnto";
         }
       }
-      return unitPrice;
+      return uniPrice;
     },
     calcSujeta(documentType, { unitPrice, incTax, sellingType, quantity }) {
       let uniPrice = null;
       const amount = parseFloat(unitPrice);
-      console.log(sellingType);
-      if ((sellingType.id == 1) | (sellingType.id == 2)) {
+
+      if ((sellingType == 1) | (sellingType == 2)) {
         uniPrice = amount * quantity;
       }
 
-      return unitPrice;
+      return uniPrice;
     },
     calcGravada(documentType, { unitPrice, incTax, sellingType, quantity }) {
       let uniPrice = null;
@@ -1055,7 +1144,8 @@ export default {
     calcExenta(documentType, { unitPrice, incTax, sellingType, quantity }) {
       let uniPrice = null;
       const amount = parseFloat(unitPrice);
-      if ((sellingType.id == 1) | (sellingType.id == 2)) {
+
+      if ((sellingType == 1) | (sellingType == 2)) {
         uniPrice = amount * quantity;
       }
 
@@ -1070,7 +1160,7 @@ export default {
         switch (this.salesEditForm.documentType) {
           case 1:
             for (const d of details) {
-              if (d.sellingType.id === 3) {
+              if (d.sellingType === 3) {
                 sumas +=
                   parseInt(d.quantity) *
                   parseFloat(d.unitPrice) *
@@ -1080,7 +1170,7 @@ export default {
             break;
           case 2:
             for (const d of details) {
-              if (d.sellingType.id === 3) {
+              if (d.sellingType === 3) {
                 sumas +=
                   (parseInt(d.quantity) * parseFloat(d.unitPrice)) /
                   (d.incTax ? 1.13 : 1);
@@ -1098,7 +1188,7 @@ export default {
         switch (this.salesEditForm.documentType) {
           case 2:
             for (const d of details) {
-              if (d.sellingType.id === 3) {
+              if (d.sellingType === 3) {
                 if (d.incTax) {
                   const total = parseInt(d.quantity) * parseFloat(d.unitPrice);
                   taxes += total - total / 1.13;
@@ -1116,11 +1206,9 @@ export default {
     subtotal() {
       return this.sumas + this.taxes;
     },
-    ivaRetenido() {
-      let ivaRetenido = 0;
-    },
+
     ventasExentas() {
-      const details = this.details.filter((d) => d.sellingType.id == 2);
+      const details = this.details.filter((d) => d.sellingType == 2);
       return details.reduce(
         (a, b) => {
           return {
@@ -1131,7 +1219,7 @@ export default {
       ).total;
     },
     ventasNoSujetas() {
-      const details = this.details.filter((d) => d.sellingType.id == 1);
+      const details = this.details.filter((d) => d.sellingType == 1);
       return details.reduce(
         (a, b) => {
           return {
@@ -1156,7 +1244,7 @@ export default {
       if (
         tributary != null &&
         tributary.customerTaxerType != null &&
-        tributary.customerTaxerType.id === 3
+        tributary.customerTaxerType === 3
       ) {
         switch (this.salesEditForm.documentType) {
           case 1:
