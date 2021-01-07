@@ -56,6 +56,7 @@
                 start-placeholder="Fecha inicial"
                 end-placeholder="Fecha final"
                 editable="false"
+                format="dd/MM/yyyy"
               >
               </el-date-picker>
             </el-form-item>
