@@ -89,7 +89,7 @@
             <div class="col-span-2">
               <el-form-item label="Tipo fact:">
                 <el-select
-                  v-model="filter.invoiceType"
+                  v-model="documentType"
                   size="small"
                   clearable
                   placeholder="Todos los tipos:"
@@ -134,7 +134,7 @@
             <div class="col-span-3">
               <el-form-item label="Vendedor:">
                 <el-select
-                  v-model="cliente"
+                  v-model="seller"
                   size="small"
                   clearable
                   filterable
@@ -169,7 +169,7 @@
             <div class="col-span-3">
               <el-form-item label="Zona:">
                 <el-select
-                  v-model="filter.zone"
+                  v-model="zone"
                   size="small"
                   clearable
                   filterable
@@ -204,7 +204,7 @@
             <div class="col-span-3">
               <el-form-item label="Servicios:">
                 <el-select
-                  v-model="filter.service"
+                  v-model="service"
                   size="small"
                   clearable
                   default-first-option
@@ -255,7 +255,7 @@
               <span>
                 {{
                   Object.keys(selectedInvoice).length > 0
-                    ? `${selectedInvoice.documentTypes.code} - ${selectedInvoice.documentType.name}`
+                    ? `${selectedInvoice.documentType.code} - ${selectedInvoice.documentType.name}`
                     : ""
                 }}
               </span>
@@ -496,16 +496,15 @@
             </span>
           </template>
         </el-table-column>
-        <!-- <el-table-column label="Tipo fact." prop="tipof" min-width="75" /> -->
+        <el-table-column
+          label="Tipo fact."
+          prop="documentType.code"
+          min-width="75"
+        >
+        </el-table-column>
         <el-table-column label="Fecha" prop="invoiceDate" min-width="90" />
         <el-table-column label="Cliente" prop="customerName" min-width="350" />
-        <el-table-column label="Estado" min-width="80">
-          <template slot-scope="scope">
-            <el-tag size="small" type="success" v-if="scope.row.isActiveInvoice"
-              >Activo</el-tag
-            >
-            <el-tag size="small" type="warning" v-else>Inactivo</el-tag>
-          </template>
+        <el-table-column label="Estado" prop="status.name" min-width="80">
         </el-table-column>
         <el-table-column label="Total" min-width="80" align="right">
           <template slot-scope="scope">
@@ -527,13 +526,17 @@
                 >
                   <i class="el-icon-edit-outline"></i> Editar cliente
                 </el-dropdown-item>
-                <el-dropdown-item @click.native="changeActive(scope.row)">
+
+                <el-dropdown-item>
+                  <i class="el-icon-edit-outline"></i> Imprimir factura
+                </el-dropdown-item>
+                <!-- <el-dropdown-item @click.native="changeActive(scope.row)">
                   <span v-if="scope.row.isActiveInvoice">
                     <i class="el-icon-close"></i> Desactivar
                   </span>
                   <span v-else> <i class="el-icon-check"></i> Activar </span>
                   cliente
-                </el-dropdown-item>
+                </el-dropdown-item> -->
                 <el-dropdown-item
                   :divided="true"
                   class="text-red-500 font-semibold"
@@ -653,7 +656,10 @@ export default {
       errorMessage: "",
       searchValue: "",
       searchCliente: "",
+      documentType: "",
       cliente: "",
+      seller: "",
+      zone: "",
       activeCustomers: [],
       inactiveCustomers: [],
       documentTypes: [],
@@ -696,6 +702,15 @@ export default {
       }
       if (this.searchValue !== "") {
         params = { ...params, search: this.searchValue.toLowerCase() };
+      }
+      if (this.documentType !== "") {
+        params = { ...params, documentType: this.documentType };
+      }
+      if (this.seller !== "") {
+        params = { ...params, seller: this.seller };
+      }
+      if (this.zone !== "") {
+        params = { ...params, zone: this.zone };
       }
       this.$axios
         .get("/invoices", { params })
@@ -820,137 +835,6 @@ export default {
     //  const {data} = await this.$axios.get(`/business/${id}`);
     //  this.selecetedBusiness =data.busine;
     //  this.showInvoicePreview = true;
-  },
-  computed: {
-    filteredInvoices() {
-      const searchValue = this.searchValue.trim().toLowerCase();
-      const {
-        dateRange,
-        customer,
-        invoiceType,
-        status,
-        seller,
-        zone,
-        service,
-      } = this.filter;
-
-      let filteredInvoices = this.rawInvoices;
-
-      // Filtra por  buscador general
-      if (!R.isEmpty(searchValue)) {
-        filteredInvoices = filteredInvoices.filter((selectedInvoice) => {
-          return (
-            selectedInvoice.customerName
-              .trim()
-              .toLowerCase()
-              .includes(searchValue) ||
-            selectedInvoice.status.name
-              .trim()
-              .toLowerCase()
-              .includes(searchValue) ||
-            selectedInvoice.ventaTotal
-              .toFixed(2)
-              .trim()
-              .toLowerCase()
-              .includes(searchValue) ||
-            selectedInvoice.documentType.code
-              .toLowerCase()
-              .includes(searchValue) ||
-            selectedInvoice.authorization.toLowerCase().includes(searchValue) ||
-            selectedInvoice.sequence.toLowerCase().includes(searchValue)
-          );
-        });
-      }
-
-      // Filtra por rango de fechas
-      if (!R.isNil(dateRange)) {
-        filteredInvoices = filteredInvoices.filter((selectedInvoice) => {
-          let date = new Date(selectedInvoice.invoiceDate);
-          return moment(date)
-            .add(1, "days")
-            .isBetween(dateRange[0], moment(dateRange[1]).add(1, "days"));
-        });
-      }
-
-      // Filtra por cliente
-      if (!R.isNil(customer)) {
-        filteredInvoices = filteredInvoices.filter(
-          (selectedInvoice) => selectedInvoice.customer.id === customer
-        );
-      }
-
-      // Filtra por tipo de factura
-      if (!R.isNil(invoiceDocumentType)) {
-        filteredInvoices = filteredInvoices.filter(
-          (selectValidation) =>
-            selectedInvoice.documentType.id === invoiceDocumentType
-        );
-      }
-
-      // Filtra por estado
-      if (!R.isNil(status)) {
-        filteredInvoices = filteredInvoices.filter(
-          (selectedInvoice) => selectedInvoice.status.id === status
-        );
-      }
-
-      // Filtra por vendedor
-      if (!R.isNil(seller)) {
-        filteredInvoices = filteredInvoices.filter(
-          (selectedInvoice) => selectedInvoice.invoicesSeller.id === seller
-        );
-      }
-
-      // Filtra por zona
-      if (!R.isNil(zone)) {
-        filteredInvoices = filteredInvoices.filter(
-          (invoice) => invoice.invoicesZone.id === zone
-        );
-      }
-
-      // Filtra por servicio
-      if (!R.isNil(service)) {
-        filteredInvoices = filteredInvoices.filter(
-          (invoice) => invoice.service.id === service
-        );
-      }
-
-      return filteredInvoices.sort((a, b) => {
-        const dateA = new Date(a.invoiceDate);
-        const dateB = new Date(b.invoiceDate);
-        return dateB - dateA;
-      });
-    },
-    paginatedInvoices() {
-      return this.filteredInvoices.slice(
-        this.page.number * this.page.size - this.page.size,
-        this.page.size * this.page.number
-      );
-    },
-    activeCustomers() {
-      return this.rawCustomers.filter((customer) => customer.isActiveCustomer);
-    },
-    inactiveCustomers() {
-      return this.rawCustomers.filter((customer) => !customer.isActiveCustomer);
-    },
-    activeServices() {
-      return this.rawServices.filter((service) => service.active);
-    },
-    inactiveServices() {
-      return this.rawServices.filter((service) => !service.active);
-    },
-    activeSellers() {
-      return this.rawSellers.filter((seller) => seller.active);
-    },
-    inactiveSellers() {
-      return this.rawSellers.filter((seller) => !seller.active);
-    },
-    activeZones() {
-      return this.rawZones.filter((zone) => zone.active);
-    },
-    inactiveZones() {
-      return this.rawZones.filter((zone) => !zone.active);
-    },
   },
 };
 </script>
