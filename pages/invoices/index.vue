@@ -504,7 +504,33 @@
         </el-table-column>
         <el-table-column label="Fecha" prop="invoiceDate" min-width="90" />
         <el-table-column label="Cliente" prop="customerName" min-width="350" />
-        <el-table-column label="Estado" prop="status.name" min-width="80">
+        <el-table-column label="Estado" min-width="80">
+          <template slot-scope="scope">
+            <el-tag
+              size="small"
+              type="info"
+              v-if="scope.row.status.id == '1'"
+              >{{ scope.row.status.name }}</el-tag
+            >
+            <el-tag
+              size="small"
+              type="success"
+              v-else-if="scope.row.status.id == '2'"
+              >{{ scope.row.status.name }}</el-tag
+            >
+            <el-tag
+              size="small"
+              type="warning"
+              v-else-if="scope.row.status.id == '4'"
+              >{{ scope.row.status.name }}</el-tag
+            >
+            <el-tag
+              size="small"
+              type="danger"
+              v-else-if="scope.row.status.id == '3'"
+              >{{ scope.row.status.name }}</el-tag
+            >
+          </template>
         </el-table-column>
         <el-table-column label="Total" min-width="80" align="right">
           <template slot-scope="scope">
@@ -528,7 +554,7 @@
                 </el-dropdown-item>
 
                 <el-dropdown-item>
-                  <i class="el-icon-edit-outline"></i> Imprimir factura
+                  <i class="el-icon-printer"></i> Imprimir factura
                 </el-dropdown-item>
                 <!-- <el-dropdown-item @click.native="changeActive(scope.row)">
                   <span v-if="scope.row.isActiveInvoice">
