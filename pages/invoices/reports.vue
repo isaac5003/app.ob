@@ -243,7 +243,7 @@
             type="primary" 
             size="small" 
             icon="el-icon-download"
-            :disabled="filterForm.reportType == null" 
+            :disabled="filterForm.reportType ? false : true" 
             :loading="generating">Descargar
             </el-button>
           </el-form-item>
@@ -289,7 +289,9 @@
       this.$axios.get("/services", { params: { active: true } });
     const inactiveService = () =>
       this.$axios.get("/services", { params: { active: false } });
-
+    
+    //  const zonaActiva = () => 
+    //  this.$axios.get("/invoice/details")
     Promise.all([
       activeCustomers(),
       inactiveCustomers(),
@@ -333,7 +335,6 @@
   fetchOnServer: false,
     data() {
       return {
-       
         centerDialogVisible: false,
         loading: false,
         errorMessage: "",
