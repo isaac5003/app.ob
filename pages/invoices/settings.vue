@@ -506,7 +506,7 @@
         </div>
       </el-tab-pane>
 
-      <el-tab-pane label="Correlativos" name="sequences">
+      <el-tab-pane label="Correlativos">
         <el-form v-model="documents">
           <div class="grid grid-cols-12 gap-4">
             <div
@@ -519,7 +519,7 @@
                 <div class="grid grid-cols-12 gap-4">
                   <div class="col-span-8">
                     <el-form-item class="font-semibold text-blue-800">{{
-                      d.documentType.name
+                      d.documentType ? d.documentType.name : ""
                     }}</el-form-item>
                   </div>
                   <div class="col-span-2">
@@ -646,7 +646,6 @@ export default {
         this.sellers = sellers.data.sellers;
         this.payments = payment.data.paymentConditions;
         this.documents = documents.data.documents;
-        console.log(documents.data.documents);
         this.loading = false;
       })
       .catch((err) => {
@@ -675,11 +674,7 @@ export default {
       zones: [],
       sellers: [],
       payments: [],
-      documents: {
-        documentType: {
-          name: [],
-        },
-      },
+      documents: [],
       showNewZone: false,
       showNewSeller: false,
       showNewPayment: false,
