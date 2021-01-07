@@ -30,6 +30,7 @@ export default {
   },
   axios: {
     baseURL: "https://v3.openbox.cloud/",
+    // baseURL: "http://localhost:5001",
   },
   googleFonts: {
     families: {
