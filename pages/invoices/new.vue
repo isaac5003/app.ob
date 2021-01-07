@@ -315,6 +315,7 @@
                   placeholder=""
                   v-model="salesNewForm.authorization"
                   :disabled="true"
+                  readonly
                 >
                 </el-input>
               </el-form-item>
@@ -327,6 +328,7 @@
                   placeholder=""
                   v-model="salesNewForm.sequence"
                   :disabled="true"
+                  readonly
                 >
                 </el-input>
               </el-form-item>
@@ -375,7 +377,7 @@
             </div>
             <!-- sucursal -->
             <div class="col-span-2">
-              <el-form-item label="Sucursal" prop="branch" ref="customerBranch">
+              <el-form-item label="Sucursal" prop="branch">
                 <el-select
                   v-model="salesNewForm.customerBranch"
                   class="w-full"
@@ -870,7 +872,7 @@ export default {
               this.salesNewForm.documentType,
               this.tributary
             );
-            this.$refs.customerBranch.resetField();
+
             this.branch = {};
             this.salesNewForm.customerBranch = "";
             this.selectBranch(this.salesNewForm.customer, this.branches);
@@ -970,7 +972,6 @@ export default {
       });
     },
     submitNewSale(formName, formData, details) {
-      console.log(formName, formData, details);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -1038,13 +1039,12 @@ export default {
                         }
                       )
                         .then(() => {
-                          this.$refs[formName].resetFields();
-                          this.$refs.customerBranch.resetField();
-                          this.details = [];
+                          this.resetForm("salesNewForm");
                           this.salesNewForm.documentType = 1;
+                          this.details = [];
+                          this.branches = [];
                           this.branch = {};
                           this.tributary = {};
-                          this.sales.customerBranch = "";
                         })
                         .catch(() => {
                           this.$router.push("/invoices");
@@ -1089,8 +1089,6 @@ export default {
               this.newServiceForm.unitPrice = uniPrice;
               break;
           }
-        } else {
-          message = "Debe seleccionar un tipo de docuemnto";
         }
       }
       return uniPrice;
