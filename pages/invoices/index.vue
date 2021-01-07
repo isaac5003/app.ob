@@ -109,7 +109,7 @@
             <div class="col-span-2">
               <el-form-item label="Estado:">
                 <el-select
-                  v-model="filter.status"
+                  v-model="filter.statuses"
                   size="small"
                   clearable
                   placeholder="Todos los estados:"
@@ -118,10 +118,10 @@
                   @change="fetchInvoices"
                 >
                   <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
+                    v-for="s in statuses"
+                    :key="s.id"
+                    :label="s.name"
+                    :value="s.id"
                   >
                   </el-option>
                 </el-select>
@@ -592,6 +592,8 @@ export default {
 
     const invoicesTotal = () => this.$axios.get("/invoices");
 
+    const statuses = () => this.$axios.get("/invoices/status");
+
     Promise.all([
       activeCustomers(),
       inactiveCustomers(),
@@ -604,6 +606,7 @@ export default {
       documentTypes(),
       invoices(),
       invoicesTotal(),
+      statuses(),
     ])
       .then((res) => {
         const [
@@ -618,6 +621,7 @@ export default {
           documentTypes,
           invoices,
           invoicesTotal,
+          statuses,
         ] = res;
         this.activeCustomers = activeCustomers.data.customers;
         this.inactiveCustomers = inactiveCustomers.data.customers;
@@ -630,6 +634,7 @@ export default {
         this.inactiveService = inactiveService.data.services;
         this.invoices = invoices.data;
         this.invoicesTotal = invoicesTotal.data.count;
+        this.statuses = statuses.data.statuses;
         this.loading = false;
       })
       .catch((err) => {
@@ -655,6 +660,7 @@ export default {
       activeService: [],
       inactiveService: [],
       invoicesTotal: [],
+      statuses: [],
       options: [],
       showInvoicePreview: false,
       selectedInvoice: {},
@@ -671,7 +677,7 @@ export default {
         dateRange: "",
         customer: "",
         invoiceType: "",
-        status: "",
+        statuses: "",
         seller: "",
         zone: "",
         service: "",
