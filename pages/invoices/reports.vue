@@ -291,8 +291,7 @@
     const inactiveService = () =>
       this.$axios.get("/services", { params: { active: false } });
     
-    //  const zonaActiva = () => 
-    //  this.$axios.get("/invoice/details")
+     
     Promise.all([
       activeCustomers(),
       inactiveCustomers(),
