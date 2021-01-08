@@ -48,6 +48,9 @@
                   range-separator="-"
                   start-placeholder="Fecha inicial"
                   end-placeholder="Fecha final"
+                  format="dd/MM/yyyy"
+                  value-format="yyyy-MM-dd"
+                  @change="fetchInvoices"
                 >
                 </el-date-picker>
               </el-form-item>
@@ -119,7 +122,7 @@
                   v-debounce:500ms="fetchInvoices"
                   @change="fetchInvoices"
                 >
-                <el-option label="Todos los estados" value=""/>
+                  <el-option label="Todos los estados" value="" />
                   <el-option
                     v-for="status1 in status"
                     :key="status1.id"
@@ -285,33 +288,36 @@
             </div>
             <div class="col-span-2 flex flex-col">
               <span class="font-semibold">Estado</span>
-              <!-- <el-tag 
-              size="small"
-              type="info"
-              v-if="`${selectedInvoice !== null} - ${selectedInvoice.status.id ==='1'}`"
-              >
-              {{ `${ selectedInvoice.sta.name}`}}
-                </el-tag> 
-            <el-tag 
-              size="small"
-              type="info"
-              v-if="`${selectedInvoice !== null} - ${selectedInvoice.status.id ==='2'}`"
-              >
-              {{ `${ selectedInvoice.sta.name}`}}
-                </el-tag> 
 
-              <el-tag 
-              size="small"
-              type="info"
-              v-if="`${selectedInvoice !== null} - ${selectedInvoice.status.id ==='3'}`"
+              <el-tag
+                size="small"
+                type="info"
+                v-if="
+                  selectedInvoice.status ? selectedInvoice.status.id == '1' : ''
+                "
               >
-              {{ `${ selectedInvoice.sta.name}`}}
-                </el-tag>  -->
+                {{ selectedInvoice.status.name }}
+              </el-tag>
+              <el-tag
+                size="small"
+                type="success"
+                v-if="
+                  selectedInvoice.status ? selectedInvoice.status.id == '2' : ''
+                "
+              >
+                {{ `${selectedInvoice.status.name}` }}
+              </el-tag>
 
-
-            
-            
-          </div>
+              <el-tag
+                size="small"
+                type="danger"
+                v-if="
+                  selectedInvoice.status ? selectedInvoice.status.id == '3' : ''
+                "
+              >
+                {{ `${selectedInvoice.status.name}` }}
+              </el-tag>
+            </div>
           </div>
           <div class="grid grid-cols-12 gap-4">
             <div class="col-span-4 flex flex-col">
@@ -340,11 +346,9 @@
               <span class="text-gray-700 font-bold text-sm w-full"
                 >Venta a cuenta de:
               </span>
-              <span
-                >{{
-                  selectedInvoice ? `${selectedInvoice.sellerName}` : ""
-                }}</span
-              >
+              <span>{{
+                selectedInvoice ? `${selectedInvoice.sellerName}` : ""
+              }}</span>
             </div>
           </div>
 
@@ -458,12 +462,19 @@
                   {{ selectedInvoice.sum | formatMoney }}
                 </td>
               </tr>
-             <tr class="flex space-x-16" v-if="selectedInvoice.documentType ? selectedInvoice.documentType.id == 2 : '' "> 
+              <tr
+                class="flex space-x-16"
+                v-if="
+                  selectedInvoice.documentType
+                    ? selectedInvoice.documentType.id == 2
+                    : ''
+                "
+              >
                 <td align="right" class="text-blue-900 w-50">13% Iva:</td>
                 <td align="right" class="text-gray-800">
                   {{ selectedInvoice.iva | formatMoney }}
                 </td>
-              </tr> 
+              </tr>
               <tr class="flex space-x-16">
                 <td align="right" class="text-blue-900 w-50">Subtotal:</td>
                 <td align="right" class="text-gray-800">
@@ -564,53 +575,43 @@
                   <i class="el-icon-view"></i> Vista previa
                 </el-dropdown-item>
                 <el-dropdown-item
-                  @click.native="
-                    $router.push(`/invoices/edit/${scope.row.id}`)
-                  "
+                  @click.native="$router.push(`/invoices/edit/${scope.row.id}`)"
                   v-if="scope.row.status.id == '1'"
                 >
                   <i class="el-icon-edit-outline"></i> Editar factura
                 </el-dropdown-item>
 
-                <el-dropdown-item
-                 
-                    v-if="scope.row.status.id == 1">
+                <el-dropdown-item v-if="scope.row.status.id == 1">
                   <i class="el-icon-printer"></i> Imprimir factura
                 </el-dropdown-item>
-                   <el-dropdown-item
-                   
-                    v-if="scope.row.status.id == 2 "
-                  >
-                    <i class="el-icon-printer"></i> Re imprimir factura
-                  </el-dropdown-item>
-                  <el-dropdown-item
-                    :divided="true"
-                    v-if="
-                      scope.row.status.id == '2' || scope.row.status.id == '3'
-                    "
-                  >
-                    <i class="el-icon-fa-reply" ></i> Revertir estados
-                  </el-dropdown-item>
-           
+                <el-dropdown-item v-if="scope.row.status.id == 2">
+                  <i class="el-icon-printer"></i> Re imprimir factura
+                </el-dropdown-item>
                 <el-dropdown-item
-                    :divided="true"
-                    class="text-red-500 font-semibold"
-                    v-if="scope.row.status.id == '1'"
-                    
-                  >
-                    <i class="el-icon-delete"></i> Eliminar factura
-                  </el-dropdown-item>
-                  <el-dropdown-item
-                    :divided="true"
-                    class="text-red-500 font-semibold"
-                   
-                    v-if="
-                      scope.row.status.id == '2' &&
-                      scope.row.status.id != '3'
-                    "
-                  >
-                    <i class="el-icon-circle-close"></i> Anular factura
-                  </el-dropdown-item>
+                  :divided="true"
+                  v-if="
+                    scope.row.status.id == '2' || scope.row.status.id == '3'
+                  "
+                >
+                  <i class="el-icon-arrow-left"></i> Revertir estado
+                </el-dropdown-item>
+
+                <el-dropdown-item
+                  :divided="true"
+                  class="text-red-500 font-semibold"
+                  v-if="scope.row.status.id == '1'"
+                >
+                  <i class="el-icon-delete"></i> Eliminar factura
+                </el-dropdown-item>
+                <el-dropdown-item
+                  :divided="true"
+                  class="text-red-500 font-semibold"
+                  v-if="
+                    scope.row.status.id == '2' && scope.row.status.id != '3'
+                  "
+                >
+                  <i class="el-icon-circle-close"></i> Anular factura
+                </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </template>
@@ -624,7 +625,7 @@
           :page-sizes="[5, 10, 15, 25, 50, 100]"
           :page-size="page.size"
           layout="total, sizes, prev, pager, next"
-          :total="invoicesTotal"
+          :total="invoices.count"
           :pager-count="5"
         />
       </div>
@@ -635,7 +636,7 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import { selectValidation } from "../../tools";
+
 export default {
   name: "InvoicesIndex",
   components: { LayoutContent, Notification },
@@ -719,13 +720,7 @@ export default {
       r: [],
       loading: false,
       errorMessage: "",
-      searchValue: "",
-      searchCliente: "",
-      documentType: "",
-      cliente: "",
-      seller: "",
-      zone: "",
-      status:"",
+
       activeCustomers: [],
       inactiveCustomers: [],
       documentTypes: [],
@@ -750,25 +745,25 @@ export default {
         page: 1,
       },
       filter: {
-        dateRange: "",
+        dateRange: null,
         customer: "",
         invoiceType: "",
         status: "",
         seller: "",
         zone: "",
         service: "",
-        searchValue:"",
-        documentType:""
+        searchValue: "",
+        documentType: "",
       },
     };
   },
   methods: {
-    //Aqui estamos filtrando todos los select 
+    //Aqui estamos filtrando todos los select
     fetchInvoices() {
       let params = this.page;
-      
+
       if (this.filter.customer !== "") {
-        params = { ...params, customer: this.filter.documentType };
+        params = { ...params, customer: this.filter.customer };
       }
       if (this.filter.searchValue !== "") {
         params = { ...params, search: this.filter.searchValue.toLowerCase() };
@@ -782,10 +777,20 @@ export default {
       if (this.filter.zone !== "") {
         params = { ...params, zone: this.filter.zone };
       }
-        if (this.filter.status !== "") {
+      if (this.filter.status !== "") {
         params = { ...params, status: this.filter.status };
-
       }
+      if (this.filter.dateRange !== null) {
+        params = {
+          ...params,
+          startDate: this.filter.dateRange[0],
+          endDate: this.filter.dateRange[1],
+        };
+      }
+      if (this.filter.service !== "") {
+        params = { ...params, service: this.filter.service };
+      }
+
       this.$axios
         .get("/invoices", { params })
         .then((res) => {
@@ -796,6 +801,7 @@ export default {
         });
     },
     handleSizeChange(val) {
+      console.log(val);
       this.page.limit = val;
       this.fetchInvoices();
     },
@@ -839,8 +845,6 @@ export default {
         }
       );
     },
-   
-    
 
     async openInvoicePreview({ id }) {
       const { data } = await this.$axios.get(`/invoices/${id}`);
