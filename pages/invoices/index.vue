@@ -282,17 +282,50 @@
                 selectedInvoice ? selectedInvoice.invoiceDate : ""
               }}</span>
             </div>
-            <div class="col-span-2 flex flex-col">
+            <div class="col-span-2 flex flex-col w-full">
               <span class="font-semibold">Estado</span>
-              <div v-if="selectedInvoice">
+              <span class="col-span-2">
+                <el-tag
+                  size="small"
+                  type="info"
+                  v-if="
+                    selectedInvoice.status
+                      ? selectedInvoice.status.id == '1'
+                      : ''
+                  "
+                  >{{ selectedInvoice.status.name }}</el-tag
+                >
                 <el-tag
                   size="small"
                   type="success"
-                  v-if="selectedInvoice.isActiveInvoice"
-                  >Activo</el-tag
+                  v-if="
+                    selectedInvoice.status
+                      ? selectedInvoice.status.id == '2'
+                      : ''
+                  "
+                  >{{ selectedInvoice.status.name }}</el-tag
                 >
-                <el-tag size="small" type="warning" v-else>Inactivo</el-tag>
-              </div>
+                <el-tag
+                  size="small"
+                  type="danger"
+                  v-if="
+                    selectedInvoice.status
+                      ? selectedInvoice.status.id == '3'
+                      : ''
+                  "
+                  >{{ selectedInvoice.status.name }}</el-tag
+                >
+                <el-tag
+                  size="small"
+                  type="warning"
+                  v-if="
+                    selectedInvoice.status
+                      ? selectedInvoice.status.id == '4'
+                      : ''
+                  "
+                  >{{ selectedInvoice.status.name }}</el-tag
+                >
+              </span>
             </div>
           </div>
           <div class="grid grid-cols-12 gap-4">
@@ -503,7 +536,7 @@
         >
         </el-table-column>
         <el-table-column label="Fecha" prop="invoiceDate" min-width="90" />
-        <el-table-column label="Cliente" prop="customerName" min-width="350" />
+        <el-table-column label="Cliente" prop="customerName" min-width="320" />
         <el-table-column label="Estado" min-width="80">
           <template slot-scope="scope">
             <el-tag
