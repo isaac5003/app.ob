@@ -27,7 +27,7 @@
               <el-input
                 suffix-icon="el-icon-search"
                 placeholder="Buscar..."
-                v-model="searchValue"
+                v-model="filter.searchValue"
                 size="small"
                 clearable
                 v-debounce:500ms="fetchInvoices"
@@ -55,7 +55,7 @@
             <div class="col-span-4">
               <el-form-item label="Cliente:">
                 <el-select
-                  v-model="searchCliente"
+                  v-model="filter.customer"
                   size="small"
                   class="w-full"
                   clearable
@@ -89,7 +89,7 @@
             <div class="col-span-2">
               <el-form-item label="Tipo fact:">
                 <el-select
-                  v-model="documentType"
+                  v-model="filter.documentType"
                   size="small"
                   clearable
                   placeholder="Todos los tipos:"
@@ -119,11 +119,12 @@
                   v-debounce:500ms="fetchInvoices"
                   @change="fetchInvoices"
                 >
+                <el-option label="Todos los estados" value=""/>
                   <el-option
-                    v-for="s in status"
-                    :key="s.id"
-                    :label="s.name"
-                    :value="s.id"
+                    v-for="status1 in status"
+                    :key="status1.id"
+                    :label="status1.name"
+                    :value="status1.id"
                   >
                   </el-option>
                 </el-select>
@@ -134,7 +135,7 @@
             <div class="col-span-3">
               <el-form-item label="Vendedor:">
                 <el-select
-                  v-model="seller"
+                  v-model="filter.seller"
                   size="small"
                   clearable
                   filterable
@@ -169,7 +170,7 @@
             <div class="col-span-3">
               <el-form-item label="Zona:">
                 <el-select
-                  v-model="zone"
+                  v-model="filter.zone"
                   size="small"
                   clearable
                   filterable
@@ -204,7 +205,7 @@
             <div class="col-span-3">
               <el-form-item label="Servicios:">
                 <el-select
-                  v-model="service"
+                  v-model="filter.service"
                   size="small"
                   clearable
                   default-first-option
@@ -282,51 +283,35 @@
                 selectedInvoice ? selectedInvoice.invoiceDate : ""
               }}</span>
             </div>
-            <div class="col-span-2 flex flex-col w-full">
+            <div class="col-span-2 flex flex-col">
               <span class="font-semibold">Estado</span>
-              <span class="col-span-2">
-                <el-tag
-                  size="small"
-                  type="info"
-                  v-if="
-                    selectedInvoice.status
-                      ? selectedInvoice.status.id == '1'
-                      : ''
-                  "
-                  >{{ selectedInvoice.status.name }}</el-tag
-                >
-                <el-tag
-                  size="small"
-                  type="success"
-                  v-if="
-                    selectedInvoice.status
-                      ? selectedInvoice.status.id == '2'
-                      : ''
-                  "
-                  >{{ selectedInvoice.status.name }}</el-tag
-                >
-                <el-tag
-                  size="small"
-                  type="danger"
-                  v-if="
-                    selectedInvoice.status
-                      ? selectedInvoice.status.id == '3'
-                      : ''
-                  "
-                  >{{ selectedInvoice.status.name }}</el-tag
-                >
-                <el-tag
-                  size="small"
-                  type="warning"
-                  v-if="
-                    selectedInvoice.status
-                      ? selectedInvoice.status.id == '4'
-                      : ''
-                  "
-                  >{{ selectedInvoice.status.name }}</el-tag
-                >
-              </span>
-            </div>
+              <!-- <el-tag 
+              size="small"
+              type="info"
+              v-if="`${selectedInvoice !== null} - ${selectedInvoice.status.id ==='1'}`"
+              >
+              {{ `${ selectedInvoice.sta.name}`}}
+                </el-tag> 
+            <el-tag 
+              size="small"
+              type="info"
+              v-if="`${selectedInvoice !== null} - ${selectedInvoice.status.id ==='2'}`"
+              >
+              {{ `${ selectedInvoice.sta.name}`}}
+                </el-tag> 
+
+              <el-tag 
+              size="small"
+              type="info"
+              v-if="`${selectedInvoice !== null} - ${selectedInvoice.status.id ==='3'}`"
+              >
+              {{ `${ selectedInvoice.sta.name}`}}
+                </el-tag>  -->
+
+
+            
+            
+          </div>
           </div>
           <div class="grid grid-cols-12 gap-4">
             <div class="col-span-4 flex flex-col">
@@ -358,7 +343,7 @@
               <span
                 >{{
                   selectedInvoice ? `${selectedInvoice.sellerName}` : ""
-                }}></span
+                }}</span
               >
             </div>
           </div>
@@ -473,12 +458,12 @@
                   {{ selectedInvoice.sum | formatMoney }}
                 </td>
               </tr>
-              <tr class="flex space-x-16">
+             <tr class="flex space-x-16" v-if="selectedInvoice.documentType ? selectedInvoice.documentType.id == 2 : '' "> 
                 <td align="right" class="text-blue-900 w-50">13% Iva:</td>
                 <td align="right" class="text-gray-800">
                   {{ selectedInvoice.iva | formatMoney }}
                 </td>
-              </tr>
+              </tr> 
               <tr class="flex space-x-16">
                 <td align="right" class="text-blue-900 w-50">Subtotal:</td>
                 <td align="right" class="text-gray-800">
@@ -536,7 +521,7 @@
         >
         </el-table-column>
         <el-table-column label="Fecha" prop="invoiceDate" min-width="90" />
-        <el-table-column label="Cliente" prop="customerName" min-width="320" />
+        <el-table-column label="Cliente" prop="customerName" min-width="350" />
         <el-table-column label="Estado" min-width="80">
           <template slot-scope="scope">
             <el-tag
@@ -580,31 +565,52 @@
                 </el-dropdown-item>
                 <el-dropdown-item
                   @click.native="
-                    $router.push(`/invoices/edit?ref=${scope.row.id}`)
+                    $router.push(`/invoices/edit/${scope.row.id}`)
                   "
+                  v-if="scope.row.status.id == '1'"
                 >
-                  <i class="el-icon-edit-outline"></i> Editar cliente
+                  <i class="el-icon-edit-outline"></i> Editar factura
                 </el-dropdown-item>
 
-                <el-dropdown-item>
+                <el-dropdown-item
+                 
+                    v-if="scope.row.status.id == 1">
                   <i class="el-icon-printer"></i> Imprimir factura
                 </el-dropdown-item>
-                <!-- <el-dropdown-item @click.native="changeActive(scope.row)">
-                  <span v-if="scope.row.isActiveInvoice">
-                    <i class="el-icon-close"></i> Desactivar
-                  </span>
-                  <span v-else> <i class="el-icon-check"></i> Activar </span>
-                  cliente
-                </el-dropdown-item> -->
+                   <el-dropdown-item
+                   
+                    v-if="scope.row.status.id == 2 "
+                  >
+                    <i class="el-icon-printer"></i> Re imprimir factura
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    :divided="true"
+                    v-if="
+                      scope.row.status.id == '2' || scope.row.status.id == '3'
+                    "
+                  >
+                    <i class="el-icon-fa-reply" ></i> Revertir estados
+                  </el-dropdown-item>
+           
                 <el-dropdown-item
-                  :divided="true"
-                  class="text-red-500 font-semibold"
-                  @click.native="deleteInvoice(scope.row)"
-                >
-                  <span class="text-red-500">
-                    <i class="el-icon-delete"></i> Eliminar cliente
-                  </span>
-                </el-dropdown-item>
+                    :divided="true"
+                    class="text-red-500 font-semibold"
+                    v-if="scope.row.status.id == '1'"
+                    
+                  >
+                    <i class="el-icon-delete"></i> Eliminar factura
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    :divided="true"
+                    class="text-red-500 font-semibold"
+                   
+                    v-if="
+                      scope.row.status.id == '2' &&
+                      scope.row.status.id != '3'
+                    "
+                  >
+                    <i class="el-icon-circle-close"></i> Anular factura
+                  </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </template>
@@ -719,6 +725,7 @@ export default {
       cliente: "",
       seller: "",
       zone: "",
+      status:"",
       activeCustomers: [],
       inactiveCustomers: [],
       documentTypes: [],
@@ -750,26 +757,34 @@ export default {
         seller: "",
         zone: "",
         service: "",
+        searchValue:"",
+        documentType:""
       },
     };
   },
   methods: {
+    //Aqui estamos filtrando todos los select 
     fetchInvoices() {
       let params = this.page;
-      if (this.searchCliente !== "") {
-        params = { ...params, customer: this.searchCliente };
+      
+      if (this.filter.customer !== "") {
+        params = { ...params, customer: this.filter.documentType };
       }
-      if (this.searchValue !== "") {
-        params = { ...params, search: this.searchValue.toLowerCase() };
+      if (this.filter.searchValue !== "") {
+        params = { ...params, search: this.filter.searchValue.toLowerCase() };
       }
-      if (this.documentType !== "") {
-        params = { ...params, documentType: this.documentType };
+      if (this.filter.documentType !== "") {
+        params = { ...params, documentType: this.filter.documentType };
       }
-      if (this.seller !== "") {
-        params = { ...params, seller: this.seller };
+      if (this.filter.seller !== "") {
+        params = { ...params, seller: this.filter.seller };
       }
-      if (this.zone !== "") {
-        params = { ...params, zone: this.zone };
+      if (this.filter.zone !== "") {
+        params = { ...params, zone: this.filter.zone };
+      }
+        if (this.filter.status !== "") {
+        params = { ...params, status: this.filter.status };
+
       }
       this.$axios
         .get("/invoices", { params })
@@ -824,44 +839,9 @@ export default {
         }
       );
     },
-    deleteInvoice({ id }) {
-      this.$confirm(
-        `¿Estás seguro que deseas eliminar este cliente?`,
-        "Confirmación",
-        {
-          confirmButtonText: `Si, eliminar`,
-          cancelButtonText: "Cancelar",
-          type: "warning",
-          beforeClose: (action, instance, done) => {
-            if (action === "confirm") {
-              instance.confirmButtonLoading = true;
-              instance.confirmButtonText = "Procesando...";
-              this.$axios
-                .delete(`/invoices/${id}`)
-                .then((res) => {
-                  this.$notify.success({
-                    title: "Éxito",
-                    message: res.data.message,
-                  });
-                  this.fetchInvoices();
-                })
-                .catch((err) => {
-                  this.$notify.error({
-                    title: "Error",
-                    message: err.response.data.message,
-                  });
-                })
-                .then((alw) => {
-                  instance.confirmButtonLoading = false;
-                  instance.confirmButtonText = `Si, eliminar`;
-                  done();
-                });
-            }
-            done();
-          },
-        }
-      );
-    },
+   
+    
+
     async openInvoicePreview({ id }) {
       const { data } = await this.$axios.get(`/invoices/${id}`);
       this.selectedInvoice = data.invoice;
