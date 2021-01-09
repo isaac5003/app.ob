@@ -15,8 +15,7 @@
       width="550px"
       :close-on-click-modal="false"
       :append-to-body="true"
-      @open="openDialog()"
-      @close="closeDialog('newServiceForm')"
+      @open="resetForm('newServiceForm')"
     >
       <el-form
         :model="newServiceForm"
@@ -70,7 +69,7 @@
           </div>
           <!-- precio -->
           <div class="col-span-6">
-            <el-form-item label="Precio" prop="unitPrice" ref="unitPrice">
+            <el-form-item label="Precio" prop="unitPrice">
               <div class="w-full flex items-end">
                 <el-input-number
                   class="w-full mt-1"
@@ -86,6 +85,7 @@
                 >
                 </el-input-number>
                 <el-checkbox
+                  v-if="newServiceForm.sellingType == 3"
                   border
                   v-model="newServiceForm.incTax"
                   size="small"
@@ -196,7 +196,7 @@
           </div>
           <!-- precio -->
           <div class="col-span-6">
-            <el-form-item label="Precio" prop="cost">
+            <el-form-item label="Precio" prop="unitPrice">
               <div class="w-full flex items-end">
                 <el-input-number
                   class="w-full mt-1"
@@ -204,7 +204,7 @@
                   type="number"
                   :min="0.0"
                   :step="0.01"
-                  v-model="editServiceForm.cost"
+                  v-model="editServiceForm.unitPrice"
                   size="small"
                   autocomplete="off"
                   style="width: 100%"
@@ -213,6 +213,7 @@
                 />
                 <el-checkbox
                   border
+                  v-if="editServiceForm.sellingType == 3"
                   v-model="editServiceForm.incTax"
                   size="small"
                   class="px-3 mt-1"
@@ -227,12 +228,12 @@
         <div class="grid grid-cols-12">
           <!--Descripcion -->
           <div class="col-span-12">
-            <el-form-item label="Descripción" prop="description">
+            <el-form-item label="Descripción" prop="chargeDescription">
               <el-input
                 type="textarea"
                 :rows="5"
                 size="small"
-                v-model="editServiceForm.description"
+                v-model="editServiceForm.chargeDescription"
                 maxlength="5000"
                 minlength="5"
                 show-word-limit
@@ -314,6 +315,7 @@
                   placeholder=""
                   v-model="salesNewForm.authorization"
                   :disabled="true"
+                  readonly
                 >
                 </el-input>
               </el-form-item>
@@ -326,6 +328,7 @@
                   placeholder=""
                   v-model="salesNewForm.sequence"
                   :disabled="true"
+                  readonly
                 >
                 </el-input>
               </el-form-item>
@@ -340,7 +343,6 @@
                   placeholder=""
                   :picker-options="pickerOptions"
                   style="width: 100%"
-                  @change="setStorage(salesNewForm)"
                   format="dd/MM/yyyy"
                 >
                 </el-date-picker>
@@ -375,7 +377,7 @@
             </div>
             <!-- sucursal -->
             <div class="col-span-2">
-              <el-form-item label="Sucursal" prop="branch" ref="customerBranch">
+              <el-form-item label="Sucursal" prop="branch">
                 <el-select
                   v-model="salesNewForm.customerBranch"
                   class="w-full"
@@ -510,10 +512,7 @@
 
           <!-- fourth row btn agregarservicio -->
           <div class="flex justify-end">
-            <el-button
-              type="primary"
-              size="small"
-              @click="showAddService = true"
+            <el-button type="primary" size="small" @click="openDialog()"
               >Agregar Servicio</el-button
             >
           </div>
@@ -744,7 +743,7 @@ export default {
         documentType: selectValidation(true),
         invoiceDate: selectValidation(true),
         customer: selectValidation(true),
-        cuastomerBranch: selectValidation(true),
+        customerBranch: selectValidation(true),
         invoicesPaymentConditions: selectValidation(true),
         invoicesSellers: selectValidation(true),
       },
@@ -811,14 +810,18 @@ export default {
     };
   },
   methods: {
-    closeDialog(formName) {
-      this.$refs[formName].resetFields();
+    resetForm(formName) {
+      if (this.$refs[formName]) {
+        this.$refs[formName].resetFields();
+        this.newServiceForm.incTax = false;
+      }
     },
     openDialog() {
       this.$axios
         .get("/services", { params: { active: true } })
         .then((res) => {
           this.services = res.data.services;
+          this.showAddService = true;
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
@@ -869,8 +872,9 @@ export default {
               this.salesNewForm.documentType,
               this.tributary
             );
-            this.$refs.customerBranch.resetField();
+
             this.branch = {};
+            this.salesNewForm.customerBranch = "";
             this.selectBranch(this.salesNewForm.customer, this.branches);
           })
           .catch((err) => {
@@ -892,7 +896,7 @@ export default {
             this.documentInfo = res.data.documents;
             this.salesNewForm.authorization =
               res.data.documents[0].authorization;
-            this.salesNewForm.sequence = res.data.documents[0].next;
+            this.salesNewForm.sequence = res.data.documents[0].current;
           })
           .catch((err) => {
             this.errorMessage = err.response.data.message;
@@ -931,7 +935,6 @@ export default {
           ventaPrice: data.unitPrice * data.quantity,
         });
         this.showAddService = false;
-        this.closeDialog("newServiceForm");
       });
     },
     openEditDetail(index, details) {
@@ -969,7 +972,6 @@ export default {
       });
     },
     submitNewSale(formName, formData, details) {
-      console.log(formName, formData, details);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -992,7 +994,10 @@ export default {
                       documentType: formData.documentType,
                       authorization: formData.authorization,
                       sequence: formData.sequence,
-                      invoiceDate: formData.invoiceDate,
+                      invoiceDate: this.$dateFns.format(
+                        formData.invoiceDate,
+                        "yyyy-MM-dd"
+                      ),
                       customer: formData.customer,
                       customerBranch: formData.customerBranch,
                       invoicesPaymentsCondition:
@@ -1037,7 +1042,13 @@ export default {
                         }
                       )
                         .then(() => {
-                          this.$refs[formName].resetFields();
+                          this.resetForm("salesNewForm");
+                          this.salesNewForm.documentType = 1;
+                          this.salesNewForm.customerBranch = "";
+                          this.details = [];
+                          this.branches = [];
+                          this.branch = {};
+                          this.tributary = {};
                         })
                         .catch(() => {
                           this.$router.push("/invoices");
@@ -1068,7 +1079,7 @@ export default {
       let uniPrice = null;
       const amount = parseFloat(unitPrice);
       let message = null;
-      if ((sellingType.id == 1) | (sellingType.id == 2)) {
+      if ((sellingType == 1) | (sellingType == 2)) {
         uniPrice = amount;
       } else {
         if (documentType) {
@@ -1079,11 +1090,9 @@ export default {
               break;
             case 2:
               uniPrice = amount / (incTax ? 1.13 : 1);
-              this.newServiceForm.cost = uniPrice;
+              this.newServiceForm.unitPrice = uniPrice;
               break;
           }
-        } else {
-          message = "Debe seleccionar un tipo de docuemnto";
         }
       }
       return uniPrice;
@@ -1092,8 +1101,8 @@ export default {
       let uniPrice = null;
       const amount = parseFloat(unitPrice);
 
-      if ((sellingType.id == 1) | (sellingType.id == 2)) {
-        unitPrice = amount * quantity;
+      if ((sellingType == 1) | (sellingType == 2)) {
+        uniPrice = amount * quantity;
       }
 
       return uniPrice;
@@ -1116,9 +1125,9 @@ export default {
     },
     calcExenta(documentType, { unitPrice, incTax, sellingType, quantity }) {
       let uniPrice = null;
-      const amount = parseFloat(uniPrice);
+      const amount = parseFloat(unitPrice);
 
-      if ((sellingType.id == 1) | (sellingType.id == 2)) {
+      if ((sellingType == 1) | (sellingType == 2)) {
         uniPrice = amount * quantity;
       }
 
@@ -1185,7 +1194,7 @@ export default {
       return details.reduce(
         (a, b) => {
           return {
-            total: a.total + b.cost * b.quantity,
+            total: a.total + b.unitPrice * b.quantity,
           };
         },
         { total: 0 }
@@ -1196,7 +1205,7 @@ export default {
       return details.reduce(
         (a, b) => {
           return {
-            total: a.total + b.cost * b.quantity,
+            total: a.total + b.unitPrice * b.quantity,
           };
         },
         { total: 0 }
