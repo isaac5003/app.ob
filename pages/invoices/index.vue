@@ -571,7 +571,9 @@
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item @click.native="openInvoicePreview(scope.row)">
+                <el-dropdown-item
+                  @click.native="openInvoicePreview(scope.row, 'view')"
+                >
                   <i class="el-icon-view"></i> Vista previa
                 </el-dropdown-item>
                 <el-dropdown-item
@@ -581,7 +583,10 @@
                   <i class="el-icon-edit-outline"></i> Editar factura
                 </el-dropdown-item>
 
-                <el-dropdown-item v-if="scope.row.status.id == 1">
+                <el-dropdown-item
+                  v-if="scope.row.status.id == 1"
+                  @click.native="printInvoice(scope.row)"
+                >
                   <i class="el-icon-printer"></i> Imprimir factura
                 </el-dropdown-item>
                 <el-dropdown-item v-if="scope.row.status.id == 2">
@@ -636,7 +641,8 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-
+import { numeroALetras, calculatedAmount } from "../../tools";
+import jsPDF from "jspdf";
 export default {
   name: "InvoicesIndex",
   components: { LayoutContent, Notification },
@@ -846,10 +852,18 @@ export default {
       );
     },
 
-    async openInvoicePreview({ id }) {
+    async openInvoicePreview({ id }, type) {
       const { data } = await this.$axios.get(`/invoices/${id}`);
       this.selectedInvoice = data.invoice;
-      this.showInvoicePreview = true;
+
+      switch (type) {
+        case "print":
+          this.showInvoicePreview = false;
+          break;
+        case "view":
+          this.showInvoicePreview = true;
+          break;
+      }
     },
     calcUniPrice(documentType, { unitPrice, incTax, sellingType }) {
       let uniPrice = null;
@@ -875,9 +889,397 @@ export default {
       }
       return unitPrice;
     },
-    //  const {data} = await this.$axios.get(`/business/${id}`);
-    //  this.selecetedBusiness =data.busine;
-    //  this.showInvoicePreview = true;
+    printInvoice({ id }) {
+      this.$confirm(
+        `¿Estás seguro que deseas imprimir esta factura?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, imprimir`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .get(`/invoices/${id}`)
+                .then((res) => {
+                  const data = res.data;
+                  if (data) {
+                    try {
+                      const vadd = 1;
+                      const hadd = 3;
+                      const conf = {
+                        configuration: "positions",
+                        resolution: [216, 140],
+                        header: [
+                          {
+                            position: [[90, 20]],
+                            lenght: 30,
+                            value: "invoice_autorization",
+                            type: "text",
+                          },
+                          {
+                            position: [[110, 20]],
+                            lenght: 15,
+                            value: "invoice_number",
+                            type: "text",
+                          },
+                          {
+                            position: [[20, 54]],
+                            lenght: 100,
+                            value: "customer_name",
+                            type: "text",
+                          },
+                          {
+                            position: [[83, 60]],
+                            lenght: 60,
+                            value: "invoice_date",
+                            type: "date",
+                          },
+                          {
+                            position: [[25, 60]],
+                            lenght: 130,
+                            value: "customer_address1",
+                            type: "text",
+                          },
+                          {
+                            position: [[60, 66]],
+                            lenght: 70,
+                            value: "customer_address2",
+                            type: "text",
+                          },
+                          {
+                            position: [[90, 67]],
+                            lenght: 55,
+                            value: "customer_nit",
+                            type: "text",
+                          },
+
+                          {
+                            position: [[105, 73]],
+                            lenght: 35,
+                            value: "payment_condition",
+                            type: "text",
+                          },
+                        ],
+                        details: {
+                          position_y: 86,
+                          size: 7.5,
+                          quantity: {
+                            position: [16],
+                            value: "charge_quantity",
+                            type: "text",
+                          },
+                          description: {
+                            position: [30],
+                            value: "charge_description",
+                            lenght: 110,
+                            type: "text",
+                          },
+                          price: {
+                            position: [89],
+                            value: "unit_price",
+                            type: "text",
+                          },
+                          sujeto: {
+                            position: [106],
+                            value: "unit_price",
+                            type: "text",
+                          },
+                          exento: {
+                            position: [99],
+                            value: "unit_price",
+                            type: "text",
+                          },
+                          afecto: {
+                            position: [115],
+                            value: "venta_price",
+                            type: "text",
+                          },
+                        },
+                        totals: [
+                          { position: [115, 156], value: "sum", type: "money" },
+                          {
+                            position: [115, 182],
+                            value: "iva_retenido",
+                            type: "money",
+                          },
+                          {
+                            position: [115, 169],
+                            value: "subtotal",
+                            type: "money",
+                          },
+                          {
+                            position: [115, 176],
+                            value: "ventas_exentas",
+                            type: "money",
+                          },
+                          {
+                            position: [115, 189],
+                            value: "venta_total",
+                            type: "money",
+                          },
+                        ],
+                      };
+
+                      // Crea el documento base
+                      const pdfDocument = new jsPDF({
+                        orientation: "portrait",
+                        unit: "mm",
+                        format: conf.resolution,
+                      });
+                      pdfDocument.setFontSize(9);
+
+                      // Agrega el encabezado
+                      for (const header of conf.header) {
+                        let value = "";
+                        switch (header.value) {
+                          case "invoice_autorization":
+                            value = data.invoice.authorization;
+                            break;
+                          case "invoice_number":
+                            value = data.invoice.sequence;
+                            break;
+                          case "customer_name":
+                            value = data.invoice.customerName;
+                            break;
+                          case "invoice_date":
+                            value = data.invoice.invoiceDate;
+                            break;
+                          case "customer_address1":
+                            value = data.invoice.customerAddress1;
+                            break;
+                          case "customer_address2":
+                            value = data.invoice.customerAddress2;
+                            break;
+                          case "customer_nrc":
+                            value = data.invoice.customerNrc;
+                            break;
+                          case "customer_nit":
+                            value = data.invoice.customerNit;
+                            break;
+                          case "customer_city":
+                            value = data.invoice.customerCity;
+                            break;
+                          case "customer_giro":
+                            value = data.invoice.customerGiro;
+                            break;
+                          case "customer_state":
+                            value = data.invoice.customerState;
+                            break;
+                          case "seller_name":
+                            value = data.invoice.invoicesSeller.name;
+                            break;
+                          case "payment_condition":
+                            value = data.invoice.invoicesPaymentsCondition.name;
+                            break;
+                        }
+
+                        const splitText = pdfDocument.splitTextToSize(
+                          value,
+                          header.lenght
+                        );
+
+                        pdfDocument.text(
+                          splitText[0],
+                          parseInt(header.position[0][0]) + vadd,
+                          parseInt(header.position[0][1]) + hadd
+                        );
+                      }
+
+                      // Agrega los detalles
+                      let acumRows = 0;
+                      for (const detail of data.invoice.details) {
+                        const acumHeight = acumRows * 5;
+                        const position_x = 1;
+                        const position_y =
+                          acumHeight + hadd + conf.details.position_y;
+                        const {
+                          quantity,
+                          chargeDescription,
+                          unitPrice,
+                          sellingType,
+                          incTax,
+                          ventaPrice,
+                        } = detail;
+
+                        // Quantity
+                        pdfDocument.text(
+                          parseFloat(quantity).toFixed(2),
+                          conf.details.quantity.position[0] + position_x,
+                          position_y
+                        );
+                        // Description
+                        const splitDescription = pdfDocument.splitTextToSize(
+                          chargeDescription,
+                          conf.details.description.lenght
+                        );
+                        acumRows = acumRows + splitDescription.length;
+                        pdfDocument.text(
+                          splitDescription,
+                          conf.details.description.position[0] + position_x,
+                          position_y
+                        );
+                        // Price
+                        pdfDocument.text(
+                          new Intl.NumberFormat("en-US", {
+                            style: "currency",
+                            currency: "USD",
+                          }).format(unitPrice),
+                          conf.details.price.position[0] + position_x,
+                          position_y
+                        );
+
+                        // Ventas sujetas
+                        pdfDocument.text(
+                          sellingType.id == 1
+                            ? new Intl.NumberFormat("en-US", {
+                                style: "currency",
+                                currency: "USD",
+                              }).format(
+                                calculatedAmount(
+                                  sellingType.id,
+                                  data.invoice.documentType.id,
+                                  unitPrice,
+                                  quantity,
+                                  incTax
+                                ).sujeta
+                              )
+                            : "",
+                          conf.details.sujeto.position[0] + position_x,
+                          position_y
+                        );
+                        // Ventas exentas
+                        pdfDocument.text(
+                          sellingType.id == 2
+                            ? new Intl.NumberFormat("en-US", {
+                                style: "currency",
+                                currency: "USD",
+                              }).format(
+                                calculatedAmount(
+                                  sellingType.id,
+                                  data.invoice.documentType.id,
+                                  unitPrice,
+                                  quantity,
+                                  incTax
+                                ).exenta
+                              )
+                            : "",
+                          conf.details.exento.position[0] + position_x,
+                          position_y
+                        );
+                        // Ventas afectas
+                        pdfDocument.text(
+                          sellingType.id == 3
+                            ? new Intl.NumberFormat("en-US", {
+                                style: "currency",
+                                currency: "USD",
+                              }).format(
+                                calculatedAmount(
+                                  sellingType.id,
+                                  data.invoice.documentType.id,
+                                  unitPrice,
+                                  quantity,
+                                  incTax
+                                ).gravada
+                              )
+                            : "",
+                          conf.details.afecto.position[0] + position_x,
+                          position_y
+                        );
+                      }
+
+                      // Agrega los totales
+                      for (const total of conf.totals) {
+                        let value = "";
+                        switch (total.value) {
+                          case "sum":
+                            value = new Intl.NumberFormat("en-US", {
+                              style: "currency",
+                              currency: "USD",
+                            }).format(data.invoice.sum);
+                            break;
+                          case "iva":
+                            value = new Intl.NumberFormat("en-US", {
+                              style: "currency",
+                              currency: "USD",
+                            }).format(data.invoice.iva);
+                            break;
+                          case "subtotal":
+                            value = new Intl.NumberFormat("en-US", {
+                              style: "currency",
+                              currency: "USD",
+                            }).format(data.invoice.subtotal);
+                            break;
+                          case "iva_retenido":
+                            value = new Intl.NumberFormat("en-US", {
+                              style: "currency",
+                              currency: "USD",
+                            }).format(data.invoice.ivaRetenido);
+                            break;
+                          case "ventas_no_sujetas":
+                            value = new Intl.NumberFormat("en-US", {
+                              style: "currency",
+                              currency: "USD",
+                            }).format(data.invoice.ventasNoSujetas);
+                            break;
+                          case "ventas_exentas":
+                            value = new Intl.NumberFormat("en-US", {
+                              style: "currency",
+                              currency: "USD",
+                            }).format(data.invoice.ventasExentas);
+                            break;
+                          case "venta_total":
+                            value = new Intl.NumberFormat("en-US", {
+                              style: "currency",
+                              currency: "USD",
+                            }).format(data.invoice.ventaTotal);
+                            break;
+                          case "venta_total_text":
+                            value = numeroALetras(data.invoice.ventaTotal);
+                            break;
+                        }
+                        const splitText = pdfDocument.splitTextToSize(
+                          value,
+                          total.lenght
+                        );
+                        pdfDocument.text(
+                          splitText,
+                          parseInt(total.position[0]) + vadd,
+                          parseInt(total.position[1]) + hadd
+                        );
+                      }
+
+                      pdfDocument.autoPrint();
+
+                      window.open(pdfDocument.output("bloburl"), "_blank");
+                    } catch (error) {
+                      this.$message.error(
+                        "Error al generar el PDF, contacta con tu administrador."
+                      );
+                    }
+                  } else {
+                    this.$notify({
+                      title: "Error",
+                      message:
+                        "Ha ocurrido un error al obtener la informacion. Contacta con tu administrador.",
+                      type: "error",
+                      duration: 3500,
+                    });
+                  }
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, imprimir`;
+                  done();
+                })
+                .catch((err) => this.$message.error(err));
+            } else {
+              done();
+            }
+          },
+        }
+      );
+    },
   },
 };
 </script>

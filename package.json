@@ -19,7 +19,9 @@
     "@nuxtjs/tailwindcss": "^3.2.0",
     "element-ui": "^2.14.0",
     "install": "^0.13.0",
+    "jspdf": "^2.2.0",
     "nuxt": "^2.14.7",
+    "pdfmake": "^0.1.69",
     "ramda": "^0.27.1",
     "simplebar-vue": "^1.6.0",
     "vue-debounce": "^2.5.7"
