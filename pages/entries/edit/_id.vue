@@ -39,10 +39,9 @@
                 <el-option
                   v-for="aC in accountingCatalog"
                   :key="aC.id"
-                  :label="aC.name"
+                  :label="`${aC.code} - ${aC.name}`"
                   :value="aC.id"
-                >
-                </el-option>
+                />
               </el-select>
             </el-form-item>
           </div>
@@ -140,12 +139,11 @@
                 placeholder="Seleccionar"
               >
                 <el-option
-                  v-for="s in accountingCatalog"
-                  :key="s.id"
-                  :label="s.name"
-                  :value="s.id"
-                >
-                </el-option>
+                  v-for="aC in accountingCatalog"
+                  :key="aC.id"
+                  :label="`${aC.code} - ${aC.name}`"
+                  :value="aC.id"
+                />
               </el-select>
             </el-form-item>
           </div>
@@ -338,8 +336,10 @@
           <el-table
             :data="accountingEntryDetails"
             style="width: 100%"
+            show-summary
+            :summary-method="getSummaries"
             stripe
-            size="small"
+            size="mini"
           >
             <el-table-column type="index" label="#" width="70" />
             <el-table-column
@@ -424,14 +424,23 @@ export default {
     this.$axios
       .get(`/entries/${this.$route.params.id}`)
       .then(({ data }) => {
+        const entryTypes = () => this.$axios.get(`/entries/types`);
         this.editEntryForm = {
           ...data.entry,
           accountingEntryType: data.entry.accountingEntryType,
         };
         this.accountingEntryDetails = data.entry.accountingEntryDetails;
+        Promise.all([entryTypes()])
+          .then((res) => {
+            const [entryTypes] = res;
+            this.accountingEntryTypes = entryTypes.data.entryTypes;
+          })
+          .catch((err) => {
+            console.log(err);
+            this.errorMessage = err.response.data.message;
+          });
       })
       .catch((err) => {
-        console.log(err);
         this.errorMessage = err.response.data.message;
       });
 
@@ -520,12 +529,6 @@ export default {
       }
     };
     return {
-      accountings: [
-        {
-          id: 1,
-          name: "prueba",
-        },
-      ],
       showEditEntryDetail: false,
       showAddEntryDetail: false,
       loading: false,
@@ -614,37 +617,60 @@ export default {
           },
         ],
       },
-      accountingEntryTypes: [
-        {
-          id: "a0dea81f-e5e4-4253-a587-716102dfc6ab",
-          name: "Diario",
-          code: "DIA",
-        },
-        {
-          id: "1546af29-2655-4c5a-b476-476709eadd82",
-          name: "Ingreso",
-          code: "ING",
-        },
-      ],
+      accountingEntryTypes: [],
       accountingEntryDetails: [],
       editingEntryDetail: "",
-      accountingCatalog: [
-        {
-          id: "1535cd59-805e-43f2-be0d-88ffd0378669",
-          code: "4201010404",
-          name: "HONORARIOS SERVICIOS ADMINISTRATIVOS ECO INGENIERO",
-        },
-        {
-          id: "7e490d8b-eeb4-4cba-aa9f-4ade1b19d053",
-          code: "110505",
-          name: "PROYECTOS POR LIQUIDAR",
-        },
-      ],
+      accountingCatalog: [],
     };
   },
   methods: {
+    getSummaries(value) {
+      const { columns, data } = value;
+      let totalAbono = "";
+      if (data.length > 0) {
+        totalAbono = data.reduce((a, b) => {
+          const first = !a.abono ? 0 : parseFloat(a.abono);
+          const second = !b.abono ? 0 : parseFloat(b.abono);
+          return { abono: first + second };
+        }).abono;
+      }
+
+      let totalCargo = "";
+      if (data.length > 0) {
+        totalCargo = data.reduce((a, b) => {
+          const first = !a.cargo ? 0 : parseFloat(a.cargo);
+          const second = !b.cargo ? 0 : parseFloat(b.cargo);
+          return { cargo: first + second };
+        }).cargo;
+      }
+
+      const result = columns.map((column) => {
+        if (column.label == "Abono") {
+          return this.$options.filters.formatMoney(totalAbono);
+        } else if (column.label == "Cargo") {
+          return this.$options.filters.formatMoney(totalCargo);
+        } else if (column.label == "Concepto") {
+          return "TOTALES";
+        } else {
+          return "";
+        }
+      });
+
+      return result;
+    },
+    getAccountingCatalog() {
+      this.$axios
+        .get("/entries/catalog", { params: { active: true } })
+        .then((res) => {
+          this.accountingCatalog = res.data.accountingCatalog;
+        })
+        .catch((err) => {
+          this.errorMessage = err.response.data.message;
+        });
+    },
     openAddEntryDetail() {
       this.showAddEntryDetail = true;
+      this.getAccountingCatalog();
     },
     resetForm(formName) {
       if (this.$refs[formName]) {
@@ -655,6 +681,7 @@ export default {
       this.editingEntryDetail = index;
       this.editEntryDetailForm = { ...details };
       this.showEditEntryDetail = true;
+      this.getAccountingCatalog();
     },
     addToEntryDetails(formName, data) {
       this.$refs[formName].validate(async (valid) => {
@@ -699,7 +726,7 @@ export default {
         }
 
         this.$confirm(
-          "¿Estás seguro que deseas guardar esta nueva venta?",
+          "¿Estás seguro que deseas actualizar esta partida?",
           "Confirmación",
           {
             confirmButtonText: "Si, guardar",
@@ -758,6 +785,23 @@ export default {
           }
         );
       });
+    },
+    checkEntry() {
+      let totalAbono = this.details.reduce((a, b) => {
+        const first = !a.abono ? 0 : parseFloat(a.abono);
+        const second = !b.abono ? 0 : parseFloat(b.abono);
+        return { abono: first + second };
+      }).abono;
+      let totalCargo = this.details.reduce((a, b) => {
+        const first = !a.cargo ? 0 : parseFloat(a.cargo);
+        const second = b.cargo ? 0 : parseFloat(b.cargo);
+        return { cargo: first + second };
+      }).cargo;
+      totalAbono = totalAbono ? "0" : totalAbono;
+      totalCargo = totalCargo ? "0" : totalCargo;
+      this.editEntryForm.squared =
+        parseFloat(totalAbono).toFixed(3) === parseFloat(totalCargo).toFixed(3);
+      this.editEntryForm.accounted = false;
     },
   },
   computed: {},
