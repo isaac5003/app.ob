@@ -65,8 +65,8 @@
           <template
             v-if="
               selectedCustomer &&
-              (!selectedCustomer.customerTypeNatural ||
-                selectedCustomer.customerTypeNatural.id == 2)
+                (!selectedCustomer.customerTypeNatural ||
+                  selectedCustomer.customerTypeNatural.id == 2)
             "
           >
             <div class="col-span-2 flex flex-col">
