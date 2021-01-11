@@ -36,10 +36,10 @@
                 placeholder="Seleccionar"
               >
                 <el-option
-                  v-for="e in entryTypes"
-                  :key="e.id"
-                  :label="`${e.code} - ${e.name}`"
-                  :value="e.id"
+                  v-for="a in accountingCatalog"
+                  :key="a.id"
+                  :label="`${a.code} - ${a.name}`"
+                  :value="a.id"
                 >
                 </el-option>
               </el-select>
@@ -109,7 +109,7 @@
         <!-- primer div tipo partida, correlativo y rango de fechas -->
         <div class="grid grid-cols-12 gap-4 relative">
           <div class="col-span-4">
-            <el-form-item label="Tipo de patidad">
+            <el-form-item label="Tipo de patida">
               <el-select
                 v-model="formAccountingDetail.select"
                 size="small"
@@ -117,10 +117,10 @@
                 placeholder="Select"
               >
                 <el-option
-                  v-for="i in entryTypes"
-                  :key="i.id"
-                  :label="`${i.code} - ${i.name}`"
-                  :value="i.id"
+                  v-for="e in entryTypes"
+                  :key="e.id"
+                  :label="`${e.code} - ${e.name}`"
+                  :value="e.id"
                 >
                 </el-option>
               </el-select>
@@ -254,11 +254,15 @@ export default {
       return this.$axios.get("/entries/types");
     };
 
-    Promise.all([entryTypes()])
+    const accountingCatalog = () => {
+      return this.$axios.get("/entries/catalog");
+    };
+
+    Promise.all([entryTypes(), accountingCatalog()])
       .then((res) => {
-        const [entryTypes] = res;
+        const [entryTypes, accountingCatalog] = res;
         this.entryTypes = entryTypes.data.entryTypes;
-        console.log(entryTypes.data.entryTypes);
+        this.accountingCatalog = accountingCatalog.data.accountingCatalog;
         this.loading = false;
       })
       .catch((err) => {
@@ -308,6 +312,7 @@ export default {
     };
     return {
       entryTypes: [],
+      accountingCatalog: [],
       fecha: "",
       showAccountingDetail: false,
       formAccountingDetail: {
