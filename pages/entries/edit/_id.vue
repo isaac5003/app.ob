@@ -41,6 +41,7 @@
                   :key="aC.id"
                   :label="`${aC.code} - ${aC.name}`"
                   :value="aC.id"
+                  :disabled="aC.isParent == true"
                 />
               </el-select>
             </el-form-item>
@@ -629,21 +630,20 @@ export default {
   methods: {
     getSummaries(value) {
       const { columns, data } = value;
-      console.log(data);
-      const totalAbono = data.reduce((a, b) => (a + b.abono ? b.abono : 0), 0);
-      const totalCargo = data.reduce((a, b) => (a + b.cargo ? b.cargo : 0), 0);
-
-      console.log("totalCargo", totalCargo);
+      let totalCargo = data.reduce((a, b) => (a + b.cargo ? b.cargo : 0), 0);
+      let totalAbono = data.reduce((a, b) => (a + b.abono ? b.abono : 0), 0);
 
       const result = columns.map((column) => {
-        if (column.label == "Abono") {
-          return this.$options.filters.formatMoney(totalAbono);
-        } else if (column.label == "Cargo") {
-          return this.$options.filters.formatMoney(totalCargo);
-        } else if (column.label == "Concepto") {
-          return "TOTALES";
-        } else {
-          return "";
+        switch (column.label) {
+          case "Abono":
+            return this.$options.filters.formatMoney(totalAbono);
+            break;
+          case "Cargo":
+            return this.$options.filters.formatMoney(totalCargo);
+            break;
+          case "Concepto":
+            return "TOTALES";
+            break;
         }
       });
       return result;
@@ -810,24 +810,27 @@ export default {
       });
     },
     checkEntry() {
-      const totalAbono = this.accountingEntryDetails.reduce(
-        (a, b) => (a + b.abono ? b.abono : 0),
-        0
-      );
-      const totalCargo = this.accountingEntryDetails.reduce(
-        (a, b) => (a + b.cargo ? b.cargo : 0),
-        0
-      );
-      // let totalAbono = this.accountingEntryDetails.reduce((a, b) => {
-      //   const first = !a.abono ? 0 : parseFloat(a.abono);
-      //   const second = !b.abono ? 0 : parseFloat(b.abono);
-      //   return { abono: first + second };
-      // }).abono;
-      // let totalCargo = this.accountingEntryDetails.reduce((a, b) => {
-      //   const first = !a.cargo ? 0 : parseFloat(a.cargo);
-      //   const second = !b.cargo ? 0 : parseFloat(b.cargo);
-      //   return { cargo: first + second };
-      // }).cargo;
+      // let totalCargo = this.accountingEntryDetails.reduce(
+      //   (a, b) => (a + b.cargo ? b.cargo : 0),
+      //   0
+      // );
+      // let totalAbono = this.accountingEntryDetails.reduce(
+      //   (a, b) => (a + b.abono ? b.abono : 0),
+      //   0
+      // );
+
+      let totalAbono = this.accountingEntryDetails.reduce((a, b) => {
+        const first = !a.abono ? 0 : parseFloat(a.abono);
+        const second = !b.abono ? 0 : parseFloat(b.abono);
+        return { abono: first + second };
+      }).abono;
+      let totalCargo = this.accountingEntryDetails.reduce((a, b) => {
+        const first = !a.cargo ? 0 : parseFloat(a.cargo);
+        const second = !b.cargo ? 0 : parseFloat(b.cargo);
+        return { cargo: first + second };
+      }).cargo;
+      console.log(totalCargo);
+      console.log(totalAbono);
       this.editEntryForm.squared =
         totalAbono.toFixed(3) === totalCargo.toFixed(3);
       this.editEntryForm.accounted = false;
