@@ -341,24 +341,24 @@
             stripe
             size="mini"
           >
-            <el-table-column type="index" label="#" width="70" />
+            <el-table-column type="index" label="#" min-width="70" />
             <el-table-column
               label="Cuenta contable"
               prop="catalogName"
-              width="150"
+              min-width="150"
             />
-            <el-table-column label="Concepto" prop="concept" width="425" />
-            <el-table-column label="Cargo" width="100">
+            <el-table-column label="Concepto" prop="concept" min-width="425" />
+            <el-table-column label="Cargo" min-width="100">
               <template slot-scope="scope">
                 <span>{{ scope.row.cargo | formatMoney }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="Abono" width="100">
+            <el-table-column label="Abono" min-width="100">
               <template slot-scope="scope">
                 <span>{{ scope.row.abono | formatMoney }}</span>
               </template>
             </el-table-column>
-            <el-table-column width="120">
+            <el-table-column min-width="120">
               <template slot-scope="scope">
                 <div class="flex flex-row items-center justify-center">
                   <el-button
@@ -395,7 +395,7 @@
           <div class="col-start-11 col-span-2">
             <el-button
               icon="el-icon-close"
-              @click="$router.replace('/entries')"
+              @click="cancel()"
               class="w-full"
               size="small"
               >Cancelar</el-button
@@ -421,31 +421,35 @@ export default {
   name: "editEntry",
   components: { LayoutContent, Notification },
   fetch() {
-    this.$axios
-      .get(`/entries/${this.$route.params.id}`)
-      .then(({ data }) => {
-        const entryTypes = () => this.$axios.get(`/entries/types`);
+    const entryTypes = () => this.$axios.get(`/entries/types`);
+    const entry = () => this.$axios.get(`/entries/${this.$route.params.id}`);
+
+    Promise.all([entryTypes(), entry()])
+      .then((res) => {
+        const [entryTypes, entry] = res;
+        this.accountingEntryTypes = entryTypes.data.entryTypes;
         this.editEntryForm = {
-          ...data.entry,
-          accountingEntryType: data.entry.accountingEntryType,
+          ...entry.data.entry,
+          accountingEntryType: entry.data.entry.accountingEntryType.id,
         };
-        this.accountingEntryDetails = data.entry.accountingEntryDetails;
-        Promise.all([entryTypes()])
-          .then((res) => {
-            const [entryTypes] = res;
-            this.accountingEntryTypes = entryTypes.data.entryTypes;
-          })
-          .catch((err) => {
-            console.log(err);
-            this.errorMessage = err.response.data.message;
-          });
+        this.accountingEntryDetails = entry.data.entry.accountingEntryDetails.map(
+          (d) => {
+            return {
+              ...d,
+              accountingCatalog: d.accountingCatalog.id,
+            };
+          }
+        );
+        this.checkEntry();
       })
       .catch((err) => {
+        console.log(err);
         this.errorMessage = err.response.data.message;
       });
-
-    // checkBeforeEnter(this, storagekey, "salesNewForm");
   },
+
+  // checkBeforeEnter(this, storagekey, "salesNewForm");
+
   fetchOnServer: false,
   data() {
     const newCargoValidateCompare = (rule, value, callback) => {
@@ -532,7 +536,6 @@ export default {
       showEditEntryDetail: false,
       showAddEntryDetail: false,
       loading: false,
-      options: [{ name: "" }],
       editEntryForm: {
         accountingEntryType: "",
         title: "",
@@ -626,23 +629,11 @@ export default {
   methods: {
     getSummaries(value) {
       const { columns, data } = value;
-      let totalAbono = "";
-      if (data.length > 0) {
-        totalAbono = data.reduce((a, b) => {
-          const first = !a.abono ? 0 : parseFloat(a.abono);
-          const second = !b.abono ? 0 : parseFloat(b.abono);
-          return { abono: first + second };
-        }).abono;
-      }
+      console.log(data);
+      const totalAbono = data.reduce((a, b) => (a + b.abono ? b.abono : 0), 0);
+      const totalCargo = data.reduce((a, b) => (a + b.cargo ? b.cargo : 0), 0);
 
-      let totalCargo = "";
-      if (data.length > 0) {
-        totalCargo = data.reduce((a, b) => {
-          const first = !a.cargo ? 0 : parseFloat(a.cargo);
-          const second = !b.cargo ? 0 : parseFloat(b.cargo);
-          return { cargo: first + second };
-        }).cargo;
-      }
+      console.log("totalCargo", totalCargo);
 
       const result = columns.map((column) => {
         if (column.label == "Abono") {
@@ -655,12 +646,11 @@ export default {
           return "";
         }
       });
-
       return result;
     },
     getAccountingCatalog() {
       this.$axios
-        .get("/entries/catalog", { params: { active: true } })
+        .get("/entries/catalog")
         .then((res) => {
           this.accountingCatalog = res.data.accountingCatalog;
         })
@@ -669,8 +659,8 @@ export default {
         });
     },
     openAddEntryDetail() {
-      this.showAddEntryDetail = true;
       this.getAccountingCatalog();
+      this.showAddEntryDetail = true;
     },
     resetForm(formName) {
       if (this.$refs[formName]) {
@@ -678,10 +668,10 @@ export default {
       }
     },
     openEditEntryDetail(index, details) {
+      this.getAccountingCatalog();
       this.editingEntryDetail = index;
       this.editEntryDetailForm = { ...details };
       this.showEditEntryDetail = true;
-      this.getAccountingCatalog();
     },
     addToEntryDetails(formName, data) {
       this.$refs[formName].validate(async (valid) => {
@@ -691,8 +681,13 @@ export default {
 
         this.accountingEntryDetails.push({
           ...data,
+
+          catalogName: this.accountingCatalog.find(
+            (c) => c.id == this.newEntryDetailForm.accountingCatalog
+          ).name,
         });
         this.showAddEntryDetail = false;
+        this.checkEntry();
       });
     },
     updateDetail(index, formName, form) {
@@ -704,6 +699,7 @@ export default {
         this.accountingEntryDetails.splice(index, 1, { ...form });
 
         this.showEditEntryDetail = false;
+        this.checkEntry();
       });
     },
     deleteDetail(index) {
@@ -725,83 +721,125 @@ export default {
           return false;
         }
 
-        this.$confirm(
-          "¿Estás seguro que deseas actualizar esta partida?",
-          "Confirmación",
-          {
-            confirmButtonText: "Si, guardar",
-            cancelButtonText: "Cancelar",
-            type: "warning",
-            beforeClose: (action, instance, done) => {
-              if (action === "confirm") {
-                instance.confirmButtonLoading = true;
-                instance.confirmButtonText = "Procesando...";
-                this.$axios
-                  .put(`/entries/${this.$route.params.id}`, {
-                    header: {
-                      title: formData.title,
-                      date: formData.rawDate,
+        const save = () => {
+          this.$confirm(
+            "¿Estás seguro que deseas actualizar esta partida?",
+            "Confirmación",
+            {
+              confirmButtonText: "Si, guardar",
+              cancelButtonText: "Cancelar",
+              type: "warning",
+              beforeClose: (action, instance, done) => {
+                if (action === "confirm") {
+                  instance.confirmButtonLoading = true;
+                  instance.confirmButtonText = "Procesando...";
+                  this.$axios
+                    .put(`/entries/${this.$route.params.id}`, {
+                      header: {
+                        title: formData.title,
+                        date: formData.rawDate,
 
-                      squared: formData.squared,
-                      accounted: formData.squared,
-                      accountingEntryType: formData.accountingEntryType,
-                    },
-                    details: details.map((d) => {
-                      return {
-                        id: d.id,
-                        catalogName: d.catalogName,
-                        concept: d.concept,
-                        cargo: d.cargo,
-                        abono: d.abono,
-                        accountingCatalog: d.accountingCatalog.id,
-                      };
-                    }),
-                  })
-                  .then((res) => {
-                    this.$notify.success({
-                      title: "Exito",
-                      message: res.data.message,
+                        squared: formData.squared,
+                        accounted: formData.accounted,
+                        accountingEntryType: formData.accountingEntryType,
+                      },
+                      details: details.map((d) => {
+                        return {
+                          ...d,
+                          accountingCatalog: d.accountingCatalog,
+                        };
+                      }),
+                    })
+                    .then((res) => {
+                      this.$notify.success({
+                        title: "Exito",
+                        message: res.data.message,
+                      });
+                      // localStorage.removeItem(storagekey);
+                      setTimeout(() => {
+                        this.$router.push("/entries");
+                      }, 500);
+                    })
+                    .catch((err) => {
+                      this.$notify.error({
+                        title: "Error",
+                        message: err.response.data.message,
+                      });
+                    })
+                    .then((alw) => {
+                      instance.confirmButtonLoading = false;
+                      instance.confirmButtonText = "Si, guardar";
+                      done();
                     });
-                    localStorage.removeItem(storagekey);
-                    setTimeout(() => {
-                      this.$router.push("/entries");
-                    }, 500);
-                  })
-                  .catch((err) => {
-                    this.$notify.error({
-                      title: "Error",
-                      message: err.response.data.message,
-                    });
-                  })
-                  .then((alw) => {
-                    instance.confirmButtonLoading = false;
-                    instance.confirmButtonText = "Si, guardar";
-                    done();
-                  });
+                } else {
+                  done();
+                }
+              },
+            }
+          );
+        };
+
+        this.checkEntry();
+        const originalAccounted = formData.accounted;
+        if (formData.squared && !formData.accounted) {
+          this.$confirm(
+            "Esta partida esta cuadrada, ¿deseas marcarla como completada?",
+            "Confirmación",
+            {
+              type: "warning",
+              distinguishCancelAndClose: true,
+              confirmButtonText: "Si, porfavor",
+              cancelButtonText: "No, gracias",
+            }
+          )
+            .then(() => {
+              formData.accounted = true;
+              save();
+            })
+            .catch((action) => {
+              if (action === "cancel") {
+                formData.accounted = false;
+                save();
               } else {
-                done();
+                return false;
               }
-            },
-          }
-        );
+            });
+        } else {
+          save();
+        }
       });
     },
     checkEntry() {
-      let totalAbono = this.details.reduce((a, b) => {
-        const first = !a.abono ? 0 : parseFloat(a.abono);
-        const second = !b.abono ? 0 : parseFloat(b.abono);
-        return { abono: first + second };
-      }).abono;
-      let totalCargo = this.details.reduce((a, b) => {
-        const first = !a.cargo ? 0 : parseFloat(a.cargo);
-        const second = b.cargo ? 0 : parseFloat(b.cargo);
-        return { cargo: first + second };
-      }).cargo;
-      totalAbono = totalAbono ? "0" : totalAbono;
-      totalCargo = totalCargo ? "0" : totalCargo;
+      const totalAbono = this.accountingEntryDetails.reduce(
+        (a, b) => (a + b.abono ? b.abono : 0),
+        0
+      );
+      const totalCargo = this.accountingEntryDetails.reduce(
+        (a, b) => (a + b.cargo ? b.cargo : 0),
+        0
+      );
+      // let totalAbono = this.accountingEntryDetails.reduce((a, b) => {
+      //   const first = !a.abono ? 0 : parseFloat(a.abono);
+      //   const second = !b.abono ? 0 : parseFloat(b.abono);
+      //   return { abono: first + second };
+      // }).abono;
+      // let totalCargo = this.accountingEntryDetails.reduce((a, b) => {
+      //   const first = !a.cargo ? 0 : parseFloat(a.cargo);
+      //   const second = !b.cargo ? 0 : parseFloat(b.cargo);
+      //   return { cargo: first + second };
+      // }).cargo;
       this.editEntryForm.squared =
-        parseFloat(totalAbono).toFixed(3) === parseFloat(totalCargo).toFixed(3);
+        totalAbono.toFixed(3) === totalCargo.toFixed(3);
       this.editEntryForm.accounted = false;
+    },
+    cancel() {
+      this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
+        confirmButtonText: "Si, salir",
+        cancelButtonText: "Cancelar",
+        type: "warning",
+      }).then(() => {
+        this.$router.push("/entries");
+      });
     },
   },
   computed: {},
