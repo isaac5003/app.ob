@@ -19,13 +19,18 @@ export default {
     "./plugins/filters.js",
     "./plugins/vue-debounce.js",
   ],
-  buildModules: ["@nuxtjs/tailwindcss", "@nuxtjs/google-fonts"],
+  buildModules: [
+    "@nuxtjs/tailwindcss",
+    "@nuxtjs/google-fonts",
+    "@nuxtjs/date-fns",
+  ],
   modules: ["@nuxtjs/axios", "@nuxtjs/auth-next"],
   router: {
     middleware: ["auth"],
   },
   axios: {
-    baseURL: "http://localhost:5001/",
+    // baseURL: "https://v3.openbox.cloud/",
+    baseURL: "http://localhost:5001",
   },
   googleFonts: {
     families: {
@@ -39,7 +44,6 @@ export default {
     redirect: {
       login: "/auth/login",
       logout: "/auth/login",
-      home: "/",
     },
     strategies: {
       local: {

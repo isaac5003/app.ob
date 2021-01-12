@@ -376,11 +376,10 @@ export default {
   name: "CustomerNew",
   components: { LayoutContent, Notification },
   fetch() {
-    const customerTypes = () => this.$axios.get(`/customers/customer-types`);
+    const customerTypes = () => this.$axios.get(`/customers/types`);
     const customerTypeNaturals = () =>
-      this.$axios.get(`/customers/customer-type-naturals`);
-    const customerTaxerTypes = () =>
-      this.$axios.get(`/customers/customer-taxer-types`);
+      this.$axios.get(`/customers/type-naturals`);
+    const customerTaxerTypes = () => this.$axios.get(`/customers/taxer-types`);
     const countries = () => this.$axios.get(`/others/countries`);
     const states = () => this.$axios.get(`/others/states`);
     const cities = () => this.$axios.get(`/others/cities`);
@@ -394,11 +393,6 @@ export default {
       cities(),
     ])
       .then((res) => {
-        // Se ubica en el tab seleccionado
-        if (this.$route.query.tab) {
-          this.activeTab = this.$route.query.tab;
-        }
-
         const [
           customerTypes,
           customerTypeNaturals,
@@ -418,7 +412,7 @@ export default {
       })
       .catch((err) => {
         this.$message.error(err.response.data.message);
-        this.$router.push("/customers");
+        this.$router.push("/services");
       });
 
     checkBeforeEnter(this, storagekey, "customersNewForm");
@@ -430,7 +424,6 @@ export default {
   data() {
     return {
       loading: false,
-      activeTab: "general-information",
       countries: [],
       rawStates: [],
       rawCities: [],
