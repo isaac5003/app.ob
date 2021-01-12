@@ -7,6 +7,7 @@
       { name: 'Partidas contables', to: null },
     ]"
   >
+  
     <div class="flex flex-col space-y-2">
       <div class="flex justify-center" v-if="errorMessage">
         <Notification
