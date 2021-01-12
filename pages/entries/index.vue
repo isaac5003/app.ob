@@ -404,7 +404,7 @@ export default {
       this.page.limit = val;
       this.page.fetchEntries();
     },
-    \(value) {
+    getSummaries(value) {
       const { columns, data } = value;
       const totalAbono = data.reduce((a,b)=>a+b.abono ? b.abono:0, 0);
       const totalCargo = data.reduce((a,b) =>a+b.cargo ? b.cargo : 0, 0);
