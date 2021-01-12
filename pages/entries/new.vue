@@ -96,7 +96,14 @@
         </div>
         <!-- boton guardar cancelar -->
         <div class="flex justify-end dialog-footer">
-          <el-button type="primary" size="small">Guardar</el-button>
+          <el-button
+            type="primary"
+            size="small"
+            @click.native="
+              addToEntryDetails('formAccountingDetail', formAccountingDetail)
+            "
+            >Guardar</el-button
+          >
           <el-button @click="showEditEntryDetail = false" size="small"
             >Cancelar</el-button
           >
@@ -109,12 +116,13 @@
         <!-- primer div tipo partida, correlativo y rango de fechas -->
         <div class="grid grid-cols-12 gap-4 relative">
           <div class="col-span-4">
-            <el-form-item label="Tipo de patida">
+            <el-form-item label="Tipo de patida" prop="select">
               <el-select
                 v-model="formAccountingDetail.select"
                 size="small"
                 class="w-full"
                 placeholder="Select"
+                @change="changeEntryType(formAccountingDetail)"
               >
                 <el-option
                   v-for="e in entryTypes"
@@ -126,10 +134,10 @@
               </el-select>
             </el-form-item>
           </div>
-          <div class="col-start-9 col-span-2">
+          <div class="col-start-8 col-span-2">
             <el-form-item label="N° de correlativo">
               <el-input
-                v-model="input"
+                v-model="formAccountingDetail.serie"
                 :disabled="true"
                 class="w-full"
                 size="small"
@@ -137,16 +145,16 @@
               </el-input>
             </el-form-item>
           </div>
-          <div class="col-start-11 col-span-2">
-            <el-form-item label="Rango de fechas:">
+          <div class="col-start-10 col-span-3">
+            <el-form-item label="Fecha de partida :">
               <el-date-picker
-                v-model="fecha"
+                v-model="formAccountingDetail.fecha"
                 size="small"
                 style="width: 100%"
                 type="date"
-                placeholder="Seleccionar"
-                :picker-options="pickerOptions"
                 format="dd MMMM yyyy"
+                value-format="yyyy-MM-dd"
+                @change="changeEntryType(formAccountingDetail)"
               >
                 >
               </el-date-picker>
@@ -162,24 +170,14 @@
           </div>
           <div class="col-span-2">
             <el-form-item label="Opciones de partida">
-              <el-checkbox
-                v-model="checked"
-                size="small"
-                class="w-full"
-                border="1"
-                disabled="true"
+              <el-checkbox v-model="checked" border size="small" class="w-full"
                 >Cuadrada</el-checkbox
               >
             </el-form-item>
           </div>
           <div class="col-span-2">
             <el-form-item label=" ">
-              <el-checkbox
-                v-model="checked"
-                size="small"
-                class="w-full"
-                border="1"
-                disabled="true"
+              <el-checkbox v-model="checked" border size="small" class="w-full"
                 >Contabilizada</el-checkbox
               >
             </el-form-item>
@@ -200,14 +198,55 @@
         </div>
         <!-- Tabla -->
         <div class="mt-4">
-          <el-table stripe>
-            <el-table-column label="#" width="70"> </el-table-column>
-            <el-table-column label="Cuenta contable" width="180">
+          <el-table
+            :data="accountingEntryDetails"
+            stripe
+            size="small"
+            :summary-method="getSummaries"
+            show-summary
+          >
+            <el-table-column label="#" min-width="70"> </el-table-column>
+            <el-table-column
+              label="Cuenta contable"
+              prop="catalogCode"
+              min-width="180"
+            >
             </el-table-column>
-            <el-table-column label="Concepto" width="180"></el-table-column>
-            <el-table-column label="Cargo" width="180"></el-table-column>
-            <el-table-column label="Abono" width="180"></el-table-column>
-            <el-table-column label="Opciones" width="180"></el-table-column>
+            <el-table-column
+              label="Concepto"
+              prop="concept"
+              min-width="180"
+            ></el-table-column>
+            <el-table-column label="Cargo" min-width="180">
+              <template slot-scope="scope">
+                <span> {{ scope.row.cargo | formatMoney }} </span>
+              </template></el-table-column
+            >
+            <el-table-column label="Abono" min-width="180">
+              <template slot-scope="scope">
+                <span> {{ scope.row.abono | formatMoney }} </span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              style="margin-left: 20px"
+              label="Opciones"
+              min-width="180"
+            >
+              <template slot-scope="">
+                <div class="flex flex-row items-center justify-center">
+                  <el-button
+                    type="primary"
+                    size="small"
+                    icon="el-icon-edit"
+                  ></el-button>
+                  <el-button
+                    type="danger"
+                    size="small"
+                    icon="el-icon-delete"
+                  ></el-button>
+                </div>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
         <!-- Guardar y Cancelar -->
@@ -233,6 +272,8 @@
 </template>
 
 <script>
+import * as R from "ramda";
+import { format } from "date-fns";
 import LayoutContent from "../../components/layout/Content";
 import {
   inputValidation,
@@ -311,15 +352,20 @@ export default {
       }
     };
     return {
+      checked: "",
       entryTypes: [],
       accountingCatalog: [],
-      fecha: "",
+      accountingEntryDetails: [],
+      accountingDetail: "",
       showAccountingDetail: false,
       formAccountingDetail: {
+        fecha: new Date(),
         accountingCatalog: "",
         concept: "",
+        select: "",
         cargo: "",
         abono: "",
+        serie: "",
       },
       entryDetailFormRules: {
         accountingCatalog: selectValidation(true),
@@ -337,18 +383,11 @@ export default {
           },
         ],
       },
-      // loading: false,
+      loading: false,
       option: {
         name: "",
       },
       pickerOptions: {
-        // disabledDate(time) {
-        //   return time.getTime() < Date.now();
-        // },
-        dateNow(time) {
-          console.log(time);
-          return time.Date.now();
-        },
         shortcuts: [
           {
             text: "Ahora",
@@ -379,6 +418,56 @@ export default {
   methods: {
     closeDialog(name) {
       this.$refs[name].resetFields();
+    },
+    addToEntryDetails(formName, data) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+        this.accountingEntryDetails.push({
+          ...data,
+          catalogCode: this.accountingCatalog.find(
+            (c) => c.id == this.formAccountingDetail.accountingCatalog
+          ).code,
+        });
+        this.showAccountingDetail = false;
+      });
+    },
+    getSummaries(param) {
+      const { columns, data } = param;
+      const totalAbono = data.reduce((a, b) => (a + b.abono ? b.abono : 0), 0);
+      const totalCargo = data.reduce((a, b) => a + (b.cargo ? b.cargo : 0), 0);
+      const resutls = columns.map((column) => {
+        if (column.label == "Abono") {
+          return this.$options.filters.formatMoney(totalAbono);
+        } else if (column.label == "Cargo") {
+          return this.$options.filters.formatMoney(totalCargo);
+        } else if (column.label == "Concepto") {
+          return "TOTALES";
+        } else {
+          return "";
+        }
+      });
+      return resutls;
+    },
+    changeEntryType(formAccountingDetail) {
+      // console.log(formAccountingDetail);
+      let params = "";
+      if (formAccountingDetail.select && formAccountingDetail.fecha) {
+        params = {
+          accountingEntryType: formAccountingDetail.select,
+          date: formAccountingDetail.fecha,
+        };
+        this.$axios
+          .get("/entries/serie", { params })
+          .then((res) => {
+            console.log(res);
+            formAccountingDetail.serie = res.data.nextSerie;
+          })
+          .catch((err) => {
+            this.errorMessage = err.response.data.message;
+          });
+      }
     },
   },
   computed: {},
