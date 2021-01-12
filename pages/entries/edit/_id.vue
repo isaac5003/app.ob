@@ -90,7 +90,7 @@
                 size="small"
                 autocomplete="off"
                 style="width: 100%"
-                :disabled="newEntryDetailForm.entryAccounting === ''"
+                :disabled="newEntryDetailForm.accountingCatalog === ''"
               />
             </el-form-item>
           </div>
@@ -192,7 +192,7 @@
                 size="small"
                 autocomplete="off"
                 style="width: 100%"
-                :disabled="editEntryDetailForm.entryAccounting === ''"
+                :disabled="editEntryDetailForm.accountingCatalog === ''"
               />
             </el-form-item>
           </div>
@@ -242,6 +242,7 @@
                 size="small"
                 class="w-full"
                 placeholder="Select"
+                @change="getEntrySerie(editEntryForm)"
               >
                 <el-option
                   v-for="aeT in accountingEntryTypes"
@@ -276,6 +277,7 @@
                 format="dd MMMM yyyy"
                 value-format="yyyy-MM-dd"
                 :picker-options="datePickerOptions"
+                @change="getEntrySerie(editEntryForm)"
               >
               </el-date-picker>
             </el-form-item>
@@ -345,7 +347,7 @@
             <el-table-column type="index" label="#" min-width="70" />
             <el-table-column
               label="Cuenta contable"
-              prop="catalogName"
+              prop="code"
               min-width="150"
             />
             <el-table-column label="Concepto" prop="concept" min-width="425" />
@@ -438,6 +440,7 @@ export default {
             return {
               ...d,
               accountingCatalog: d.accountingCatalog.id,
+              code: d.accountingCatalog.code,
             };
           }
         );
@@ -628,10 +631,26 @@ export default {
     };
   },
   methods: {
+    getEntrySerie({ accountingEntryType, rawDate }) {
+      console.log({ accountingEntryType, rawDate });
+      if (accountingEntryType && rawDate) {
+        this.$axios
+          .get(`entries/serie`, { params: accountingEntryType.id, rawDate })
+          .then((res) => {
+            this.editEntryForm.serie = res.data.nextSerie;
+            this.checkEntry();
+          })
+          .catch((err) => {
+            console.log(err);
+            this.errorMessage = err.response.data.message;
+          });
+      }
+    },
+
     getSummaries(value) {
       const { columns, data } = value;
-      let totalCargo = data.reduce((a, b) => (a + b.cargo ? b.cargo : 0), 0);
-      let totalAbono = data.reduce((a, b) => (a + b.abono ? b.abono : 0), 0);
+      let totalCargo = data.reduce((a, b) => a + (b.cargo ? b.cargo : 0), 0);
+      let totalAbono = data.reduce((a, b) => a + (b.abono ? b.abono : 0), 0);
 
       const result = columns.map((column) => {
         switch (column.label) {
@@ -648,8 +667,8 @@ export default {
       });
       return result;
     },
-    getAccountingCatalog() {
-      this.$axios
+    async getAccountingCatalog() {
+      await this.$axios
         .get("/entries/catalog")
         .then((res) => {
           this.accountingCatalog = res.data.accountingCatalog;
@@ -682,9 +701,9 @@ export default {
         this.accountingEntryDetails.push({
           ...data,
 
-          catalogName: this.accountingCatalog.find(
+          code: this.accountingCatalog.find(
             (c) => c.id == this.newEntryDetailForm.accountingCatalog
-          ).name,
+          ).code,
         });
         this.showAddEntryDetail = false;
         this.checkEntry();
@@ -697,7 +716,6 @@ export default {
         }
 
         this.accountingEntryDetails.splice(index, 1, { ...form });
-
         this.showEditEntryDetail = false;
         this.checkEntry();
       });
@@ -810,27 +828,15 @@ export default {
       });
     },
     checkEntry() {
-      // let totalCargo = this.accountingEntryDetails.reduce(
-      //   (a, b) => (a + b.cargo ? b.cargo : 0),
-      //   0
-      // );
-      // let totalAbono = this.accountingEntryDetails.reduce(
-      //   (a, b) => (a + b.abono ? b.abono : 0),
-      //   0
-      // );
+      let totalCargo = this.accountingEntryDetails.reduce(
+        (a, b) => a + (b.cargo ? b.cargo : 0),
+        0
+      );
+      let totalAbono = this.accountingEntryDetails.reduce(
+        (a, b) => a + (b.abono ? b.abono : 0),
+        0
+      );
 
-      let totalAbono = this.accountingEntryDetails.reduce((a, b) => {
-        const first = !a.abono ? 0 : parseFloat(a.abono);
-        const second = !b.abono ? 0 : parseFloat(b.abono);
-        return { abono: first + second };
-      }).abono;
-      let totalCargo = this.accountingEntryDetails.reduce((a, b) => {
-        const first = !a.cargo ? 0 : parseFloat(a.cargo);
-        const second = !b.cargo ? 0 : parseFloat(b.cargo);
-        return { cargo: first + second };
-      }).cargo;
-      console.log(totalCargo);
-      console.log(totalAbono);
       this.editEntryForm.squared =
         totalAbono.toFixed(3) === totalCargo.toFixed(3);
       this.editEntryForm.accounted = false;
