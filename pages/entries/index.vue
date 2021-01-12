@@ -1,6 +1,6 @@
 <template>
   <layout-content
-    v-loading="loading"
+    v-loading="loading" 
     page-title="Partidas contables"
     :breadcrumb="[
       { name: 'Contabilidad', to: '/entries' },
