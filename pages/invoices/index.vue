@@ -29,6 +29,8 @@
             placeholder="Buscar..."
             v-model="searchValue"
             size="small"
+              v-debounce:500ms="fetchInvoices"
+              @change="fetchInvoices"
           />
             </el-form-item>
           </div>
