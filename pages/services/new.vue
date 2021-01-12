@@ -76,7 +76,8 @@
             minlength="5"
             maxlength="5000"
             show-word-limit
-          ></el-input>
+            class="mt-1"
+          />
         </el-form-item>
       </div>
       <div class="flex justify-end">
@@ -106,9 +107,7 @@ export default {
   name: "ServicesEdit",
   components: { LayoutContent },
   fetch() {
-    const sellingTypes = () => {
-      return this.$axios.get("/services/selling-types");
-    };
+    const sellingTypes = () => this.$axios.get("/services/selling-types");
 
     Promise.all([sellingTypes()])
       .then((res) => {

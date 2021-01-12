@@ -385,11 +385,11 @@ export default {
   fetch() {
     const customer = () =>
       this.$axios.get(`/customers/${this.$route.query.ref}`);
-    const customerTypes = () => this.$axios.get(`/customers/customer-types`);
+    const customerTypes = () => this.$axios.get(`/customers/types`);
     const customerTypeNaturals = () =>
-      this.$axios.get(`/customers/customer-type-naturals`);
+      this.$axios.get(`/customers/type-naturals`);
     const customerTaxerTypes = () =>
-      this.$axios.get(`/customers/customer-taxer-types`);
+      this.$axios.get(`/customers/taxer-types`);
     const countries = () => this.$axios.get(`/others/countries`);
     const states = () => this.$axios.get(`/others/states`);
     const cities = () => this.$axios.get(`/others/cities`);
