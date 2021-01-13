@@ -35,7 +35,7 @@
             </el-form-item>
           </div>
         </div>
-        <div class="flex flex-col">
+       
         <div class="grid grid-cols-12 gap-4">
             <div class=" col-span-4">
             <el-form-item label="Rango de fechas:">
