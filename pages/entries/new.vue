@@ -7,7 +7,7 @@
       { name: 'Nueva partida', to: null },
     ]"
   >
-    <!-- dialogo editdetalledepartida-->
+    <!-- dialogo agregar detalle partida-->
     <el-dialog
       title="Agregar detalle de partida"
       :visible.sync="showAccountingDetail"
@@ -17,10 +17,10 @@
       @open="resetForm('formAccountingDetail')"
     >
       <el-form
-        :model="formAccountingDetail"
+        :model="newEntryDetailForm"
         status-icon
-        :rules="entryDetailFormRules"
-        ref="formAccountingDetail"
+        :rules="newEntryDetailFormRules"
+        ref="newEntryDetailForm"
       >
         <!-- first row -->
         <div class="grid grid-cols-12">
@@ -28,7 +28,7 @@
           <div class="col-span-12">
             <el-form-item label="Cuenta contable" prop="accountingCatalog">
               <el-select
-                v-model="formAccountingDetail.accountingCatalog"
+                v-model="newEntryDetailForm.accountingCatalog"
                 clearable
                 filterable
                 default-first-option
@@ -54,11 +54,11 @@
           <div class="col-span-12">
             <el-form-item label="Concepto" prop="concept">
               <el-input
-                v-model="formAccountingDetail.concept"
+                v-model="newEntryDetailForm.concept"
                 size="small"
                 autocomplete="off"
                 style="width: 100%"
-                :disabled="formAccountingDetail.accountingCatalog === ''"
+                :disabled="newEntryDetailForm.accountingCatalog === ''"
               />
             </el-form-item>
           </div>
@@ -72,11 +72,11 @@
                 type="number"
                 :min="0"
                 :step="0.01"
-                v-model="formAccountingDetail.cargo"
+                v-model="newEntryDetailForm.cargo"
                 size="small"
                 autocomplete="off"
                 style="width: 100%"
-                :disabled="formAccountingDetail.entryAccounting === ''"
+                :disabled="newEntryDetailForm.entryAccounting === ''"
               />
             </el-form-item>
           </div>
@@ -87,11 +87,11 @@
                 type="number"
                 :min="0"
                 :step="0.01"
-                v-model="formAccountingDetail.abono"
+                v-model="newEntryDetailForm.abono"
                 size="small"
                 autocomplete="off"
                 style="width: 100%"
-                :disabled="formAccountingDetail.entryAccounting === ''"
+                :disabled="newEntryDetailForm.entryAccounting === ''"
               />
             </el-form-item>
           </div>
@@ -102,7 +102,7 @@
             type="primary"
             size="small"
             @click.native="
-              addToEntryDetails('formAccountingDetail', formAccountingDetail)
+              addToEntryDetails('newEntryDetailForm', newEntryDetailForm)
             "
             >Guardar</el-button
           >
@@ -403,7 +403,6 @@
 </template>
 
 <script>
-import * as R from "ramda";
 import { format } from "date-fns";
 import LayoutContent from "../../components/layout/Content";
 import {
@@ -416,19 +415,12 @@ import {
 } from "../../tools";
 import Notification from "../../components/Notification";
 
-const storagekey = "new-customer";
-
 export default {
-  name: "CustomerNew",
+  name: "EntryNew",
   components: { LayoutContent, Notification },
   fetch() {
-    const entryTypes = () => {
-      return this.$axios.get("/entries/types");
-    };
-
-    const accountingCatalog = () => {
-      return this.$axios.get("/entries/catalog");
-    };
+    const entryTypes = () => this.$axios.get("/entries/types");
+    const accountingCatalog = () => this.$axios.get("/entries/catalog");
 
     Promise.all([entryTypes(), accountingCatalog()])
       .then((res) => {
@@ -442,6 +434,46 @@ export default {
       });
   },
   data() {
+    const newCargoValidateCompare = (rule, value, callback) => {
+      const abono =
+        this.newEntryDetailForm.abono > 0
+          ? this.newEntryDetailForm.abono.toFixed(2)
+          : "";
+      const val = value > 0 ? value.toFixed(2) : "";
+      if (!abono) {
+        if (!val) {
+          callback(new Error("Este campo es requerido."));
+        } else {
+          callback();
+        }
+      } else if (abono && val) {
+        return callback(
+          new Error("No puedes agregar cargo y abono al mismo tiempo")
+        );
+      } else {
+        callback();
+      }
+    };
+    const newAbonoValidateCompare = (rule, value, callback) => {
+      const cargo =
+        this.newEntryDetailForm.cargo > 0
+          ? this.newEntryDetailForm.cargo.toFixed(2)
+          : "";
+      const val = value > 0 ? value.toFixed(2) : "";
+      if (!cargo) {
+        if (!val) {
+          callback(new Error("Este campo es requerido."));
+        } else {
+          callback();
+        }
+      } else if (cargo && val) {
+        return callback(
+          new Error("No puedes agregar abono y cargo al mismo tiempo")
+        );
+      } else {
+        callback();
+      }
+    };
     const editCargoValidateCompare = (rule, value, callback) => {
       const abono =
         this.formAccountingDetail.abono > 0
@@ -512,6 +544,44 @@ export default {
         concept: "",
         cargo: "",
         abono: "",
+      },
+      newEntryDetailForm: {
+        accountingCatalog: "",
+        concept: "",
+        cargo: "",
+        abono: "",
+      },
+      newEntryDetailFormRules: {
+        accountingCatalog: selectValidation(true),
+        concept: inputValidation(true),
+        cargo: [
+          {
+            validator: newCargoValidateCompare,
+            trigger: ["blur", "change"],
+          },
+        ],
+        abono: [
+          {
+            validator: newAbonoValidateCompare,
+            trigger: ["blur", "change"],
+          },
+        ],
+      },
+      editEntryDetailFormRules: {
+        accountingCatalog: selectValidation(true),
+        concept: inputValidation(true),
+        cargo: [
+          {
+            validator: editCargoValidateCompare,
+            trigger: ["blur", "change"],
+          },
+        ],
+        abono: [
+          {
+            validator: editAbonoValidateCompare,
+            trigger: ["blur", "change"],
+          },
+        ],
       },
       loading: false,
       option: {
