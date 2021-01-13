@@ -157,7 +157,7 @@
                 size="small"
                 autocomplete="off"
                 style="width: 100%"
-                :disabled="editEntryDetailForm.entryAccounting === ''"
+                :disabled="editEntryDetailForm.accountingCatalog === ''"
               />
             </el-form-item>
           </div>
@@ -202,6 +202,10 @@
         :model="newEntryForm"
         :rules="newEntryFormRules"
         class="flex flex-col space-y-4"
+        @submit.native.prevent="
+          saveEntry('newEntryForm', newEntryForm, accountingEntryDetails)
+        "
+        ref="newEntryForm"
       >
         <div class="flex flex-col">
           <div class="grid grid-cols-12 gap-4">
@@ -340,7 +344,11 @@
           </el-table-column>
         </el-table>
         <div class="flex flex-row justify-end space-x-4">
-          <el-button type="primary" icon="el-icon-check" size="small"
+          <el-button
+            type="primary"
+            icon="el-icon-check"
+            size="small"
+            native-type="submit"
             >Guardar</el-button
           >
           <el-button icon="el-icon-close" size="small">Cancelar</el-button>
@@ -587,6 +595,7 @@ export default {
       });
     },
     changeEntryType({ entryType, date }) {
+      // console.log(`ENTRY TYPE :::${entryType} FECHA ::: ${date}`);
       if (entryType && date) {
         this.$axios
           .get("/entries/serie", {
@@ -596,6 +605,7 @@ export default {
             },
           })
           .then(({ data }) => {
+            console.log(data);
             this.newEntryForm.serie = data.nextSerie;
           })
           .catch((err) => {
@@ -662,6 +672,127 @@ export default {
       this.newEntryForm.scuared =
         totalAbono.toFixed(3) === totalCargo.toFixed(3);
       this.newEntryForm.accounted = false;
+    },
+    saveEntry(formName, formData, details) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+        console.log(formData);
+
+        const save = () => {
+          this.$confirm(
+            "¿Estás seguro que deseas guardar esta partida?",
+            "Confirmación",
+            {
+              confirmButtonText: "Si, guardar",
+              cancelButtonText: "Cancelar",
+              type: "warning",
+              beforeClose: (action, instance, done) => {
+                if (action === "confirm") {
+                  instance.confirmButtonLoading = true;
+                  instance.confirmButtonText = "Procesando...";
+                  this.$axios
+                    .post("/entries", {
+                      header: {
+                        title: formData.title,
+                        serie: formData.serie,
+                        date: formData.date,
+                        squared: formData.scuared,
+                        accounted: formData.accounted,
+                        accountingEntryType: formData.entryType,
+                      },
+                      details: details.map((d) => {
+                        return {
+                          ...d,
+                          accountingCatalog: d.accountingCatalog,
+                          concept: d.concept,
+                          cargo: d.cargo,
+                          abono: d.abono,
+                        };
+                      }),
+                    })
+                    .then((res) => {
+                      this.$notify.success({
+                        title: "Exito",
+                        message: res.data.message,
+                      });
+                      setTimeout(() => {
+                        this.$confirm(
+                          "¿Deseas crear una nueva partida?",
+                          "Confirmación",
+                          {
+                            confirmButtonText: "Si, porfavor",
+                            cancelButtonText: "No, gracias",
+                            type: "warning",
+                            closeOnClickModal: false,
+                            closeOnPressEscape: false,
+                          }
+                        )
+                          .then(() => {
+                            if (this.$refs["newEntryForm"]) {
+                              this.$refs["newEntryForm"].resetFields();
+                            }
+                            this.salesNewForm.documentType = 1;
+                            this.salesNewForm.customerBranch = "";
+                            this.details = [];
+                            this.branches = [];
+                            this.branch = {};
+                            this.tributary = {};
+                          })
+                          .catch(() => {
+                            this.$router.push("/entries");
+                          });
+                      }, 2000);
+                    })
+                    .catch((err) => {
+                      this.$notify.error({
+                        title: "Error",
+                        message: err.response.data.message,
+                      });
+                    })
+                    .then((alw) => {
+                      instance.confirmButtonLoading = false;
+                      instance.confirmButtonText = "Si, guardar";
+                      done();
+                    });
+                } else {
+                  done();
+                }
+              },
+            }
+          );
+        };
+
+        this.checkEntry();
+        const originalAccounted = formData.accounted;
+        if (formData.squared && !formData.accounted) {
+          this.$confirm(
+            "Esta partida esta cuadrada, ¿deseas marcarla como completada?",
+            "Confirmación",
+            {
+              type: "warning",
+              distinguishCancelAndClose: true,
+              confirmButtonText: "Si, porfavor",
+              cancelButtonText: "No, gracias",
+            }
+          )
+            .then(() => {
+              formData.accounted = true;
+              save();
+            })
+            .catch((action) => {
+              if (action === "cancel") {
+                formData.accounted = false;
+                save();
+              } else {
+                return false;
+              }
+            });
+        } else {
+          save();
+        }
+      });
     },
   },
 };
