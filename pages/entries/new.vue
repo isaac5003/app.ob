@@ -222,7 +222,11 @@
     </el-dialog>
 
     <div class="flex flex-col space-y-2">
-      <el-form label-position="top">
+      <el-form
+        label-position="top"
+        :rules="formAccountingDetailRules"
+        :model="formAccountingDetail"
+      >
         <!-- primer div tipo partida, correlativo y rango de fechas -->
         <div class="grid grid-cols-12 gap-4 relative">
           <div class="col-span-4">
@@ -245,7 +249,7 @@
             </el-form-item>
           </div>
           <div class="col-start-8 col-span-2">
-            <el-form-item label="N° de correlativo">
+            <el-form-item label="N° de correlativo" prop="serie">
               <el-input
                 v-model="formAccountingDetail.serie"
                 :disabled="true"
@@ -256,7 +260,7 @@
             </el-form-item>
           </div>
           <div class="col-start-10 col-span-3">
-            <el-form-item label="Fecha de partida :">
+            <el-form-item label="Fecha de partida :" prop="fecha">
               <el-date-picker
                 v-model="formAccountingDetail.fecha"
                 size="small"
@@ -274,7 +278,7 @@
         <!-- segundo div para titulo partida, opciones de partida -->
         <div class="grid grid-cols-12 gap-4 relative">
           <div class="col-start-1 col-span-8">
-            <el-form-item label="Titulo de la partida">
+            <el-form-item label="Titulo de la partida" prop="title">
               <el-input
                 v-model="formAccountingDetail.title"
                 class="w-full"
@@ -497,21 +501,11 @@ export default {
         accounted: "",
         title: "",
       },
-      entryDetailFormRules: {
-        accountingCatalog: selectValidation(true),
-        concept: inputValidation(true),
-        cargo: [
-          {
-            validator: editCargoValidateCompare,
-            trigger: ["blur", "change"],
-          },
-        ],
-        abono: [
-          {
-            validator: editAbonoValidateCompare,
-            trigger: ["blur", "change"],
-          },
-        ],
+      formAccountingDetailRules: {
+        title: inputValidation(true),
+        accountingEntryType: selectValidation(true),
+        fecha: selectValidation(true),
+        select: selectValidation(true),
       },
       editEntryDetailForm: {
         accountingCatalog: "",
