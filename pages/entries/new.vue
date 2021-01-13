@@ -14,7 +14,6 @@
       width="550px"
       :close-on-click-modal="false"
       :append-to-body="true"
-      @open="resetForm('formAccountingDetail')"
     >
       <el-form
         :model="newEntryDetailForm"
@@ -62,7 +61,7 @@
                 size="small"
                 autocomplete="off"
                 style="width: 100%"
-                :disabled="newEntryDetailForm.entryAccounting === ''"
+                :disabled="newEntryDetailForm.accountingCatalog === ''"
               />
             </el-form-item>
           </div>
@@ -76,7 +75,7 @@
                 size="small"
                 autocomplete="off"
                 style="width: 100%"
-                :disabled="newEntryDetailForm.entryAccounting === ''"
+                :disabled="newEntryDetailForm.accountingCatalog === ''"
               />
             </el-form-item>
           </div>
@@ -284,7 +283,7 @@
               </el-form-item>
             </div>
           </div>
-          <div class="grid grid-cols-12 gap-4 ">
+          <div class="grid grid-cols-12 gap-4">
             <div class="col-start-11 col-span-2">
               <el-button
                 @click="openNewEntryDetail()"
@@ -385,8 +384,8 @@ export default {
       const abono =
         this.newEntryDetailForm.abono > 0
           ? this.newEntryDetailForm.abono.toFixed(2)
-          : "";
-      const val = value > 0 ? value.toFixed(2) : "";
+          : 0;
+      const val = value > 0 ? value.toFixed(2) : 0;
       if (!abono) {
         if (!val) {
           callback(new Error("Este campo es requerido."));
@@ -405,8 +404,8 @@ export default {
       const cargo =
         this.newEntryDetailForm.cargo > 0
           ? this.newEntryDetailForm.cargo.toFixed(2)
-          : "";
-      const val = value > 0 ? value.toFixed(2) : "";
+          : 0;
+      const val = value > 0 ? value.toFixed(2) : 0;
       if (!cargo) {
         if (!val) {
           callback(new Error("Este campo es requerido."));
