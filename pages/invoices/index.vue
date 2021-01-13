@@ -752,7 +752,7 @@ export default {
     };
   },
   methods: {
-    deleteInvoice(invoice) {
+    deleteInvoice({ id }) {
       this.$confirm(
         `¿Estás seguro que deseas eliminar esta venta?`,
         "Confirmación",
@@ -765,7 +765,7 @@ export default {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
               this.$axios
-                .delete(`/invoices/${invoice.id}`)
+                .delete(`/invoices/${id}`)
                 .then((res) => {
                   this.$notify.success({
                     title: "Éxito",
