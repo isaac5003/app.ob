@@ -9,11 +9,12 @@
   >
     <!-- dialogo editdetalledepartida-->
     <el-dialog
-      title="Editar detalle de partida"
+      title="Agregar detalle de partida"
       :visible.sync="showAccountingDetail"
       width="550px"
       :close-on-click-modal="false"
       :append-to-body="true"
+      @open="resetForm('formAccountingDetail')"
     >
       <el-form
         :model="formAccountingDetail"
@@ -40,6 +41,7 @@
                   :key="a.id"
                   :label="`${a.code} - ${a.name}`"
                   :value="a.id"
+                  :disabled="a.isParent == true"
                 >
                 </el-option>
               </el-select>
@@ -111,6 +113,114 @@
       </el-form>
     </el-dialog>
 
+    <!-- dialogo editdetalledepartida-->
+    <el-dialog
+      title="Editar detalle de partida"
+      :visible.sync="showEditEntryDetail"
+      width="550px"
+      :close-on-click-modal="false"
+      :append-to-body="true"
+    >
+      <el-form
+        :model="editEntryDetailForm"
+        status-icon
+        :rules="editEntryDetailFormRules"
+        ref="editEntryDetailForm"
+      >
+        <!-- first row -->
+        <div class="grid grid-cols-12">
+          <!-- cuenta contable -->
+          <div class="col-span-12">
+            <el-form-item label="Cuenta contable" prop="accountingCatalog">
+              <el-select
+                v-model="editEntryDetailForm.accountingCatalog"
+                clearable
+                filterable
+                default-first-option
+                size="small"
+                class="w-full"
+                placeholder="Seleccionar"
+              >
+                <el-option
+                  v-for="aC in accountingCatalog"
+                  :key="aC.id"
+                  :label="`${aC.code} - ${aC.name}`"
+                  :value="aC.id"
+                  :disabled="aC.isParent == true"
+                />
+              </el-select>
+            </el-form-item>
+          </div>
+        </div>
+        <!-- second row -->
+        <div class="grid grid-cols-12 gap-4">
+          <!-- concepto -->
+          <div class="col-span-12">
+            <el-form-item label="Concepto" prop="concept">
+              <el-input
+                v-model="editEntryDetailForm.concept"
+                size="small"
+                autocomplete="off"
+                style="width: 100%"
+                :disabled="editEntryDetailForm.accountingCatalog === ''"
+              />
+            </el-form-item>
+          </div>
+        </div>
+        <!-- third row -->
+        <div class="grid grid-cols-12 gap-4">
+          <!-- Cargo -->
+          <div class="col-span-6">
+            <el-form-item label="Cargo" prop="cargo">
+              <el-input-number
+                type="number"
+                :min="0"
+                :step="0.01"
+                v-model="editEntryDetailForm.cargo"
+                size="small"
+                autocomplete="off"
+                style="width: 100%"
+                :disabled="editEntryDetailForm.entryAccounting === ''"
+              />
+            </el-form-item>
+          </div>
+          <!-- Cargo -->
+          <div class="col-span-6">
+            <el-form-item label="Abono" prop="abono">
+              <el-input-number
+                type="number"
+                :min="0"
+                :step="0.01"
+                v-model="editEntryDetailForm.abono"
+                size="small"
+                autocomplete="off"
+                style="width: 100%"
+                :disabled="editEntryDetailForm.accountingCatalog === ''"
+              />
+            </el-form-item>
+          </div>
+        </div>
+        <!-- boton guardar cancelar -->
+        <div class="flex justify-end dialog-footer">
+          <el-button
+            type="primary"
+            @click.native="
+              updateDetail(
+                editingEntryDetail,
+                'editEntryDetailForm',
+                editEntryDetailForm
+              )
+            "
+            size="small"
+            >Guardar</el-button
+          >
+          <el-button @click="showEditEntryDetail = false" size="small"
+            >Cancelar</el-button
+          >
+        </div>
+      </el-form>
+    </el-dialog>
+
     <div class="flex flex-col space-y-2">
       <el-form label-position="top">
         <!-- primer div tipo partida, correlativo y rango de fechas -->
@@ -165,19 +275,34 @@
         <div class="grid grid-cols-12 gap-4 relative">
           <div class="col-start-1 col-span-8">
             <el-form-item label="Titulo de la partida">
-              <el-input v-model="input" class="w-full" size="small"> </el-input>
+              <el-input
+                v-model="formAccountingDetail.title"
+                class="w-full"
+                size="small"
+              >
+              </el-input>
             </el-form-item>
           </div>
           <div class="col-span-2">
-            <el-form-item label="Opciones de partida">
-              <el-checkbox v-model="checked" border size="small" class="w-full"
+            <el-form-item label="Opciones de partida" prop="scuared">
+              <el-checkbox
+                v-model="formAccountingDetail.scuared"
+                disabled
+                border
+                size="small"
+                class="w-full"
                 >Cuadrada</el-checkbox
               >
             </el-form-item>
           </div>
           <div class="col-span-2">
-            <el-form-item label=" ">
-              <el-checkbox v-model="checked" border size="small" class="w-full"
+            <el-form-item label="Fecha de partida" prop="accounted">
+              <el-checkbox
+                v-model="formAccountingDetail.accounted"
+                disabled
+                border
+                size="small"
+                class="w-full"
                 >Contabilizada</el-checkbox
               >
             </el-form-item>
@@ -232,17 +357,19 @@
               label="Opciones"
               min-width="180"
             >
-              <template slot-scope="">
+              <template slot-scope="scope">
                 <div class="flex flex-row items-center justify-center">
                   <el-button
                     type="primary"
                     size="small"
                     icon="el-icon-edit"
+                    @click="openEditEntryDetail(scope.$index, scope.row)"
                   ></el-button>
                   <el-button
                     type="danger"
                     size="small"
                     icon="el-icon-delete"
+                    @click="deleteDetail(scope.$index)"
                   ></el-button>
                 </div>
               </template>
@@ -352,12 +479,12 @@ export default {
       }
     };
     return {
-      checked: "",
       entryTypes: [],
       accountingCatalog: [],
       accountingEntryDetails: [],
       accountingDetail: "",
       showAccountingDetail: false,
+      showEditEntryDetail: false,
       formAccountingDetail: {
         fecha: new Date(),
         accountingCatalog: "",
@@ -366,6 +493,9 @@ export default {
         cargo: "",
         abono: "",
         serie: "",
+        scuared: "",
+        accounted: "",
+        title: "",
       },
       entryDetailFormRules: {
         accountingCatalog: selectValidation(true),
@@ -382,6 +512,12 @@ export default {
             trigger: ["blur", "change"],
           },
         ],
+      },
+      editEntryDetailForm: {
+        accountingCatalog: "",
+        concept: "",
+        cargo: "",
+        abono: "",
       },
       loading: false,
       option: {
@@ -416,6 +552,11 @@ export default {
     };
   },
   methods: {
+    resetForm(formName) {
+      if (this.$refs[formName]) {
+        this.$refs[formName].resetFields();
+      }
+    },
     closeDialog(name) {
       this.$refs[name].resetFields();
     },
@@ -431,11 +572,12 @@ export default {
           ).code,
         });
         this.showAccountingDetail = false;
+        this.checkEntry();
       });
     },
     getSummaries(param) {
       const { columns, data } = param;
-      const totalAbono = data.reduce((a, b) => (a + b.abono ? b.abono : 0), 0);
+      const totalAbono = data.reduce((a, b) => a + (b.abono ? b.abono : 0), 0);
       const totalCargo = data.reduce((a, b) => a + (b.cargo ? b.cargo : 0), 0);
       const resutls = columns.map((column) => {
         if (column.label == "Abono") {
@@ -468,6 +610,58 @@ export default {
             this.errorMessage = err.response.data.message;
           });
       }
+    },
+    deleteDetail(index) {
+      this.$confirm(
+        "¿Estás seguro que deseas eliminar este detalle?",
+        "Confirmación",
+        {
+          confirmButtonText: "Si, eliminar",
+          cancelButtonText: "Cancelar",
+          type: "warning",
+        }
+      ).then(() => {
+        this.accountingEntryDetails.splice(index, 1);
+      });
+    },
+    async getAccountingCatalog() {
+      await this.$axios
+        .get("/entries/catalog")
+        .then((res) => {
+          this.accountingCatalog = res.data.accountingCatalog;
+        })
+        .catch((err) => {
+          this.errorMessage = err.response.data.message;
+        });
+    },
+    openEditEntryDetail(index, details) {
+      this.getAccountingCatalog();
+      this.editingEntryDetail = index;
+      this.editEntryDetailForm = { ...details };
+      this.showEditEntryDetail = true;
+    },
+    updateDetail(index, formName, form) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+        this.accountingEntryDetails.splice(index, 1, { ...form });
+        this.showEditEntryDetail = false;
+        this.checkEntry();
+      });
+    },
+    checkEntry() {
+      let totalCargo = this.accountingEntryDetails.reduce(
+        (a, b) => a + (b.cargo ? b.cargo : 0),
+        0
+      );
+      let totalAbono = this.accountingEntryDetails.reduce(
+        (a, b) => a + (b.abono ? b.abono : 0),
+        0
+      );
+      this.formAccountingDetail.scuared =
+        totalAbono.toFixed(3) === totalCargo.toFixed(3);
+      this.formAccountingDetail.accounted = false;
     },
   },
   computed: {},
