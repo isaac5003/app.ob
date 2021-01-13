@@ -7,70 +7,67 @@
     ]"
   >
     <div class="flex flex-col space-y-2">
-      <div class="flex justify-center" v-if="errorMessage">
-        <Notification
-          class="w-1/2"
-          type="danger"
-          title="Error de comunicación"
-          :message="errorMessage"
-          :action="{
-            title: 'Intentar nuevamente',
-            function: () => $router.go(),
-          }"
-        />
-      </div>
+      <Notification
+        v-if="errorMessage"
+        class="w-full"
+        type="danger"
+        title="Error de comunicación"
+        :message="errorMessage"
+        :action="{
+          title: 'Intentar nuevamente',
+          function: () => $router.go(),
+        }"
+      />
       <el-form label-position="top">
-        <div class="flex justify-between">
-          <div class="flex space-x-4">
-            <el-form-item class="w-60" label="Estado">
-              <el-select
-                v-model="status"
-                placeholder="Seleccionar"
-                size="small"
-                class="w-full"
-                filterable
-                clearable
-                default-first-option
-                @change="fetchServices"
-              >
-                <el-option label="Todos los estados" value="" />
-                <el-option label="Activo" :value="true" />
-                <el-option label="Inactivo" :value="false" />
-              </el-select>
-            </el-form-item>
-            <el-form-item class="w-60" label="Tipo de venta">
-              <el-select
-                v-model="type"
-                placeholder="Seleccionar"
-                size="small"
-                class="w-full"
-                filterable
-                clearable
-                default-first-option
-                @change="fetchServices"
-              >
-                <el-option label="Todos los tipos" value="" />
-                <el-option
-                  v-for="item in sellingTypes"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-form-item>
-          </div>
-          <div class="w-75">
+        <div class="grid grid-cols-12 gap-4">
+          <el-form-item class="col-span-2" label="Estado">
+            <el-select
+              v-model="filter.status"
+              placeholder="Seleccionar"
+              size="small"
+              class="w-full"
+              filterable
+              clearable
+              default-first-option
+              @change="fetchServices"
+            >
+              <el-option label="Todos los estados" value="" />
+              <el-option label="Activo" :value="true" />
+              <el-option label="Inactivo" :value="false" />
+            </el-select>
+          </el-form-item>
+          <el-form-item class="col-span-2" label="Tipo de venta">
+            <el-select
+              v-model="filter.type"
+              placeholder="Seleccionar"
+              size="small"
+              class="w-full"
+              filterable
+              clearable
+              default-first-option
+              @change="fetchServices"
+            >
+              <el-option label="Todos los tipos" value="" />
+              <el-option
+                v-for="item in sellingTypes"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item class="col-start-10 col-end-13" label="">
             <el-input
+              style="margin-top: 22px"
               suffix-icon="el-icon-search"
               placeholder="Buscar..."
-              v-model="searchValue"
+              v-model="filter.searchValue"
               size="small"
-              style="margin-top: 26px"
               clearable
               v-debounce:500ms="fetchServices"
               @change="fetchServices"
             />
-          </div>
+          </el-form-item>
         </div>
       </el-form>
       <el-table
@@ -80,23 +77,18 @@
         v-loading="loading"
       >
         <el-table-column prop="index" min-width="40" />
-        <el-table-column label="Nombre" prop="name" min-width="200" />
-        <el-table-column
-          label="Descripción"
-          prop="description"
-          min-width="300"
-        />
+        <el-table-column label="Nombre" prop="name" min-width="550" />
         <el-table-column label="Precio" min-width="100" align="right">
           <template slot-scope="scope">
             <span>{{ scope.row.cost | formatMoney }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Tipo de venta" prop="type" min-width="100">
+        <el-table-column label="Tipo de venta" prop="type" min-width="120">
           <template slot-scope="scope">
             <span>{{ scope.row.sellingType.name }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Estado" prop="status" min-width="80">
+        <el-table-column label="Estado" prop="status" min-width="90">
           <template slot-scope="scope">
             <el-tag size="small" type="success" v-if="scope.row.active"
               >Activo</el-tag
@@ -104,7 +96,7 @@
             <el-tag size="small" type="warning" v-else>Inactivo</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label min-width="60" align="center">
+        <el-table-column label min-width="70" align="center">
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />
@@ -160,13 +152,8 @@ export default {
   name: "ServicesIndex",
   components: { LayoutContent, Notification },
   fetch() {
-    const sellingTypes = () => {
-      return this.$axios.get("/services/selling-types");
-    };
-
-    const services = () => {
-      return this.$axios.get("/services", { params: this.page });
-    };
+    const sellingTypes = () => this.$axios.get("/services/selling-types");
+    const services = () => this.$axios.get("/services", { params: this.page });
 
     Promise.all([sellingTypes(), services()])
       .then((res) => {
@@ -184,9 +171,11 @@ export default {
     return {
       loading: true,
       errorMessage: "",
-      searchValue: "",
-      status: "",
-      type: "",
+      filter: {
+        searchValue: "",
+        status: "",
+        type: "",
+      },
       sellingTypes: [],
       services: {
         services: [],
@@ -201,14 +190,14 @@ export default {
   methods: {
     fetchServices() {
       let params = this.page;
-      if (this.status !== "") {
-        params = { ...params, active: this.status };
+      if (this.filter.status !== "") {
+        params = { ...params, active: this.filter.status };
       }
-      if (this.type !== "") {
-        params = { ...params, type: this.type };
+      if (this.filter.type !== "") {
+        params = { ...params, type: this.filter.type };
       }
-      if (this.searchValue !== "") {
-        params = { ...params, search: this.searchValue.toLowerCase() };
+      if (this.filter.searchValue !== "") {
+        params = { ...params, search: this.filter.searchValue.toLowerCase() };
       }
 
       this.$axios
@@ -247,6 +236,7 @@ export default {
                   this.fetchServices();
                 })
                 .catch((err) => {
+                  console.log(err);
                   this.$notify.error({
                     title: "Error",
                     message: err.response.data.message,

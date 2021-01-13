@@ -292,7 +292,69 @@
               <el-input
                 suffix-icon="el-icon-search"
                 placeholder="Buscar..."
-                v-model="filter.searchValue"
+                v-model="searchValue"
+                size="small"
+                v-debounce:500ms="fetchInvoices"
+                @change="fetchInvoices"
+              />
+            </el-form-item>
+          </div>
+        </div>
+        <!-- <div class="flex flex-col"> -->
+        <div class="grid grid-cols-12 gap-4">
+          <div class=" col-span-4">
+            <el-form-item label="Rango de fechas:">
+              <el-date-picker
+                v-model="filter.dateRange"
+                style="width:100%"
+                size="small"
+                type="daterange"
+                range-separator="-"
+                start-placeholder="Fecha inicial"
+                end-placeholder="Fecha final"
+              >
+              </el-date-picker>
+            </el-form-item>
+          </div>
+          <div class="col-span-4">
+            <el-form-item label="Cliente:">
+              <el-select
+                v-model="filter.customer"
+                size="small"
+                class="w-full"
+                clearable
+                filterable
+                default-first-option
+                placeholder="Todos los clientes:"
+                v-debounce:500ms="fetchInvoices"
+                @change="fetchInvoices"
+              >
+                <el-option-group key="ACTIVOS" label="ACTIVOS">
+                  <el-option label="Todos los clientes" value="" />
+                  <el-option
+                    v-for="item in activeCustomers"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                  </el-option>
+                </el-option-group>
+                <el-option-group key="INACTIVOS" label="INACTIVOS">
+                  <el-option
+                    v-for="item in inactiveCustomers"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                  </el-option>
+                </el-option-group>
+              </el-select>
+            </el-form-item>
+          </div>
+          <div class="col-span-2">
+            <el-form-item label="Tipo fact:">
+              <el-select
+                v-model="filter.invoiceType"
                 size="small"
                 clearable
                 v-debounce:500ms="fetchInvoices"
@@ -316,8 +378,7 @@
                   format="dd/MM/yyyy"
                   value-format="yyyy-MM-dd"
                   @change="fetchInvoices"
-                >
-                </el-date-picker>
+                />
               </el-form-item>
             </div>
             <div class="col-span-4">
@@ -332,15 +393,14 @@
                   placeholder="Todos los clientes:"
                   @change="fetchInvoices"
                 >
+                  <el-option label="Todos los clientes" value="" />
                   <el-option-group key="ACTIVOS" label="ACTIVOS">
-                    <el-option label="Todos los clientes" value="" />
                     <el-option
                       v-for="item in activeCustomers"
                       :key="item.id"
                       :label="item.name"
                       :value="item.id"
-                    >
-                    </el-option>
+                    />
                   </el-option-group>
                   <el-option-group key="INACTIVOS" label="INACTIVOS">
                     <el-option
@@ -348,8 +408,7 @@
                       :key="item.id"
                       :label="item.name"
                       :value="item.id"
-                    >
-                    </el-option>
+                    />
                   </el-option-group>
                 </el-select>
               </el-form-item>
@@ -362,7 +421,6 @@
                   clearable
                   placeholder="Todos los tipos:"
                   class="w-full"
-                  v-debounce:500ms="fetchInvoices"
                   @change="fetchInvoices"
                 >
                   <el-option label="Todos los tipos" value="" />
@@ -371,8 +429,7 @@
                     :key="item.id"
                     :label="`${item.code} - ${item.name}`"
                     :value="item.id"
-                  >
-                  </el-option>
+                  />
                 </el-select>
               </el-form-item>
             </div>
@@ -384,17 +441,15 @@
                   clearable
                   placeholder="Todos los estados:"
                   class="w-full"
-                  v-debounce:500ms="fetchInvoices"
                   @change="fetchInvoices"
                 >
                   <el-option label="Todos los estados" value="" />
                   <el-option
-                    v-for="status1 in status"
-                    :key="status1.id"
-                    :label="status1.name"
-                    :value="status1.id"
-                  >
-                  </el-option>
+                    v-for="status in statuses"
+                    :key="status.id"
+                    :label="status.name"
+                    :value="status.id"
+                  />
                 </el-select>
               </el-form-item>
             </div>
@@ -408,29 +463,26 @@
                   clearable
                   filterable
                   default-first-option
-                  placeholder="Todos los clientes:"
+                  placeholder="Todos los vendedores:"
                   class="w-full"
-                  v-debounce:500ms="fetchInvoices"
                   @change="fetchInvoices"
                 >
+                  <el-option label="Todos los vendedores" value="" />
                   <el-option-group key="ACTIVOS" label="ACTIVOS">
-                    <el-option label="Todos los clientes" value="" />
                     <el-option
-                      v-for="item in activeSellers"
-                      :key="item.id"
-                      :label="item.name"
-                      :value="item.id"
-                    >
-                    </el-option>
+                      v-for="seller in activeSellers"
+                      :key="seller.id"
+                      :label="seller.name"
+                      :value="seller.id"
+                    />
                   </el-option-group>
                   <el-option-group key="INACTIVOS" label="INACTIVOS">
                     <el-option
-                      v-for="item in inactiveSellers"
-                      :key="item.id"
-                      :label="item.name"
-                      :value="item.id"
-                    >
-                    </el-option>
+                      v-for="seller in inactiveSellers"
+                      :key="seller.id"
+                      :label="seller.name"
+                      :value="seller.id"
+                    />
                   </el-option-group>
                 </el-select>
               </el-form-item>
@@ -445,27 +497,24 @@
                   default-first-option
                   placeholder="Todos las Zonas"
                   class="w-full"
-                  v-debounce:500ms="fetchInvoices"
                   @change="fetchInvoices"
                 >
+                  <el-option label="Tados las zonas" value="" />
                   <el-option-group key="ACTIVOS" label="ACTIVOS">
-                    <el-option label="Tados las zonas" value="" />
                     <el-option
-                      v-for="item in activeZones"
-                      :key="item.id"
-                      :label="item.name"
-                      :value="item.id"
-                    >
-                    </el-option>
+                      v-for="zone in activeZones"
+                      :key="zone.id"
+                      :label="zone.name"
+                      :value="zone.id"
+                    />
                   </el-option-group>
                   <el-option-group key="INACTIVOS" label="INACTIVOS">
                     <el-option
-                      v-for="item in inactiveZones"
-                      :key="item.id"
-                      :label="item.name"
-                      :value="item.id"
-                    >
-                    </el-option>
+                      v-for="zone in inactiveZones"
+                      :key="zone.id"
+                      :label="zone.name"
+                      :value="zone.id"
+                    />
                   </el-option-group>
                 </el-select>
               </el-form-item>
@@ -479,27 +528,24 @@
                   default-first-option
                   placeholder="Todos los servicios"
                   class="w-full"
-                  v-debounce:500ms="fetchInvoices"
                   @change="fetchInvoices"
                 >
+                  <el-option label="Todos los servicios" value="" />
                   <el-option-group key="ACTIVOS" label="ACTIVOS">
-                    <el-option label="Todos los servicios" value="" />
                     <el-option
-                      v-for="item in activeService"
-                      :key="item.id"
-                      :label="item.name"
-                      :value="item.id"
-                    >
-                    </el-option>
+                      v-for="service in activeServices"
+                      :key="service.id"
+                      :label="service.name"
+                      :value="service.id"
+                    />
                   </el-option-group>
                   <el-option-group key="INACTIVOS" label="INACTIVOS">
                     <el-option
-                      v-for="item in inactiveService"
-                      :key="item.id"
-                      :label="item.name"
-                      :value="item.id"
-                    >
-                    </el-option>
+                      v-for="service in inactiveServices"
+                      :key="service.id"
+                      :label="service.name"
+                      :value="service.id"
+                    />
                   </el-option-group>
                 </el-select>
               </el-form-item>
@@ -507,13 +553,12 @@
           </div>
         </div>
       </el-form>
-
       <el-table :data="invoices.invoices" stripe size="small">
         <el-table-column prop="index" min-width="40" />
         <el-table-column label="# Factura" min-width="120">
           <template slot-scope="scope">
             <span>
-              {{ scope.row.authorization }} - {{ scope.row.sequence }}
+              {{ scope.row.authorization }}-{{ scope.row.sequence }}
             </span>
           </template>
         </el-table-column>
@@ -521,11 +566,10 @@
           label="Tipo fact."
           prop="documentType.code"
           min-width="75"
-        >
-        </el-table-column>
+        />
         <el-table-column label="Fecha" prop="invoiceDate" min-width="90" />
-        <el-table-column label="Cliente" prop="customerName" min-width="350" />
-        <el-table-column label="Estado" min-width="80">
+        <el-table-column label="Cliente" prop="customerName" min-width="380" />
+        <el-table-column label="Estado" min-width="90">
           <template slot-scope="scope">
             <el-tag
               size="small"
@@ -558,7 +602,7 @@
             <span>{{ scope.row.ventaTotal | formatMoney }}</span>
           </template>
         </el-table-column>
-        <el-table-column label min-width="60" align="center">
+        <el-table-column label min-width="65" align="center">
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />
@@ -572,7 +616,6 @@
                 >
                   <i class="el-icon-edit-outline"></i> Editar factura
                 </el-dropdown-item>
-
                 <el-dropdown-item v-if="scope.row.status.id == 1">
                   <i class="el-icon-printer"></i> Imprimir factura
                 </el-dropdown-item>
@@ -585,9 +628,8 @@
                     scope.row.status.id == '2' || scope.row.status.id == '3'
                   "
                 >
-                  <i class="el-icon-arrow-left"></i> Revertir estado
+                  <i class="el-icon-refresh-left"></i> Revertir estado
                 </el-dropdown-item>
-
                 <el-dropdown-item
                   :divided="true"
                   class="text-red-500 font-semibold"
@@ -631,74 +673,43 @@ import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
 
 export default {
-  name: "InvoicesIndex",
+  name: "Invoices",
   components: { LayoutContent, Notification },
   fetch() {
-    const activeCustomers = () =>
-      this.$axios.get("/customers", { params: { active: true } });
-    const inactiveCustomers = () =>
-      this.$axios.get("/customers", { params: { active: false } });
     const documentTypes = () => this.$axios.get("/invoices/document-types");
-    const activeSellers = () =>
-      this.$axios.get("/invoices/sellers", { params: { active: true } });
-    const inactiveSellers = () =>
-      this.$axios.get("/invoices/sellers", { params: { active: false } });
-    const activeZones = () =>
-      this.$axios.get("/invoices/zones", { params: { active: true } });
-    const inactiveZones = () =>
-      this.$axios.get("/invoices/zones", { params: { active: false } });
-    const activeService = () =>
-      this.$axios.get("/services", { params: { active: true } });
-    const inactiveService = () =>
-      this.$axios.get("/services", { params: { active: false } });
-
+    const customers = () => this.$axios.get("/customers");
+    const sellers = () => this.$axios.get("/invoices/sellers");
+    const zones = () => this.$axios.get("/invoices/zones");
+    const services = () => this.$axios.get("/services");
     const invoices = () => this.$axios.get("/invoices", { params: this.page });
-
-    const invoicesTotal = () => this.$axios.get("/invoices");
-
-    const status = () => this.$axios.get("/invoices/status");
+    const statuses = () => this.$axios.get("/invoices/status");
 
     Promise.all([
-      activeCustomers(),
-      inactiveCustomers(),
-      activeSellers(),
-      inactiveSellers(),
-      activeZones(),
-      inactiveZones(),
-      activeService(),
-      inactiveService(),
       documentTypes(),
+      customers(),
+      sellers(),
+      zones(),
+      services(),
       invoices(),
-      invoicesTotal(),
-      status(),
+      statuses(),
     ])
       .then((res) => {
         const [
-          activeCustomers,
-          inactiveCustomers,
-          activeSellers,
-          inactiveSellers,
-          activeZones,
-          inactiveZones,
-          activeService,
-          inactiveService,
           documentTypes,
+          customers,
+          sellers,
+          zones,
+          services,
           invoices,
-          invoicesTotal,
-          status,
+          statuses,
         ] = res;
-        this.activeCustomers = activeCustomers.data.customers;
-        this.inactiveCustomers = inactiveCustomers.data.customers;
         this.documentTypes = documentTypes.data.documentTypes;
-        this.activeSellers = activeSellers.data.sellers;
-        this.inactiveSellers = inactiveSellers.data.sellers;
-        this.activeZones = activeZones.data.zones;
-        this.inactiveZones = inactiveZones.data.zones;
-        this.activeService = activeService.data.services;
-        this.inactiveService = inactiveService.data.services;
+        this.customers = customers.data.customers;
+        this.sellers = sellers.data.sellers;
+        this.zones = zones.data.zones;
+        this.services = services.data.services;
         this.invoices = invoices.data;
-        this.invoicesTotal = invoicesTotal.data.count;
-        this.status = status.data.statuses;
+        this.statuses = statuses.data.statuses;
         this.loading = false;
       })
       .catch((err) => {
@@ -710,27 +721,16 @@ export default {
   fetchOnServer: false,
   data() {
     return {
-      r: [],
-      loading: false,
       errorMessage: "",
-
-      activeCustomers: [],
-      inactiveCustomers: [],
+      loading: false,
       documentTypes: [],
-      activeSellers: [],
-      inactiveSellers: [],
-      activeZones: [],
-      inactiveZones: [],
-      activeService: [],
-      inactiveService: [],
-      invoicesTotal: [],
-      status: [],
-      options: [],
-      showInvoicePreview: false,
-      selectedInvoice: {},
+      customers: [],
+      sellers: [],
+      zones: [],
+      services: [],
+      statuses: [],
       invoices: {
         invoices: [],
-        details: [],
         count: 0,
       },
       page: {
@@ -793,7 +793,6 @@ export default {
     //Aqui estamos filtrando todos los select
     fetchInvoices() {
       let params = this.page;
-
       if (this.filter.customer !== "") {
         params = { ...params, customer: this.filter.customer };
       }
@@ -822,7 +821,6 @@ export default {
       if (this.filter.service !== "") {
         params = { ...params, service: this.filter.service };
       }
-
       this.$axios
         .get("/invoices", { params })
         .then((res) => {
@@ -833,72 +831,66 @@ export default {
         });
     },
     handleSizeChange(val) {
-      console.log(val);
       this.page.limit = val;
       this.fetchInvoices();
     },
-
-    changeActive({ id, isActiveInvoice }) {
-      const action = isActiveInvoice ? "desactivar" : "activar";
-      this.$confirm(
-        `¿Estás seguro que deseas ${action} este cliente?`,
-        "Confirmación",
-        {
-          confirmButtonText: `Si, ${action}`,
-          cancelButtonText: "Cancelar",
-          type: "warning",
-          beforeClose: (action, instance, done) => {
-            if (action === "confirm") {
-              instance.confirmButtonLoading = true;
-              instance.confirmButtonText = "Procesando...";
-              this.$axios
-                .put(`/invoices/status/${id}`, { status: !isActiveInvoice })
-                .then((res) => {
-                  this.$notify.success({
-                    title: "Éxito",
-                    message: res.data.message,
-                  });
-                  this.fetchInvoices();
-                })
-                .catch((err) => {
-                  this.$notify.error({
-                    title: "Error",
-                    message: err.response.data.message,
-                  });
-                })
-                .then((alw) => {
-                  instance.confirmButtonLoading = false;
-                  instance.confirmButtonText = `Si, ${action}`;
-                  done();
-                });
-            }
-            done();
-          },
-        }
-      );
-    },
-
+    // changeActive({ id, isActiveInvoice }) {
+    //   const action = isActiveInvoice ? "desactivar" : "activar";
+    //   this.$confirm(
+    //     `¿Estás seguro que deseas ${action} este cliente?`,
+    //     "Confirmación",
+    //     {
+    //       confirmButtonText: `Si, ${action}`,
+    //       cancelButtonText: "Cancelar",
+    //       type: "warning",
+    //       beforeClose: (action, instance, done) => {
+    //         if (action === "confirm") {
+    //           instance.confirmButtonLoading = true;
+    //           instance.confirmButtonText = "Procesando...";
+    //           this.$axios
+    //             .put(`/invoices/status/${id}`, { status: !isActiveInvoice })
+    //             .then((res) => {
+    //               this.$notify.success({
+    //                 title: "Éxito",
+    //                 message: res.data.message,
+    //               });
+    //               this.fetchInvoices();
+    //             })
+    //             .catch((err) => {
+    //               this.$notify.error({
+    //                 title: "Error",
+    //                 message: err.response.data.message,
+    //               });
+    //             })
+    //             .then((alw) => {
+    //               instance.confirmButtonLoading = false;
+    //               instance.confirmButtonText = `Si, ${action}`;
+    //               done();
+    //             });
+    //         }
+    //         done();
+    //       },
+    //     }
+    //   );
+    // },
     async openInvoicePreview({ id }) {
       const { data } = await this.$axios.get(`/invoices/${id}`);
       this.selectedInvoice = data.invoice;
       this.showInvoicePreview = true;
     },
     calcUniPrice(documentType, { unitPrice, incTax, sellingType }) {
-      let uniPrice = null;
       const amount = parseFloat(unitPrice);
       let message = null;
-      if ((sellingType.id == 1) | (sellingType.id == 2)) {
+      if (sellingType.id == 1 || sellingType.id == 2) {
         unitPrice = amount;
       } else {
         if (documentType) {
           switch (documentType.id) {
             case 1:
               unitPrice = amount * (incTax ? 1 : 1.13);
-
               break;
             case 2:
               unitPrice = amount / (incTax ? 1.13 : 1);
-
               break;
           }
         } else {
