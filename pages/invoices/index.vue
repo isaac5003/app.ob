@@ -7,6 +7,271 @@
       { name: 'Listado de ventas', to: null },
     ]"
   >
+    <!--  -->
+    <el-dialog
+      title="Vista previa"
+      size="mini"
+      :visible.sync="showInvoicePreview"
+      width="900px"
+      :append-to-body="true"
+    >
+      <div class="flex flex-col space-y-4">
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-4 flex flex-col">
+            <span class="text-gray-700 font-bold text-sm w-full"
+              >Tipo de documento</span
+            >
+            <span>
+              {{
+                Object.keys(selectedInvoice).length > 0
+                  ? `${selectedInvoice.documentType.code} - ${selectedInvoice.documentType.name}`
+                  : ""
+              }}
+            </span>
+          </div>
+          <div class="col-span-2 flex flex-col">
+            <span class="text-gray-700 font-bold text-sm w-full"
+              >No. autorización</span
+            >
+            <span>{{
+              selectedInvoice ? selectedInvoice.authorization : ""
+            }}</span>
+          </div>
+          <div class="col-span-2 flex flex-col">
+            <span class="text-gray-700 font-bold text-sm w-full">
+              Correlativo</span
+            >
+            <span>{{ selectedInvoice ? selectedInvoice.sequence : "" }}</span>
+          </div>
+          <div class="col-span-2 flex flex-col">
+            <span class="text-gray-700 font-bold text-sm w-full">
+              Fecha de factura</span
+            >
+            <span>{{
+              selectedInvoice ? selectedInvoice.invoiceDate : ""
+            }}</span>
+          </div>
+          <div class="col-span-2 flex flex-col">
+            <span class="font-semibold">Estado</span>
+
+            <el-tag
+              size="small"
+              type="info"
+              v-if="
+                selectedInvoice.status ? selectedInvoice.status.id == '1' : ''
+              "
+            >
+              {{ selectedInvoice.status.name }}
+            </el-tag>
+            <el-tag
+              size="small"
+              type="success"
+              v-if="
+                selectedInvoice.status ? selectedInvoice.status.id == '2' : ''
+              "
+            >
+              {{ `${selectedInvoice.status.name}` }}
+            </el-tag>
+
+            <el-tag
+              size="small"
+              type="danger"
+              v-if="
+                selectedInvoice.status ? selectedInvoice.status.id == '3' : ''
+              "
+            >
+              {{ `${selectedInvoice.status.name}` }}
+            </el-tag>
+          </div>
+        </div>
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-4 flex flex-col">
+            <span class="text-gray-700 font-bold text-sm w-full">Cliente:</span>
+            <span>{{
+              selectedInvoice ? selectedInvoice.customerName : ""
+            }}</span>
+          </div>
+          <div class="col-span-2 flex flex-col">
+            <span class="text-gray-700 font-bold text-sm w-full"
+              >Sucursal:</span
+            >
+            <span> Casa matriz</span>
+          </div>
+          <div class="col-span-3 flex flex-col">
+            <span class="text-gray-700 font-bold text-sm w-full"
+              >Condiciones de pago:</span
+            >
+            <span>{{
+              selectedInvoice ? `${selectedInvoice.paymentConditionName}` : ""
+            }}</span>
+          </div>
+          <div class="col-span-3 flex flex-col">
+            <span class="text-gray-700 font-bold text-sm w-full"
+              >Venta a cuenta de:
+            </span>
+            <span>{{
+              selectedInvoice ? `${selectedInvoice.sellerName}` : ""
+            }}</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-4 flex flex-col">
+            <span class="text-gray-700 font-bold text-sm w-full"
+              >Dirección 1:</span
+            >
+            <span>{{
+              selectedInvoice ? selectedInvoice.customerAddress1 : ""
+            }}</span>
+          </div>
+          <div class="col-span-4 flex flex-col">
+            <span class="text-gray-700 font-bold text-sm w-full"
+              >Dirección 2:</span
+            >
+            <span>
+              {{
+                selectedInvoice ? selectedInvoice.customerAddress2 : ""
+              }}</span
+            >
+          </div>
+          <div class="col-span-2 flex flex-col">
+            <span class="text-gray-700 font-bold text-sm w-full"
+              >Departamento:</span
+            >
+            <span>{{
+              selectedInvoice ? `${selectedInvoice.customerState}` : ""
+            }}</span>
+          </div>
+          <div class="col-span-2 flex flex-col">
+            <span class="text-gray-700 font-bold text-sm w-full"
+              >Municipio:
+            </span>
+            <span>{{
+              selectedInvoice ? `${selectedInvoice.customerCity}` : ""
+            }}</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-3 flex flex-col">
+            <span class="text-gray-700 font-bold text-sm w-full">NIT:</span>
+            <span>{{
+              selectedInvoice ? selectedInvoice.customerNit : ""
+            }}</span>
+          </div>
+          <div class="col-span-3 flex flex-col">
+            <span class="text-gray-700 font-bold text-sm w-full">DUI:</span>
+            <span>
+              {{ selectedInvoice ? selectedInvoice.customerDui : "" }}</span
+            >
+          </div>
+          <div class="col-span-2 flex flex-col">
+            <span class="text-gray-700 font-bold text-sm w-full">NRC:</span>
+            <span>{{
+              selectedInvoice ? `${selectedInvoice.customerNrc}` : ""
+            }}</span>
+          </div>
+          <div class="col-span-4 flex flex-col">
+            <span class="text-gray-700 font-bold text-sm w-full">GIRO: </span>
+            <span>{{
+              selectedInvoice ? selectedInvoice.customerGiro : ""
+            }}</span>
+          </div>
+        </div>
+
+        <el-table :data="selectedInvoice.details" style="width: 100%">
+          <el-table-column type="index" prop="quantity" label="#" width="30" />
+          <el-table-column prop="quantity" label="Cant." width="55">
+          </el-table-column>
+          <el-table-column
+            prop="chargeDescription"
+            label="Description"
+            width="375"
+          />
+
+          <el-table-column prop="unitPrice" label="Precio Unit." width="100">
+            <template slot-scope="scope">
+              <span>{{
+                calcUniPrice(selectedInvoice.documentType, scope.row)
+                  | formatMoney
+              }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="address" label="V. No sujeta" width="100">
+          </el-table-column>
+          <el-table-column prop="address" label="V. Extenta" width="100">
+          </el-table-column>
+          <el-table-column prop="ventaPrice" label="V. Grabada" width="100">
+            <template slot-scope="scope">
+              <span>{{
+                calcUniPrice(selectedInvoice.ventaTotal, scope.row)
+                  | formatMoney
+              }}</span>
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <!-- sumas -->
+        <table class="flex justify-end">
+          <tbody class="text-sm divide-y divide-gray-300">
+            <tr class="flex space-x-16">
+              <td align="right" class="text-blue-900 w-50">SUMAS:</td>
+              <td align="right" class="text-gray-800">
+                {{ selectedInvoice.sum | formatMoney }}
+              </td>
+            </tr>
+            <tr
+              class="flex space-x-16"
+              v-if="
+                selectedInvoice.documentType
+                  ? selectedInvoice.documentType.id == 2
+                  : ''
+              "
+            >
+              <td align="right" class="text-blue-900 w-50">13% Iva:</td>
+              <td align="right" class="text-gray-800">
+                {{ selectedInvoice.iva | formatMoney }}
+              </td>
+            </tr>
+            <tr class="flex space-x-16">
+              <td align="right" class="text-blue-900 w-50">Subtotal:</td>
+              <td align="right" class="text-gray-800">
+                {{ selectedInvoice.subtotal | formatMoney }}
+              </td>
+            </tr>
+            <tr class="flex space-x-16">
+              <td align="right" class="text-blue-900 w-50">Iva retenido:</td>
+              <td align="right" class="text-gray-800">
+                {{ selectedInvoice.ivaRetenido | formatMoney }}
+              </td>
+            </tr>
+            <tr class="flex space-x-16">
+              <td align="right" class="text-blue-900 w-50">Ventas exentas:</td>
+              <td align="right" class="text-gray-800">
+                {{ selectedInvoice.ventasExentas | formatMoney }}
+              </td>
+            </tr>
+            <tr class="flex space-x-16">
+              <td align="right" class="text-blue-900 w-50">
+                Ventas no sujetas:
+              </td>
+              <td align="right" class="text-gray-800">
+                {{ selectedInvoice.ventasNoSujetas | formatMoney }}
+              </td>
+            </tr>
+            <tr class="flex space-x-16">
+              <td align="right" class="text-blue-900 font-semibold w-50">
+                Venta total:
+              </td>
+              <td align="right" class="text-gray-800">
+                {{ selectedInvoice.ventaTotal | formatMoney }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </el-dialog>
+    <!--  -->
     <div class="flex flex-col space-4">
       <div class="flex justify-center" v-if="errorMessage">
         <Notification
@@ -242,280 +507,7 @@
           </div>
         </div>
       </el-form>
-      <!--  -->
-      <el-dialog
-        title="Vista previa"
-        size="mini"
-        :visible.sync="showInvoicePreview"
-        width="900px"
-        :append-to-body="true"
-      >
-        <div class="flex flex-col space-y-4">
-          <div class="grid grid-cols-12 gap-4">
-            <div class="col-span-4 flex flex-col">
-              <span class="text-gray-700 font-bold text-sm w-full"
-                >Tipo de documento</span
-              >
-              <span>
-                {{
-                  Object.keys(selectedInvoice).length > 0
-                    ? `${selectedInvoice.documentType.code} - ${selectedInvoice.documentType.name}`
-                    : ""
-                }}
-              </span>
-            </div>
-            <div class="col-span-2 flex flex-col">
-              <span class="text-gray-700 font-bold text-sm w-full"
-                >No. autorización</span
-              >
-              <span>{{
-                selectedInvoice ? selectedInvoice.authorization : ""
-              }}</span>
-            </div>
-            <div class="col-span-2 flex flex-col">
-              <span class="text-gray-700 font-bold text-sm w-full">
-                Correlativo</span
-              >
-              <span>{{ selectedInvoice ? selectedInvoice.sequence : "" }}</span>
-            </div>
-            <div class="col-span-2 flex flex-col">
-              <span class="text-gray-700 font-bold text-sm w-full">
-                Fecha de factura</span
-              >
-              <span>{{
-                selectedInvoice ? selectedInvoice.invoiceDate : ""
-              }}</span>
-            </div>
-            <div class="col-span-2 flex flex-col">
-              <span class="font-semibold">Estado</span>
 
-              <el-tag
-                size="small"
-                type="info"
-                v-if="
-                  selectedInvoice.status ? selectedInvoice.status.id == '1' : ''
-                "
-              >
-                {{ selectedInvoice.status.name }}
-              </el-tag>
-              <el-tag
-                size="small"
-                type="success"
-                v-if="
-                  selectedInvoice.status ? selectedInvoice.status.id == '2' : ''
-                "
-              >
-                {{ `${selectedInvoice.status.name}` }}
-              </el-tag>
-
-              <el-tag
-                size="small"
-                type="danger"
-                v-if="
-                  selectedInvoice.status ? selectedInvoice.status.id == '3' : ''
-                "
-              >
-                {{ `${selectedInvoice.status.name}` }}
-              </el-tag>
-            </div>
-          </div>
-          <div class="grid grid-cols-12 gap-4">
-            <div class="col-span-4 flex flex-col">
-              <span class="text-gray-700 font-bold text-sm w-full"
-                >Cliente:</span
-              >
-              <span>{{
-                selectedInvoice ? selectedInvoice.customerName : ""
-              }}</span>
-            </div>
-            <div class="col-span-2 flex flex-col">
-              <span class="text-gray-700 font-bold text-sm w-full"
-                >Sucursal:</span
-              >
-              <span> Casa matriz</span>
-            </div>
-            <div class="col-span-3 flex flex-col">
-              <span class="text-gray-700 font-bold text-sm w-full"
-                >Condiciones de pago:</span
-              >
-              <span>{{
-                selectedInvoice ? `${selectedInvoice.paymentConditionName}` : ""
-              }}</span>
-            </div>
-            <div class="col-span-3 flex flex-col">
-              <span class="text-gray-700 font-bold text-sm w-full"
-                >Venta a cuenta de:
-              </span>
-              <span>{{
-                selectedInvoice ? `${selectedInvoice.sellerName}` : ""
-              }}</span>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-12 gap-4">
-            <div class="col-span-4 flex flex-col">
-              <span class="text-gray-700 font-bold text-sm w-full"
-                >Dirección 1:</span
-              >
-              <span>{{
-                selectedInvoice ? selectedInvoice.customerAddress1 : ""
-              }}</span>
-            </div>
-            <div class="col-span-4 flex flex-col">
-              <span class="text-gray-700 font-bold text-sm w-full"
-                >Dirección 2:</span
-              >
-              <span>
-                {{
-                  selectedInvoice ? selectedInvoice.customerAddress2 : ""
-                }}</span
-              >
-            </div>
-            <div class="col-span-2 flex flex-col">
-              <span class="text-gray-700 font-bold text-sm w-full"
-                >Departamento:</span
-              >
-              <span>{{
-                selectedInvoice ? `${selectedInvoice.customerState}` : ""
-              }}</span>
-            </div>
-            <div class="col-span-2 flex flex-col">
-              <span class="text-gray-700 font-bold text-sm w-full"
-                >Municipio:
-              </span>
-              <span>{{
-                selectedInvoice ? `${selectedInvoice.customerCity}` : ""
-              }}</span>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-12 gap-4">
-            <div class="col-span-3 flex flex-col">
-              <span class="text-gray-700 font-bold text-sm w-full">NIT:</span>
-              <span>{{
-                selectedInvoice ? selectedInvoice.customerNit : ""
-              }}</span>
-            </div>
-            <div class="col-span-3 flex flex-col">
-              <span class="text-gray-700 font-bold text-sm w-full">DUI:</span>
-              <span>
-                {{ selectedInvoice ? selectedInvoice.customerDui : "" }}</span
-              >
-            </div>
-            <div class="col-span-2 flex flex-col">
-              <span class="text-gray-700 font-bold text-sm w-full">NRC:</span>
-              <span>{{
-                selectedInvoice ? `${selectedInvoice.customerNrc}` : ""
-              }}</span>
-            </div>
-            <div class="col-span-4 flex flex-col">
-              <span class="text-gray-700 font-bold text-sm w-full">GIRO: </span>
-              <span>{{
-                selectedInvoice ? selectedInvoice.customerGiro : ""
-              }}</span>
-            </div>
-          </div>
-
-          <el-table :data="selectedInvoice.details" style="width: 100%">
-            <el-table-column
-              type="index"
-              prop="quantity"
-              label="#"
-              width="30"
-            />
-            <el-table-column prop="quantity" label="Cant." width="55">
-            </el-table-column>
-            <el-table-column
-              prop="chargeDescription"
-              label="Description"
-              width="375"
-            />
-
-            <el-table-column prop="unitPrice" label="Precio Unit." width="100">
-              <template slot-scope="scope">
-                <span>{{
-                  calcUniPrice(selectedInvoice.documentType, scope.row)
-                    | formatMoney
-                }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="address" label="V. No sujeta" width="100">
-            </el-table-column>
-            <el-table-column prop="address" label="V. Extenta" width="100">
-            </el-table-column>
-            <el-table-column prop="ventaPrice" label="V. Grabada" width="100">
-              <template slot-scope="scope">
-                <span>{{
-                  calcUniPrice(selectedInvoice.ventaTotal, scope.row)
-                    | formatMoney
-                }}</span>
-              </template>
-            </el-table-column>
-          </el-table>
-
-          <!-- sumas -->
-          <table class="flex justify-end">
-            <tbody class="text-sm divide-y divide-gray-300">
-              <tr class="flex space-x-16">
-                <td align="right" class="text-blue-900 w-50">SUMAS:</td>
-                <td align="right" class="text-gray-800">
-                  {{ selectedInvoice.sum | formatMoney }}
-                </td>
-              </tr>
-              <tr
-                class="flex space-x-16"
-                v-if="
-                  selectedInvoice.documentType
-                    ? selectedInvoice.documentType.id == 2
-                    : ''
-                "
-              >
-                <td align="right" class="text-blue-900 w-50">13% Iva:</td>
-                <td align="right" class="text-gray-800">
-                  {{ selectedInvoice.iva | formatMoney }}
-                </td>
-              </tr>
-              <tr class="flex space-x-16">
-                <td align="right" class="text-blue-900 w-50">Subtotal:</td>
-                <td align="right" class="text-gray-800">
-                  {{ selectedInvoice.subtotal | formatMoney }}
-                </td>
-              </tr>
-              <tr class="flex space-x-16">
-                <td align="right" class="text-blue-900 w-50">Iva retenido:</td>
-                <td align="right" class="text-gray-800">
-                  {{ selectedInvoice.ivaRetenido | formatMoney }}
-                </td>
-              </tr>
-              <tr class="flex space-x-16">
-                <td align="right" class="text-blue-900 w-50">
-                  Ventas exentas:
-                </td>
-                <td align="right" class="text-gray-800">
-                  {{ selectedInvoice.ventasExentas | formatMoney }}
-                </td>
-              </tr>
-              <tr class="flex space-x-16">
-                <td align="right" class="text-blue-900 w-50">
-                  Ventas no sujetas:
-                </td>
-                <td align="right" class="text-gray-800">
-                  {{ selectedInvoice.ventasNoSujetas | formatMoney }}
-                </td>
-              </tr>
-              <tr class="flex space-x-16">
-                <td align="right" class="text-blue-900 font-semibold w-50">
-                  Venta total:
-                </td>
-                <td align="right" class="text-gray-800">
-                  {{ selectedInvoice.ventaTotal | formatMoney }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </el-dialog>
-      <!--  -->
       <el-table :data="invoices.invoices" stripe size="small">
         <el-table-column prop="index" min-width="40" />
         <el-table-column label="# Factura" min-width="120">
@@ -600,6 +592,7 @@
                   :divided="true"
                   class="text-red-500 font-semibold"
                   v-if="scope.row.status.id == '1'"
+                  @click.native="deleteInvoice(scope.row)"
                 >
                   <i class="el-icon-delete"></i> Eliminar factura
                 </el-dropdown-item>
@@ -625,7 +618,7 @@
           :page-sizes="[5, 10, 15, 25, 50, 100]"
           :page-size="page.size"
           layout="total, sizes, prev, pager, next"
-          :total="invoices.count"
+          :total="parseInt(invoices.count)"
           :pager-count="5"
         />
       </div>
@@ -755,9 +748,48 @@ export default {
         searchValue: "",
         documentType: "",
       },
+      document: {},
     };
   },
   methods: {
+    deleteInvoice({ id }) {
+      this.$confirm(
+        `¿Estás seguro que deseas eliminar esta venta?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, eliminar`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .delete(`/invoices/${id}`)
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchInvoices();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, eliminar`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
+    },
     //Aqui estamos filtrando todos los select
     fetchInvoices() {
       let params = this.page;
@@ -875,9 +907,6 @@ export default {
       }
       return unitPrice;
     },
-    //  const {data} = await this.$axios.get(`/business/${id}`);
-    //  this.selecetedBusiness =data.busine;
-    //  this.showInvoicePreview = true;
   },
 };
 </script>
