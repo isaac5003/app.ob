@@ -342,16 +342,9 @@ export default {
         searchValue: "",
         squared: false,
         accounted: false,
+        active:false
       },
-      tipoPartida: [
-        {
-          id: "a0dea81f-e5e4-4253-a587-716102dfc6ab",
-          name: "Diario",
-          name: "Ingreso",
-          name: "Egreso",
-          name: "DIA",
-        },
-      ],
+    
       entries: {
         entries: [],
         count: 0,
@@ -371,7 +364,7 @@ export default {
       if (this.filterBy.entryType != "") {
         params = {
           ...params,
-          sec: this.filterBy.entryType,
+         entryType: this.filterBy.entryType,
         };
       }
       if (this.filterBy.searchValue != "") {
@@ -407,8 +400,8 @@ export default {
     },
     getSummaries(value) {
       const { columns, data } = value;
-      const totalAbono = data.reduce((a,b)=>a+b.abono ? b.abono:0, 0);
-      const totalCargo = data.reduce((a,b) =>a+b.cargo ? b.cargo : 0, 0);
+      const totalAbono = data.reduce((a,b) => a+b.abono ? b.abono:0, 0);
+      const totalCargo = data.reduce((a,b)  =>a+b.cargo ? b.cargo : 0, 0);
 
       const result = columns.map((column) => {
         console.log(column.label)
