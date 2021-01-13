@@ -27,7 +27,69 @@
               <el-input
                 suffix-icon="el-icon-search"
                 placeholder="Buscar..."
-                v-model="filter.searchValue"
+                v-model="searchValue"
+                size="small"
+                v-debounce:500ms="fetchInvoices"
+                @change="fetchInvoices"
+              />
+            </el-form-item>
+          </div>
+        </div>
+        <!-- <div class="flex flex-col"> -->
+        <div class="grid grid-cols-12 gap-4">
+          <div class=" col-span-4">
+            <el-form-item label="Rango de fechas:">
+              <el-date-picker
+                v-model="filter.dateRange"
+                style="width:100%"
+                size="small"
+                type="daterange"
+                range-separator="-"
+                start-placeholder="Fecha inicial"
+                end-placeholder="Fecha final"
+              >
+              </el-date-picker>
+            </el-form-item>
+          </div>
+          <div class="col-span-4">
+            <el-form-item label="Cliente:">
+              <el-select
+                v-model="filter.customer"
+                size="small"
+                class="w-full"
+                clearable
+                filterable
+                default-first-option
+                placeholder="Todos los clientes:"
+                v-debounce:500ms="fetchInvoices"
+                @change="fetchInvoices"
+              >
+                <el-option-group key="ACTIVOS" label="ACTIVOS">
+                  <el-option label="Todos los clientes" value="" />
+                  <el-option
+                    v-for="item in activeCustomers"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                  </el-option>
+                </el-option-group>
+                <el-option-group key="INACTIVOS" label="INACTIVOS">
+                  <el-option
+                    v-for="item in inactiveCustomers"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                  </el-option>
+                </el-option-group>
+              </el-select>
+            </el-form-item>
+          </div>
+          <div class="col-span-2">
+            <el-form-item label="Tipo fact:">
+              <el-select
+                v-model="filter.invoiceType"
                 size="small"
                 clearable
                 v-debounce:500ms="fetchInvoices"
