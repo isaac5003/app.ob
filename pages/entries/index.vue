@@ -398,16 +398,14 @@ export default {
       this.page.limit = val;
       this.page.fetchEntries();
     },
-    getSummaries(value) {
-      const { columns, data } = value;
-      const totalAbono = data.reduce((a,b) => a+b.abono ? b.abono:0, 0);
-      const totalCargo = data.reduce((a,b)  =>a+b.cargo ? b.cargo : 0, 0);
-
-      const result = columns.map((column) => {
-        console.log(column.label)
+ getSummaries(param) {
+      const { columns, data } = param;
+      const totalAbono = data.reduce((a, b) => a + (b.abono ? b.abono : 0), 0);
+      const totalCargo = data.reduce((a, b) => a + (b.cargo ? b.cargo : 0), 0);
+      const resutls = columns.map((column) => {
         if (column.label == "Abono") {
           return this.$options.filters.formatMoney(totalAbono);
-        } else if (column.label == "Cargo" ) {
+        } else if (column.label == "Cargo") {
           return this.$options.filters.formatMoney(totalCargo);
         } else if (column.label == "Concepto") {
           return "TOTALES";
@@ -415,8 +413,9 @@ export default {
           return "";
         }
       });
-      return result;
+      return resutls;
     },
+    
     // changeActive({ id, isActiveInvoice }) {
     //   const action = isActiveInvoice ? "desactivar" : "activar";
     //   this.$confirm(
