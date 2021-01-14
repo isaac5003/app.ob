@@ -13,12 +13,7 @@
       :append-to-body="true"
       width="900px"
     >
-      <el-form
-        :model="mayorAccountForm"
-        :rules="mayorAccountFormRules"
-        status-icon
-        ref="mayorAccountForm"
-      >
+      <el-form :model="mayorAccountForm" status-icon ref="mayorAccountForm">
         <!-- first row -->
         <div
           class="grid grid-cols-12 gap-4"
@@ -26,7 +21,11 @@
           :key="i"
         >
           <div class="col-span-2">
-            <el-form-item label="Código" prop="code">
+            <el-form-item
+              label="Código"
+              :prop="`items.${i}.code`"
+              :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
+            >
               <el-input-number
                 v-model="mayorAccountForm.items[i].code"
                 type="number"
@@ -39,7 +38,11 @@
             </el-form-item>
           </div>
           <div class="col-span-5">
-            <el-form-item label="Nombre" prop="name">
+            <el-form-item
+              label="Nombre"
+              :prop="`items.${i}.name`"
+              :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
+            >
               <el-input
                 v-model="mayorAccountForm.items[i].name"
                 size="small"
@@ -104,8 +107,116 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <div class="flex justify-end">
-          <el-button type="primary" size="small">Guardar</el-button>
+          <el-button
+            type="primary"
+            size="small"
+            @click.native="
+              submitNewCatalog(mayorAccountForm.items, 'mayorAccountForm')
+            "
+            >Guardar</el-button
+          >
           <el-button @click="showCreateCatalogDialog = false" size="small"
+            >Cancelar</el-button
+          >
+        </div>
+      </span>
+    </el-dialog>
+    <!-- editar cuenta mayo -->
+    <el-dialog
+      title="Editar cuenta mayor"
+      :visible.sync="showEditMayorDialog"
+      :append-to-body="true"
+      width="900px"
+    >
+      <el-form
+        :model="activeAccount"
+        :rules="mayorAccountFormRules"
+        status-icon
+        ref="activeAccount"
+      >
+        <div
+          class="grid grid-cols-12 gap-4"
+          v-if="activeAccount.subCatalogs.length > 0"
+        >
+          <div class="col-span-12">
+            <notification
+              type="info"
+              title="Atención"
+              message="Esta cuenta tiene sub cuentas, y no se puede editar el código, solamente el nombre."
+            />
+          </div>
+        </div>
+        <!-- first row -->
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-2">
+            <el-form-item
+              label="Código"
+              prop="code"
+              :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
+            >
+              <el-input-number
+                v-model="activeAccount.code"
+                type="number"
+                min="1"
+                size="small"
+                :disabled="activeAccount.subCatalogs.length > 0"
+              />
+            </el-form-item>
+          </div>
+          <div class="col-span-5">
+            <el-form-item
+              label="Nombre"
+              prop="name"
+              :rules="[
+                {
+                  required: true,
+                  message: 'Este campo es requerido',
+                  trigger: 'blur',
+                },
+                {
+                  min: 3,
+                  message: 'Debe contener mínimo 3 caracteres.',
+                  trigger: 'blur',
+                },
+              ]"
+            >
+              <el-input v-model="activeAccount.name" size="small" />
+            </el-form-item>
+          </div>
+          <div class="col-span-2">
+            <el-form-item prop="service" style="margin-top: 20px">
+              <el-checkbox
+                v-model="activeAccount.isAcreedora"
+                label="Acreedora"
+                size="small"
+                border
+                class="w-full"
+              />
+            </el-form-item>
+          </div>
+          <div class="col-span-2">
+            <el-form-item prop="service" style="margin-top: 20px">
+              <el-checkbox
+                v-model="activeAccount.isBalance"
+                label="Balance"
+                size="small"
+                border
+                class="w-full"
+              />
+            </el-form-item>
+          </div>
+        </div>
+        <!-- second row -->
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <div class="flex justify-end">
+          <el-button
+            type="primary"
+            size="small"
+            @click.native="submitEditedCatalog(activeAccount, 'activeAccount')"
+            >Guardar</el-button
+          >
+          <el-button @click="showEditMayorDialog = false" size="small"
             >Cancelar</el-button
           >
         </div>
@@ -118,20 +229,19 @@
       :append-to-body="true"
       width="900px"
     >
-      <el-form
-        :model="newAccountForm"
-        :rules="newAccountFormRules"
-        status-icon
-        ref="newAccountForm"
-      >
+      <el-form :model="newAccountForm" status-icon ref="newAccountForm">
         <div class="grid grid-cols-12 gap-4 mb-4">
           <div class="col-span-2 flex flex-col">
             <span class="font-bold text-xs">Código padre</span>
-            <p class="text-xs">1111111prueba</p>
+            <p class="text-xs">
+              {{ activeAccount != null ? activeAccount.code : "" }}
+            </p>
           </div>
           <div class="col-span-3 flex flex-col">
             <span class="font-bold text-xs">Nombre padre</span>
-            <p class="text-xs">nombre del padre prueba</p>
+            <p class="text-xs">
+              {{ activeAccount != null ? activeAccount.name : "" }}
+            </p>
           </div>
         </div>
 
@@ -142,9 +252,13 @@
           :key="i"
         >
           <div class="col-span-2">
-            <el-form-item label="Código" prop="code">
+            <el-form-item
+              label="Código"
+              :prop="`items.${i}.code`"
+              :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
+            >
               <el-input-number
-                v-model="newAccountForm.items[i].code"
+                v-model="item.code"
                 ref="code"
                 type="number"
                 :min="0"
@@ -156,10 +270,14 @@
             </el-form-item>
           </div>
           <div class="col-span-5">
-            <el-form-item label="Nombre" prop="name">
+            <el-form-item
+              label="Nombre"
+              :prop="`items.${i}.name`"
+              :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
+            >
               <el-input
                 size="small"
-                v-model="newAccountForm.items[i].name"
+                v-model="item.name"
                 autocomplete="off"
                 style="width: 100%"
                 maxlength="100"
@@ -175,7 +293,7 @@
                 border
                 class="mt-5"
                 style="width: 100%"
-                v-model="newAccountForm.items[i].isAcreedora"
+                v-model="item.isAcreedora"
               >
                 Acreedora
               </el-checkbox>
@@ -221,8 +339,149 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <div class="flex justify-end">
-          <el-button type="primary" size="small">Guardar</el-button>
+          <el-button
+            type="primary"
+            size="small"
+            @click.native="
+              submitNewCatalog(
+                newAccountForm.items,
+                'newAccountForm',
+                activeAccount
+              )
+            "
+            >Guardar</el-button
+          >
           <el-button @click="showCreateCatalogDialog = false" size="small"
+            >Cancelar</el-button
+          >
+        </div>
+      </span>
+    </el-dialog>
+    <!-- editar cuenta contable -->
+    <el-dialog
+      :id="activeAccount != null ? activeAccount.code : ''"
+      title="Editar cuenta contable"
+      :visible.sync="showEditAccount"
+      :append-to-body="true"
+      width="1000px"
+    >
+      <el-form
+        :model="activeAccount"
+        :rules="mayorAccountFormRules"
+        status-icon
+        ref="accountFormEdit"
+      >
+        <div
+          class="grid grid-cols-12 gap-4"
+          v-if="activeAccount.subCatalogs.length > 0"
+        >
+          <div class="col-span-12">
+            <notification
+              type="info"
+              title="Atención"
+              message="Esta cuenta tiene sub cuentas, y no se puede editar el código, solamente el nombre."
+            />
+          </div>
+        </div>
+        <div class="grid grid-cols-12 gap-4 mb-4">
+          <div class="col-span-2 flex flex-col">
+            <span class="font-semibold text-xs">Código padre</span>
+            <p class="text-xs">
+              {{
+                activeAccount != null && activeAccount.parentCatalog != null
+                  ? activeAccount.parentCatalog.code
+                  : ""
+              }}
+            </p>
+          </div>
+          <div class="col-span-3 flex flex-col">
+            <span class="font-semibold text-xs">Nombre padre</span>
+            <p class="text-xs">
+              {{
+                activeAccount != null && activeAccount.parentCatalog != null
+                  ? activeAccount.parentCatalog.name
+                  : ""
+              }}
+            </p>
+          </div>
+        </div>
+        <!-- first row -->
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-2">
+            <el-form-item
+              label="Código"
+              prop="code"
+              :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
+            >
+              <el-input-number
+                v-model="activeAccount.code"
+                type="number"
+                min="1"
+                size="small"
+                :disabled="activeAccount.subCatalogs.length > 0"
+              />
+            </el-form-item>
+          </div>
+          <div class="col-span-5">
+            <el-form-item
+              label="Nombre"
+              prop="name"
+              :rules="[
+                {
+                  required: true,
+                  message: 'Este campo es requerido',
+                  trigger: 'blur',
+                },
+                {
+                  min: 3,
+                  message: 'Debe contener mínimo 3 caracteres.',
+                  trigger: 'blur',
+                },
+              ]"
+            >
+              <el-input v-model="activeAccount.name" size="small" />
+            </el-form-item>
+          </div>
+          <div class="col-span-2">
+            <el-form-item prop="service" style="margin-top: 20px">
+              <el-checkbox
+                v-model="activeAccount.isAcreedora"
+                label="Acreedora"
+                size="small"
+                border
+                class="w-full"
+              />
+            </el-form-item>
+          </div>
+          <div class="col-span-2">
+            <el-form-item prop="service" style="margin-top: 20px">
+              <el-checkbox
+                v-model="activeAccount.isBalance"
+                label="Balance"
+                size="small"
+                border
+                class="w-full"
+              />
+            </el-form-item>
+          </div>
+        </div>
+        <!-- second row -->
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <div class="flex justify-end">
+          <el-button
+            type="primary"
+            size="small"
+            @click.native="
+              submitEditedCatalog(
+                activeAccount,
+                'accountFormEdit',
+                activeAccount.parentCatalog
+              )
+            "
+            >Guardar</el-button
+          >
+          <el-button @click="showEditAccount = false" size="small"
             >Cancelar</el-button
           >
         </div>
@@ -294,22 +553,24 @@
                 label="	(A)creedor/(D)eudor"
                 min-width="150"
                 align="center"
-              ></el-table-column>
+              >
+                <template slot-scope="scope">{{
+                  scope.row.isAcreedora ? "A" : "D"
+                }}</template>
+              </el-table-column>
               <el-table-column prop="name" min-width="150">
                 <template slot-scope="scope">
                   <el-button
                     size="mini"
                     type="primary"
-                    @click="addNewAccountDialog()"
+                    @click="addNewAccountDialog(scope.row)"
                     icon="el-icon-plus"
                   />
                   <el-dropdown trigger="click" szie="mini">
                     <el-button icon="el-icon-more" size="mini" />
                     <el-dropdown-menu slot="dropdown">
                       <el-dropdown-item
-                        @click.native="
-                          $router.push(`/invoices/edit/${scope.row.id}`)
-                        "
+                        @click.native="openEditAccount(scope.row)"
                       >
                         <i class="el-icon-edit-outline"></i> Editar cuenta
                       </el-dropdown-item>
@@ -633,18 +894,8 @@ export default {
       ],
       showCreateCatalogDialog: false,
       showCreateAccountEntryDialog: false,
-      accounts: [
-        {
-          code: "454sa",
-          name: "EFECTIVO Y EQUIVALENTES AL EFECTIVO",
-          description: "Tangamandapio y perulapia",
-          isAcreedora: "Acreedora",
-        },
-      ],
-      mayorAccountFormRules: {
-        code: inputValidation(true),
-        name: inputValidation(true),
-      },
+      accounts: [],
+
       mayorAccountForm: {
         items: [
           {
@@ -669,20 +920,43 @@ export default {
           },
         ],
       },
+      activeAccount: {
+        code: "",
+        name: "",
+        description: "",
+        isAcreedora: false,
+        isBalance: false,
+        subCatalogs: [],
+      },
+      showEditMayorDialog: false,
+      showEditAccount: false,
     };
   },
   methods: {
+    mayorAccountFormRules: {},
     addMayorAccount() {
       this.showCreateCatalogDialog = true;
       if (this.$refs["mayorAccountForm"]) {
         this.$refs["mayorAccountForm"].resetFields();
       }
     },
-    addNewAccountDialog() {
+    addNewAccountDialog(parentAccount) {
+      console.log(parentAccount);
+
       this.showCreateAccountEntryDialog = true;
-      if (this.$refs["addNewAccountForm"]) {
-        this.$refs["addNewAccountForm"].resetFields();
-      }
+
+      this.activeAccount = { ...parentAccount, subCatalogs: [] };
+      console.log(this.activeAccount);
+      return false;
+      this.newAccountForm.items = [
+        {
+          code: "",
+          name: "",
+          description: "",
+          isAcreedora: false,
+          isBalance: false,
+        },
+      ];
     },
     addNewMayorAccount() {
       this.mayorAccountForm.items.push({
@@ -706,11 +980,145 @@ export default {
     removeNewAccount(index) {
       this.newAccountForm.items.splice(index, 1);
     },
+    submitNewCatalog(mayorAccounts, formName, activeAccount) {
+      console.log(mayorAccounts, formName, activeAccount);
+      this.$refs[formName].validate((valid) => {
+        if (!valid) {
+          return false;
+        }
+
+        // Verifica si es sub cuenta
+        if (activeAccount) {
+          // Si es sub cuenta actualiza el codigo a utilizar
+          mayorAccounts = mayorAccounts.map((a) => {
+            return { ...a, code: `${activeAccount.code}${a.code}`, level: 2 };
+          });
+        } else {
+          mayorAccounts = mayorAccounts.map((a) => {
+            return { ...a, level: 1 };
+          });
+        }
+
+        // Verifica si los codigos en la ventana de dialogo estan duplicados entre ellos.
+        let count = {};
+        for (let i = 0; i < mayorAccounts.length; i++) {
+          const acc = mayorAccounts[i].code;
+          count[acc] = count[acc] ? count[acc] + 1 : 1;
+        }
+
+        if (Object.values(count).filter((v) => v > 1).length > 0) {
+          return this.$notify({
+            title: "Error",
+            message: "No puedes tener números de códigos duplicados.",
+            type: "error",
+          });
+        }
+
+        // Verifica si los codigos nuevos y los guardados estan duplicados entre ellos.
+        const catalog = this.accounts.map((a) => a.code);
+        for (const acc of mayorAccounts) {
+          if (catalog.includes(acc.code)) {
+            return this.$notify({
+              title: "Error",
+              message:
+                "No pueden existir códigos duplicados entres las nuevas cuentas y las ya existentes.",
+              type: "error",
+            });
+          }
+        }
+
+        this.$confirm(
+          "¿Estás seguro que deseas guardar estas cuentas contables?",
+          "Confirmación",
+          {
+            confirmButtonText: "Si, guardar",
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                let dataAccounts = "";
+                for (const acc of mayorAccounts) {
+                  // Agrega la descripcion
+                  const description = !acc.description
+                    ? null
+                    : `"${acc.description}"`;
+
+                  // Agrega parentCatalog
+                  const parentCatalog = !activeAccount ? null : activeAccount;
+
+                  // esto ya no seria necesario (pasarlo a string, ahorita guarda obketos en el arreglo)
+                  // proba nuevamente
+
+                  this.accounts.push({
+                    code: acc.code,
+                    name: acc.name,
+                    description: description,
+                    isAcreedora: acc.isAcreedora,
+                    isBalance: acc.isBalance,
+                    parentCatalog: parentCatalog,
+                    level: acc.level,
+                  });
+
+                  // dataAccounts += `{
+                  //   code: "${acc.code}",
+                  //   name: "${acc.name}",
+                  //   description: ${description},
+                  //   isAcreedora: ${acc.isAcreedora},
+                  //   isBalance: ${acc.isBalance},
+                  //   parentCatalog: ${parentCatalog},
+                  // }`;
+
+                  // if (!activeAccount) {
+                  //   this.accounts += dataAccounts;
+                  // } else {
+                  //   this.accounts += dataAccounts;
+                  // }
+                }
+                setTimeout(() => {
+                  this.$refs[formName].resetFields();
+                  this.showCreateAccountEntryDialog = false;
+                  (this.mayorAccountForm.items = [
+                    {
+                      code: "",
+                      name: "",
+                      isAcreedora: false,
+                      isBalance: false,
+                    },
+                  ]),
+                    (this.showCreateCatalogDialog = false);
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = "Si, guardar";
+                  done();
+                }, 500);
+              } else {
+                done();
+              }
+            },
+          }
+        );
+      });
+    },
+    openEditAccount(account) {
+      console.log(account);
+
+      if (account.level == 1) {
+        this.activeAccount = { ...account, subCatalogs: [] };
+        this.showEditMayorDialog = true;
+      } else {
+        this.activeAccount = {
+          ...account,
+          subCatalogs: [],
+        };
+        this.showEditAccount = true;
+      }
+    },
   },
   computed: {
-    filteredIntegrations() {
-      return this.integrations.filter((i) => hasModule(i.ref, this.$auth.user));
-    },
+    // filteredIntegrations() {
+    //   return this.integrations.filter((i) => hasModule(i.ref, this.$auth.user));
+    // },
   },
 };
 </script>
