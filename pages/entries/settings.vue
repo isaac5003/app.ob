@@ -608,6 +608,56 @@
         >
       </span>
     </el-dialog>
+    <el-dialog
+      title="Cambiar nombre en reporte"
+      :visible.sync="showChangeDisplayNameEstado"
+      width="550px"
+      :append-to-body="true"
+    >
+      <div class="flex flex-col space-y-2">
+        <span>Cambiar de: {{ selectedParentAccountEstado.name }}</span>
+        <div class="flex flex-row items-center space-x-2">
+          <el-checkbox
+            size="small"
+            v-model="allowNewDisplayNameEstado"
+            label="Personalizar"
+            border
+            class="mt-1"
+            @change="
+              changeAllowDisplayName(
+                selectedParentAccountEstado,
+                allowNewDisplayNameEstado,
+                newDisplayNameEstado
+              )
+            "
+          />
+          <el-input
+            placeholder="Nombre a mostrar en reporte"
+            v-model="newDisplayNameEstado"
+            size="small"
+            clearable
+            :disabled="!allowNewDisplayNameEsatdo"
+          />
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showChangeDisplayNameEstado = false" size="small"
+          >Cancelar</el-button
+        >
+        <el-button
+          type="primary"
+          @click="
+            changeDisplayName(
+              selectedParentAccountEstado,
+              newDisplayNameEstado,
+              allowNewDisplayNameEstado
+            )
+          "
+          size="small"
+          >Agregar</el-button
+        >
+      </span>
+    </el-dialog>
 
     <el-tabs
       v-model="tab"
@@ -945,7 +995,7 @@
                     <el-button
                       icon="el-icon-edit"
                       size="mini"
-                      @click="openChangeDisplay(scope.row)"
+                      @click="openChangeDisplayName(scope.row)"
                     />
                   </el-tooltip>
                 </template>
@@ -1715,7 +1765,7 @@ export default {
       }, 500);
     },
 
-    changeDisplayName(account, display, allow) {
+    changeDisplayNameEstado(account, display, allow) {
       if (display == "") {
         return this.$notify.error({
           title: "Error",
@@ -1723,14 +1773,17 @@ export default {
         });
       }
       account.display = allow ? display : account.name;
-      this.showChangeDisplayName = false;
+      this.showChangeDisplayNameEstado = false;
     },
-    changeAllowDisplayName(account, allowNewDisplayName, newDisplayName) {
-      this.newDisplayName == allowNewDisplayName
-        ? newDisplayName
+    changeAllowDisplayName(account, allowNewDisplayNameEstado, newDisplayName) {
+      this.newDisplayNameEstado == allowNewDisplayNameEstado
+        ? newDisplayNameEstado
         : account.display;
-      console.log(account, allowNewDisplayName, newDisplayName);
-      console.log(allowNewDisplayName ? newDisplayName : account.name);
+    },
+    openChangeDisplayName(account) {
+      this.selectedParentAccountEstado = account;
+      this.newDisplayNameEstado = account.display;
+      this.showChangeDisplayNameEstado = true;
     },
     cancel() {
       this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
