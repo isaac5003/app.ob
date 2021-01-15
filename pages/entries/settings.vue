@@ -27,7 +27,7 @@
               :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
             >
               <el-input-number
-                v-model="mayorAccountForm.items[i].code"
+                v-model="item.code"
                 type="number"
                 :min="0"
                 :step="1"
@@ -44,7 +44,7 @@
               :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
             >
               <el-input
-                v-model="mayorAccountForm.items[i].name"
+                v-model="item.name"
                 size="small"
                 autocomplete="off"
                 style="width: 100%"
@@ -61,7 +61,7 @@
                 border
                 class="mt-5"
                 style="width: 100%"
-                v-model="mayorAccountForm.items[i].isAcreedora"
+                v-model="item.isAcreedora"
               >
                 Acreedora
               </el-checkbox>
@@ -74,7 +74,7 @@
                 border
                 class="mt-5"
                 style="width: 100%"
-                v-model="mayorAccountForm.items[i].isBalance"
+                v-model="item.isBalance"
               >
                 Balance
               </el-checkbox>
@@ -133,11 +133,9 @@
         :rules="mayorAccountFormRules"
         status-icon
         ref="activeAccount"
+        class="space-y-4"
       >
-        <div
-          class="grid grid-cols-12 gap-4"
-          v-if="activeAccount.subCatalogs.length > 0"
-        >
+        <div class="grid grid-cols-12 gap-4" v-if="activeAccount.isParent">
           <div class="col-span-12">
             <notification
               type="info"
@@ -159,7 +157,7 @@
                 type="number"
                 min="1"
                 size="small"
-                :disabled="activeAccount.subCatalogs.length > 0"
+                :disabled="activeAccount.isParent == true"
               />
             </el-form-item>
           </div>
@@ -371,10 +369,7 @@
         status-icon
         ref="accountFormEdit"
       >
-        <div
-          class="grid grid-cols-12 gap-4"
-          v-if="activeAccount.subCatalogs.length > 0"
-        >
+        <div class="grid grid-cols-12 gap-4">
           <div class="col-span-12">
             <notification
               type="info"
@@ -418,7 +413,6 @@
                 type="number"
                 min="1"
                 size="small"
-                :disabled="activeAccount.subCatalogs.length > 0"
               />
             </el-form-item>
           </div>
@@ -549,7 +543,6 @@
                 min-width="270"
               ></el-table-column>
               <el-table-column
-                prop="isAcreedora"
                 label="	(A)creedor/(D)eudor"
                 min-width="150"
                 align="center"
@@ -558,7 +551,7 @@
                   scope.row.isAcreedora ? "A" : "D"
                 }}</template>
               </el-table-column>
-              <el-table-column prop="name" min-width="150">
+              <el-table-column min-width="150">
                 <template slot-scope="scope">
                   <el-button
                     size="mini"
@@ -578,6 +571,7 @@
                       <el-dropdown-item
                         :divided="true"
                         class="text-red-500 font-semibold"
+                        v-if="activeAccount.isParent"
                       >
                         <i class="el-icon-delete"></i> Eliminar Cuenta
                       </el-dropdown-item>
@@ -590,8 +584,8 @@
         </div>
       </el-tab-pane>
       <!-- tab balance general -->
-      <el-tab-pane label="Balance General" name="balance-general">
-        <!-- noticication -->
+      <!-- <el-tab-pane label="Balance General" name="balance-general">
+      
         <div class="grid grid-cols-12">
           <div class="col-span-12">
             <Notification
@@ -602,7 +596,7 @@
             />
           </div>
         </div>
-        <!-- second row -->
+        
         <el-form>
           <div class="grid grid-cols-12 gap-4">
             <div class="col-span-3">
@@ -659,7 +653,7 @@
             </div>
           </div>
         </el-form>
-        <!-- table row -->
+     
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-12">
             <el-table
@@ -670,11 +664,7 @@
               border
             >
               <el-table-column prop="cuenta" label="Cuenta" min-width="200" />
-              <el-table-column
-                prop="nombrereporte"
-                label="Nombre en reporte"
-                min-width="170"
-              >
+              <el-table-column label="Nombre en reporte" min-width="170">
                 <template slot-scope="scope">
                   <div class="flex justify-between items-center">
                     <span>{{ scope.row.nombrereporte }}</span>
@@ -693,17 +683,17 @@
             </el-table>
           </div>
         </div>
-        <!-- botones de guardar y cancelar -->
+     
         <div class="flex justify-end mt-4">
           <el-button type="primary" size="small" native-type="submit"
             >Guardar</el-button
           >
           <el-button size="small">Cancelar</el-button>
         </div>
-      </el-tab-pane>
+      </el-tab-pane> -->
       <!-- tab estado resultados -->
-      <el-tab-pane label="Estado de resultados" name="estado resultados">
-        <!-- noticication -->
+      <!-- <el-tab-pane label="Estado de resultados" name="estado resultados">
+     
         <div class="grid grid-cols-12">
           <div class="col-span-12">
             <Notification
@@ -715,7 +705,7 @@
           </div>
         </div>
 
-        <!-- table row -->
+        
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-12">
             <el-table
@@ -779,14 +769,14 @@
             </el-table>
           </div>
         </div>
-        <!-- botones de guardar y cancelar -->
+     
         <div class="flex justify-end mt-4">
           <el-button type="primary" size="small" native-type="submit"
             >Guardar</el-button
           >
           <el-button size="small">Cancelar</el-button>
         </div>
-      </el-tab-pane>
+      </el-tab-pane> -->
       <!-- tab integraciones -->
       <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
         <Notification
@@ -856,14 +846,12 @@ export default {
       this.utab = this.$route.query.utab;
     }
 
-    const zones = () => {
-      return this.$axios.get("/invoices/zones");
-    };
+    const accountCatalogs = () => this.$axios.get("/entries/catalog");
 
-    Promise.all([zones()])
+    Promise.all([accountCatalogs()])
       .then((res) => {
-        const [zones] = res;
-        this.zones = zones.data.zones;
+        const [accountCatalogs] = res;
+        this.accounts = accountCatalogs.data.accountingCatalog;
         this.loading = false;
       })
       .catch((err) => {
@@ -873,6 +861,7 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+      loading: true,
       balance: [
         { cuenta: "Activo", nombrereporte: "hola que ase en un dia caluroso" },
       ],
@@ -991,11 +980,7 @@ export default {
         if (activeAccount) {
           // Si es sub cuenta actualiza el codigo a utilizar
           mayorAccounts = mayorAccounts.map((a) => {
-            return { ...a, code: `${activeAccount.code}${a.code}`, level: 2 };
-          });
-        } else {
-          mayorAccounts = mayorAccounts.map((a) => {
-            return { ...a, level: 1 };
+            return { ...a, code: `${activeAccount.code}${a.code}` };
           });
         }
 
@@ -1052,13 +1037,12 @@ export default {
                   // proba nuevamente
 
                   this.accounts.push({
-                    code: acc.code,
+                    code: `${acc.code}`,
                     name: acc.name,
                     description: description,
                     isAcreedora: acc.isAcreedora,
                     isBalance: acc.isBalance,
                     parentCatalog: parentCatalog,
-                    level: acc.level,
                   });
 
                   // dataAccounts += `{
@@ -1103,13 +1087,12 @@ export default {
     openEditAccount(account) {
       console.log(account);
 
-      if (account.level == 1) {
-        this.activeAccount = { ...account, subCatalogs: [] };
+      if (account.code.length == 1) {
+        this.activeAccount = { ...account };
         this.showEditMayorDialog = true;
       } else {
         this.activeAccount = {
           ...account,
-          subCatalogs: [],
         };
         this.showEditAccount = true;
       }
