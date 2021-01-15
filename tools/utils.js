@@ -25,7 +25,7 @@ const getHeader = (name, nit, nrc, lastDay, docName, dateType = 'date', preTitle
             {
                 columns: [
                     {
-                        text: v.upperCase(name),
+                        text: name.toUpperCase(),
                         fontSize: 12,
                         bold: true,
 
@@ -53,7 +53,7 @@ const getHeader = (name, nit, nrc, lastDay, docName, dateType = 'date', preTitle
             {
                 columns: [
                     {
-                        text: v.upperCase(title),
+                        text: title.toUpperCase(),
                         fontSize: 10,
                         margin: [0, 5, 0, 0],
                         width: '70%'

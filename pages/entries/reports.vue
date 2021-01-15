@@ -267,68 +267,69 @@ export default {
       });
     },
     getAccountingCatalog() {
-      this.$axios.get("/entries/catalog").then((res) => {
-        const { data, err } = res.data;
-        if (!err) {
-          const catalog = res.data.accountingCatalog;
-          console.log(catalog);
-          const values = catalog.map((c) => {
-            return [
-              { bold: c.level === 1, text: c.code },
-              { bold: c.level === 1, text: c.name },
-              {
-                bold: c.level === 1,
-                text: c.isParent ? "N" : "S",
-                alignment: "center",
-              },
-            ];
-          });
+      const catalog = () => this.$axios.get("/entries/catalog");
+      const bussinesInfo = () => this.$axios.get("/business/info");
+      Promise.all([catalog(), bussinesInfo()]).then((res) => {
+        const [catalog, bussinesInfo] = res;
+        const catalogReport = catalog.data.accountingCatalog;
+        const { name, nit, nrc } = bussinesInfo.data.info;
+        console.log(nrc);
+        const values = catalogReport.map((c) => {
+          return [
+            { bold: c.level === 1, text: c.code },
+            { bold: c.level === 1, text: c.name },
+            {
+              bold: c.level === 1,
+              text: c.isParent ? "N" : "S",
+              alignment: "center",
+            },
+          ];
+        });
 
-          const docDefinition = {
-            pageSize: "LETTER",
-            pageOrientation: "portrait",
-            pageMargins: [20, 60, 20, 40],
-            footer: getFooter(),
-            content: [
-              {
-                fontSize: 9,
-                layout: "noBorders",
-                table: {
-                  headerRows: 1,
-                  widths: ["20%", "70%", "10%"],
-                  heights: -5,
-                  body: [
-                    [
-                      {
-                        text: "CUENTA",
-                        style: "tableHeader",
-                      },
-                      {
-                        text: "DESCRIPCIÓN LA CUENTA",
-                        style: "tableHeader",
-                      },
-                      {
-                        alignment: "center",
-                        text: "ASIGNABLE",
-                        style: "tableHeader",
-                      },
-                    ],
-                    ...values,
+        const docDefinition = {
+          pageSize: "LETTER",
+          pageOrientation: "portrait",
+          pageMargins: [20, 60, 20, 40],
+          header: getHeader(name, nit, nrc, null, "CATALOGO DE CUENTAS"),
+          footer: getFooter(),
+          content: [
+            {
+              fontSize: 9,
+              layout: "noBorders",
+              table: {
+                headerRows: 1,
+                widths: ["20%", "70%", "10%"],
+                heights: -5,
+                body: [
+                  [
+                    {
+                      text: "CUENTA",
+                      style: "tableHeader",
+                    },
+                    {
+                      text: "DESCRIPCIÓN LA CUENTA",
+                      style: "tableHeader",
+                    },
+                    {
+                      alignment: "center",
+                      text: "ASIGNABLE",
+                      style: "tableHeader",
+                    },
                   ],
-                },
-              },
-            ],
-            styles: {
-              tableHeader: {
-                bold: true,
-                fontSize: 9,
+                  ...values,
+                ],
               },
             },
-          };
-          this.generating = false;
-          pdfMake.createPdf(docDefinition).open();
-        }
-        // console.log(res.data.accountingCatalog);
+          ],
+          styles: {
+            tableHeader: {
+              bold: true,
+              fontSize: 9,
+            },
+          },
+        };
+        this.generating = false;
+        pdfMake.createPdf(docDefinition).open();
       });
     },
     cancel() {
