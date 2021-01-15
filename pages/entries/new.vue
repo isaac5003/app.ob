@@ -272,7 +272,7 @@
 </template>
 
 <script>
-import * as R from "ramda";
+// import * as R from "ramda";
 import { format } from "date-fns";
 import LayoutContent from "../../components/layout/Content";
 import {

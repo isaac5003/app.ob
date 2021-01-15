@@ -20,7 +20,15 @@
       />
     </div>
 
-    <el-form :model="reportForm" :rules="reportFormRules" status-icon>
+    <el-form
+      :model="reportForm"
+      :rules="reportFormRules"
+      ref="reportForm"
+      @submit.native.prevent="
+        generateReport('reportForm', reportForm, auxiliarReports)
+      "
+      status-icon
+    >
       <!-- first row -->
       <div class="grid grid-cols-12 gap-4">
         <!-- Tipos de reporte -->
@@ -123,6 +131,8 @@
             class="w-full"
             size="small"
             icon="el-icon-download"
+            native-type="submit"
+            :loading="generating"
             >Descargar</el-button
           >
         </div>
@@ -136,7 +146,11 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { selectValidation } from "../../tools";
+import { getHeader, getFooter } from "../../tools/utils";
 export default {
   name: "EntriesReports",
   components: {
@@ -161,6 +175,7 @@ export default {
   // fetchOnServer: false,
   data() {
     return {
+      generating: false,
       loading: false,
       errorMessage: "",
       reportForm: {
@@ -203,10 +218,10 @@ export default {
           case "libroAuxiliares":
             this.requirementForm = "compact";
             break;
-          case "detalleCuentas":
+          case "catalogoCuentas":
+            break;
           case "movimientoCuentas":
             this.requirementForm = "extended";
-            this.getCalogs();
             break;
           default:
             this.requirementForm = "none";
@@ -214,9 +229,105 @@ export default {
         }
       }
     },
-    async getCalogs() {
-      const { data } = await this.$axios.get("/entries/catalog");
-      this.accountingCatalog = data.accountingCatalog;
+    generateReport(formName, { dateRange, reportType, catalogs }, catalogList) {
+      this.$refs[formName].validate((valid) => {
+        if (!valid) {
+          return false;
+        }
+
+        this.generating = true;
+        switch (reportType) {
+          case "balanceGeneral":
+            this.generateBalanceGeneral(dateRange);
+            break;
+          case "estadoResultados":
+            this.generateEstadoResultados(dateRange);
+            break;
+          case "balanceComprobacion":
+            this.generateBalanceComprobacion(dateRange);
+            break;
+          case "diarioMayor":
+            this.generateDiarioMayor(dateRange);
+            break;
+          case "libroAuxiliares":
+            this.generateLibroAuxiliares(dateRange);
+            break;
+          case "catalogoCuentas":
+            this.getAccountingCatalog(dateRange);
+            break;
+          case "detalleCuentas":
+            this.generateDetalleCuentas(dateRange, catalogs, catalogList);
+            break;
+          case "movimientoCuentas":
+            this.generateMovimientoCuentas(dateRange, catalogs, catalogList);
+            break;
+        }
+      });
+    },
+    getAccountingCatalog() {
+      this.$axios.get("/entries/catalog").then((res) => {
+        const { data, err } = res.data;
+        if (!err) {
+          const catalog = res.data.accountingCatalog;
+          console.log(catalog);
+          const values = catalog.map((c) => {
+            return [
+              { bold: c.level === 1, text: c.code },
+              { bold: c.level === 1, text: c.name },
+              {
+                bold: c.level === 1,
+                text: c.isParent ? "N" : "S",
+                alignment: "center",
+              },
+            ];
+          });
+
+          const docDefinition = {
+            pageSize: "LETTER",
+            pageOrientation: "portrait",
+            pageMargins: [20, 60, 20, 40],
+            footer: getFooter(),
+            content: [
+              {
+                fontSize: 9,
+                layout: "noBorders",
+                table: {
+                  headerRows: 1,
+                  widths: ["20%", "70%", "10%"],
+                  heights: -5,
+                  body: [
+                    [
+                      {
+                        text: "CUENTA",
+                        style: "tableHeader",
+                      },
+                      {
+                        text: "DESCRIPCIÓN LA CUENTA",
+                        style: "tableHeader",
+                      },
+                      {
+                        alignment: "center",
+                        text: "ASIGNABLE",
+                        style: "tableHeader",
+                      },
+                    ],
+                    ...values,
+                  ],
+                },
+              },
+            ],
+            styles: {
+              tableHeader: {
+                bold: true,
+                fontSize: 9,
+              },
+            },
+          };
+          this.generating = false;
+          pdfMake.createPdf(docDefinition).open();
+        }
+        // console.log(res.data.accountingCatalog);
+      });
     },
   },
 };
