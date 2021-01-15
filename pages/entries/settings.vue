@@ -6,6 +6,7 @@
       { name: 'Configuraciones', to: null },
     ]"
   >
+    <!-- catalogocuentas -->
     <!-- cuenta mayor -->
     <el-dialog
       title="Nueva cuenta mayor"
@@ -481,6 +482,133 @@
         </div>
       </span>
     </el-dialog>
+
+    <!-- BALANCE General
+    ADDaccount -->
+    <el-dialog
+      :title="`Agregar cuenta a: ${selectedParentAccount.name}`"
+      :visible.sync="showAddAccount"
+      width="500px"
+      :append-to-body="true"
+      @open="selectedCatalog = []"
+    >
+      <div class="grid grid-cols-12">
+        <div class="col-span-12">
+          <el-select
+            multiple
+            filterable
+            remote
+            reserve-keyword
+            default-first-option
+            clearable
+            v-model="selectedCatalog"
+            placeholder="Escribe el numero o nombre de la cuenta"
+            :remote-method="findAccount"
+            :loading="loadingAccount"
+            class="w-full"
+            size="small"
+          >
+            <el-option
+              v-for="item in filteredCatalog"
+              :key="item.id"
+              :label="`${item.code} - ${item.name}`"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showAddAccount = false" size="small"
+          >Cancelar</el-button
+        >
+        <el-button
+          type="primary"
+          @click="addSubAccount(selectedParentAccount, selectedCatalog)"
+          size="small"
+          >Agregar</el-button
+        >
+      </span>
+    </el-dialog>
+    <!-- changedisplayname -->
+    <el-dialog
+      title="Cambiar nombre en reporte"
+      :visible.sync="showChangeDisplayName"
+      width="500px"
+      :append-to-body="true"
+      @open="newDisplayName = ''"
+    >
+      <div class="flex flex-col space-y-2">
+        <span>Cambiar de: {{ selectedParentAccount.display }}</span>
+        <el-input
+          placeholder="Nombre a mostrar en reporte"
+          v-model="newDisplayName"
+          size="small"
+          clearable
+        />
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showChangeDisplayName = false" size="small"
+          >Cancelar</el-button
+        >
+        <el-button
+          type="primary"
+          @click="addSubAccount(selectedParentAccount, selectedCatalog)"
+          size="small"
+          >Agregar</el-button
+        >
+      </span>
+    </el-dialog>
+    <!-- Estadoderesultados -->
+    <el-dialog
+      :title="`Agregar cuenta a: ${selectedParentAccountEstado.name}`"
+      :visible.sync="showAddAccountEstado"
+      width="500px"
+      :append-to-body="true"
+      @open="selectedCatalogEstado = []"
+    >
+      <div class="grid grid-cols-12">
+        <div class="col-span-12">
+          <el-select
+            multiple
+            filterable
+            remote
+            reserve-keyword
+            default-first-option
+            clearable
+            v-model="selectedCatalogEstado"
+            placeholder="Escribe el numero o nombre de la cuenta"
+            :remote-method="findAccountEstado"
+            :loading="loadingAccount"
+            class="w-full"
+            size="small"
+          >
+            <el-option
+              v-for="item in filteredCatalogEstado"
+              :key="item.id"
+              :label="`${item.code} - ${item.name}`"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showAddAccountEstado = false" size="small"
+          >Cancelar</el-button
+        >
+        <el-button
+          type="primary"
+          @click="
+            addSubAccountEstado(
+              selectedParentAccountEstado,
+              selectedCatalogEstado
+            )
+          "
+          size="small"
+          >Agregar</el-button
+        >
+      </span>
+    </el-dialog>
+
     <el-tabs
       v-model="tab"
       @tab-click="
@@ -584,8 +712,7 @@
         </div>
       </el-tab-pane>
       <!-- tab balance general -->
-      <!-- <el-tab-pane label="Balance General" name="balance-general">
-      
+      <el-tab-pane label="Balance General" name="balance-general">
         <div class="grid grid-cols-12">
           <div class="col-span-12">
             <Notification
@@ -596,12 +723,13 @@
             />
           </div>
         </div>
-        
+
         <el-form>
           <div class="grid grid-cols-12 gap-4">
             <div class="col-span-3">
               <el-form-item label="Utilidad ejercicios anteriores">
                 <el-select
+                  v-model="specialAccounts.accum_gain"
                   size="small"
                   class="w-full"
                   placeholder="Escriba el numero o el nombre"
@@ -609,12 +737,19 @@
                   clereable
                   default-first-option
                 >
+                  <el-option
+                    v-for="aC in accounts"
+                    :key="aC.id"
+                    :label="`${aC.code} - ${aC.name}`"
+                    :value="aC.id"
+                  />
                 </el-select>
               </el-form-item>
             </div>
             <div class="col-span-3">
               <el-form-item label="Utilidad ejercicios anteriores">
                 <el-select
+                  v-model="specialAccounts.accum_lost"
                   size="small"
                   class="w-full"
                   placeholder="Escribe el numero o el nombre"
@@ -622,12 +757,19 @@
                   clereable
                   default-first-option
                 >
+                  <el-option
+                    v-for="aC in accounts"
+                    :key="aC.id"
+                    :label="`${aC.code} - ${aC.name}`"
+                    :value="aC.id"
+                  />
                 </el-select>
               </el-form-item>
             </div>
             <div class="col-span-3">
               <el-form-item label="utilidad presente ejercicio">
                 <el-select
+                  v-model="specialAccounts.curre_gain"
                   size="small"
                   class="w-full"
                   placeholder="Escriba el numero o el nombre"
@@ -635,12 +777,19 @@
                   clereable
                   default-first-option
                 >
+                  <el-option
+                    v-for="aC in accounts"
+                    :key="aC.id"
+                    :label="`${aC.code} - ${aC.name}`"
+                    :value="aC.id"
+                  />
                 </el-select>
               </el-form-item>
             </div>
             <div class="col-span-3">
               <el-form-item label="Perdida presente ejercicio">
                 <el-select
+                  v-model="specialAccounts.curre_lost"
                   size="small"
                   class="w-full"
                   placeholder="Escriba el numero o el nombre"
@@ -648,26 +797,40 @@
                   clereable
                   default-first-option
                 >
+                  <el-option
+                    v-for="aC in accounts"
+                    :key="aC.id"
+                    :label="`${aC.code} - ${aC.name}`"
+                    :value="aC.id"
+                  />
                 </el-select>
               </el-form-item>
             </div>
           </div>
         </el-form>
-     
+
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-12">
             <el-table
-              :data="balance"
-              style="width: 100%"
-              stripe
-              size="small"
+              :data="tableData"
+              row-key="id"
               border
+              default-expand-all
+              size="mini"
             >
-              <el-table-column prop="cuenta" label="Cuenta" min-width="200" />
-              <el-table-column label="Nombre en reporte" min-width="170">
+              <el-table-column label="Cuenta" min-width="200">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.id }} - {{ scope.row.name }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="display"
+                label="Nombre en reporte"
+                min-width="170"
+              >
                 <template slot-scope="scope">
                   <div class="flex justify-between items-center">
-                    <span>{{ scope.row.nombrereporte }}</span>
+                    <span>{{ scope.row.display }}</span>
                     <el-tooltip
                       :open-delay="600"
                       class="item"
@@ -675,25 +838,62 @@
                       content="Editar nombre a mostrar en reporte"
                       placement="top"
                     >
-                      <el-button icon="el-icon-edit" size="mini" />
+                      <el-button
+                        icon="el-icon-edit"
+                        size="mini"
+                        @click="openChangeDisplay(scope.row)"
+                      />
                     </el-tooltip>
-                  </div> </template
-              ></el-table-column>
-              <el-table-column min-width="40"></el-table-column>
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column prop="display" align="center" min-width="40">
+                <template slot-scope="scope">
+                  <el-tooltip
+                    :open-delay="600"
+                    v-if="scope.row.showAdd"
+                    class="item"
+                    effect="dark"
+                    content="Agregar nueva cuenta"
+                    placement="top"
+                  >
+                    <el-button
+                      type="primary"
+                      icon="el-icon-plus"
+                      size="small"
+                      @click="openAddAccount(scope.row)"
+                    />
+                  </el-tooltip>
+                  <el-tooltip
+                    :open-delay="600"
+                    v-if="scope.row.canDelete"
+                    class="item"
+                    effect="dark"
+                    content="Eliminar esta cuenta"
+                    placement="top"
+                  >
+                    <el-button
+                      type="danger"
+                      icon="el-icon-delete"
+                      size="small"
+                      @click="deleteSubAccount(scope.row)"
+                    />
+                  </el-tooltip>
+                </template>
+              </el-table-column>
             </el-table>
           </div>
         </div>
-     
+
         <div class="flex justify-end mt-4">
           <el-button type="primary" size="small" native-type="submit"
             >Guardar</el-button
           >
           <el-button size="small">Cancelar</el-button>
         </div>
-      </el-tab-pane> -->
+      </el-tab-pane>
       <!-- tab estado resultados -->
-      <!-- <el-tab-pane label="Estado de resultados" name="estado resultados">
-     
+      <el-tab-pane label="Estado de resultados" name="estado resultados">
         <div class="grid grid-cols-12">
           <div class="col-span-12">
             <Notification
@@ -705,78 +905,120 @@
           </div>
         </div>
 
-        
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-12">
             <el-table
-              :data="balance"
-              style="width: 100%"
-              stripe
-              size="small"
+              ref="table"
+              :data="tablesData"
+              row-key="id"
               border
+              default-expand-all
+              size="mini"
             >
-              <el-table-column prop="cuenta" label="Nombre" min-width="300" />
-              <el-table-column align="center" min-width="40">
-                <el-tooltip
-                  :open-delay="600"
-                  class="item"
-                  effect="dark"
-                  content="Agregar nueva cuenta"
-                  placement="top"
-                >
-                  <el-button
-                    type="primary"
-                    icon="el-icon-edit"
-                    size="small"
-                    @click="openAddAccount(scope.row)"
-                  />
-                </el-tooltip>
-              </el-table-column>
-              <el-table-column
-                align="center"
-                label="Incluir en reporte"
-                min-width="70"
-              >
+              <el-table-column label="Nombre" min-width="300">
                 <template slot-scope="scope">
-                  <el-switch v-model="scope.row.show" />
+                  <span :class="{ 'font-semibold': scope.row.bold }"
+                    >{{ scope.row.id }} - {{ scope.row.display }}</span
+                  >
+                  <i
+                    class="el-icon-right mx-2"
+                    v-if="scope.row.display != scope.row.name"
+                  ></i>
+                  <span
+                    class="italic text-gray-600"
+                    style="font-size: 10px"
+                    v-if="scope.row.display != scope.row.name"
+                    >({{ scope.row.name }})</span
+                  >
+                </template>
+              </el-table-column>
+              <el-table-column align="center" min-width="40">
+                <template slot-scope="scope">
+                  <el-tooltip
+                    v-if="scope.row.showUpdateName"
+                    :open-delay="600"
+                    class="item"
+                    effect="dark"
+                    content="Editar nombre a mostrar en reporte"
+                    placement="top"
+                  >
+                    <el-button
+                      icon="el-icon-edit"
+                      size="mini"
+                      @click="openChangeDisplay(scope.row)"
+                    />
+                  </el-tooltip>
                 </template>
               </el-table-column>
               <el-table-column
+                label="Incluir en reporte"
                 align="center"
-                label="Mostrar detalle"
                 min-width="65"
               >
                 <template slot-scope="scope">
-                  <el-switch v-model="scope.row.show" />
+                  <el-switch
+                    v-model="scope.row.show"
+                    v-if="scope.row.showAdd"
+                  />
                 </template>
               </el-table-column>
-              <el-table-column min-width="35">
-                <el-tooltip
-                  :open-delay="600"
-                  class="item"
-                  effect="dark"
-                  content="Agregar nueva cuenta"
-                  placement="top"
-                >
-                  <el-button
-                    type="primary"
-                    icon="el-icon-plus"
-                    size="small"
-                    @click="openAddAccount(scope.row)"
+              <el-table-column
+                label="Mostrar detalle"
+                align="center"
+                min-width="65"
+              >
+                <template slot-scope="scope">
+                  <el-switch
+                    v-model="scope.row.details"
+                    v-if="scope.row.showAdd"
                   />
-                </el-tooltip>
+                </template>
+              </el-table-column>
+              <el-table-column align="center" min-width="35">
+                <template slot-scope="scope">
+                  <el-tooltip
+                    :open-delay="600"
+                    v-if="scope.row.showAdd"
+                    class="item"
+                    effect="dark"
+                    content="Agregar nueva cuenta"
+                    placement="top"
+                  >
+                    <el-button
+                      type="primary"
+                      icon="el-icon-plus"
+                      size="small"
+                      @click="openAddAccountEstado(scope.row)"
+                    />
+                  </el-tooltip>
+                  <el-tooltip
+                    :open-delay="600"
+                    v-if="scope.row.canDelete"
+                    class="item"
+                    effect="dark"
+                    content="Eliminar esta cuenta"
+                    placement="top"
+                  >
+                    <el-button
+                      type="danger"
+                      icon="el-icon-delete"
+                      size="small"
+                      @click="deleteSubAccountEstado(scope.row)"
+                    />
+                  </el-tooltip>
+                </template>
               </el-table-column>
             </el-table>
           </div>
         </div>
-     
+
         <div class="flex justify-end mt-4">
           <el-button type="primary" size="small" native-type="submit"
             >Guardar</el-button
           >
           <el-button size="small">Cancelar</el-button>
         </div>
-      </el-tab-pane> -->
+      </el-tab-pane>
       <!-- tab integraciones -->
       <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
         <Notification
@@ -859,6 +1101,7 @@ export default {
       });
   },
   fetchOnServer: false,
+
   data() {
     return {
       loading: true,
@@ -881,10 +1124,10 @@ export default {
           icon: getIcon("cash"),
         },
       ],
+      //  catalogo de cuenta
       showCreateCatalogDialog: false,
       showCreateAccountEntryDialog: false,
       accounts: [],
-
       mayorAccountForm: {
         items: [
           {
@@ -919,10 +1162,262 @@ export default {
       },
       showEditMayorDialog: false,
       showEditAccount: false,
+      //Balance General
+      tableData: [
+        {
+          id: 1,
+          name: "ACTIVO",
+          display: "ACTIVO",
+          children: [
+            {
+              id: 11,
+              name: "ACTIVO CORRIENTE",
+              display: "ACTIVO CORRIENTE",
+              showAdd: true,
+              children: [],
+            },
+            {
+              id: 12,
+              name: "ACTIVO NO CORRIENTE",
+              display: "ACTIVO NO CORRIENTE",
+              showAdd: true,
+              children: [],
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: "PASIVO",
+          display: "PASIVO",
+          children: [
+            {
+              id: 21,
+              name: "PASIVO CORRIENTE",
+              display: "PASIVO CORRIENTE",
+              showAdd: true,
+              children: [],
+            },
+            {
+              id: 22,
+              name: "PASIVO NO CORRIENTE",
+              display: "PASIVO NO CORRIENTE",
+              showAdd: true,
+              children: [],
+            },
+          ],
+        },
+        {
+          id: 3,
+          name: "PATRIMONIO",
+          display: "PATRIMONIO",
+          children: [
+            {
+              id: 31,
+              name: "CAPITAL Y RESERVAS",
+              display: "CAPITAL Y RESERVAS",
+              showAdd: true,
+              children: [],
+            },
+          ],
+        },
+      ],
+      specialAccounts: {
+        accum_gain: "",
+        accum_lost: "",
+        curre_gain: "",
+        curre_lost: "",
+      },
+      showAddAccount: false,
+      selectedParentAccount: {},
+      selectedCatalog: [],
+      loadingAccount: false,
+      filteredCatalog: [],
+      showChangeDisplayName: false,
+      newDisplayName: "",
+      //Estadoderesultados
+      tablesData: [
+        {
+          name: "Ingreso de actividades ordinarias",
+          display: "Ingreso de actividades ordinarias",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 1,
+        },
+        {
+          name: "Costo de ventas, producción o servicios",
+          display: "Costo de ventas, producción o servicios",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 2,
+        },
+        {
+          name: "Utilidad/Perdida bruta",
+          display: "Utilidad/Perdida bruta",
+          showUpdateName: true,
+          bold: true,
+        },
+        {
+          name: "Otros ingresos",
+          display: "Otros ingresos",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 3,
+        },
+        {
+          name: "Otros gastos",
+          display: "Otros gastos",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 4,
+        },
+        {
+          name: "Gastos de distribucion y venta",
+          display: "Gastos de distribucion y venta",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 5,
+        },
+        {
+          name: "Gastos de administracion",
+          display: "Gastos de administracion",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 6,
+        },
+        {
+          name: "Utilidad/Perdida de operacion",
+          display: "Utilidad/Perdida de operacion",
+          showUpdateName: true,
+          bold: true,
+        },
+        {
+          name: "Ingresos financieros",
+          display: "Ingresos financieros",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 7,
+        },
+        {
+          name: "Gastos financieros",
+          display: "Gastos financieros",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 8,
+        },
+        {
+          name:
+            "Utiidad/Perdida antes de impuesto sobre la renta y las ganancias",
+          display:
+            "Utiidad/Perdida antes de impuesto sobre la renta y las ganancias",
+          showUpdateName: true,
+          bold: true,
+        },
+        {
+          name: "Reserva legal",
+          display: "Reserva legal",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 9,
+        },
+        {
+          name: "Utiidad/Perdida antes de impuesto sobre la renta",
+          display: "Utiidad/Perdida antes de impuesto sobre la renta",
+          showUpdateName: true,
+          bold: true,
+        },
+        {
+          name: "Impuesto sobre la renta",
+          display: "Impuesto sobre la renta",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 10,
+        },
+        {
+          name:
+            "Utilidad/Perdida antes de contribucion especial a las ganancias",
+          display:
+            "Utilidad/Perdida antes de contribucion especial a las ganancias",
+          showUpdateName: true,
+          bold: true,
+        },
+        {
+          name: "Contribucion especial a las ganancias",
+          display: "Contribucion especial a las ganancias",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 11,
+        },
+        {
+          name: "Resultado del ejercicio",
+          display: "Resultado del ejercicio",
+          showUpdateName: true,
+          bold: true,
+        },
+        {
+          name: "Otros resultados integrales del ejercicio neto de impuestos",
+          display:
+            "Otros resultados integrales del ejercicio neto de impuestos",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 12,
+        },
+        {
+          name: "RESULTADO INTEGRAL TOTAL DEL AÑO",
+          display: "RESULTADO INTEGRAL TOTAL DEL AÑO",
+          showUpdateName: true,
+          bold: true,
+        },
+      ],
+
+      showAddAccountEstado: false,
+      selectedCatalogEstado: "",
+      selectedParentAccountEstado: {},
+      loadingAccountEstado: false,
+      filteredCatalogEstado: [],
+      showChangeDisplayNameEstado: false,
+      allowNewDisplayNameEstado: false,
+      newDisplayNameEstado: "",
     };
   },
   methods: {
-    mayorAccountFormRules: {},
+    //  CatalogAccount
+    mayorAccountFormRules() {},
     addMayorAccount() {
       this.showCreateCatalogDialog = true;
       if (this.$refs["mayorAccountForm"]) {
@@ -1096,6 +1591,155 @@ export default {
         };
         this.showEditAccount = true;
       }
+    },
+    // balanceGeneral
+    openAddAccount(parent) {
+      this.showAddAccountEstado = true;
+      this.selectedParentAccount = { ...parent };
+    },
+    findAccount(query) {
+      if (query !== "") {
+        this.loadingAccount = true;
+        setTimeout(() => {
+          this.filteredCatalog = this.accounts.filter((c) => {
+            return (
+              c.code.toLowerCase().includes(query.toLowerCase()) ||
+              c.name.toLowerCase().includes(query.toLowerCase())
+            );
+          });
+          this.loadingAccount = false;
+        }, 200);
+      } else {
+        this.options = [];
+      }
+    },
+    addSubAccount(selected, list) {
+      let addTo = this.tableData.find((td) => {
+        return td.children.find((c) => c.id == selected.id);
+      });
+      addTo = addTo.children.find((c) => c.id == selected.id);
+      for (const code of list) {
+        const account = this.accounts.find((c) => c.id == code);
+        addTo.children.push({
+          id: account.code,
+          name: account.name,
+          display: account.name,
+          canDelete: true,
+        });
+      }
+      this.showAddAccount = false;
+    },
+    deleteSubAccount(selected) {
+      let parent = null;
+      for (const acc of this.tableData) {
+        for (const ch of acc.children) {
+          for (const c of ch.children) {
+            if (c.id == selected.id) {
+              parent = ch;
+            }
+          }
+        }
+      }
+      const index = parent.children.findIndex((e) => e.id == selected.id);
+      parent.children.splice(index, 1);
+    },
+    openChangeDisplay(account) {
+      this.selectedParentAccount = account;
+      this.showChangeDisplayName = true;
+    },
+    cancel() {
+      this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
+        confirmButtonText: "Si, salir",
+        cancelButtonText: "Cancelar",
+        type: "warning",
+      }).then(() => {
+        this.$router.push("/entries");
+      });
+    },
+    //estado de resultados
+    openAddAccountEstado(parent) {
+      this.showAddAccountEstado = true;
+      this.selectedParentAccountEstado = { ...parent };
+    },
+    findAccountEstado(query) {
+      if (query !== "") {
+        this.loadingAccountEstado = true;
+        setTimeout(() => {
+          this.filteredCatalogEstado = this.accounts.filter((c) => {
+            return (
+              c.code.toLowerCase().includes(query.toLowerCase()) ||
+              c.name.toLowerCase().includes(query.toLowerCase())
+            );
+          });
+          this.loadingAccountEstado = false;
+        }, 200);
+      } else {
+        this.options = [];
+      }
+    },
+    addSubAccountEstado(selected, code) {
+      const account = this.accounts.find((c) => c.id == code);
+      const tablesData = [...this.tablesData];
+      this.tablesData = [];
+      let addTo = tablesData.find((d) => d.id == selected.id);
+      addTo.children.push({
+        id: account.code,
+        name: account.name,
+        display: account.name,
+        canDelete: true,
+        showUpdateName: false,
+      });
+      this.showAddAccountEstado = false;
+      setTimeout(() => {
+        console.log("entra");
+        this.tablesData = [...tablesData];
+      }, 500);
+    },
+    deleteSubAccountEstado(selected) {
+      let parent = null;
+      const tablesData = [...this.tablesData];
+      this.tablesData = [];
+      for (const acc of tablesData) {
+        if (acc.hasOwnProperty("children")) {
+          for (const c of acc.children) {
+            if (c.id == selected.id) {
+              parent = acc;
+            }
+          }
+        }
+      }
+      const index = parent.children.findIndex((e) => e.id == selected.id);
+      parent.children.splice(index, 1);
+      setTimeout(() => {
+        this.tablesData = [...tablesData];
+      }, 500);
+    },
+
+    changeDisplayName(account, display, allow) {
+      if (display == "") {
+        return this.$notify.error({
+          title: "Error",
+          message: "Debes incluir un nombre a mostrar",
+        });
+      }
+      account.display = allow ? display : account.name;
+      this.showChangeDisplayName = false;
+    },
+    changeAllowDisplayName(account, allowNewDisplayName, newDisplayName) {
+      this.newDisplayName == allowNewDisplayName
+        ? newDisplayName
+        : account.display;
+      console.log(account, allowNewDisplayName, newDisplayName);
+      console.log(allowNewDisplayName ? newDisplayName : account.name);
+    },
+    cancel() {
+      this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
+        confirmButtonText: "Si, salir",
+        cancelButtonText: "Cancelar",
+        type: "warning",
+      }).then(() => {
+        this.$router.push("/entries");
+      });
     },
   },
   computed: {
