@@ -126,7 +126,7 @@
       <div class="grid grid-cols-12 gap-4">
         <div class="col-start-9 col-span-2">
           <el-button
-            :disabled="reportForm.reportType == null"
+            :disabled="reportForm.reportType ? false : true"
             type="primary"
             class="w-full"
             size="small"
@@ -137,7 +137,9 @@
           >
         </div>
         <div class="col-start-11 col-span-2">
-          <el-button class="w-full" size="small">Cancelar</el-button>
+          <el-button class="w-full" size="small" @click="cancel()"
+            >Cancelar</el-button
+          >
         </div>
       </div>
     </el-form>
@@ -327,6 +329,15 @@ export default {
           pdfMake.createPdf(docDefinition).open();
         }
         // console.log(res.data.accountingCatalog);
+      });
+    },
+    cancel() {
+      this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
+        confirmButtonText: "Si, salir",
+        cancelButtonText: "Cancelar",
+        type: "warning",
+      }).then(() => {
+        this.$router.push("/entries");
       });
     },
   },
