@@ -126,60 +126,68 @@
           function: () => $router.go(),
         }"
       />
-      <el-form label-position="top">
-        <div class="grid grid-cols-12 gap-4">
-          <el-form-item class="col-span-2" label="Estado">
-            <el-select
-              v-model="status"
-              placeholder="Seleccionar"
-              size="small"
-              class="w-full"
-              filterable
-              clearable
-              default-first-option
-              @change="fetchCustomers"
-            >
-              <el-option label="Todos los estados" value="" />
-              <el-option label="Activo" :value="true" />
-              <el-option label="Inactivo" :value="false" />
-            </el-select>
-          </el-form-item>
-          <el-form-item class="col-start-10 col-end-13">
-            <el-input
-              suffix-icon="el-icon-search"
-              placeholder="Buscar..."
-              v-model="searchValue"
-              size="small"
-              style="margin-top: 22px"
-              clearable
-              v-debounce:500ms="fetchCustomers"
-              @change="fetchCustomers"
-            />
-          </el-form-item>
-        </div>
+      <el-form label-position="top" class="grid grid-cols-12 gap-4">
+        <el-form-item class="col-span-2" label="Estado">
+          <el-select
+            v-model="status"
+            placeholder="Seleccionar"
+            size="small"
+            class="w-full"
+            filterable
+            clearable
+            default-first-option
+            @change="fetchCustomers"
+          >
+            <el-option label="Todos los estados" value="" />
+            <el-option label="Activo" :value="true" />
+            <el-option label="Inactivo" :value="false" />
+          </el-select>
+        </el-form-item>
+        <el-form-item class="col-start-10 col-end-13">
+          <el-input
+            suffix-icon="el-icon-search"
+            placeholder="Buscar..."
+            v-model="searchValue"
+            size="small"
+            style="margin-top: 22px"
+            clearable
+            v-debounce:500ms="fetchCustomers"
+            @change="fetchCustomers"
+          />
+        </el-form-item>
       </el-form>
-      <el-table :data="customers.customers" stripe size="mini">
-        <el-table-column prop="index" min-width="40" />
-        <el-table-column label="Nombre" prop="name" min-width="350" />
+      <el-table
+        :data="customers.customers"
+        stripe
+        size="mini"
+        v-loading="tableloading"
+      >
+        <el-table-column prop="index" width="40" />
+        <el-table-column label="Nombre" prop="name" min-width="370" />
         <el-table-column
           label="Tipo"
           prop="customerType.name"
-          min-width="120"
+          min-width="130"
         />
         <el-table-column label="NIT" prop="nit" min-width="160" />
         <el-table-column label="NRC" prop="nrc" min-width="90" />
-        <el-table-column label="Estado" min-width="90">
+        <el-table-column label="Estado" width="110">
           <template slot-scope="scope">
             <el-tag
               size="small"
               type="success"
               v-if="scope.row.isActiveCustomer"
-              >Activo</el-tag
             >
-            <el-tag size="small" type="warning" v-else>Inactivo</el-tag>
+              <i class="el-icon-success"></i>
+              Activo</el-tag
+            >
+            <el-tag size="small" type="warning" v-else>
+              <i class="el-icon-remove"></i>
+              Inactivo</el-tag
+            >
           </template>
         </el-table-column>
-        <el-table-column label min-width="60" align="center">
+        <el-table-column label width="70" align="center">
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />
@@ -281,6 +289,7 @@ export default {
   },
   methods: {
     fetchCustomers() {
+      this.tableloading = true;
       let params = this.page;
       if (this.status !== "") {
         params = { ...params, active: this.status };
@@ -296,7 +305,8 @@ export default {
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
-        });
+        })
+        .then((alw) => (this.tableloading = false));
     },
     handleSizeChange(val) {
       this.page.limit = val;
