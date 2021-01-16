@@ -106,6 +106,9 @@ const storagekey = "new-service";
 
 export default {
   name: "ServicesEdit",
+  head: {
+    titleTemplate: `%s | Nuevo servicio`,
+  },
   components: { LayoutContent },
   fetch() {
     const sellingTypes = () => this.$axios.get("/services/selling-types");

@@ -155,6 +155,9 @@ import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
 export default {
   name: "ServicesIndex",
+  head: {
+    titleTemplate: `%s | Servicios`,
+  },
   components: { LayoutContent, Notification },
   fetch() {
     const sellingTypes = () => this.$axios.get("/services/selling-types");
