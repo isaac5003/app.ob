@@ -1,5 +1,6 @@
 <template>
   <layout-content
+    v-loading="pageloading"
     page-title="Configuraciones"
     :breadcrumb="[
       { name: 'Contabilidad', to: '/entries' },
@@ -21,89 +22,83 @@
           v-for="(item, i) in mayorAccountForm.items"
           :key="i"
         >
-          <div class="col-span-2">
-            <el-form-item
-              label="Código"
-              :prop="`items.${i}.code`"
-              :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
+          <el-form-item
+            class="col-span-2"
+            label="Código"
+            :prop="`items.${i}.code`"
+            :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
+          >
+            <el-input-number
+              v-model="item.code"
+              type="number"
+              :min="0"
+              :step="1"
+              size="small"
+              autocomplete="off"
+              :controls="false"
+              style="width: 100%"
+            />
+          </el-form-item>
+          <el-form-item
+            class="col-span-5"
+            label="Nombre"
+            :prop="`items.${i}.name`"
+            :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
+          >
+            <el-input
+              v-model="item.name"
+              size="small"
+              autocomplete="off"
+              style="width: 100%"
+              maxlength="100"
+              minlength="3"
+              show-word-limit
+            />
+          </el-form-item>
+          <el-form-item class="col-span-2">
+            <el-checkbox
+              size="small"
+              border
+              class="mt-5"
+              style="width: 100%"
+              v-model="item.isAcreedora"
             >
-              <el-input-number
-                v-model="item.code"
-                type="number"
-                :min="0"
-                :step="1"
-                size="small"
-                autocomplete="off"
-                style="width: 100%"
-              />
-            </el-form-item>
-          </div>
-          <div class="col-span-5">
-            <el-form-item
-              label="Nombre"
-              :prop="`items.${i}.name`"
-              :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
+              Acreedora
+            </el-checkbox>
+          </el-form-item>
+          <el-form-item class="col-span-2">
+            <el-checkbox
+              size="small"
+              border
+              class="mt-5"
+              style="width: 100%"
+              v-model="item.isBalance"
             >
-              <el-input
-                v-model="item.name"
-                size="small"
-                autocomplete="off"
-                style="width: 100%"
-                maxlength="100"
-                minlength="3"
-                show-word-limit
-              />
-            </el-form-item>
-          </div>
-          <div class="col-span-2">
-            <el-form-item label=" ">
-              <el-checkbox
-                size="small"
-                border
-                class="mt-5"
-                style="width: 100%"
-                v-model="item.isAcreedora"
-              >
-                Acreedora
-              </el-checkbox>
-            </el-form-item>
-          </div>
-          <div class="col-span-2">
-            <el-form-item label=" ">
-              <el-checkbox
-                size="small"
-                border
-                class="mt-5"
-                style="width: 100%"
-                v-model="item.isBalance"
-              >
-                Balance
-              </el-checkbox>
-            </el-form-item>
-          </div>
-          <div class="col-span-1 flex items-center">
+              Balance
+            </el-checkbox>
+          </el-form-item>
+          <el-form-item class="col-span-1">
             <el-button
-              class="w-full mt-5"
+              class="w-full"
               type="danger"
               icon="el-icon-delete"
               :disabled="mayorAccountForm.items.length === 1"
               @click="removeMayorAccount(i)"
               size="small"
+              style="margin-top: 20px"
             />
-          </div>
+          </el-form-item>
         </div>
         <!-- second row -->
         <div class="grid grid-cols-12">
-          <div class="col-span-1">
-            <el-form-item prop="service">
-              <el-button
-                type="primary"
-                icon="el-icon-plus"
-                size="mini"
-                @click="addNewMayorAccount()"
-              />
-            </el-form-item>
-          </div>
+          <el-form-item class="col-span-1">
+            <el-button
+              type="primary"
+              icon="el-icon-plus"
+              size="mini"
+              @click="addNewMayorAccount()"
+            />
+          </el-form-item>
         </div>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -131,79 +126,70 @@
     >
       <el-form
         :model="activeAccount"
-        :rules="mayorAccountFormRules"
         status-icon
         ref="activeAccount"
         class="space-y-4"
       >
-        <div class="grid grid-cols-12 gap-4" v-if="activeAccount.isParent">
-          <div class="col-span-12">
-            <notification
-              type="info"
-              title="Atención"
-              message="Esta cuenta tiene sub cuentas, y no se puede editar el código, solamente el nombre."
-            />
-          </div>
-        </div>
+        <notification
+          v-if="activeAccount.isParent"
+          type="info"
+          title="Atención"
+          message="Esta cuenta tiene sub cuentas, y no se puede editar el código, solamente el nombre."
+        />
         <!-- first row -->
         <div class="grid grid-cols-12 gap-4">
-          <div class="col-span-2">
-            <el-form-item
-              label="Código"
-              prop="code"
-              :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
-            >
-              <el-input-number
-                v-model="activeAccount.code"
-                type="number"
-                min="1"
-                size="small"
-                :disabled="activeAccount.isParent == true"
-              />
-            </el-form-item>
-          </div>
-          <div class="col-span-5">
-            <el-form-item
-              label="Nombre"
-              prop="name"
-              :rules="[
-                {
-                  required: true,
-                  message: 'Este campo es requerido',
-                  trigger: 'blur',
-                },
-                {
-                  min: 3,
-                  message: 'Debe contener mínimo 3 caracteres.',
-                  trigger: 'blur',
-                },
-              ]"
-            >
-              <el-input v-model="activeAccount.name" size="small" />
-            </el-form-item>
-          </div>
-          <div class="col-span-2">
-            <el-form-item prop="service" style="margin-top: 20px">
-              <el-checkbox
-                v-model="activeAccount.isAcreedora"
-                label="Acreedora"
-                size="small"
-                border
-                class="w-full"
-              />
-            </el-form-item>
-          </div>
-          <div class="col-span-2">
-            <el-form-item prop="service" style="margin-top: 20px">
-              <el-checkbox
-                v-model="activeAccount.isBalance"
-                label="Balance"
-                size="small"
-                border
-                class="w-full"
-              />
-            </el-form-item>
-          </div>
+          <el-form-item
+            class="col-span-2"
+            label="Código"
+            prop="code"
+            :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
+          >
+            <el-input-number
+              v-model="activeAccount.code"
+              type="number"
+              min="1"
+              size="small"
+              :disabled="activeAccount.isParent == true"
+              :controls="false"
+            />
+          </el-form-item>
+          <el-form-item
+            class="col-span-6"
+            label="Nombre"
+            prop="name"
+            :rules="[
+              {
+                required: true,
+                message: 'Este campo es requerido',
+                trigger: 'blur',
+              },
+              {
+                min: 3,
+                message: 'Debe contener mínimo 3 caracteres.',
+                trigger: 'blur',
+              },
+            ]"
+          >
+            <el-input v-model="activeAccount.name" size="small" />
+          </el-form-item>
+          <el-form-item prop="service" class="col-span-2">
+            <el-checkbox
+              v-model="activeAccount.isAcreedora"
+              label="Acreedora"
+              size="small"
+              border
+              class="w-full mt-5"
+            />
+          </el-form-item>
+          <el-form-item prop="service" class="col-span-2">
+            <el-checkbox
+              v-model="activeAccount.isBalance"
+              label="Balance"
+              size="small"
+              border
+              class="w-full mt-5"
+            />
+          </el-form-item>
         </div>
         <!-- second row -->
       </el-form>
@@ -228,48 +214,44 @@
       :append-to-body="true"
       width="900px"
     >
-      <el-form :model="newAccountForm" status-icon ref="newAccountForm">
-        <div class="grid grid-cols-12 gap-4 mb-4">
-          <div class="col-span-2 flex flex-col">
-            <span class="font-bold text-xs">Código padre</span>
-            <p class="text-xs">
-              {{ activeAccount != null ? activeAccount.code : "" }}
-            </p>
+      <el-form :model="subAccountForm" status-icon ref="subAccountForm">
+        <div class="flex flex-col space-y-4">
+          <div class="grid grid-cols-12 gap-4 text-xs">
+            <div class="col-span-2 flex flex-col">
+              <span class="font-semibold">Código padre</span>
+              <p>{{ activeAccount != null ? activeAccount.code : "" }}</p>
+            </div>
+            <div class="col-span-3 flex flex-col">
+              <span class="font-semibold">Nombre padre</span>
+              <p>{{ activeAccount != null ? activeAccount.name : "" }}</p>
+            </div>
           </div>
-          <div class="col-span-3 flex flex-col">
-            <span class="font-bold text-xs">Nombre padre</span>
-            <p class="text-xs">
-              {{ activeAccount != null ? activeAccount.name : "" }}
-            </p>
-          </div>
-        </div>
 
-        <!-- first row -->
-        <div
-          class="grid grid-cols-12 gap-4"
-          v-for="(item, i) in newAccountForm.items"
-          :key="i"
-        >
-          <div class="col-span-2">
+          <!-- first row -->
+          <div
+            class="grid grid-cols-12 gap-4"
+            v-for="(item, i) in subAccountForm.items"
+            :key="i"
+          >
             <el-form-item
+              class="col-span-2"
               label="Código"
               :prop="`items.${i}.code`"
               :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
             >
               <el-input-number
                 v-model="item.code"
-                ref="code"
                 type="number"
                 :min="0"
                 :step="1"
                 size="small"
                 autocomplete="off"
                 style="width: 100%"
+                :controls="false"
               />
             </el-form-item>
-          </div>
-          <div class="col-span-5">
             <el-form-item
+              class="col-span-5"
               label="Nombre"
               :prop="`items.${i}.name`"
               :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
@@ -284,9 +266,7 @@
                 show-word-limit
               />
             </el-form-item>
-          </div>
-          <div class="col-span-2">
-            <el-form-item label=" ">
+            <el-form-item class="col-span-2">
               <el-checkbox
                 size="small"
                 border
@@ -297,43 +277,40 @@
                 Acreedora
               </el-checkbox>
             </el-form-item>
-          </div>
-          <div class="col-span-2">
-            <el-form-item label=" ">
+            <el-form-item class="col-span-2">
               <el-checkbox
                 size="small"
                 border
                 class="mt-5"
                 style="width: 100%"
-                v-model="newAccountForm.items[i].isBalance"
+                v-model="subAccountForm.items[i].isBalance"
               >
                 Balance
               </el-checkbox>
             </el-form-item>
-          </div>
-          <div class="col-span-1 flex items-center">
-            <el-button
-              class="w-full mt-5"
-              type="danger"
-              icon="el-icon-delete"
-              :disabled="newAccountForm.items.length === 1"
-              @click="removeNewAccount(i)"
-              size="small"
-            />
+            <el-form-item class="col-span-1">
+              <el-button
+                class="w-full"
+                type="danger"
+                icon="el-icon-delete"
+                :disabled="subAccountForm.items.length === 1"
+                @click="removeSubAccount(i)"
+                size="small"
+                style="margin-top: 20px"
+              />
+            </el-form-item>
           </div>
         </div>
         <!-- second row -->
         <div class="grid grid-cols-12">
-          <div class="col-span-1">
-            <el-form-item prop="service">
-              <el-button
-                type="primary"
-                icon="el-icon-plus"
-                size="mini"
-                @click="addNewAccount()"
-              />
-            </el-form-item>
-          </div>
+          <el-form-item prop="service" class="col-span-1">
+            <el-button
+              type="primary"
+              icon="el-icon-plus"
+              size="mini"
+              @click="addNewSubAccount()"
+            />
+          </el-form-item>
         </div>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -343,14 +320,14 @@
             size="small"
             @click.native="
               submitNewCatalog(
-                newAccountForm.items,
-                'newAccountForm',
+                subAccountForm.items,
+                'subAccountForm',
                 activeAccount
               )
             "
             >Guardar</el-button
           >
-          <el-button @click="showCreateCatalogDialog = false" size="small"
+          <el-button @click="showCreateAccountEntryDialog = false" size="small"
             >Cancelar</el-button
           >
         </div>
@@ -362,52 +339,54 @@
       title="Editar cuenta contable"
       :visible.sync="showEditAccount"
       :append-to-body="true"
-      width="1000px"
+      width="900px"
     >
       <el-form
         :model="activeAccount"
-        :rules="mayorAccountFormRules"
         status-icon
         ref="accountFormEdit"
+        class="space-y-4"
       >
-        <div class="grid grid-cols-12 gap-4">
-          <div class="col-span-12">
-            <notification
-              type="info"
-              title="Atención"
-              message="Esta cuenta tiene sub cuentas, y no se puede editar el código, solamente el nombre."
-            />
+        <notification
+          v-if="activeAccount.subAccounts"
+          type="info"
+          title="Atención"
+          message="Esta cuenta tiene sub cuentas, y no se puede editar el código, solamente el nombre."
+        />
+        <div class="flex flex-col space-y-4">
+          <div class="grid grid-cols-12 gap-4 text-xs">
+            <div class="col-span-2 flex flex-col">
+              <span class="font-semibold">Código padre</span>
+              <p>
+                {{
+                  activeAccount && activeAccount.parentCatalog
+                    ? activeAccount.parentCatalog.code
+                    : ""
+                }}
+              </p>
+            </div>
+            <div class="col-span-10 flex flex-col">
+              <span class="font-semibold">Nombre padre</span>
+              <p>
+                {{
+                  activeAccount && activeAccount.parentCatalog
+                    ? activeAccount.parentCatalog.name
+                    : ""
+                }}
+              </p>
+            </div>
           </div>
-        </div>
-        <div class="grid grid-cols-12 gap-4 mb-4">
-          <div class="col-span-2 flex flex-col">
-            <span class="font-semibold text-xs">Código padre</span>
-            <p class="text-xs">
-              {{
-                activeAccount != null && activeAccount.parentCatalog != null
-                  ? activeAccount.parentCatalog.code
-                  : ""
-              }}
-            </p>
-          </div>
-          <div class="col-span-3 flex flex-col">
-            <span class="font-semibold text-xs">Nombre padre</span>
-            <p class="text-xs">
-              {{
-                activeAccount != null && activeAccount.parentCatalog != null
-                  ? activeAccount.parentCatalog.name
-                  : ""
-              }}
-            </p>
-          </div>
-        </div>
-        <!-- first row -->
-        <div class="grid grid-cols-12 gap-4">
-          <div class="col-span-2">
+          <!-- first row -->
+          <div class="grid grid-cols-12 gap-4">
             <el-form-item
+              class="col-span-2"
               label="Código"
               prop="code"
-              :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
+              :rules="{
+                required: true,
+                message: 'Requerido',
+                trigger: 'blur',
+              }"
             >
               <el-input-number
                 v-model="activeAccount.code"
@@ -416,9 +395,8 @@
                 size="small"
               />
             </el-form-item>
-          </div>
-          <div class="col-span-5">
             <el-form-item
+              class="col-span-6"
               label="Nombre"
               prop="name"
               :rules="[
@@ -436,26 +414,22 @@
             >
               <el-input v-model="activeAccount.name" size="small" />
             </el-form-item>
-          </div>
-          <div class="col-span-2">
-            <el-form-item prop="service" style="margin-top: 20px">
+            <el-form-item prop="service" class="col-span-2">
               <el-checkbox
                 v-model="activeAccount.isAcreedora"
                 label="Acreedora"
                 size="small"
                 border
-                class="w-full"
+                class="w-full mt-5"
               />
             </el-form-item>
-          </div>
-          <div class="col-span-2">
-            <el-form-item prop="service" style="margin-top: 20px">
+            <el-form-item prop="service" class="col-span-2">
               <el-checkbox
                 v-model="activeAccount.isBalance"
                 label="Balance"
                 size="small"
                 border
-                class="w-full"
+                class="w-full mt-5"
               />
             </el-form-item>
           </div>
@@ -485,7 +459,7 @@
 
     <!-- BALANCE General
     ADDaccount -->
-    <el-dialog
+    <!-- <el-dialog
       :title="`Agregar cuenta a: ${selectedParentAccount.name}`"
       :visible.sync="showAddAccount"
       width="500px"
@@ -528,9 +502,9 @@
           >Agregar</el-button
         >
       </span>
-    </el-dialog>
+    </el-dialog> -->
     <!-- changedisplayname -->
-    <el-dialog
+    <!-- <el-dialog
       title="Cambiar nombre en reporte"
       :visible.sync="showChangeDisplayName"
       width="500px"
@@ -557,9 +531,9 @@
           >Agregar</el-button
         >
       </span>
-    </el-dialog>
+    </el-dialog> -->
     <!-- Estadoderesultados -->
-    <el-dialog
+    <!-- <el-dialog
       :title="`Agregar cuenta a: ${selectedParentAccountEstado.name}`"
       :visible.sync="showAddAccountEstado"
       width="500px"
@@ -657,7 +631,7 @@
           >Agregar</el-button
         >
       </span>
-    </el-dialog>
+    </el-dialog> -->
 
     <el-tabs
       v-model="tab"
@@ -671,98 +645,83 @@
       "
     >
       <!-- tab catalogo -->
-      <el-tab-pane label="Catálogo de cuentas" name="catalog">
+      <el-tab-pane label="Catálogo de cuentas" name="catalog" class="space-y-4">
         <!-- first row -->
-        <el-form>
-          <div class="grid grid-cols-12 gap-4">
-            <div class="col-span-3">
-              <el-form-item>
-                <el-button
-                  type="primary"
-                  icon="el-icon-plus"
-                  size="small"
-                  @click="addMayorAccount()"
-                >
-                  Agregar cuenta mayor
-                </el-button>
-              </el-form-item>
-            </div>
-            <div class="col-span-3 col-start-10">
-              <el-form-item>
-                <el-input
-                  suffix-icon="el-icon-search"
-                  placeholder="Buscar..."
-                  size="small"
-                />
-              </el-form-item>
-            </div>
-          </div>
-        </el-form>
-        <!-- second row -->
-        <div class="grid grid-cols-12">
-          <div class="col-span-12">
-            <el-table :data="accounts" style="width: 100%" stripe size="small">
-              <el-table-column
-                sortable="true"
-                type="index"
-                label="#"
-                min-width="50"
-                align="center"
-              ></el-table-column>
-              <el-table-column prop="code" label="Código" min-width="60" />
-              <el-table-column
-                prop="name"
-                label="Nombre de la cuenta"
-                min-width="260"
-              ></el-table-column>
-              <el-table-column
-                prop="description"
-                label="Descripción general"
-                min-width="270"
-              ></el-table-column>
-              <el-table-column
-                label="	(A)creedor/(D)eudor"
-                min-width="150"
-                align="center"
-              >
-                <template slot-scope="scope">{{
-                  scope.row.isAcreedora ? "A" : "D"
-                }}</template>
-              </el-table-column>
-              <el-table-column min-width="150">
-                <template slot-scope="scope">
-                  <el-button
-                    size="mini"
-                    type="primary"
-                    @click="addNewAccountDialog(scope.row)"
-                    icon="el-icon-plus"
-                  />
-                  <el-dropdown trigger="click" szie="mini">
-                    <el-button icon="el-icon-more" size="mini" />
-                    <el-dropdown-menu slot="dropdown">
-                      <el-dropdown-item
-                        @click.native="openEditAccount(scope.row)"
-                      >
-                        <i class="el-icon-edit-outline"></i> Editar cuenta
-                      </el-dropdown-item>
-
-                      <el-dropdown-item
-                        :divided="true"
-                        class="text-red-500 font-semibold"
-                        v-if="activeAccount.isParent"
-                      >
-                        <i class="el-icon-delete"></i> Eliminar Cuenta
-                      </el-dropdown-item>
-                    </el-dropdown-menu>
-                  </el-dropdown>
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
+        <div class="grid grid-cols-12 gap-4">
+          <el-button
+            class="col-span-3"
+            type="primary"
+            icon="el-icon-plus"
+            size="small"
+            @click="openMayorAccountDialog()"
+          >
+            Agregar cuenta mayor
+          </el-button>
+          <el-input
+            class="col-span-3 col-start-10"
+            suffix-icon="el-icon-search"
+            placeholder="Buscar..."
+            size="small"
+          />
         </div>
+        <!-- second row -->
+        <el-table :data="accounts" style="width: 100%" stripe size="mini">
+          <el-table-column
+            sortable="true"
+            type="index"
+            label="#"
+            min-width="50"
+            align="center"
+          />
+          <el-table-column prop="code" label="Código" min-width="90" />
+          <el-table-column
+            prop="name"
+            label="Nombre de la cuenta"
+            min-width="260"
+          />
+          <el-table-column
+            prop="description"
+            label="Descripción general"
+            min-width="300"
+          />
+          <el-table-column
+            label="	(A)creedor/(D)eudor"
+            min-width="150"
+            align="center"
+          >
+            <template slot-scope="scope">{{
+              scope.row.isAcreedora ? "A" : "D"
+            }}</template>
+          </el-table-column>
+          <el-table-column min-width="120" align="right">
+            <template slot-scope="scope">
+              <el-button
+                size="mini"
+                type="primary"
+                @click="openSubAccountDialog(scope.row)"
+                icon="el-icon-plus"
+              />
+              <el-dropdown trigger="click" szie="mini">
+                <el-button icon="el-icon-more" size="mini" />
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item @click.native="openEditAccount(scope.row)">
+                    <i class="el-icon-edit-outline"></i> Editar cuenta
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    :divided="true"
+                    class="text-red-500 font-semibold"
+                    v-if="!scope.row.isParent"
+                  >
+                    <i class="el-icon-delete"></i> Eliminar Cuenta
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </template>
+          </el-table-column>
+        </el-table>
       </el-tab-pane>
       <!-- tab balance general -->
-      <el-tab-pane label="Balance General" name="balance-general">
+      <!-- <el-tab-pane label="Balance General" name="balance-general">
         <div class="grid grid-cols-12">
           <div class="col-span-12">
             <Notification
@@ -941,9 +900,9 @@
           >
           <el-button size="small">Cancelar</el-button>
         </div>
-      </el-tab-pane>
+      </el-tab-pane> -->
       <!-- tab estado resultados -->
-      <el-tab-pane label="Estado de resultados" name="estado resultados">
+      <!-- <el-tab-pane label="Estado de resultados" name="estado resultados">
         <div class="grid grid-cols-12">
           <div class="col-span-12">
             <Notification
@@ -1068,7 +1027,7 @@
           >
           <el-button size="small">Cancelar</el-button>
         </div>
-      </el-tab-pane>
+      </el-tab-pane> -->
       <!-- tab integraciones -->
       <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
         <Notification
@@ -1144,20 +1103,16 @@ export default {
       .then((res) => {
         const [accountCatalogs] = res;
         this.accounts = accountCatalogs.data.accountingCatalog;
-        this.loading = false;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
-      });
+      })
+      .then((alw) => (this.pageloading = false));
   },
   fetchOnServer: false,
-
   data() {
     return {
-      loading: true,
-      balance: [
-        { cuenta: "Activo", nombrereporte: "hola que ase en un dia caluroso" },
-      ],
+      pageloading: true,
       tab: "catalog",
       utab: "invoicing",
       integrations: [
@@ -1174,25 +1129,20 @@ export default {
           icon: getIcon("cash"),
         },
       ],
-      //  catalogo de cuenta
+      accounts: [],
       showCreateCatalogDialog: false,
       showCreateAccountEntryDialog: false,
-      accounts: [],
       mayorAccountForm: {
         items: [
           {
-            code: "",
+            code: "1",
             name: "",
             isAcreedora: false,
             isBalance: false,
           },
         ],
       },
-      newAccountFormRules: {
-        code: inputValidation(true),
-        name: inputValidation(true),
-      },
-      newAccountForm: {
+      subAccountForm: {
         items: [
           {
             code: "",
@@ -1212,277 +1162,272 @@ export default {
       },
       showEditMayorDialog: false,
       showEditAccount: false,
-      //Balance General
-      tableData: [
-        {
-          id: 1,
-          name: "ACTIVO",
-          display: "ACTIVO",
-          children: [
-            {
-              id: 11,
-              name: "ACTIVO CORRIENTE",
-              display: "ACTIVO CORRIENTE",
-              showAdd: true,
-              children: [],
-            },
-            {
-              id: 12,
-              name: "ACTIVO NO CORRIENTE",
-              display: "ACTIVO NO CORRIENTE",
-              showAdd: true,
-              children: [],
-            },
-          ],
-        },
-        {
-          id: 2,
-          name: "PASIVO",
-          display: "PASIVO",
-          children: [
-            {
-              id: 21,
-              name: "PASIVO CORRIENTE",
-              display: "PASIVO CORRIENTE",
-              showAdd: true,
-              children: [],
-            },
-            {
-              id: 22,
-              name: "PASIVO NO CORRIENTE",
-              display: "PASIVO NO CORRIENTE",
-              showAdd: true,
-              children: [],
-            },
-          ],
-        },
-        {
-          id: 3,
-          name: "PATRIMONIO",
-          display: "PATRIMONIO",
-          children: [
-            {
-              id: 31,
-              name: "CAPITAL Y RESERVAS",
-              display: "CAPITAL Y RESERVAS",
-              showAdd: true,
-              children: [],
-            },
-          ],
-        },
-      ],
-      specialAccounts: {
-        accum_gain: "",
-        accum_lost: "",
-        curre_gain: "",
-        curre_lost: "",
-      },
-      showAddAccount: false,
-      selectedParentAccount: {},
-      selectedCatalog: [],
-      loadingAccount: false,
-      filteredCatalog: [],
-      showChangeDisplayName: false,
-      newDisplayName: "",
-      //Estadoderesultados
-      tablesData: [
-        {
-          name: "Ingreso de actividades ordinarias",
-          display: "Ingreso de actividades ordinarias",
-          showUpdateName: true,
-          showAdd: true,
-          children: [],
-          show: true,
-          details: false,
-          id: 1,
-        },
-        {
-          name: "Costo de ventas, producción o servicios",
-          display: "Costo de ventas, producción o servicios",
-          showUpdateName: true,
-          showAdd: true,
-          children: [],
-          show: true,
-          details: false,
-          id: 2,
-        },
-        {
-          name: "Utilidad/Perdida bruta",
-          display: "Utilidad/Perdida bruta",
-          showUpdateName: true,
-          bold: true,
-        },
-        {
-          name: "Otros ingresos",
-          display: "Otros ingresos",
-          showUpdateName: true,
-          showAdd: true,
-          children: [],
-          show: true,
-          details: false,
-          id: 3,
-        },
-        {
-          name: "Otros gastos",
-          display: "Otros gastos",
-          showUpdateName: true,
-          showAdd: true,
-          children: [],
-          show: true,
-          details: false,
-          id: 4,
-        },
-        {
-          name: "Gastos de distribucion y venta",
-          display: "Gastos de distribucion y venta",
-          showUpdateName: true,
-          showAdd: true,
-          children: [],
-          show: true,
-          details: false,
-          id: 5,
-        },
-        {
-          name: "Gastos de administracion",
-          display: "Gastos de administracion",
-          showUpdateName: true,
-          showAdd: true,
-          children: [],
-          show: true,
-          details: false,
-          id: 6,
-        },
-        {
-          name: "Utilidad/Perdida de operacion",
-          display: "Utilidad/Perdida de operacion",
-          showUpdateName: true,
-          bold: true,
-        },
-        {
-          name: "Ingresos financieros",
-          display: "Ingresos financieros",
-          showUpdateName: true,
-          showAdd: true,
-          children: [],
-          show: true,
-          details: false,
-          id: 7,
-        },
-        {
-          name: "Gastos financieros",
-          display: "Gastos financieros",
-          showUpdateName: true,
-          showAdd: true,
-          children: [],
-          show: true,
-          details: false,
-          id: 8,
-        },
-        {
-          name:
-            "Utiidad/Perdida antes de impuesto sobre la renta y las ganancias",
-          display:
-            "Utiidad/Perdida antes de impuesto sobre la renta y las ganancias",
-          showUpdateName: true,
-          bold: true,
-        },
-        {
-          name: "Reserva legal",
-          display: "Reserva legal",
-          showUpdateName: true,
-          showAdd: true,
-          children: [],
-          show: true,
-          details: false,
-          id: 9,
-        },
-        {
-          name: "Utiidad/Perdida antes de impuesto sobre la renta",
-          display: "Utiidad/Perdida antes de impuesto sobre la renta",
-          showUpdateName: true,
-          bold: true,
-        },
-        {
-          name: "Impuesto sobre la renta",
-          display: "Impuesto sobre la renta",
-          showUpdateName: true,
-          showAdd: true,
-          children: [],
-          show: true,
-          details: false,
-          id: 10,
-        },
-        {
-          name:
-            "Utilidad/Perdida antes de contribucion especial a las ganancias",
-          display:
-            "Utilidad/Perdida antes de contribucion especial a las ganancias",
-          showUpdateName: true,
-          bold: true,
-        },
-        {
-          name: "Contribucion especial a las ganancias",
-          display: "Contribucion especial a las ganancias",
-          showUpdateName: true,
-          showAdd: true,
-          children: [],
-          show: true,
-          details: false,
-          id: 11,
-        },
-        {
-          name: "Resultado del ejercicio",
-          display: "Resultado del ejercicio",
-          showUpdateName: true,
-          bold: true,
-        },
-        {
-          name: "Otros resultados integrales del ejercicio neto de impuestos",
-          display:
-            "Otros resultados integrales del ejercicio neto de impuestos",
-          showUpdateName: true,
-          showAdd: true,
-          children: [],
-          show: true,
-          details: false,
-          id: 12,
-        },
-        {
-          name: "RESULTADO INTEGRAL TOTAL DEL AÑO",
-          display: "RESULTADO INTEGRAL TOTAL DEL AÑO",
-          showUpdateName: true,
-          bold: true,
-        },
-      ],
+      // tableData: [
+      //   {
+      //     id: 1,
+      //     name: "ACTIVO",
+      //     display: "ACTIVO",
+      //     children: [
+      //       {
+      //         id: 11,
+      //         name: "ACTIVO CORRIENTE",
+      //         display: "ACTIVO CORRIENTE",
+      //         showAdd: true,
+      //         children: [],
+      //       },
+      //       {
+      //         id: 12,
+      //         name: "ACTIVO NO CORRIENTE",
+      //         display: "ACTIVO NO CORRIENTE",
+      //         showAdd: true,
+      //         children: [],
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 2,
+      //     name: "PASIVO",
+      //     display: "PASIVO",
+      //     children: [
+      //       {
+      //         id: 21,
+      //         name: "PASIVO CORRIENTE",
+      //         display: "PASIVO CORRIENTE",
+      //         showAdd: true,
+      //         children: [],
+      //       },
+      //       {
+      //         id: 22,
+      //         name: "PASIVO NO CORRIENTE",
+      //         display: "PASIVO NO CORRIENTE",
+      //         showAdd: true,
+      //         children: [],
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 3,
+      //     name: "PATRIMONIO",
+      //     display: "PATRIMONIO",
+      //     children: [
+      //       {
+      //         id: 31,
+      //         name: "CAPITAL Y RESERVAS",
+      //         display: "CAPITAL Y RESERVAS",
+      //         showAdd: true,
+      //         children: [],
+      //       },
+      //     ],
+      //   },
+      // ],
+      // specialAccounts: {
+      //   accum_gain: "",
+      //   accum_lost: "",
+      //   curre_gain: "",
+      //   curre_lost: "",
+      // },
+      // showAddAccount: false,
+      // selectedParentAccount: {},
+      // selectedCatalog: [],
+      // loadingAccount: false,
+      // filteredCatalog: [],
+      // showChangeDisplayName: false,
+      // newDisplayName: "",
+      // //Estadoderesultados
+      // tablesData: [
+      //   {
+      //     name: "Ingreso de actividades ordinarias",
+      //     display: "Ingreso de actividades ordinarias",
+      //     showUpdateName: true,
+      //     showAdd: true,
+      //     children: [],
+      //     show: true,
+      //     details: false,
+      //     id: 1,
+      //   },
+      //   {
+      //     name: "Costo de ventas, producción o servicios",
+      //     display: "Costo de ventas, producción o servicios",
+      //     showUpdateName: true,
+      //     showAdd: true,
+      //     children: [],
+      //     show: true,
+      //     details: false,
+      //     id: 2,
+      //   },
+      //   {
+      //     name: "Utilidad/Perdida bruta",
+      //     display: "Utilidad/Perdida bruta",
+      //     showUpdateName: true,
+      //     bold: true,
+      //   },
+      //   {
+      //     name: "Otros ingresos",
+      //     display: "Otros ingresos",
+      //     showUpdateName: true,
+      //     showAdd: true,
+      //     children: [],
+      //     show: true,
+      //     details: false,
+      //     id: 3,
+      //   },
+      //   {
+      //     name: "Otros gastos",
+      //     display: "Otros gastos",
+      //     showUpdateName: true,
+      //     showAdd: true,
+      //     children: [],
+      //     show: true,
+      //     details: false,
+      //     id: 4,
+      //   },
+      //   {
+      //     name: "Gastos de distribucion y venta",
+      //     display: "Gastos de distribucion y venta",
+      //     showUpdateName: true,
+      //     showAdd: true,
+      //     children: [],
+      //     show: true,
+      //     details: false,
+      //     id: 5,
+      //   },
+      //   {
+      //     name: "Gastos de administracion",
+      //     display: "Gastos de administracion",
+      //     showUpdateName: true,
+      //     showAdd: true,
+      //     children: [],
+      //     show: true,
+      //     details: false,
+      //     id: 6,
+      //   },
+      //   {
+      //     name: "Utilidad/Perdida de operacion",
+      //     display: "Utilidad/Perdida de operacion",
+      //     showUpdateName: true,
+      //     bold: true,
+      //   },
+      //   {
+      //     name: "Ingresos financieros",
+      //     display: "Ingresos financieros",
+      //     showUpdateName: true,
+      //     showAdd: true,
+      //     children: [],
+      //     show: true,
+      //     details: false,
+      //     id: 7,
+      //   },
+      //   {
+      //     name: "Gastos financieros",
+      //     display: "Gastos financieros",
+      //     showUpdateName: true,
+      //     showAdd: true,
+      //     children: [],
+      //     show: true,
+      //     details: false,
+      //     id: 8,
+      //   },
+      //   {
+      //     name:
+      //       "Utiidad/Perdida antes de impuesto sobre la renta y las ganancias",
+      //     display:
+      //       "Utiidad/Perdida antes de impuesto sobre la renta y las ganancias",
+      //     showUpdateName: true,
+      //     bold: true,
+      //   },
+      //   {
+      //     name: "Reserva legal",
+      //     display: "Reserva legal",
+      //     showUpdateName: true,
+      //     showAdd: true,
+      //     children: [],
+      //     show: true,
+      //     details: false,
+      //     id: 9,
+      //   },
+      //   {
+      //     name: "Utiidad/Perdida antes de impuesto sobre la renta",
+      //     display: "Utiidad/Perdida antes de impuesto sobre la renta",
+      //     showUpdateName: true,
+      //     bold: true,
+      //   },
+      //   {
+      //     name: "Impuesto sobre la renta",
+      //     display: "Impuesto sobre la renta",
+      //     showUpdateName: true,
+      //     showAdd: true,
+      //     children: [],
+      //     show: true,
+      //     details: false,
+      //     id: 10,
+      //   },
+      //   {
+      //     name:
+      //       "Utilidad/Perdida antes de contribucion especial a las ganancias",
+      //     display:
+      //       "Utilidad/Perdida antes de contribucion especial a las ganancias",
+      //     showUpdateName: true,
+      //     bold: true,
+      //   },
+      //   {
+      //     name: "Contribucion especial a las ganancias",
+      //     display: "Contribucion especial a las ganancias",
+      //     showUpdateName: true,
+      //     showAdd: true,
+      //     children: [],
+      //     show: true,
+      //     details: false,
+      //     id: 11,
+      //   },
+      //   {
+      //     name: "Resultado del ejercicio",
+      //     display: "Resultado del ejercicio",
+      //     showUpdateName: true,
+      //     bold: true,
+      //   },
+      //   {
+      //     name: "Otros resultados integrales del ejercicio neto de impuestos",
+      //     display:
+      //       "Otros resultados integrales del ejercicio neto de impuestos",
+      //     showUpdateName: true,
+      //     showAdd: true,
+      //     children: [],
+      //     show: true,
+      //     details: false,
+      //     id: 12,
+      //   },
+      //   {
+      //     name: "RESULTADO INTEGRAL TOTAL DEL AÑO",
+      //     display: "RESULTADO INTEGRAL TOTAL DEL AÑO",
+      //     showUpdateName: true,
+      //     bold: true,
+      //   },
+      // ],
 
-      showAddAccountEstado: false,
-      selectedCatalogEstado: "",
-      selectedParentAccountEstado: {},
-      loadingAccountEstado: false,
-      filteredCatalogEstado: [],
-      showChangeDisplayNameEstado: false,
-      allowNewDisplayNameEstado: false,
-      newDisplayNameEstado: "",
+      // showAddAccountEstado: false,
+      // selectedCatalogEstado: "",
+      // selectedParentAccountEstado: {},
+      // loadingAccountEstado: false,
+      // filteredCatalogEstado: [],
+      // showChangeDisplayNameEstado: false,
+      // allowNewDisplayNameEstado: false,
+      // newDisplayNameEstado: "",
     };
   },
   methods: {
     //  CatalogAccount
-    mayorAccountFormRules() {},
-    addMayorAccount() {
-      this.showCreateCatalogDialog = true;
+    openMayorAccountDialog() {
       if (this.$refs["mayorAccountForm"]) {
         this.$refs["mayorAccountForm"].resetFields();
       }
+      this.showCreateCatalogDialog = true;
     },
-    addNewAccountDialog(parentAccount) {
-      console.log(parentAccount);
-
+    openSubAccountDialog(parentAccount) {
       this.showCreateAccountEntryDialog = true;
-
       this.activeAccount = { ...parentAccount, subCatalogs: [] };
       console.log(this.activeAccount);
       return false;
-      this.newAccountForm.items = [
+      this.subAccountForm.items = [
         {
           code: "",
           name: "",
@@ -1503,23 +1448,21 @@ export default {
     removeMayorAccount(index) {
       this.mayorAccountForm.items.splice(index, 1);
     },
-    addNewAccount() {
-      this.newAccountForm.items.push({
+    addNewSubAccount() {
+      this.subAccountForm.items.push({
         code: "",
         name: "",
         isAcreedora: false,
         isBalance: false,
       });
     },
-    removeNewAccount(index) {
-      this.newAccountForm.items.splice(index, 1);
+    removeSubAccount(index) {
+      this.subAccountForm.items.splice(index, 1);
     },
     submitNewCatalog(mayorAccounts, formName, activeAccount) {
       console.log(mayorAccounts, formName, activeAccount);
       this.$refs[formName].validate((valid) => {
-        if (!valid) {
-          return false;
-        }
+        if (!valid) return false;
 
         // Verifica si es sub cuenta
         if (activeAccount) {
@@ -1547,7 +1490,7 @@ export default {
         // Verifica si los codigos nuevos y los guardados estan duplicados entre ellos.
         const catalog = this.accounts.map((a) => a.code);
         for (const acc of mayorAccounts) {
-          if (catalog.includes(acc.code)) {
+          if (catalog.includes(acc.code.toString())) {
             return this.$notify({
               title: "Error",
               message:
@@ -1630,161 +1573,156 @@ export default {
       });
     },
     openEditAccount(account) {
-      console.log(account);
-
+      this.activeAccount = { ...account };
       if (account.code.length == 1) {
-        this.activeAccount = { ...account };
         this.showEditMayorDialog = true;
       } else {
-        this.activeAccount = {
-          ...account,
-        };
         this.showEditAccount = true;
       }
     },
     // balanceGeneral
-    openAddAccount(parent) {
-      this.showAddAccountEstado = true;
-      this.selectedParentAccount = { ...parent };
-    },
-    findAccount(query) {
-      if (query !== "") {
-        this.loadingAccount = true;
-        setTimeout(() => {
-          this.filteredCatalog = this.accounts.filter((c) => {
-            return (
-              c.code.toLowerCase().includes(query.toLowerCase()) ||
-              c.name.toLowerCase().includes(query.toLowerCase())
-            );
-          });
-          this.loadingAccount = false;
-        }, 200);
-      } else {
-        this.options = [];
-      }
-    },
-    addSubAccount(selected, list) {
-      let addTo = this.tableData.find((td) => {
-        return td.children.find((c) => c.id == selected.id);
-      });
-      addTo = addTo.children.find((c) => c.id == selected.id);
-      for (const code of list) {
-        const account = this.accounts.find((c) => c.id == code);
-        addTo.children.push({
-          id: account.code,
-          name: account.name,
-          display: account.name,
-          canDelete: true,
-        });
-      }
-      this.showAddAccount = false;
-    },
-    deleteSubAccount(selected) {
-      let parent = null;
-      for (const acc of this.tableData) {
-        for (const ch of acc.children) {
-          for (const c of ch.children) {
-            if (c.id == selected.id) {
-              parent = ch;
-            }
-          }
-        }
-      }
-      const index = parent.children.findIndex((e) => e.id == selected.id);
-      parent.children.splice(index, 1);
-    },
-    openChangeDisplay(account) {
-      this.selectedParentAccount = account;
-      this.showChangeDisplayName = true;
-    },
-    cancel() {
-      this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
-        confirmButtonText: "Si, salir",
-        cancelButtonText: "Cancelar",
-        type: "warning",
-      }).then(() => {
-        this.$router.push("/entries");
-      });
-    },
+    // openAddAccount(parent) {
+    //   this.showAddAccountEstado = true;
+    //   this.selectedParentAccount = { ...parent };
+    // },
+    // findAccount(query) {
+    //   if (query !== "") {
+    //     this.loadingAccount = true;
+    //     setTimeout(() => {
+    //       this.filteredCatalog = this.accounts.filter((c) => {
+    //         return (
+    //           c.code.toLowerCase().includes(query.toLowerCase()) ||
+    //           c.name.toLowerCase().includes(query.toLowerCase())
+    //         );
+    //       });
+    //       this.loadingAccount = false;
+    //     }, 200);
+    //   } else {
+    //     this.options = [];
+    //   }
+    // },
+    // addSubAccount(selected, list) {
+    //   let addTo = this.tableData.find((td) => {
+    //     return td.children.find((c) => c.id == selected.id);
+    //   });
+    //   addTo = addTo.children.find((c) => c.id == selected.id);
+    //   for (const code of list) {
+    //     const account = this.accounts.find((c) => c.id == code);
+    //     addTo.children.push({
+    //       id: account.code,
+    //       name: account.name,
+    //       display: account.name,
+    //       canDelete: true,
+    //     });
+    //   }
+    //   this.showAddAccount = false;
+    // },
+    // deleteSubAccount(selected) {
+    //   let parent = null;
+    //   for (const acc of this.tableData) {
+    //     for (const ch of acc.children) {
+    //       for (const c of ch.children) {
+    //         if (c.id == selected.id) {
+    //           parent = ch;
+    //         }
+    //       }
+    //     }
+    //   }
+    //   const index = parent.children.findIndex((e) => e.id == selected.id);
+    //   parent.children.splice(index, 1);
+    // },
+    // openChangeDisplay(account) {
+    //   this.selectedParentAccount = account;
+    //   this.showChangeDisplayName = true;
+    // },
+    // cancel() {
+    //   this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
+    //     confirmButtonText: "Si, salir",
+    //     cancelButtonText: "Cancelar",
+    //     type: "warning",
+    //   }).then(() => {
+    //     this.$router.push("/entries");
+    //   });
+    // },
     //estado de resultados
-    openAddAccountEstado(parent) {
-      this.showAddAccountEstado = true;
-      this.selectedParentAccountEstado = { ...parent };
-    },
-    findAccountEstado(query) {
-      if (query !== "") {
-        this.loadingAccountEstado = true;
-        setTimeout(() => {
-          this.filteredCatalogEstado = this.accounts.filter((c) => {
-            return (
-              c.code.toLowerCase().includes(query.toLowerCase()) ||
-              c.name.toLowerCase().includes(query.toLowerCase())
-            );
-          });
-          this.loadingAccountEstado = false;
-        }, 200);
-      } else {
-        this.options = [];
-      }
-    },
-    addSubAccountEstado(selected, code) {
-      const account = this.accounts.find((c) => c.id == code);
-      const tablesData = [...this.tablesData];
-      this.tablesData = [];
-      let addTo = tablesData.find((d) => d.id == selected.id);
-      addTo.children.push({
-        id: account.code,
-        name: account.name,
-        display: account.name,
-        canDelete: true,
-        showUpdateName: false,
-      });
-      this.showAddAccountEstado = false;
-      setTimeout(() => {
-        console.log("entra");
-        this.tablesData = [...tablesData];
-      }, 500);
-    },
-    deleteSubAccountEstado(selected) {
-      let parent = null;
-      const tablesData = [...this.tablesData];
-      this.tablesData = [];
-      for (const acc of tablesData) {
-        if (acc.hasOwnProperty("children")) {
-          for (const c of acc.children) {
-            if (c.id == selected.id) {
-              parent = acc;
-            }
-          }
-        }
-      }
-      const index = parent.children.findIndex((e) => e.id == selected.id);
-      parent.children.splice(index, 1);
-      setTimeout(() => {
-        this.tablesData = [...tablesData];
-      }, 500);
-    },
+    // openAddAccountEstado(parent) {
+    //   this.showAddAccountEstado = true;
+    //   this.selectedParentAccountEstado = { ...parent };
+    // },
+    // findAccountEstado(query) {
+    //   if (query !== "") {
+    //     this.loadingAccountEstado = true;
+    //     setTimeout(() => {
+    //       this.filteredCatalogEstado = this.accounts.filter((c) => {
+    //         return (
+    //           c.code.toLowerCase().includes(query.toLowerCase()) ||
+    //           c.name.toLowerCase().includes(query.toLowerCase())
+    //         );
+    //       });
+    //       this.loadingAccountEstado = false;
+    //     }, 200);
+    //   } else {
+    //     this.options = [];
+    //   }
+    // },
+    // addSubAccountEstado(selected, code) {
+    //   const account = this.accounts.find((c) => c.id == code);
+    //   const tablesData = [...this.tablesData];
+    //   this.tablesData = [];
+    //   let addTo = tablesData.find((d) => d.id == selected.id);
+    //   addTo.children.push({
+    //     id: account.code,
+    //     name: account.name,
+    //     display: account.name,
+    //     canDelete: true,
+    //     showUpdateName: false,
+    //   });
+    //   this.showAddAccountEstado = false;
+    //   setTimeout(() => {
+    //     console.log("entra");
+    //     this.tablesData = [...tablesData];
+    //   }, 500);
+    // },
+    // deleteSubAccountEstado(selected) {
+    //   let parent = null;
+    //   const tablesData = [...this.tablesData];
+    //   this.tablesData = [];
+    //   for (const acc of tablesData) {
+    //     if (acc.hasOwnProperty("children")) {
+    //       for (const c of acc.children) {
+    //         if (c.id == selected.id) {
+    //           parent = acc;
+    //         }
+    //       }
+    //     }
+    //   }
+    //   const index = parent.children.findIndex((e) => e.id == selected.id);
+    //   parent.children.splice(index, 1);
+    //   setTimeout(() => {
+    //     this.tablesData = [...tablesData];
+    //   }, 500);
+    // },
 
-    changeDisplayNameEstado(account, display, allow) {
-      if (display == "") {
-        return this.$notify.error({
-          title: "Error",
-          message: "Debes incluir un nombre a mostrar",
-        });
-      }
-      account.display = allow ? display : account.name;
-      this.showChangeDisplayNameEstado = false;
-    },
-    changeAllowDisplayName(account, allowNewDisplayNameEstado, newDisplayName) {
-      this.newDisplayNameEstado == allowNewDisplayNameEstado
-        ? newDisplayNameEstado
-        : account.display;
-    },
-    openChangeDisplayName(account) {
-      this.selectedParentAccountEstado = account;
-      this.newDisplayNameEstado = account.display;
-      this.showChangeDisplayNameEstado = true;
-    },
+    // changeDisplayNameEstado(account, display, allow) {
+    //   if (display == "") {
+    //     return this.$notify.error({
+    //       title: "Error",
+    //       message: "Debes incluir un nombre a mostrar",
+    //     });
+    //   }
+    //   account.display = allow ? display : account.name;
+    //   this.showChangeDisplayNameEstado = false;
+    // },
+    // changeAllowDisplayName(account, allowNewDisplayNameEstado, newDisplayName) {
+    //   this.newDisplayNameEstado == allowNewDisplayNameEstado
+    //     ? newDisplayNameEstado
+    //     : account.display;
+    // },
+    // openChangeDisplayName(account) {
+    //   this.selectedParentAccountEstado = account;
+    //   this.newDisplayNameEstado = account.display;
+    //   this.showChangeDisplayNameEstado = true;
+    // },
     cancel() {
       this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
         confirmButtonText: "Si, salir",
