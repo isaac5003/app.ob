@@ -253,7 +253,7 @@ export default {
             this.getDiarioMayor(dateRange);
             break;
           case "libroAuxiliares":
-            this.generateLibroAuxiliares(dateRange);
+            this.getAuxiliares(dateRange);
             break;
           case "catalogoCuentas":
             this.getAccountingCatalog(dateRange);
@@ -333,7 +333,6 @@ export default {
       });
     },
     getDiarioMayor(dateRange) {
-      console.log(dateRange);
       const bussinesInfo = () => this.$axios.get("/business/info");
       const libroMayor = () => {
         return this.$axios.get("/entries/report/diario-mayor", {
@@ -425,11 +424,11 @@ export default {
             },
           ]);
         }
-        console.log(this.$dateFns.lastDayOfMonth(new Date(dateRange)));
+
         const docDefinition = {
           pageSize: "LETTER",
           pageOrientation: "portrait",
-          pageMargins: [15, 60, 15, 40],
+          pageMargins: [20, 60, 20, 40],
           header: getHeader(
             name,
             nit,
@@ -456,6 +455,188 @@ export default {
                     },
                     {
                       text: "NOMBRE DE LA CUENTA",
+                      style: "tableHeader",
+                      rowSpan: 2,
+                    },
+                    {
+                      alignment: "center",
+                      text: "FECHA DE\nPARTIDA",
+                      style: "tableHeader",
+                      rowSpan: 2,
+                    },
+                    {
+                      alignment: "center",
+                      text: "MES ACTUAL",
+                      style: "tableHeader",
+                      colSpan: 2,
+                    },
+                    {},
+                    {
+                      alignment: "center",
+                      text: "SALDO DEL\nPERÍODO",
+                      style: "tableHeader",
+                      rowSpan: 2,
+                    },
+                  ],
+                  [
+                    {},
+                    {},
+                    {},
+                    {
+                      alignment: "center",
+                      text: "CARGOS",
+                      style: "tableHeader",
+                    },
+                    {
+                      alignment: "center",
+                      text: "ABONOS",
+                      style: "tableHeader",
+                    },
+                    {},
+                  ],
+                  ...values,
+                ],
+              },
+            },
+          ],
+          styles: {
+            tableHeader: {
+              bold: true,
+              fontSize: 9,
+            },
+          },
+        };
+        this.generating = false;
+        pdfMake.createPdf(docDefinition).open();
+      });
+    },
+    getAuxiliares(dateRange) {
+      const bussinesInfo = () => this.$axios.get("/business/info");
+      const auxiliares = () => {
+        return this.$axios.get("/entries/report/auxiliares", {
+          params: {
+            date: dateRange,
+          },
+        });
+      };
+      Promise.all([bussinesInfo(), auxiliares()]).then((res) => {
+        const [bussinesInfo, auxiliares] = res;
+        const { name, nit, nrc } = bussinesInfo.data.info;
+        console.log(auxiliares.data.accounts);
+        const reporteAuxiliares = auxiliares.data.accounts;
+        const values = [];
+        const emptyRow = [{}, {}, {}, {}, {}, {}];
+
+        for (const i of reporteAuxiliares) {
+          values.push(emptyRow);
+          values.push([
+            {
+              bold: true,
+              text: i.code,
+            },
+            {
+              bold: true,
+              text: i.name,
+            },
+            {
+              bold: true,
+              text: "Saldo inicial",
+              alignment: "center",
+            },
+            {},
+            {},
+            {
+              bold: true,
+              text: this.$options.filters.formatMoney(i.initialBalance),
+              alignment: "right",
+            },
+          ]);
+
+          for (const j of i.movements) {
+            // values.push(emptyRow);
+            values.push([
+              {
+                text: j.entryNumber,
+                alignment: "right",
+              },
+              {
+                text: j.entryName,
+              },
+              {
+                text: j.date,
+                alignment: "center",
+              },
+              {
+                text: this.$options.filters.formatMoney(j.cargo),
+                alignment: "right",
+              },
+              {
+                text: this.$options.filters.formatMoney(j.abono),
+                alignment: "right",
+              },
+              {
+                text: this.$options.filters.formatMoney(j.balance),
+                alignment: "right",
+              },
+            ]);
+          }
+
+          values.push([
+            {},
+            {},
+            {
+              bold: true,
+              text: "Saldo actual",
+              alignment: "center",
+            },
+            {
+              bold: true,
+              text: this.$options.filters.formatMoney(i.totalCargo),
+              alignment: "right",
+            },
+            {
+              bold: true,
+              text: this.$options.filters.formatMoney(i.totalAbono),
+              alignment: "right",
+            },
+            {
+              bold: true,
+              text: this.$options.filters.formatMoney(i.currentBalance),
+              alignment: "right",
+            },
+          ]);
+        }
+
+        const docDefinition = {
+          pageSize: "LETTER",
+          pageOrientation: "portrait",
+          pageMargins: [20, 60, 20, 40],
+          header: getHeader(
+            name,
+            nit,
+            nrc,
+            this.$dateFns.lastDayOfMonth(new Date(dateRange)),
+            "LIBROS DE AUXILIARES",
+            "month"
+          ),
+          footer: getFooter(),
+          content: [
+            {
+              fontSize: 9,
+              layout: "noBorders",
+              table: {
+                headerRows: 2,
+                widths: ["12%", "auto", "10%", "9%", "9%", "10%"],
+                heights: -5,
+                body: [
+                  [
+                    {
+                      text: "CÓD. DE LA CUENTA\nN° DE PARTIDA",
+                      style: "tableHeader",
+                      rowSpan: 2,
+                    },
+                    {
+                      text: "NOMBRE DE LA CUENTA\nCONCEPTO",
                       style: "tableHeader",
                       rowSpan: 2,
                     },
