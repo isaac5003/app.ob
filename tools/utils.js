@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 const getHeader = (name, nit, nrc, lastDay, docName, dateType = 'date', preTitle = null) => {
     let title = docName
-    if (!lastDay === null) {
+    if (!lastDay) {
         let date = null
         switch (dateType) {
             case 'date':

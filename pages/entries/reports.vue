@@ -71,6 +71,7 @@
               v-model="reportForm.dateRange"
               type="month"
               format="MMMM yyyy"
+              value-format="yyyy-MM-dd"
               placeholder="Selecciona un mes"
               size="small"
             />
@@ -249,7 +250,7 @@ export default {
             this.generateBalanceComprobacion(dateRange);
             break;
           case "diarioMayor":
-            this.generateDiarioMayor(dateRange);
+            this.getDiarioMayor(dateRange);
             break;
           case "libroAuxiliares":
             this.generateLibroAuxiliares(dateRange);
@@ -273,7 +274,6 @@ export default {
         const [catalog, bussinesInfo] = res;
         const catalogReport = catalog.data.accountingCatalog;
         const { name, nit, nrc } = bussinesInfo.data.info;
-        console.log(nrc);
         const values = catalogReport.map((c) => {
           return [
             { bold: c.level === 1, text: c.code },
@@ -315,6 +315,185 @@ export default {
                       text: "ASIGNABLE",
                       style: "tableHeader",
                     },
+                  ],
+                  ...values,
+                ],
+              },
+            },
+          ],
+          styles: {
+            tableHeader: {
+              bold: true,
+              fontSize: 9,
+            },
+          },
+        };
+        this.generating = false;
+        pdfMake.createPdf(docDefinition).open();
+      });
+    },
+    getDiarioMayor(dateRange) {
+      console.log(dateRange);
+      const bussinesInfo = () => this.$axios.get("/business/info");
+      const libroMayor = () => {
+        return this.$axios.get("/entries/report/diario-mayor", {
+          params: {
+            date: dateRange,
+          },
+        });
+      };
+      Promise.all([bussinesInfo(), libroMayor()]).then((res) => {
+        const [bussinesInfo, libroMayor] = res;
+        const { name, nit, nrc } = bussinesInfo.data.info;
+        const lib = libroMayor.data.accounts;
+        const values = [];
+        const emptyRow = [{}, {}, {}, {}, {}, {}];
+
+        for (const i of lib) {
+          values.push(emptyRow);
+          values.push([
+            {
+              bold: true,
+              text: i.code,
+            },
+            {
+              bold: true,
+              text: i.name,
+            },
+            {
+              bold: true,
+              text: "Saldo inicial",
+              alignment: "center",
+            },
+            {},
+            {},
+            {
+              bold: true,
+              text: this.$options.filters.formatMoney(i.initialBalance),
+              alignment: "right",
+            },
+          ]);
+
+          for (const j of i.movements) {
+            // values.push(emptyRow);
+            values.push([
+              {},
+              {
+                text: "MOVIMIENTOS DEL DIA",
+              },
+              {
+                text: j.date,
+                alignment: "center",
+              },
+              {
+                text: this.$options.filters.formatMoney(j.cargo),
+                alignment: "right",
+              },
+              {
+                text: this.$options.filters.formatMoney(j.abono),
+                alignment: "right",
+              },
+              {
+                text: this.$options.filters.formatMoney(j.balance),
+                alignment: "right",
+              },
+            ]);
+          }
+
+          values.push([
+            {},
+            {},
+            {
+              bold: true,
+              text: "Saldo actual",
+              alignment: "center",
+            },
+            {
+              bold: true,
+              text: this.$options.filters.formatMoney(i.totalCargo),
+              alignment: "right",
+            },
+            {
+              bold: true,
+              text: this.$options.filters.formatMoney(i.totalAbono),
+              alignment: "right",
+            },
+            {
+              bold: true,
+              text: this.$options.filters.formatMoney(i.currentBalance),
+              alignment: "right",
+            },
+          ]);
+        }
+        console.log(this.$dateFns.lastDayOfMonth(new Date(dateRange)));
+        const docDefinition = {
+          pageSize: "LETTER",
+          pageOrientation: "portrait",
+          pageMargins: [15, 60, 15, 40],
+          header: getHeader(
+            name,
+            nit,
+            nrc,
+            this.$dateFns.lastDayOfMonth(new Date(dateRange)),
+            "LIBRO DIARIO MAYOR",
+            "month"
+          ),
+          footer: getFooter(),
+          content: [
+            {
+              fontSize: 9,
+              layout: "noBorders",
+              table: {
+                headerRows: 2,
+                widths: ["12%", "auto", "10%", "9%", "9%", "10%"],
+                heights: -5,
+                body: [
+                  [
+                    {
+                      text: "CÓD. DE LA CUENTA",
+                      style: "tableHeader",
+                      rowSpan: 2,
+                    },
+                    {
+                      text: "NOMBRE DE LA CUENTA",
+                      style: "tableHeader",
+                      rowSpan: 2,
+                    },
+                    {
+                      alignment: "center",
+                      text: "FECHA DE\nPARTIDA",
+                      style: "tableHeader",
+                      rowSpan: 2,
+                    },
+                    {
+                      alignment: "center",
+                      text: "MES ACTUAL",
+                      style: "tableHeader",
+                      colSpan: 2,
+                    },
+                    {},
+                    {
+                      alignment: "center",
+                      text: "SALDO DEL\nPERÍODO",
+                      style: "tableHeader",
+                      rowSpan: 2,
+                    },
+                  ],
+                  [
+                    {},
+                    {},
+                    {},
+                    {
+                      alignment: "center",
+                      text: "CARGOS",
+                      style: "tableHeader",
+                    },
+                    {
+                      alignment: "center",
+                      text: "ABONOS",
+                      style: "tableHeader",
+                    },
+                    {},
                   ],
                   ...values,
                 ],
