@@ -61,6 +61,9 @@ import LayoutContent from "../../components/layout/Content";
 import { inputValidation } from "../../tools";
 export default {
   name: "Password",
+  head: {
+    titleTemplate: `%s | Cambiar contraseña`,
+  },
   components: { LayoutContent },
   data() {
     return {
