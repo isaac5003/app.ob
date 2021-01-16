@@ -1130,6 +1130,7 @@ export default {
         },
       ],
       accounts: [],
+      rawCatalog: [],
       showCreateCatalogDialog: false,
       showCreateAccountEntryDialog: false,
       mayorAccountForm: {
@@ -1460,7 +1461,6 @@ export default {
       this.subAccountForm.items.splice(index, 1);
     },
     submitNewCatalog(mayorAccounts, formName, activeAccount) {
-      console.log(mayorAccounts, formName, activeAccount);
       this.$refs[formName].validate((valid) => {
         if (!valid) return false;
 
@@ -1511,43 +1511,30 @@ export default {
               if (action === "confirm") {
                 instance.confirmButtonLoading = true;
                 instance.confirmButtonText = "Procesando...";
-                let dataAccounts = "";
-                for (const acc of mayorAccounts) {
-                  // Agrega la descripcion
-                  const description = !acc.description
-                    ? null
-                    : `"${acc.description}"`;
 
-                  // Agrega parentCatalog
-                  const parentCatalog = !activeAccount ? null : activeAccount;
-
-                  // esto ya no seria necesario (pasarlo a string, ahorita guarda obketos en el arreglo)
-                  // proba nuevamente
-
-                  this.accounts.push({
-                    code: `${acc.code}`,
-                    name: acc.name,
-                    description: description,
-                    isAcreedora: acc.isAcreedora,
-                    isBalance: acc.isBalance,
-                    parentCatalog: parentCatalog,
+                this.$axios
+                  .post("/entries/catalog", {
+                    parentCatalog: !activeAccount ? null : activeAccount.id,
+                    accounts: mayorAccounts,
+                  })
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Exito",
+                      message: res.data.message,
+                    });
+                    this.fetchCatalog();
+                    this.showCreateCatalogDialog = false;
+                    this.showCreateAccount = false;
+                    done();
+                  })
+                  .catch(
+                    (err) => (this.errorMessage = err.response.data.message)
+                  )
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = "Si, guardar";
                   });
 
-                  // dataAccounts += `{
-                  //   code: "${acc.code}",
-                  //   name: "${acc.name}",
-                  //   description: ${description},
-                  //   isAcreedora: ${acc.isAcreedora},
-                  //   isBalance: ${acc.isBalance},
-                  //   parentCatalog: ${parentCatalog},
-                  // }`;
-
-                  // if (!activeAccount) {
-                  //   this.accounts += dataAccounts;
-                  // } else {
-                  //   this.accounts += dataAccounts;
-                  // }
-                }
                 setTimeout(() => {
                   this.$refs[formName].resetFields();
                   this.showCreateAccountEntryDialog = false;
@@ -1571,6 +1558,16 @@ export default {
           }
         );
       });
+    },
+    fetchCatalog() {
+      this.$axios
+        .get("/entries/catalog")
+        .then((res) => {
+          this.accounts = res.data.accountingCatalog;
+        })
+        .catch((err) => {
+          this.errorMessage = err.response.data.message;
+        });
     },
     openEditAccount(account) {
       this.activeAccount = { ...account };
