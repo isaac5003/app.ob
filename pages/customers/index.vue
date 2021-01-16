@@ -1,6 +1,6 @@
 <template>
   <layout-content
-    v-loading="loading"
+    v-loading="pageloading"
     page-title="Listado de clientes"
     :breadcrumb="[
       { name: 'Clientes', to: '/customers' },
@@ -65,8 +65,8 @@
           <template
             v-if="
               selectedCustomer &&
-                (!selectedCustomer.customerTypeNatural ||
-                  selectedCustomer.customerTypeNatural.id == 2)
+              (!selectedCustomer.customerTypeNatural ||
+                selectedCustomer.customerTypeNatural.id == 2)
             "
           >
             <div class="col-span-2 flex flex-col">
@@ -115,50 +115,47 @@
     </el-dialog>
 
     <div class="flex flex-col space-y-2">
-      <div class="flex justify-center" v-if="errorMessage">
-        <Notification
-          class="w-1/2"
-          type="danger"
-          title="Error de comunicación"
-          :message="errorMessage"
-          :action="{
-            title: 'Intentar nuevamente',
-            function: () => $router.go(),
-          }"
-        />
-      </div>
+      <Notification
+        v-if="errorMessage"
+        class="w-full"
+        type="danger"
+        title="Error de comunicación"
+        :message="errorMessage"
+        :action="{
+          title: 'Intentar nuevamente',
+          function: () => $router.go(),
+        }"
+      />
       <el-form label-position="top">
-        <div class="flex justify-between">
-          <div class="flex">
-            <el-form-item class="w-60" label="Estado">
-              <el-select
-                v-model="status"
-                placeholder="Seleccionar"
-                size="small"
-                class="w-full"
-                filterable
-                clearable
-                default-first-option
-                @change="fetchCustomers"
-              >
-                <el-option label="Todos los estados" value="" />
-                <el-option label="Activo" :value="true" />
-                <el-option label="Inactivo" :value="false" />
-              </el-select>
-            </el-form-item>
-          </div>
-          <div class="w-75">
+        <div class="grid grid-cols-12 gap-4">
+          <el-form-item class="col-span-2" label="Estado">
+            <el-select
+              v-model="status"
+              placeholder="Seleccionar"
+              size="small"
+              class="w-full"
+              filterable
+              clearable
+              default-first-option
+              @change="fetchCustomers"
+            >
+              <el-option label="Todos los estados" value="" />
+              <el-option label="Activo" :value="true" />
+              <el-option label="Inactivo" :value="false" />
+            </el-select>
+          </el-form-item>
+          <el-form-item class="col-start-10 col-end-13">
             <el-input
               suffix-icon="el-icon-search"
               placeholder="Buscar..."
               v-model="searchValue"
               size="small"
-              style="margin-top: 26px"
+              style="margin-top: 22px"
               clearable
               v-debounce:500ms="fetchCustomers"
               @change="fetchCustomers"
             />
-          </div>
+          </el-form-item>
         </div>
       </el-form>
       <el-table :data="customers.customers" stripe size="mini">
@@ -255,16 +252,17 @@ export default {
       .then((res) => {
         const [customers] = res;
         this.customers = customers.data;
-        this.loading = false;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
-      });
+      })
+      .then((alw) => (this.pageloading = false));
   },
   fetchOnServer: false,
   data() {
     return {
-      loading: true,
+      pageloading: true,
+      tableloading: false,
       errorMessage: "",
       searchValue: "",
       status: "",
