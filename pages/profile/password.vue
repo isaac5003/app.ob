@@ -8,29 +8,37 @@
   >
     <el-form
       label-position="top"
-      class="flex flex-col bg-white w-full p-5 border rounded"
+      class="flex flex-col bg-white p-4 border rounded"
       status-icon
       :model="form"
       :rules="rules"
       ref="form"
       @submit.native.prevent="changePassword('form', form)"
     >
-      <div class="w-1/2">
-        <el-form-item label="Contraseña actual" prop="currentPassword">
+      <div class="grid grid-cols-12 gap-4">
+        <el-form-item
+          label="Contraseña actual"
+          prop="currentPassword"
+          class="col-span-4"
+        >
           <el-input
             type="password"
             v-model="form.currentPassword"
             size="small"
           />
         </el-form-item>
-      </div>
-      <div class="w-1/2">
-        <el-form-item label="Nueva contraseña" prop="newPassword">
+        <el-form-item
+          label="Nueva contraseña"
+          prop="newPassword"
+          class="col-span-4"
+        >
           <el-input type="password" v-model="form.newPassword" size="small" />
         </el-form-item>
-      </div>
-      <div class="w-1/2">
-        <el-form-item label="Confirmar contraseña" prop="confirmPassword">
+        <el-form-item
+          label="Confirmar contraseña"
+          prop="confirmPassword"
+          class="col-span-4"
+        >
           <el-input
             type="password"
             v-model="form.confirmPassword"
