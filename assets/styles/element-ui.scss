@@ -17,3 +17,8 @@ $--font-path: "../../node_modules/element-ui/lib/theme-chalk/fonts";
   padding-bottom: 0 !important;
   line-height: 15px;
 }
+
+.el-loading-spinner {
+  display: flex;
+  justify-content: center;
+}
