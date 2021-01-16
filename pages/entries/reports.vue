@@ -693,6 +693,10 @@ export default {
         pdfMake.createPdf(docDefinition).open();
       });
     },
+    async getCalogs() {
+      const { data } = await this.$axios.get("/entries/catalog");
+      this.accountingCatalog = data.accountingCatalog;
+    },
     cancel() {
       this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
         confirmButtonText: "Si, salir",
