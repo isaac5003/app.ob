@@ -225,6 +225,7 @@ export default {
             break;
           case "movimientoCuentas":
             this.requirementForm = "extended";
+            this.getCalogs();
             break;
           default:
             this.requirementForm = "none";
