@@ -28,15 +28,12 @@
             :prop="`items.${i}.code`"
             :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
           >
-            <el-input-number
+            <el-input
               v-model="item.code"
               type="number"
-              :min="0"
-              :step="1"
+              :min="1"
               size="small"
               autocomplete="off"
-              :controls="false"
-              style="width: 100%"
             />
           </el-form-item>
           <el-form-item
@@ -144,13 +141,11 @@
             prop="code"
             :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
           >
-            <el-input-number
+            <el-input
               v-model="activeAccount.code"
               type="number"
               :min="1"
               size="small"
-              :disabled="activeAccount.isParent == true"
-              :controls="false"
             />
           </el-form-item>
           <el-form-item
@@ -244,15 +239,12 @@
                   trigger: 'blur',
                 }"
               >
-                <el-input-number
+                <el-input
                   v-model="item.code"
                   type="number"
-                  :min="0"
-                  :step="1"
+                  :min="1"
                   size="small"
                   autocomplete="off"
-                  style="width: 100%"
-                  :controls="false"
                 />
               </el-form-item>
               <div class="col-span-5">
@@ -413,7 +405,7 @@
                 trigger: 'blur',
               }"
             >
-              <el-input-number
+              <el-input
                 v-model="activeAccount.code"
                 type="number"
                 :min="1"
@@ -487,7 +479,7 @@
 
     <!-- BALANCE General
     ADDaccount -->
-    <!-- <el-dialog
+    <el-dialog
       :title="`Agregar cuenta a: ${selectedParentAccount.name}`"
       :visible.sync="showAddAccount"
       width="500px"
@@ -530,9 +522,9 @@
           >Agregar</el-button
         >
       </span>
-    </el-dialog> -->
+    </el-dialog>
     <!-- changedisplayname -->
-    <!-- <el-dialog
+    <el-dialog
       title="Cambiar nombre en reporte"
       :visible.sync="showChangeDisplayName"
       width="500px"
@@ -559,7 +551,7 @@
           >Agregar</el-button
         >
       </span>
-    </el-dialog> -->
+    </el-dialog>
     <!-- Estadoderesultados -->
     <!-- <el-dialog
       :title="`Agregar cuenta a: ${selectedParentAccountEstado.name}`"
@@ -771,7 +763,7 @@
         </div>
       </el-tab-pane>
       <!-- tab balance general -->
-      <!-- <el-tab-pane label="Balance General" name="balance-general">
+      <el-tab-pane label="Balance General" name="balance-general">
         <div class="grid grid-cols-12">
           <div class="col-span-12">
             <Notification
@@ -788,80 +780,104 @@
             <div class="col-span-3">
               <el-form-item label="Utilidad ejercicios anteriores">
                 <el-select
+                  multiple
+                  filterable
+                  remote
+                  reserve-keyword
+                  default-first-option
+                  clearable
                   v-model="specialAccounts.accum_gain"
-                  size="small"
+                  placeholder="Escribe el numero o nombre de la cuenta"
+                  :remote-method="findAccount"
+                  :loading="loadingAccount"
                   class="w-full"
-                  placeholder="Escriba el numero o el nombre"
-                  filterable
-                  clereable
-                  default-first-option
+                  size="small"
+                  @focus="filteredCatalog = []"
                 >
                   <el-option
-                    v-for="aC in accounts"
-                    :key="aC.id"
-                    :label="`${aC.code} - ${aC.name}`"
-                    :value="aC.id"
-                  />
+                    v-for="item in filteredCatalog"
+                    :key="item.id"
+                    :label="`${item.code} - ${item.name}`"
+                    :value="item.id"
+                  ></el-option>
                 </el-select>
               </el-form-item>
             </div>
             <div class="col-span-3">
-              <el-form-item label="Utilidad ejercicios anteriores">
+              <el-form-item label="Perdida ejercicios anteriores">
                 <el-select
+                  multiple
+                  filterable
+                  remote
+                  reserve-keyword
+                  default-first-option
+                  clearable
                   v-model="specialAccounts.accum_lost"
-                  size="small"
+                  placeholder="Escribe el numero o nombre de la cuenta"
+                  :remote-method="findAccount"
+                  :loading="loadingAccount"
                   class="w-full"
-                  placeholder="Escribe el numero o el nombre"
-                  filterable
-                  clereable
-                  default-first-option
+                  size="small"
+                  @focus="filteredCatalog = []"
                 >
                   <el-option
-                    v-for="aC in accounts"
-                    :key="aC.id"
-                    :label="`${aC.code} - ${aC.name}`"
-                    :value="aC.id"
-                  />
+                    v-for="item in filteredCatalog"
+                    :key="item.id"
+                    :label="`${item.code} - ${item.name}`"
+                    :value="item.id"
+                  ></el-option>
                 </el-select>
               </el-form-item>
             </div>
             <div class="col-span-3">
-              <el-form-item label="utilidad presente ejercicio">
+              <el-form-item label="Utilidad presente ejercicio">
                 <el-select
-                  v-model="specialAccounts.curre_gain"
-                  size="small"
-                  class="w-full"
-                  placeholder="Escriba el numero o el nombre"
+                  multiple
                   filterable
-                  clereable
+                  remote
+                  reserve-keyword
                   default-first-option
+                  clearable
+                  v-model="specialAccounts.curre_gain"
+                  placeholder="Escribe el numero o nombre de la cuenta"
+                  :remote-method="findAccount"
+                  :loading="loadingAccount"
+                  class="w-full"
+                  size="small"
+                  @focus="filteredCatalog = []"
                 >
                   <el-option
-                    v-for="aC in accounts"
-                    :key="aC.id"
-                    :label="`${aC.code} - ${aC.name}`"
-                    :value="aC.id"
-                  />
+                    v-for="item in filteredCatalog"
+                    :key="item.id"
+                    :label="`${item.code} - ${item.name}`"
+                    :value="item.id"
+                  ></el-option>
                 </el-select>
               </el-form-item>
             </div>
             <div class="col-span-3">
               <el-form-item label="Perdida presente ejercicio">
                 <el-select
-                  v-model="specialAccounts.curre_lost"
-                  size="small"
-                  class="w-full"
-                  placeholder="Escriba el numero o el nombre"
+                  multiple
                   filterable
-                  clereable
+                  remote
+                  reserve-keyword
                   default-first-option
+                  clearable
+                  v-model="specialAccounts.curre_lost"
+                  placeholder="Escribe el numero o nombre de la cuenta"
+                  :remote-method="findAccount"
+                  :loading="loadingAccount"
+                  class="w-full"
+                  size="small"
+                  @focus="filteredCatalog = []"
                 >
                   <el-option
-                    v-for="aC in accounts"
-                    :key="aC.id"
-                    :label="`${aC.code} - ${aC.name}`"
-                    :value="aC.id"
-                  />
+                    v-for="item in filteredCatalog"
+                    :key="item.id"
+                    :label="`${item.code} - ${item.name}`"
+                    :value="item.id"
+                  ></el-option>
                 </el-select>
               </el-form-item>
             </div>
@@ -950,7 +966,8 @@
           >
           <el-button size="small">Cancelar</el-button>
         </div>
-      </el-tab-pane> -->
+      </el-tab-pane>
+
       <!-- tab estado resultados -->
       <!-- <el-tab-pane label="Estado de resultados" name="estado resultados">
         <div class="grid grid-cols-12">
@@ -1149,12 +1166,13 @@ export default {
 
     const accountCatalogs = () =>
       this.$axios.get("/entries/catalog", { params: this.page });
-
-    Promise.all([accountCatalogs()])
+    const accounts = () => this.$axios.get("/entries/catalog");
+    Promise.all([accountCatalogs(), accounts()])
       .then((res) => {
-        const [accountCatalogs] = res;
+        const [accountCatalogs, accounts] = res;
         this.accounts = accountCatalogs.data.accountingCatalog;
         this.accountsCount = accountCatalogs.data.count;
+        this.catalogs = accounts.data.accountingCatalog;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
@@ -1222,77 +1240,78 @@ export default {
       showEditMayorDialog: false,
       showEditAccount: false,
       searchValue: "",
-      // tableData: [
-      //   {
-      //     id: 1,
-      //     name: "ACTIVO",
-      //     display: "ACTIVO",
-      //     children: [
-      //       {
-      //         id: 11,
-      //         name: "ACTIVO CORRIENTE",
-      //         display: "ACTIVO CORRIENTE",
-      //         showAdd: true,
-      //         children: [],
-      //       },
-      //       {
-      //         id: 12,
-      //         name: "ACTIVO NO CORRIENTE",
-      //         display: "ACTIVO NO CORRIENTE",
-      //         showAdd: true,
-      //         children: [],
-      //       },
-      //     ],
-      //   },
-      //   {
-      //     id: 2,
-      //     name: "PASIVO",
-      //     display: "PASIVO",
-      //     children: [
-      //       {
-      //         id: 21,
-      //         name: "PASIVO CORRIENTE",
-      //         display: "PASIVO CORRIENTE",
-      //         showAdd: true,
-      //         children: [],
-      //       },
-      //       {
-      //         id: 22,
-      //         name: "PASIVO NO CORRIENTE",
-      //         display: "PASIVO NO CORRIENTE",
-      //         showAdd: true,
-      //         children: [],
-      //       },
-      //     ],
-      //   },
-      //   {
-      //     id: 3,
-      //     name: "PATRIMONIO",
-      //     display: "PATRIMONIO",
-      //     children: [
-      //       {
-      //         id: 31,
-      //         name: "CAPITAL Y RESERVAS",
-      //         display: "CAPITAL Y RESERVAS",
-      //         showAdd: true,
-      //         children: [],
-      //       },
-      //     ],
-      //   },
-      // ],
-      // specialAccounts: {
-      //   accum_gain: "",
-      //   accum_lost: "",
-      //   curre_gain: "",
-      //   curre_lost: "",
-      // },
-      // showAddAccount: false,
-      // selectedParentAccount: {},
-      // selectedCatalog: [],
-      // loadingAccount: false,
-      // filteredCatalog: [],
-      // showChangeDisplayName: false,
-      // newDisplayName: "",
+      tableData: [
+        {
+          id: 1,
+          name: "ACTIVO",
+          display: "ACTIVO",
+          children: [
+            {
+              id: 11,
+              name: "ACTIVO CORRIENTE",
+              display: "ACTIVO CORRIENTE",
+              showAdd: true,
+              children: [],
+            },
+            {
+              id: 12,
+              name: "ACTIVO NO CORRIENTE",
+              display: "ACTIVO NO CORRIENTE",
+              showAdd: true,
+              children: [],
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: "PASIVO",
+          display: "PASIVO",
+          children: [
+            {
+              id: 21,
+              name: "PASIVO CORRIENTE",
+              display: "PASIVO CORRIENTE",
+              showAdd: true,
+              children: [],
+            },
+            {
+              id: 22,
+              name: "PASIVO NO CORRIENTE",
+              display: "PASIVO NO CORRIENTE",
+              showAdd: true,
+              children: [],
+            },
+          ],
+        },
+        {
+          id: 3,
+          name: "PATRIMONIO",
+          display: "PATRIMONIO",
+          children: [
+            {
+              id: 31,
+              name: "CAPITAL Y RESERVAS",
+              display: "CAPITAL Y RESERVAS",
+              showAdd: true,
+              children: [],
+            },
+          ],
+        },
+      ],
+      specialAccounts: {
+        accum_gain: "",
+        accum_lost: "",
+        curre_gain: "",
+        curre_lost: "",
+      },
+      showAddAccount: false,
+      selectedParentAccount: {},
+      selectedCatalog: [],
+      loadingAccount: false,
+      filteredCatalog: [],
+      showChangeDisplayName: false,
+      newDisplayName: "",
+      catalogs: [],
       // //Estadoderesultados
       // tablesData: [
       //   {
@@ -1479,23 +1498,34 @@ export default {
     openMayorAccountDialog() {
       if (this.$refs["mayorAccountForm"]) {
         this.$refs["mayorAccountForm"].resetFields();
+        this.mayorAccountForm.items = [
+          {
+            code: "1",
+            name: "",
+            isAcreedora: false,
+            isBalance: false,
+          },
+        ];
       }
       this.showCreateCatalogDialog = true;
     },
     openSubAccountDialog(parentAccount) {
+      if (this.$refs["subAccountForm"]) {
+        this.$refs["subAccountForm"].resetFields();
+        this.subAccountForm.items = [
+          {
+            code: "",
+            name: "",
+            description: "",
+            isAcreedora: false,
+            isBalance: false,
+          },
+        ];
+      }
       this.showCreateAccountEntryDialog = true;
       this.activeAccount = { ...parentAccount, subCatalogs: [] };
-      console.log(this.activeAccount);
+
       return false;
-      this.subAccountForm.items = [
-        {
-          code: "",
-          name: "",
-          description: "",
-          isAcreedora: false,
-          isBalance: false,
-        },
-      ];
     },
     addNewMayorAccount() {
       this.mayorAccountForm.items.push({
@@ -1642,7 +1672,6 @@ export default {
       this.fetchCatalog();
     },
     openEditAccount(account) {
-      console.log(account);
       this.activeAccount = { ...account };
       if (account.code.length == 1) {
         this.showEditMayorDialog = true;
@@ -1764,60 +1793,59 @@ export default {
       });
     },
     // balanceGeneral
-    // openAddAccount(parent) {
-    //   this.showAddAccountEstado = true;
-    //   this.selectedParentAccount = { ...parent };
-    // },
-    // findAccount(query) {
-    //   if (query !== "") {
-    //     this.loadingAccount = true;
-    //     setTimeout(() => {
-    //       this.filteredCatalog = this.accounts.filter((c) => {
-    //         return (
-    //           c.code.toLowerCase().includes(query.toLowerCase()) ||
-    //           c.name.toLowerCase().includes(query.toLowerCase())
-    //         );
-    //       });
-    //       this.loadingAccount = false;
-    //     }, 200);
-    //   } else {
-    //     this.options = [];
-    //   }
-    // },
-    // addSubAccount(selected, list) {
-    //   let addTo = this.tableData.find((td) => {
-    //     return td.children.find((c) => c.id == selected.id);
-    //   });
-    //   addTo = addTo.children.find((c) => c.id == selected.id);
-    //   for (const code of list) {
-    //     const account = this.accounts.find((c) => c.id == code);
-    //     addTo.children.push({
-    //       id: account.code,
-    //       name: account.name,
-    //       display: account.name,
-    //       canDelete: true,
-    //     });
-    //   }
-    //   this.showAddAccount = false;
-    // },
-    // deleteSubAccount(selected) {
-    //   let parent = null;
-    //   for (const acc of this.tableData) {
-    //     for (const ch of acc.children) {
-    //       for (const c of ch.children) {
-    //         if (c.id == selected.id) {
-    //           parent = ch;
-    //         }
-    //       }
-    //     }
-    //   }
-    //   const index = parent.children.findIndex((e) => e.id == selected.id);
-    //   parent.children.splice(index, 1);
-    // },
-    // openChangeDisplay(account) {
-    //   this.selectedParentAccount = account;
-    //   this.showChangeDisplayName = true;
-    // },
+    openAddAccount(parent) {
+      this.showAddAccount = true;
+      this.selectedParentAccount = { ...parent };
+      this.filteredCatalog = [];
+    },
+    findAccount(query) {
+      if (query !== "") {
+        this.loadingAccount = true;
+        this.$axios
+          .get("/entries/catalog", { params: { search: query.toLowerCase() } })
+          .then((res) => {
+            this.filteredCatalog = res.data.accountingCatalog;
+            this.loadingAccount = false;
+          })
+          .catch((err) => (this.errorMessage = err.response.data.message));
+      } else {
+        this.filteredCatalog = [];
+      }
+    },
+    addSubAccount(selected, list) {
+      let addTo = this.tableData.find((td) => {
+        return td.children.find((c) => c.id == selected.id);
+      });
+      addTo = addTo.children.find((c) => c.id == selected.id);
+      for (const code of list) {
+        const account = this.catalogs.find((c) => c.id == code);
+        addTo.children.push({
+          id: account.code,
+          name: account.name,
+          display: account.name,
+          canDelete: true,
+        });
+      }
+      this.showAddAccount = false;
+    },
+    deleteSubAccount(selected) {
+      let parent = null;
+      for (const acc of this.tableData) {
+        for (const ch of acc.children) {
+          for (const c of ch.children) {
+            if (c.id == selected.id) {
+              parent = ch;
+            }
+          }
+        }
+      }
+      const index = parent.children.findIndex((e) => e.id == selected.id);
+      parent.children.splice(index, 1);
+    },
+    openChangeDisplay(account) {
+      this.selectedParentAccount = account;
+      this.showChangeDisplayName = true;
+    },
     // cancel() {
     //   this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
     //     confirmButtonText: "Si, salir",
