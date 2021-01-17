@@ -501,6 +501,7 @@
             :loading="loadingAccount"
             class="w-full"
             size="small"
+            @focus="filterCatalog = []"
           >
             <el-option
               v-for="item in filteredCatalog"
@@ -553,7 +554,7 @@
       </span>
     </el-dialog>
     <!-- Estadoderesultados -->
-    <!-- <el-dialog
+    <el-dialog
       :title="`Agregar cuenta a: ${selectedParentAccountEstado.name}`"
       :visible.sync="showAddAccountEstado"
       width="500px"
@@ -651,7 +652,8 @@
           >Agregar</el-button
         >
       </span>
-    </el-dialog> -->
+    </el-dialog>
+    -->
 
     <el-tabs
       v-model="tab"
@@ -780,7 +782,6 @@
             <div class="col-span-3">
               <el-form-item label="Utilidad ejercicios anteriores">
                 <el-select
-                  multiple
                   filterable
                   remote
                   reserve-keyword
@@ -806,7 +807,6 @@
             <div class="col-span-3">
               <el-form-item label="Perdida ejercicios anteriores">
                 <el-select
-                  multiple
                   filterable
                   remote
                   reserve-keyword
@@ -832,7 +832,6 @@
             <div class="col-span-3">
               <el-form-item label="Utilidad presente ejercicio">
                 <el-select
-                  multiple
                   filterable
                   remote
                   reserve-keyword
@@ -858,7 +857,6 @@
             <div class="col-span-3">
               <el-form-item label="Perdida presente ejercicio">
                 <el-select
-                  multiple
                   filterable
                   remote
                   reserve-keyword
@@ -916,7 +914,7 @@
                       <el-button
                         icon="el-icon-edit"
                         size="mini"
-                        @click="openChangeDisplay(scope.row)"
+                        @click="openChangeDisplay(scope.row, 'balance')"
                       />
                     </el-tooltip>
                   </div>
@@ -936,7 +934,7 @@
                       type="primary"
                       icon="el-icon-plus"
                       size="small"
-                      @click="openAddAccount(scope.row)"
+                      @click="openAddAccount(scope.row, 'balance')"
                     />
                   </el-tooltip>
                   <el-tooltip
@@ -969,7 +967,7 @@
       </el-tab-pane>
 
       <!-- tab estado resultados -->
-      <!-- <el-tab-pane label="Estado de resultados" name="estado resultados">
+      <el-tab-pane label="Estado de resultados" name="estado resultados">
         <div class="grid grid-cols-12">
           <div class="col-span-12">
             <Notification
@@ -1021,7 +1019,7 @@
                     <el-button
                       icon="el-icon-edit"
                       size="mini"
-                      @click="openChangeDisplayName(scope.row)"
+                      @click="openChangeDisplay(scope.row, 'results')"
                     />
                   </el-tooltip>
                 </template>
@@ -1064,7 +1062,7 @@
                       type="primary"
                       icon="el-icon-plus"
                       size="small"
-                      @click="openAddAccountEstado(scope.row)"
+                      @click="openAddAccount(scope.row, 'results')"
                     />
                   </el-tooltip>
                   <el-tooltip
@@ -1094,7 +1092,7 @@
           >
           <el-button size="small">Cancelar</el-button>
         </div>
-      </el-tab-pane> -->
+      </el-tab-pane>
       <!-- tab integraciones -->
       <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
         <Notification
@@ -1313,184 +1311,184 @@ export default {
       newDisplayName: "",
       catalogs: [],
       // //Estadoderesultados
-      // tablesData: [
-      //   {
-      //     name: "Ingreso de actividades ordinarias",
-      //     display: "Ingreso de actividades ordinarias",
-      //     showUpdateName: true,
-      //     showAdd: true,
-      //     children: [],
-      //     show: true,
-      //     details: false,
-      //     id: 1,
-      //   },
-      //   {
-      //     name: "Costo de ventas, producción o servicios",
-      //     display: "Costo de ventas, producción o servicios",
-      //     showUpdateName: true,
-      //     showAdd: true,
-      //     children: [],
-      //     show: true,
-      //     details: false,
-      //     id: 2,
-      //   },
-      //   {
-      //     name: "Utilidad/Perdida bruta",
-      //     display: "Utilidad/Perdida bruta",
-      //     showUpdateName: true,
-      //     bold: true,
-      //   },
-      //   {
-      //     name: "Otros ingresos",
-      //     display: "Otros ingresos",
-      //     showUpdateName: true,
-      //     showAdd: true,
-      //     children: [],
-      //     show: true,
-      //     details: false,
-      //     id: 3,
-      //   },
-      //   {
-      //     name: "Otros gastos",
-      //     display: "Otros gastos",
-      //     showUpdateName: true,
-      //     showAdd: true,
-      //     children: [],
-      //     show: true,
-      //     details: false,
-      //     id: 4,
-      //   },
-      //   {
-      //     name: "Gastos de distribucion y venta",
-      //     display: "Gastos de distribucion y venta",
-      //     showUpdateName: true,
-      //     showAdd: true,
-      //     children: [],
-      //     show: true,
-      //     details: false,
-      //     id: 5,
-      //   },
-      //   {
-      //     name: "Gastos de administracion",
-      //     display: "Gastos de administracion",
-      //     showUpdateName: true,
-      //     showAdd: true,
-      //     children: [],
-      //     show: true,
-      //     details: false,
-      //     id: 6,
-      //   },
-      //   {
-      //     name: "Utilidad/Perdida de operacion",
-      //     display: "Utilidad/Perdida de operacion",
-      //     showUpdateName: true,
-      //     bold: true,
-      //   },
-      //   {
-      //     name: "Ingresos financieros",
-      //     display: "Ingresos financieros",
-      //     showUpdateName: true,
-      //     showAdd: true,
-      //     children: [],
-      //     show: true,
-      //     details: false,
-      //     id: 7,
-      //   },
-      //   {
-      //     name: "Gastos financieros",
-      //     display: "Gastos financieros",
-      //     showUpdateName: true,
-      //     showAdd: true,
-      //     children: [],
-      //     show: true,
-      //     details: false,
-      //     id: 8,
-      //   },
-      //   {
-      //     name:
-      //       "Utiidad/Perdida antes de impuesto sobre la renta y las ganancias",
-      //     display:
-      //       "Utiidad/Perdida antes de impuesto sobre la renta y las ganancias",
-      //     showUpdateName: true,
-      //     bold: true,
-      //   },
-      //   {
-      //     name: "Reserva legal",
-      //     display: "Reserva legal",
-      //     showUpdateName: true,
-      //     showAdd: true,
-      //     children: [],
-      //     show: true,
-      //     details: false,
-      //     id: 9,
-      //   },
-      //   {
-      //     name: "Utiidad/Perdida antes de impuesto sobre la renta",
-      //     display: "Utiidad/Perdida antes de impuesto sobre la renta",
-      //     showUpdateName: true,
-      //     bold: true,
-      //   },
-      //   {
-      //     name: "Impuesto sobre la renta",
-      //     display: "Impuesto sobre la renta",
-      //     showUpdateName: true,
-      //     showAdd: true,
-      //     children: [],
-      //     show: true,
-      //     details: false,
-      //     id: 10,
-      //   },
-      //   {
-      //     name:
-      //       "Utilidad/Perdida antes de contribucion especial a las ganancias",
-      //     display:
-      //       "Utilidad/Perdida antes de contribucion especial a las ganancias",
-      //     showUpdateName: true,
-      //     bold: true,
-      //   },
-      //   {
-      //     name: "Contribucion especial a las ganancias",
-      //     display: "Contribucion especial a las ganancias",
-      //     showUpdateName: true,
-      //     showAdd: true,
-      //     children: [],
-      //     show: true,
-      //     details: false,
-      //     id: 11,
-      //   },
-      //   {
-      //     name: "Resultado del ejercicio",
-      //     display: "Resultado del ejercicio",
-      //     showUpdateName: true,
-      //     bold: true,
-      //   },
-      //   {
-      //     name: "Otros resultados integrales del ejercicio neto de impuestos",
-      //     display:
-      //       "Otros resultados integrales del ejercicio neto de impuestos",
-      //     showUpdateName: true,
-      //     showAdd: true,
-      //     children: [],
-      //     show: true,
-      //     details: false,
-      //     id: 12,
-      //   },
-      //   {
-      //     name: "RESULTADO INTEGRAL TOTAL DEL AÑO",
-      //     display: "RESULTADO INTEGRAL TOTAL DEL AÑO",
-      //     showUpdateName: true,
-      //     bold: true,
-      //   },
-      // ],
+      tablesData: [
+        {
+          name: "Ingreso de actividades ordinarias",
+          display: "Ingreso de actividades ordinarias",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 1,
+        },
+        {
+          name: "Costo de ventas, producción o servicios",
+          display: "Costo de ventas, producción o servicios",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 2,
+        },
+        {
+          name: "Utilidad/Perdida bruta",
+          display: "Utilidad/Perdida bruta",
+          showUpdateName: true,
+          bold: true,
+        },
+        {
+          name: "Otros ingresos",
+          display: "Otros ingresos",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 3,
+        },
+        {
+          name: "Otros gastos",
+          display: "Otros gastos",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 4,
+        },
+        {
+          name: "Gastos de distribucion y venta",
+          display: "Gastos de distribucion y venta",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 5,
+        },
+        {
+          name: "Gastos de administracion",
+          display: "Gastos de administracion",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 6,
+        },
+        {
+          name: "Utilidad/Perdida de operacion",
+          display: "Utilidad/Perdida de operacion",
+          showUpdateName: true,
+          bold: true,
+        },
+        {
+          name: "Ingresos financieros",
+          display: "Ingresos financieros",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 7,
+        },
+        {
+          name: "Gastos financieros",
+          display: "Gastos financieros",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 8,
+        },
+        {
+          name:
+            "Utiidad/Perdida antes de impuesto sobre la renta y las ganancias",
+          display:
+            "Utiidad/Perdida antes de impuesto sobre la renta y las ganancias",
+          showUpdateName: true,
+          bold: true,
+        },
+        {
+          name: "Reserva legal",
+          display: "Reserva legal",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 9,
+        },
+        {
+          name: "Utiidad/Perdida antes de impuesto sobre la renta",
+          display: "Utiidad/Perdida antes de impuesto sobre la renta",
+          showUpdateName: true,
+          bold: true,
+        },
+        {
+          name: "Impuesto sobre la renta",
+          display: "Impuesto sobre la renta",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 10,
+        },
+        {
+          name:
+            "Utilidad/Perdida antes de contribucion especial a las ganancias",
+          display:
+            "Utilidad/Perdida antes de contribucion especial a las ganancias",
+          showUpdateName: true,
+          bold: true,
+        },
+        {
+          name: "Contribucion especial a las ganancias",
+          display: "Contribucion especial a las ganancias",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 11,
+        },
+        {
+          name: "Resultado del ejercicio",
+          display: "Resultado del ejercicio",
+          showUpdateName: true,
+          bold: true,
+        },
+        {
+          name: "Otros resultados integrales del ejercicio neto de impuestos",
+          display:
+            "Otros resultados integrales del ejercicio neto de impuestos",
+          showUpdateName: true,
+          showAdd: true,
+          children: [],
+          show: true,
+          details: false,
+          id: 12,
+        },
+        {
+          name: "RESULTADO INTEGRAL TOTAL DEL AÑO",
+          display: "RESULTADO INTEGRAL TOTAL DEL AÑO",
+          showUpdateName: true,
+          bold: true,
+        },
+      ],
 
-      // showAddAccountEstado: false,
-      // selectedCatalogEstado: "",
-      // selectedParentAccountEstado: {},
-      // loadingAccountEstado: false,
-      // filteredCatalogEstado: [],
-      // showChangeDisplayNameEstado: false,
-      // allowNewDisplayNameEstado: false,
-      // newDisplayNameEstado: "",
+      showAddAccountEstado: false,
+      selectedCatalogEstado: "",
+      selectedParentAccountEstado: {},
+      loadingAccountEstado: false,
+      filteredCatalogEstado: [],
+      showChangeDisplayNameEstado: false,
+      allowNewDisplayNameEstado: false,
+      newDisplayNameEstado: "",
     };
   },
   methods: {
@@ -1793,10 +1791,18 @@ export default {
       });
     },
     // balanceGeneral
-    openAddAccount(parent) {
-      this.showAddAccount = true;
-      this.selectedParentAccount = { ...parent };
-      this.filteredCatalog = [];
+    openAddAccount(parent, tabName) {
+      switch (tabName) {
+        case "balance":
+          this.showAddAccount = true;
+          this.selectedParentAccount = { ...parent };
+
+          break;
+        case "results":
+          this.showAddAccountEstado = true;
+          this.selectedParentAccountEstado = { ...parent };
+          break;
+      }
     },
     findAccount(query) {
       if (query !== "") {
@@ -1842,19 +1848,21 @@ export default {
       const index = parent.children.findIndex((e) => e.id == selected.id);
       parent.children.splice(index, 1);
     },
-    openChangeDisplay(account) {
-      this.selectedParentAccount = account;
-      this.showChangeDisplayName = true;
+    openChangeDisplay(account, tabName) {
+      switch (tabName) {
+        case "balance":
+          this.selectedParentAccount = account;
+          this.showChangeDisplayName = true;
+
+          break;
+        case "results":
+          this.selectedParentAccountEstado = account;
+          this.newDisplayNameEstado = account.display;
+          this.showChangeDisplayNameEstado = true;
+          break;
+      }
     },
-    // cancel() {
-    //   this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
-    //     confirmButtonText: "Si, salir",
-    //     cancelButtonText: "Cancelar",
-    //     type: "warning",
-    //   }).then(() => {
-    //     this.$router.push("/entries");
-    //   });
-    // },
+
     //estado de resultados
     // openAddAccountEstado(parent) {
     //   this.showAddAccountEstado = true;
