@@ -1,7 +1,7 @@
 <template>
   <el-breadcrumb separator-class="el-icon-arrow-right" class="mb-4">
     <el-breadcrumb-item
-      class="text-sm"
+      class="text-xs"
       v-for="(p, k) of path"
       :key="k"
       :to="p.to"
