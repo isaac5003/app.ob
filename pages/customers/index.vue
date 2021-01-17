@@ -250,6 +250,9 @@ import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
 export default {
   name: "CustomersIndex",
+  head: {
+    titleTemplate: `%s | Clientes`,
+  },
   components: { LayoutContent, Notification },
   fetch() {
     const customers = () => {
