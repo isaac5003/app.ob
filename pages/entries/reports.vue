@@ -112,6 +112,7 @@
                 :key="catalog.id"
                 :label="catalog.code"
                 :value="catalog.id"
+                :disabled="catalog.isParent == true"
               >
                 <div class="flex flex-row justify-between">
                   <span class="mr-5 text-sm">{{ catalog.name }}</span>
@@ -220,10 +221,9 @@ export default {
           case "balanceComprobacion":
           case "diarioMayor":
           case "libroAuxiliares":
-           
             this.requirementForm = "compact";
             break;
-         
+
           case "movimientoCuentas":
             this.requirementForm = "extended";
             this.getCalogs();
@@ -281,7 +281,7 @@ export default {
           return [
             { bold: c.isParent, text: c.code },
             { bold: c.isParent, text: c.name },
-         
+
             {
               bold: c.isParent,
               text: c.isParent ? "N" : "S",
@@ -697,17 +697,19 @@ export default {
       });
     },
 
-     generateMovimientoCuentas(dateRange) {
+    generateMovimientoCuentas(dateRange) {
       const acount = () => this.$axios.get("/entries/report/account-movements");
       console.log(acount);
       const auxiliares = () => {
         return this.$axios.get("/entries/report/auxiliares", {
           params: {
             date: dateRange,
-      }})}
+          },
+        });
+      };
       Promise.all([acount(), auxiliares()]).then((res) => {
         const [acount, auxiliares] = res;
-        
+
         const { name, nit, nrc } = bussinesInfo.data.info;
         console.log(auxiliares.data.accounts);
         const reporteAuxiliares = auxiliares.data.accounts;
@@ -892,6 +894,6 @@ export default {
         this.$router.push("/entries");
       });
     },
-  }
+  },
 };
 </script>
