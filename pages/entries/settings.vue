@@ -250,22 +250,41 @@
                 :controls="false"
               />
             </el-form-item>
-            <el-form-item
-              class="col-span-5"
-              label="Nombre"
-              :prop="`items.${i}.name`"
-              :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
-            >
-              <el-input
-                size="small"
-                v-model="item.name"
-                autocomplete="off"
-                style="width: 100%"
-                maxlength="100"
-                minlength="3"
-                show-word-limit
-              />
-            </el-form-item>
+            <div class="col-span-5">
+              <div class="grid grid-cols-12 gap-4">
+                <el-form-item
+                  class="col-span-6"
+                  label="Nombre"
+                  :prop="`items.${i}.name`"
+                  :rules="{
+                    required: true,
+                    message: 'Requerido',
+                    trigger: 'blur',
+                  }"
+                >
+                  <el-input
+                    size="small"
+                    v-model="item.name"
+                    autocomplete="off"
+                    style="width: 100%"
+                    maxlength="100"
+                    minlength="3"
+                    show-word-limit
+                  />
+                </el-form-item>
+                <el-form-item class="col-span-6" label="Descripción">
+                  <el-input
+                    size="small"
+                    v-model="item.description"
+                    autocomplete="off"
+                    style="width: 100%"
+                    maxlength="100"
+                    minlength="3"
+                    show-word-limit
+                  />
+                </el-form-item>
+              </div>
+            </div>
             <el-form-item class="col-span-2">
               <el-checkbox
                 size="small"
@@ -396,7 +415,7 @@
               />
             </el-form-item>
             <el-form-item
-              class="col-span-6"
+              class="col-span-3"
               label="Nombre"
               prop="name"
               :rules="[
@@ -414,7 +433,10 @@
             >
               <el-input v-model="activeAccount.name" size="small" />
             </el-form-item>
-            <el-form-item prop="service" class="col-span-2">
+            <el-form-item class="col-span-3" label="Descripción">
+              <el-input v-model="activeAccount.description" size="small" />
+            </el-form-item>
+            <el-form-item class="col-span-2">
               <el-checkbox
                 v-model="activeAccount.isAcreedora"
                 label="Acreedora"
@@ -423,7 +445,7 @@
                 class="w-full mt-5"
               />
             </el-form-item>
-            <el-form-item prop="service" class="col-span-2">
+            <el-form-item class="col-span-2">
               <el-checkbox
                 v-model="activeAccount.isBalance"
                 label="Balance"
@@ -661,11 +683,20 @@
             class="col-span-3 col-start-10"
             suffix-icon="el-icon-search"
             placeholder="Buscar..."
+            v-model="searchValue"
             size="small"
+            v-debounce:500ms="fetchCatalog"
+            @change="fetchCatalog"
           />
         </div>
         <!-- second row -->
-        <el-table :data="accounts" style="width: 100%" stripe size="mini">
+        <el-table
+          v-loading="tableloading"
+          :data="accounts"
+          style="width: 100%"
+          stripe
+          size="mini"
+        >
           <el-table-column
             sortable="true"
             type="index"
@@ -711,6 +742,7 @@
                     :divided="true"
                     class="text-red-500 font-semibold"
                     v-if="!scope.row.isParent"
+                    @click.native="deleteAccount(scope.row)"
                   >
                     <i class="el-icon-delete"></i> Eliminar Cuenta
                   </el-dropdown-item>
@@ -719,6 +751,18 @@
             </template>
           </el-table-column>
         </el-table>
+        <div class="flex justify-end">
+          <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="fetchCatalog"
+            :current-page.sync="page.page"
+            :page-sizes="[5, 10, 15, 25, 50, 100]"
+            :page-size="page.size"
+            layout="total, sizes, prev, pager, next"
+            :total="parseInt(accountsCount)"
+            :pager-count="5"
+          />
+        </div>
       </el-tab-pane>
       <!-- tab balance general -->
       <!-- <el-tab-pane label="Balance General" name="balance-general">
@@ -1097,12 +1141,14 @@ export default {
       this.utab = this.$route.query.utab;
     }
 
-    const accountCatalogs = () => this.$axios.get("/entries/catalog");
+    const accountCatalogs = () =>
+      this.$axios.get("/entries/catalog", { params: this.page });
 
     Promise.all([accountCatalogs()])
       .then((res) => {
         const [accountCatalogs] = res;
         this.accounts = accountCatalogs.data.accountingCatalog;
+        this.accountsCount = accountCatalogs.data.count;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
@@ -1113,6 +1159,7 @@ export default {
   data() {
     return {
       pageloading: true,
+      tableloading: false,
       tab: "catalog",
       utab: "invoicing",
       integrations: [
@@ -1129,7 +1176,13 @@ export default {
           icon: getIcon("cash"),
         },
       ],
+      page: {
+        limit: 10,
+        page: 1,
+      },
       accounts: [],
+      accountsCount: "",
+      rawCatalog: [],
       showCreateCatalogDialog: false,
       showCreateAccountEntryDialog: false,
       mayorAccountForm: {
@@ -1162,6 +1215,7 @@ export default {
       },
       showEditMayorDialog: false,
       showEditAccount: false,
+      searchValue: "",
       // tableData: [
       //   {
       //     id: 1,
@@ -1460,7 +1514,6 @@ export default {
       this.subAccountForm.items.splice(index, 1);
     },
     submitNewCatalog(mayorAccounts, formName, activeAccount) {
-      console.log(mayorAccounts, formName, activeAccount);
       this.$refs[formName].validate((valid) => {
         if (!valid) return false;
 
@@ -1511,43 +1564,30 @@ export default {
               if (action === "confirm") {
                 instance.confirmButtonLoading = true;
                 instance.confirmButtonText = "Procesando...";
-                let dataAccounts = "";
-                for (const acc of mayorAccounts) {
-                  // Agrega la descripcion
-                  const description = !acc.description
-                    ? null
-                    : `"${acc.description}"`;
 
-                  // Agrega parentCatalog
-                  const parentCatalog = !activeAccount ? null : activeAccount;
-
-                  // esto ya no seria necesario (pasarlo a string, ahorita guarda obketos en el arreglo)
-                  // proba nuevamente
-
-                  this.accounts.push({
-                    code: `${acc.code}`,
-                    name: acc.name,
-                    description: description,
-                    isAcreedora: acc.isAcreedora,
-                    isBalance: acc.isBalance,
-                    parentCatalog: parentCatalog,
+                this.$axios
+                  .post("/entries/catalog", {
+                    parentCatalog: !activeAccount ? null : activeAccount.id,
+                    accounts: mayorAccounts,
+                  })
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Exito",
+                      message: res.data.message,
+                    });
+                    this.fetchCatalog();
+                    this.showCreateCatalogDialog = false;
+                    this.showCreateAccount = false;
+                    done();
+                  })
+                  .catch(
+                    (err) => (this.errorMessage = err.response.data.message)
+                  )
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = "Si, guardar";
                   });
 
-                  // dataAccounts += `{
-                  //   code: "${acc.code}",
-                  //   name: "${acc.name}",
-                  //   description: ${description},
-                  //   isAcreedora: ${acc.isAcreedora},
-                  //   isBalance: ${acc.isBalance},
-                  //   parentCatalog: ${parentCatalog},
-                  // }`;
-
-                  // if (!activeAccount) {
-                  //   this.accounts += dataAccounts;
-                  // } else {
-                  //   this.accounts += dataAccounts;
-                  // }
-                }
                 setTimeout(() => {
                   this.$refs[formName].resetFields();
                   this.showCreateAccountEntryDialog = false;
@@ -1572,13 +1612,152 @@ export default {
         );
       });
     },
+    fetchCatalog() {
+      let params = this.page;
+
+      if (this.searchValue) {
+        params = { ...params, search: this.searchValue.toLowerCase() };
+      }
+
+      this.$axios
+        .get("/entries/catalog", { params })
+        .then((res) => {
+          this.accounts = res.data.accountingCatalog;
+          this.accountsCount = res.data.count;
+          this.tableloading = false;
+        })
+        .catch((err) => {
+          this.errorMessage = err.response.data.message;
+        })
+        .then((alw) => {
+          return (this.tableloading = false);
+        });
+    },
+    handleSizeChange(val) {
+      this.page.limit = val;
+      this.fetchCatalog();
+    },
     openEditAccount(account) {
+      console.log(account);
       this.activeAccount = { ...account };
       if (account.code.length == 1) {
         this.showEditMayorDialog = true;
       } else {
         this.showEditAccount = true;
       }
+    },
+    deleteAccount({ id }) {
+      this.$confirm(
+        "¿Estás seguro que deseas eliminar esta cuenta?",
+        "Confirmación",
+        {
+          confirmButtonText: "Si, eliminar",
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .delete(`/entries/catalog/${id}`)
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchCatalog();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, eliminar`;
+                  done();
+                });
+            } else {
+              done();
+            }
+          },
+        }
+      );
+    },
+    submitEditedCatalog(accounts, formName, activeAccount) {
+      this.$refs[formName].validate((valid) => {
+        if (!valid) {
+          return false;
+        }
+
+        // Genera el codigo real a guardar
+        const realCode = !activeAccount
+          ? `${accounts.code}`
+          : `${activeAccount.code}${accounts.code}`;
+
+        // Verifica si los codigos nuevos y los guardados estan duplicados entre ellos.
+        // const catalog = this.accounts.map((a) => a.code);
+        const catalog = this.accounts
+          .filter((a) => a.id != accounts.id)
+          .map((a) => a.code);
+
+        if (catalog.includes(realCode)) {
+          return this.$notify({
+            title: "Error",
+            message: "No pueden existir códigos duplicados entres las cuentas.",
+            type: "error",
+          });
+        }
+
+        this.$confirm(
+          "¿Estás seguro que deseas actualizar esta cuenta contable?",
+          "Confirmación",
+          {
+            confirmButtonText: "Si, guardar",
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+
+                this.$axios
+                  .put(`/entries/catalog/${accounts.id}`, {
+                    ...accounts,
+                  })
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Exito",
+                      message: res.data.message,
+                    });
+                    this.fetchCatalog();
+                    this.showEditMayorDialog = false;
+                    this.showEditAccount = false;
+                    done();
+                  })
+                  .catch(
+                    (err) => (this.errorMessage = err.response.data.message)
+                  )
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = "Si, guardar";
+                  });
+
+                setTimeout(() => {
+                  this.$refs[formName].resetFields();
+                  this.showCreateAccountEntryDialog = false;
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = "Si, guardar";
+                  done();
+                }, 500);
+              } else {
+                done();
+              }
+            },
+          }
+        );
+      });
     },
     // balanceGeneral
     // openAddAccount(parent) {
