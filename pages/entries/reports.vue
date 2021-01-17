@@ -161,14 +161,14 @@ export default {
     Notification,
   },
   // fetch() {
-  //   const invoices = () => {
-  //     return this.$axios.get("/invoices", { params: this.page });
+  //   const catalog = () => {
+  //     return this.$axios.get("/entries/catalog" );
   //   };
 
-  //   Promise.all([invoices()])
+  //   Promise.all([catalog()])
   //     .then((res) => {
-  //       const [invoices] = res;
-  //       this.invoices = invoices.data;
+  //       const [catalog] = res;
+  //       this.catalog = catalog.data.catalog;
   //       this.loading = false;
   //     })
   //     .catch((err) => {
@@ -176,6 +176,7 @@ export default {
   //     });
   // },
   // fetchOnServer: false,
+
   data() {
     return {
       generating: false,
@@ -219,10 +220,10 @@ export default {
           case "balanceComprobacion":
           case "diarioMayor":
           case "libroAuxiliares":
+           
             this.requirementForm = "compact";
             break;
-          case "catalogoCuentas":
-            break;
+         
           case "movimientoCuentas":
             this.requirementForm = "extended";
             this.getCalogs();
@@ -268,6 +269,7 @@ export default {
         }
       });
     },
+
     getAccountingCatalog() {
       const catalog = () => this.$axios.get("/entries/catalog");
       const bussinesInfo = () => this.$axios.get("/business/info");
@@ -277,10 +279,11 @@ export default {
         const { name, nit, nrc } = bussinesInfo.data.info;
         const values = catalogReport.map((c) => {
           return [
-            { bold: c.level === 1, text: c.code },
-            { bold: c.level === 1, text: c.name },
+            { bold: c.isParent, text: c.code },
+            { bold: c.isParent, text: c.name },
+         
             {
-              bold: c.level === 1,
+              bold: c.isParent,
               text: c.isParent ? "N" : "S",
               alignment: "center",
             },
@@ -693,6 +696,188 @@ export default {
         pdfMake.createPdf(docDefinition).open();
       });
     },
+
+     generateMovimientoCuentas(dateRange) {
+      const acount = () => this.$axios.get("/entries/report/account-movements");
+      console.log(acount);
+      const auxiliares = () => {
+        return this.$axios.get("/entries/report/auxiliares", {
+          params: {
+            date: dateRange,
+      }})}
+      Promise.all([acount(), auxiliares()]).then((res) => {
+        const [acount, auxiliares] = res;
+        const { name, nit, nrc } = bussinesInfo.data.info;
+        console.log(auxiliares.data.accounts);
+        const reporteAuxiliares = auxiliares.data.accounts;
+        const values = [];
+        const emptyRow = [{}, {}, {}, {}, {}, {}];
+
+        for (const i of reporteAuxiliares) {
+          values.push(emptyRow);
+          values.push([
+            {
+              bold: true,
+              text: i.code,
+            },
+            {
+              bold: true,
+              text: i.name,
+            },
+            {
+              bold: true,
+              text: "Saldo inicial",
+              alignment: "center",
+            },
+            {},
+            {},
+            {
+              bold: true,
+              text: this.$options.filters.formatMoney(i.initialBalance),
+              alignment: "right",
+            },
+          ]);
+
+          for (const j of i.movements) {
+            // values.push(emptyRow);
+            values.push([
+              {
+                text: j.entryNumber,
+                alignment: "right",
+              },
+              {
+                text: j.entryName,
+              },
+              {
+                text: j.date,
+                alignment: "center",
+              },
+              {
+                text: this.$options.filters.formatMoney(j.cargo),
+                alignment: "right",
+              },
+              {
+                text: this.$options.filters.formatMoney(j.abono),
+                alignment: "right",
+              },
+              {
+                text: this.$options.filters.formatMoney(j.balance),
+                alignment: "right",
+              },
+            ]);
+          }
+
+          values.push([
+            {},
+            {},
+            {
+              bold: true,
+              text: "Saldo actual",
+              alignment: "center",
+            },
+            {
+              bold: true,
+              text: this.$options.filters.formatMoney(i.totalCargo),
+              alignment: "right",
+            },
+            {
+              bold: true,
+              text: this.$options.filters.formatMoney(i.totalAbono),
+              alignment: "right",
+            },
+            {
+              bold: true,
+              text: this.$options.filters.formatMoney(i.currentBalance),
+              alignment: "right",
+            },
+          ]);
+        }
+
+        const docDefinition = {
+          pageSize: "LETTER",
+          pageOrientation: "portrait",
+          pageMargins: [20, 60, 20, 40],
+          header: getHeader(
+            name,
+            nit,
+            nrc,
+            this.$dateFns.lastDayOfMonth(new Date(dateRange)),
+            "LIBROS DE AUXILIARES",
+            "month"
+          ),
+          footer: getFooter(),
+          content: [
+            {
+              fontSize: 9,
+              layout: "noBorders",
+              table: {
+                headerRows: 2,
+                widths: ["12%", "auto", "10%", "9%", "9%", "10%"],
+                heights: -5,
+                body: [
+                  [
+                    {
+                      text: "CÓD. DE LA CUENTA\nN° DE PARTIDA",
+                      style: "tableHeader",
+                      rowSpan: 2,
+                    },
+                    {
+                      text: "NOMBRE DE LA CUENTA\nCONCEPTO",
+                      style: "tableHeader",
+                      rowSpan: 2,
+                    },
+                    {
+                      alignment: "center",
+                      text: "FECHA DE\nPARTIDA",
+                      style: "tableHeader",
+                      rowSpan: 2,
+                    },
+                    {
+                      alignment: "center",
+                      text: "MES ACTUAL",
+                      style: "tableHeader",
+                      colSpan: 2,
+                    },
+                    {},
+                    {
+                      alignment: "center",
+                      text: "SALDO DEL\nPERÍODO",
+                      style: "tableHeader",
+                      rowSpan: 2,
+                    },
+                  ],
+                  [
+                    {},
+                    {},
+                    {},
+                    {
+                      alignment: "center",
+                      text: "CARGOS",
+                      style: "tableHeader",
+                    },
+                    {
+                      alignment: "center",
+                      text: "ABONOS",
+                      style: "tableHeader",
+                    },
+                    {},
+                  ],
+                  ...values,
+                ],
+              },
+            },
+          ],
+          styles: {
+            tableHeader: {
+              bold: true,
+              fontSize: 9,
+            },
+          },
+        };
+        this.generating = false;
+        pdfMake.createPdf(docDefinition).open();
+      });
+    },
     async getCalogs() {
       const { data } = await this.$axios.get("/entries/catalog");
       this.accountingCatalog = data.accountingCatalog;
@@ -706,6 +891,6 @@ export default {
         this.$router.push("/entries");
       });
     },
-  },
+  }
 };
 </script>
