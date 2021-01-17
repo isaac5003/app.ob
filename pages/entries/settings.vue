@@ -147,7 +147,7 @@
             <el-input-number
               v-model="activeAccount.code"
               type="number"
-              min="1"
+              :min="1"
               size="small"
               :disabled="activeAccount.isParent == true"
               :controls="false"
@@ -228,96 +228,102 @@
           </div>
 
           <!-- first row -->
-          <div
-            class="grid grid-cols-12 gap-4"
-            v-for="(item, i) in subAccountForm.items"
-            :key="i"
-          >
-            <el-form-item
-              class="col-span-2"
-              label="Código"
-              :prop="`items.${i}.code`"
-              :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
+          <div class="flex flex-col">
+            <div
+              class="grid grid-cols-12 gap-4"
+              v-for="(item, i) in subAccountForm.items"
+              :key="i"
             >
-              <el-input-number
-                v-model="item.code"
-                type="number"
-                :min="0"
-                :step="1"
-                size="small"
-                autocomplete="off"
-                style="width: 100%"
-                :controls="false"
-              />
-            </el-form-item>
-            <div class="col-span-5">
-              <div class="grid grid-cols-12 gap-4">
-                <el-form-item
-                  class="col-span-6"
-                  label="Nombre"
-                  :prop="`items.${i}.name`"
-                  :rules="{
-                    required: true,
-                    message: 'Requerido',
-                    trigger: 'blur',
-                  }"
-                >
-                  <el-input
-                    size="small"
-                    v-model="item.name"
-                    autocomplete="off"
-                    style="width: 100%"
-                    maxlength="100"
-                    minlength="3"
-                    show-word-limit
-                  />
-                </el-form-item>
-                <el-form-item class="col-span-6" label="Descripción">
-                  <el-input
-                    size="small"
-                    v-model="item.description"
-                    autocomplete="off"
-                    style="width: 100%"
-                    maxlength="100"
-                    minlength="3"
-                    show-word-limit
-                  />
-                </el-form-item>
+              <el-form-item
+                class="col-span-2"
+                label="Código"
+                :prop="`items.${i}.code`"
+                :rules="{
+                  required: true,
+                  message: 'Requerido',
+                  trigger: 'blur',
+                }"
+              >
+                <el-input-number
+                  v-model="item.code"
+                  type="number"
+                  :min="0"
+                  :step="1"
+                  size="small"
+                  autocomplete="off"
+                  style="width: 100%"
+                  :controls="false"
+                />
+              </el-form-item>
+              <div class="col-span-5">
+                <div class="grid grid-cols-12 gap-4">
+                  <el-form-item
+                    class="col-span-6"
+                    label="Nombre"
+                    :prop="`items.${i}.name`"
+                    :rules="{
+                      required: true,
+                      message: 'Requerido',
+                      trigger: 'blur',
+                    }"
+                  >
+                    <el-input
+                      size="small"
+                      v-model="item.name"
+                      autocomplete="off"
+                      style="width: 100%"
+                      maxlength="100"
+                      minlength="3"
+                      show-word-limit
+                    />
+                  </el-form-item>
+                  <el-form-item class="col-span-6" label="Descripción">
+                    <el-input
+                      size="small"
+                      v-model="item.description"
+                      autocomplete="off"
+                      style="width: 100%"
+                      maxlength="100"
+                      minlength="3"
+                      show-word-limit
+                    />
+                  </el-form-item>
+                </div>
               </div>
+              <el-form-item class="col-span-2">
+                <el-checkbox
+                  size="small"
+                  border
+                  class="mt-5"
+                  style="width: 100%"
+                  v-model="item.isAcreedora"
+                >
+                  Acreedora
+                </el-checkbox>
+              </el-form-item>
+              <el-form-item class="col-span-2">
+                <el-checkbox
+                  size="small"
+                  border
+                  class="mt-5"
+                  style="width: 100%"
+                  v-model="subAccountForm.items[i].isBalance"
+                >
+                  Balance
+                </el-checkbox>
+              </el-form-item>
+              <el-form-item class="col-span-1">
+                <el-button
+                  class="w-full"
+                  type="danger"
+                  icon="el-icon-delete"
+                  :disabled="subAccountForm.items.length === 1"
+                  @click="removeSubAccount(i)"
+                  size="small"
+                  style="margin-top: 20px"
+                />
+              </el-form-item>
             </div>
-            <el-form-item class="col-span-2">
-              <el-checkbox
-                size="small"
-                border
-                class="mt-5"
-                style="width: 100%"
-                v-model="item.isAcreedora"
-              >
-                Acreedora
-              </el-checkbox>
-            </el-form-item>
-            <el-form-item class="col-span-2">
-              <el-checkbox
-                size="small"
-                border
-                class="mt-5"
-                style="width: 100%"
-                v-model="subAccountForm.items[i].isBalance"
-              >
-                Balance
-              </el-checkbox>
-            </el-form-item>
-            <el-form-item class="col-span-1">
-              <el-button
-                class="w-full"
-                type="danger"
-                icon="el-icon-delete"
-                :disabled="subAccountForm.items.length === 1"
-                @click="removeSubAccount(i)"
-                size="small"
-                style="margin-top: 20px"
-              />
-            </el-form-item>
           </div>
         </div>
         <!-- second row -->
@@ -410,7 +416,7 @@
               <el-input-number
                 v-model="activeAccount.code"
                 type="number"
-                min="1"
+                :min="1"
                 size="small"
               />
             </el-form-item>
@@ -699,7 +705,7 @@
         >
           <el-table-column
             sortable="true"
-            type="index"
+            prop="index"
             label="#"
             min-width="50"
             align="center"
@@ -1613,8 +1619,8 @@ export default {
       });
     },
     fetchCatalog() {
+      this.tableloading = true;
       let params = this.page;
-
       if (this.searchValue) {
         params = { ...params, search: this.searchValue.toLowerCase() };
       }
@@ -1629,9 +1635,7 @@ export default {
         .catch((err) => {
           this.errorMessage = err.response.data.message;
         })
-        .then((alw) => {
-          return (this.tableloading = false);
-        });
+        .then((alw) => (this.tableloading = false));
     },
     handleSizeChange(val) {
       this.page.limit = val;
