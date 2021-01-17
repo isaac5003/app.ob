@@ -683,7 +683,10 @@
             class="col-span-3 col-start-10"
             suffix-icon="el-icon-search"
             placeholder="Buscar..."
+            v-model="searchValue"
             size="small"
+            v-debounce:500ms="fetchCatalog"
+            @change="fetchCatalog"
           />
         </div>
         <!-- second row -->
@@ -1212,6 +1215,7 @@ export default {
       },
       showEditMayorDialog: false,
       showEditAccount: false,
+      searchValue: "",
       // tableData: [
       //   {
       //     id: 1,
@@ -1610,17 +1614,23 @@ export default {
     },
     fetchCatalog() {
       let params = this.page;
-      this.tableloading = true;
+
+      if (this.searchValue) {
+        params = { ...params, search: this.searchValue.toLowerCase() };
+      }
 
       this.$axios
         .get("/entries/catalog", { params })
         .then((res) => {
           this.accounts = res.data.accountingCatalog;
-          this.accountsCount = accountCatalogs.data.count;
+          this.accountsCount = res.data.count;
           this.tableloading = false;
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
+        })
+        .then((alw) => {
+          return (this.tableloading = false);
         });
     },
     handleSizeChange(val) {
@@ -1637,7 +1647,6 @@ export default {
       }
     },
     deleteAccount({ id }) {
-      this.tableloading = true;
       this.$confirm(
         "¿Estás seguro que deseas eliminar esta cuenta?",
         "Confirmación",
