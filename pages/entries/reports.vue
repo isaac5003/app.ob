@@ -707,6 +707,7 @@ export default {
       }})}
       Promise.all([acount(), auxiliares()]).then((res) => {
         const [acount, auxiliares] = res;
+        
         const { name, nit, nrc } = bussinesInfo.data.info;
         console.log(auxiliares.data.accounts);
         const reporteAuxiliares = auxiliares.data.accounts;
