@@ -1,5 +1,6 @@
 <template>
   <layout-content
+    v-loading="pageloading"
     page-title="Listado de servicios"
     :breadcrumb="[
       { name: 'Servicios', to: '/services' },
@@ -56,7 +57,7 @@
               />
             </el-select>
           </el-form-item>
-          <el-form-item class="col-start-10 col-end-13" label="">
+          <el-form-item class="col-start-10 col-span-4" label="">
             <el-input
               style="margin-top: 22px"
               suffix-icon="el-icon-search"
@@ -71,32 +72,36 @@
         </div>
       </el-form>
       <el-table
+        v-loading="tableloading"
         :data="services.services"
         stripe
         size="mini"
-        v-loading="loading"
       >
-        <el-table-column prop="index" min-width="40" />
-        <el-table-column label="Nombre" prop="name" min-width="550" />
-        <el-table-column label="Precio" min-width="100" align="right">
+        <el-table-column prop="index" width="40" />
+        <el-table-column label="Nombre" prop="name" min-width="530" />
+        <el-table-column label="Precio" width="100" align="right">
           <template slot-scope="scope">
             <span>{{ scope.row.cost | formatMoney }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Tipo de venta" prop="type" min-width="120">
+        <el-table-column label="Tipo de venta" prop="type" width="120">
           <template slot-scope="scope">
             <span>{{ scope.row.sellingType.name }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Estado" prop="status" min-width="90">
+        <el-table-column label="Estado" prop="status" width="110">
           <template slot-scope="scope">
-            <el-tag size="small" type="success" v-if="scope.row.active"
-              >Activo</el-tag
+            <el-tag size="small" type="success" v-if="scope.row.active">
+              <i class="el-icon-success"></i>
+              Activo</el-tag
             >
-            <el-tag size="small" type="warning" v-else>Inactivo</el-tag>
+            <el-tag size="small" type="warning" v-else>
+              <i class="el-icon-remove"></i>
+              Inactivo</el-tag
+            >
           </template>
         </el-table-column>
-        <el-table-column label min-width="70" align="center">
+        <el-table-column label width="70" align="center">
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />
@@ -150,6 +155,9 @@ import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
 export default {
   name: "ServicesIndex",
+  head: {
+    titleTemplate: `%s | Servicios`,
+  },
   components: { LayoutContent, Notification },
   fetch() {
     const sellingTypes = () => this.$axios.get("/services/selling-types");
@@ -160,16 +168,17 @@ export default {
         const [sellingTypes, services] = res;
         this.sellingTypes = sellingTypes.data.types;
         this.services = services.data;
-        this.loading = false;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
-      });
+      })
+      .then((alw) => (this.pageloading = false));
   },
   fetchOnServer: false,
   data() {
     return {
-      loading: true,
+      pageloading: true,
+      tableloading: false,
       errorMessage: "",
       filter: {
         searchValue: "",
@@ -189,6 +198,7 @@ export default {
   },
   methods: {
     fetchServices() {
+      this.tableloading = true;
       let params = this.page;
       if (this.filter.status !== "") {
         params = { ...params, active: this.filter.status };
@@ -207,7 +217,8 @@ export default {
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
-        });
+        })
+        .then((alw) => (this.tableloading = false));
     },
     handleSizeChange(val) {
       this.page.limit = val;

@@ -342,16 +342,9 @@ export default {
         searchValue: "",
         squared: false,
         accounted: false,
+        active:false
       },
-      tipoPartida: [
-        {
-          id: "a0dea81f-e5e4-4253-a587-716102dfc6ab",
-          name: "Diario",
-          name: "Ingreso",
-          name: "Egreso",
-          name: "DIA",
-        },
-      ],
+    
       entries: {
         entries: [],
         count: 0,
@@ -371,7 +364,7 @@ export default {
       if (this.filterBy.entryType != "") {
         params = {
           ...params,
-          sec: this.filterBy.entryType,
+         entryType: this.filterBy.entryType,
         };
       }
       if (this.filterBy.searchValue != "") {
@@ -405,16 +398,14 @@ export default {
       this.page.limit = val;
       this.page.fetchEntries();
     },
-    getSummaries(value) {
-      const { columns, data } = value;
-      const totalAbono = data.reduce((a,b)=>a+b.abono ? b.abono:0, 0);
-      const totalCargo = data.reduce((a,b) =>a+b.cargo ? b.cargo : 0, 0);
-
-      const result = columns.map((column) => {
-        console.log(column.label)
+ getSummaries(param) {
+      const { columns, data } = param;
+      const totalAbono = data.reduce((a, b) => a + (b.abono ? b.abono : 0), 0);
+      const totalCargo = data.reduce((a, b) => a + (b.cargo ? b.cargo : 0), 0);
+      const resutls = columns.map((column) => {
         if (column.label == "Abono") {
           return this.$options.filters.formatMoney(totalAbono);
-        } else if (column.label == "Cargo" ) {
+        } else if (column.label == "Cargo") {
           return this.$options.filters.formatMoney(totalCargo);
         } else if (column.label == "Concepto") {
           return "TOTALES";
@@ -422,8 +413,9 @@ export default {
           return "";
         }
       });
-      return result;
+      return resutls;
     },
+    
     // changeActive({ id, isActiveInvoice }) {
     //   const action = isActiveInvoice ? "desactivar" : "activar";
     //   this.$confirm(
