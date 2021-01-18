@@ -525,7 +525,6 @@ export default {
       Promise.all([bussinesInfo(), auxiliares()]).then((res) => {
         const [bussinesInfo, auxiliares] = res;
         const { name, nit, nrc } = bussinesInfo.data.info;
-        console.log(auxiliares.data.accounts);
         const reporteAuxiliares = auxiliares.data.accounts;
         const values = [];
         const emptyRow = [{}, {}, {}, {}, {}, {}];
@@ -708,7 +707,174 @@ export default {
       Promise.all([bussinesInfo(), movements()]).then((res) => {
         const [bussinesInfo, movements] = res;
         const { name, nit, nrc } = bussinesInfo.data.info;
-        console.log(movements);
+        const movementsReport = movements.data.accounts;
+
+        const values = [];
+        const emptyRow = [{}, {}, {}, {}, {}, {}];
+
+        for (const i of movementsReport) {
+          values.push(emptyRow);
+          values.push([
+            {
+              bold: true,
+              text: i.code,
+            },
+            {
+              bold: true,
+              text: i.name,
+            },
+            {
+              bold: true,
+              text: "Saldo\ninicial",
+              alignment: "center",
+            },
+            {},
+            {},
+            {
+              bold: true,
+              text: this.$options.filters.formatMoney(i.initialBalance),
+              alignment: "right",
+            },
+          ]);
+
+          for (const j of i.movements) {
+            // values.push(emptyRow);
+            values.push([
+              {
+                text: j.entryNumber,
+                alignment: "right",
+              },
+              {
+                text: j.entryName,
+              },
+              {
+                text: j.date,
+                alignment: "center",
+              },
+              {
+                text: this.$options.filters.formatMoney(j.cargo),
+                alignment: "right",
+              },
+              {
+                text: this.$options.filters.formatMoney(j.abono),
+                alignment: "right",
+              },
+              {
+                text: this.$options.filters.formatMoney(j.balance),
+                alignment: "right",
+              },
+            ]);
+          }
+
+          values.push([
+            {},
+            {},
+            {
+              bold: true,
+              text: "Saldo\nactual",
+              alignment: "center",
+            },
+            {
+              bold: true,
+              text: this.$options.filters.formatMoney(i.totalCargo),
+              alignment: "right",
+            },
+            {
+              bold: true,
+              text: this.$options.filters.formatMoney(i.totalAbono),
+              alignment: "right",
+            },
+            {
+              bold: true,
+              text: this.$options.filters.formatMoney(i.currentBalance),
+              alignment: "right",
+            },
+          ]);
+        }
+
+        const docDefinition = {
+          pageSize: "LETTER",
+          pageOrientation: "portrait",
+          pageMargins: [20, 60, 20, 40],
+          header: getHeader(
+            name,
+            nit,
+            nrc,
+            [new Date(dateRange[0]), new Date(dateRange[1])],
+            "DETALLE DE MOVIMIENTO DE CUENTAS",
+            "period"
+          ),
+          footer: getFooter(),
+          content: [
+            {
+              fontSize: 9,
+              layout: "noBorders",
+              table: {
+                headerRows: 2,
+                widths: ["12%", "52%", "9%", "9%", "9%", "9%"],
+                heights: -5,
+                body: [
+                  [
+                    {
+                      text: "CÓD. DE LA CUENTA\nN° DE PARTIDA",
+                      style: "tableHeader",
+                      rowSpan: 2,
+                    },
+                    {
+                      text: "NOMBRE DE LA CUENTA\nCONCEPTO",
+                      style: "tableHeader",
+                      rowSpan: 2,
+                    },
+                    {
+                      alignment: "center",
+                      text: "FECHA DE\nPARTIDA",
+                      style: "tableHeader",
+                      rowSpan: 2,
+                    },
+                    {
+                      alignment: "center",
+                      text: "MES ACTUAL",
+                      style: "tableHeader",
+                      colSpan: 2,
+                    },
+                    {},
+                    {
+                      alignment: "center",
+                      text: "SALDO DEL\nPERÍODO",
+                      style: "tableHeader",
+                      rowSpan: 2,
+                    },
+                  ],
+                  [
+                    {},
+                    {},
+                    {},
+                    {
+                      alignment: "center",
+                      text: "CARGOS",
+                      style: "tableHeader",
+                    },
+                    {
+                      alignment: "center",
+                      text: "ABONOS",
+                      style: "tableHeader",
+                    },
+                    {},
+                  ],
+                  ...values,
+                ],
+              },
+            },
+          ],
+          styles: {
+            tableHeader: {
+              bold: true,
+              fontSize: 9,
+            },
+          },
+        };
+        this.generating = false;
+        pdfMake.createPdf(docDefinition).open();
       });
     },
     async getCalogs() {
