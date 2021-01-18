@@ -1935,7 +1935,7 @@ export default {
 
       for (const code of list) {
         let addTo = tablesData.find((c) => c.id == selected.id);
-        const account = this.filteredCatalog.find((c) => c.id == code);
+        const account = this.catalogs.find((c) => c.id == code);
 
         addTo.children.push({
           id: account.code,
