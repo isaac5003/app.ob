@@ -572,13 +572,13 @@
             clearable
             v-model="selectedCatalogEstado"
             placeholder="Escribe el numero o nombre de la cuenta"
-            :remote-method="findAccountEstado"
+            :remote-method="findAccount"
             :loading="loadingAccount"
             class="w-full"
             size="small"
           >
             <el-option
-              v-for="item in filteredCatalogEstado"
+              v-for="item in filteredCatalog"
               :key="item.id"
               :label="`${item.code} - ${item.name}`"
               :value="item.id"
@@ -631,7 +631,7 @@
             v-model="newDisplayNameEstado"
             size="small"
             clearable
-            :disabled="!allowNewDisplayNameEsatdo"
+            :disabled="!allowNewDisplayNameEstado"
           />
         </div>
       </div>
@@ -642,7 +642,7 @@
         <el-button
           type="primary"
           @click="
-            changeDisplayName(
+            changeDisplayNameEstado(
               selectedParentAccountEstado,
               newDisplayNameEstado,
               allowNewDisplayNameEstado
@@ -653,7 +653,6 @@
         >
       </span>
     </el-dialog>
-    -->
 
     <el-tabs
       v-model="tab"
@@ -986,13 +985,13 @@
               :data="tablesData"
               row-key="id"
               border
-              default-expand-all
               size="mini"
             >
               <el-table-column label="Nombre" min-width="300">
                 <template slot-scope="scope">
                   <span :class="{ 'font-semibold': scope.row.bold }"
-                    >{{ scope.row.id }} - {{ scope.row.display }}</span
+                    >{{ scope.row.code ? `${scope.row.code} -` : "" }}
+                    {{ scope.row.display }}</span
                   >
                   <i
                     class="el-icon-right mx-2"
@@ -1002,11 +1001,11 @@
                     class="italic text-gray-600"
                     style="font-size: 10px"
                     v-if="scope.row.display != scope.row.name"
-                    >({{ scope.row.name }})</span
+                    >( {{ scope.row.name }})</span
                   >
                 </template>
               </el-table-column>
-              <el-table-column align="center" min-width="40">
+              <el-table-column align="center" width="90">
                 <template slot-scope="scope">
                   <el-tooltip
                     v-if="scope.row.showUpdateName"
@@ -1027,7 +1026,7 @@
               <el-table-column
                 label="Incluir en reporte"
                 align="center"
-                min-width="65"
+                width="130"
               >
                 <template slot-scope="scope">
                   <el-switch
@@ -1039,7 +1038,7 @@
               <el-table-column
                 label="Mostrar detalle"
                 align="center"
-                min-width="65"
+                width="130"
               >
                 <template slot-scope="scope">
                   <el-switch
@@ -1048,7 +1047,7 @@
                   />
                 </template>
               </el-table-column>
-              <el-table-column align="center" min-width="35">
+              <el-table-column align="center" width="100">
                 <template slot-scope="scope">
                   <el-tooltip
                     :open-delay="600"
@@ -1796,11 +1795,12 @@ export default {
         case "balance":
           this.showAddAccount = true;
           this.selectedParentAccount = { ...parent };
-
+          this.filteredCatalog = [];
           break;
         case "results":
           this.showAddAccountEstado = true;
           this.selectedParentAccountEstado = { ...parent };
+          this.filteredCatalog = [];
           break;
       }
     },
@@ -1864,84 +1864,68 @@ export default {
     },
 
     //estado de resultados
-    // openAddAccountEstado(parent) {
-    //   this.showAddAccountEstado = true;
-    //   this.selectedParentAccountEstado = { ...parent };
-    // },
-    // findAccountEstado(query) {
-    //   if (query !== "") {
-    //     this.loadingAccountEstado = true;
-    //     setTimeout(() => {
-    //       this.filteredCatalogEstado = this.accounts.filter((c) => {
-    //         return (
-    //           c.code.toLowerCase().includes(query.toLowerCase()) ||
-    //           c.name.toLowerCase().includes(query.toLowerCase())
-    //         );
-    //       });
-    //       this.loadingAccountEstado = false;
-    //     }, 200);
-    //   } else {
-    //     this.options = [];
-    //   }
-    // },
-    // addSubAccountEstado(selected, code) {
-    //   const account = this.accounts.find((c) => c.id == code);
-    //   const tablesData = [...this.tablesData];
-    //   this.tablesData = [];
-    //   let addTo = tablesData.find((d) => d.id == selected.id);
-    //   addTo.children.push({
-    //     id: account.code,
-    //     name: account.name,
-    //     display: account.name,
-    //     canDelete: true,
-    //     showUpdateName: false,
-    //   });
-    //   this.showAddAccountEstado = false;
-    //   setTimeout(() => {
-    //     console.log("entra");
-    //     this.tablesData = [...tablesData];
-    //   }, 500);
-    // },
-    // deleteSubAccountEstado(selected) {
-    //   let parent = null;
-    //   const tablesData = [...this.tablesData];
-    //   this.tablesData = [];
-    //   for (const acc of tablesData) {
-    //     if (acc.hasOwnProperty("children")) {
-    //       for (const c of acc.children) {
-    //         if (c.id == selected.id) {
-    //           parent = acc;
-    //         }
-    //       }
-    //     }
-    //   }
-    //   const index = parent.children.findIndex((e) => e.id == selected.id);
-    //   parent.children.splice(index, 1);
-    //   setTimeout(() => {
-    //     this.tablesData = [...tablesData];
-    //   }, 500);
-    // },
 
-    // changeDisplayNameEstado(account, display, allow) {
-    //   if (display == "") {
-    //     return this.$notify.error({
-    //       title: "Error",
-    //       message: "Debes incluir un nombre a mostrar",
-    //     });
-    //   }
-    //   account.display = allow ? display : account.name;
-    //   this.showChangeDisplayNameEstado = false;
-    // },
-    // changeAllowDisplayName(account, allowNewDisplayNameEstado, newDisplayName) {
-    //   this.newDisplayNameEstado == allowNewDisplayNameEstado
-    //     ? newDisplayNameEstado
-    //     : account.display;
-    // },
-    // openChangeDisplayName(account) {
-    //   this.selectedParentAccountEstado = account;
-    //   this.newDisplayNameEstado = account.display;
-    //   this.showChangeDisplayNameEstado = true;
-    // },
+    addSubAccountEstado(selected, code) {
+      const tablesData = [...this.tablesData];
+      this.tablesData = [];
+
+      for (const code of code) {
+        let addTo = tablesData.find((c) => c.id == selected.id);
+        const account = this.filteredCatalog.find((c) => c.id == code);
+        addTo.children.push({
+          id: account.code,
+          code: account.code,
+          name: account.name,
+          display: account.name,
+          canDelete: true,
+          showUpdateName: false,
+        });
+      }
+
+      this.showAddAccountEstado = false;
+
+      this.tablesData = [...tablesData];
+    },
+    deleteSubAccountEstado(selected) {
+      let parent = null;
+      const tablesData = [...this.tablesData];
+      this.tablesData = [];
+
+      for (const acc of tablesData) {
+        if (acc.hasOwnProperty("children")) {
+          for (const c of acc.children) {
+            if (c.id == selected.id && acc.id == selected.id) {
+              parent = acc;
+            }
+          }
+        }
+      }
+      const index = parent.children.findIndex((e) => e.id == selected.id);
+      parent.children.splice(index, 1);
+
+      this.tablesData = [...tablesData];
+    },
+
+    changeDisplayNameEstado(account, display, allow) {
+      if (display == "") {
+        return this.$notify.error({
+          title: "Error",
+          message: "Debes incluir un nombre a mostrar",
+        });
+      }
+      account.display = allow ? display : account.name;
+      this.showChangeDisplayNameEstado = false;
+    },
+    changeAllowDisplayName(account, allowNewDisplayNameEstado, newDisplayName) {
+      this.newDisplayNameEstado == allowNewDisplayNameEstado
+        ? newDisplayNameEstado
+        : account.display;
+    },
+    openChangeDisplayName(account) {
+      this.selectedParentAccountEstado = account;
+      this.newDisplayNameEstado = account.display;
+      this.showChangeDisplayNameEstado = true;
+    },
     cancel() {
       this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
         confirmButtonText: "Si, salir",
