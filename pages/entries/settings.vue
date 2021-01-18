@@ -492,7 +492,6 @@
             multiple
             filterable
             remote
-            reserve-keyword
             default-first-option
             clearable
             v-model="selectedCatalog"
@@ -553,13 +552,62 @@
         >
       </span>
     </el-dialog>
+    <el-dialog
+      title="Cambiar nombre en reporte"
+      :visible.sync="showChangeDisplayName"
+      width="550px"
+      :append-to-body="true"
+    >
+      <div class="flex flex-col space-y-2">
+        <span>Cambiar de: {{ selectedParentAccount.name }}</span>
+        <div class="flex flex-row items-center space-x-2">
+          <el-checkbox
+            size="small"
+            v-model="allowNewDisplayName"
+            label="Personalizar"
+            border
+            class="mt-1"
+            @change="
+              changeAllowDisplay(
+                selectedParentAccount,
+                allowNewDisplayName,
+                newDisplayName
+              )
+            "
+          />
+          <el-input
+            placeholder="Nombre a mostrar en reporte"
+            v-model="newDisplayName"
+            size="small"
+            clearable
+            :disabled="!allowNewDisplayName"
+          />
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showChangeDisplayName = false" size="small"
+          >Cancelar</el-button
+        >
+        <el-button
+          type="primary"
+          @click="
+            changeDisplayName(
+              selectedParentAccount,
+              newDisplayName,
+              allowNewDisplayName
+            )
+          "
+          size="small"
+          >Agregar</el-button
+        >
+      </span>
+    </el-dialog>
     <!-- Estadoderesultados -->
     <el-dialog
       :title="`Agregar cuenta a: ${selectedParentAccountEstado.name}`"
       :visible.sync="showAddAccountEstado"
       width="500px"
       :append-to-body="true"
-      @open="selectedCatalogEstado = []"
     >
       <div class="grid grid-cols-12">
         <div class="col-span-12">
@@ -567,7 +615,6 @@
             multiple
             filterable
             remote
-            reserve-keyword
             default-first-option
             clearable
             v-model="selectedCatalogEstado"
@@ -1307,6 +1354,8 @@ export default {
       loadingAccount: false,
       filteredCatalog: [],
       showChangeDisplayName: false,
+
+      allowNewDisplayName: false,
       newDisplayName: "",
       catalogs: [],
       // //Estadoderesultados
@@ -1848,6 +1897,21 @@ export default {
       const index = parent.children.findIndex((e) => e.id == selected.id);
       parent.children.splice(index, 1);
     },
+    changeDisplayName(account, display, allow) {
+      if (display == "") {
+        return this.$notify.error({
+          title: "Error",
+          message: "Debes incluir un nombre a mostrar",
+        });
+      }
+      account.display = allow ? display : account.name;
+      this.showChangeDisplayName = false;
+    },
+    changeAllowDisplay(account, allowNewDisplayName, newDisplayName) {
+      this.newDisplayName == allowNewDisplayName
+        ? newDisplayName
+        : account.display;
+    },
     openChangeDisplay(account, tabName) {
       switch (tabName) {
         case "balance":
@@ -1865,13 +1929,14 @@ export default {
 
     //estado de resultados
 
-    addSubAccountEstado(selected, code) {
+    addSubAccountEstado(selected, list) {
       const tablesData = [...this.tablesData];
       this.tablesData = [];
 
-      for (const code of code) {
+      for (const code of list) {
         let addTo = tablesData.find((c) => c.id == selected.id);
         const account = this.filteredCatalog.find((c) => c.id == code);
+
         addTo.children.push({
           id: account.code,
           code: account.code,
@@ -1894,7 +1959,7 @@ export default {
       for (const acc of tablesData) {
         if (acc.hasOwnProperty("children")) {
           for (const c of acc.children) {
-            if (c.id == selected.id && acc.id == selected.id) {
+            if (c.id == selected.id) {
               parent = acc;
             }
           }
@@ -1902,7 +1967,6 @@ export default {
       }
       const index = parent.children.findIndex((e) => e.id == selected.id);
       parent.children.splice(index, 1);
-
       this.tablesData = [...tablesData];
     },
 
@@ -1921,11 +1985,7 @@ export default {
         ? newDisplayNameEstado
         : account.display;
     },
-    openChangeDisplayName(account) {
-      this.selectedParentAccountEstado = account;
-      this.newDisplayNameEstado = account.display;
-      this.showChangeDisplayNameEstado = true;
-    },
+
     cancel() {
       this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
         confirmButtonText: "Si, salir",
