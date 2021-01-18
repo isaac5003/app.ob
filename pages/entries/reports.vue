@@ -53,20 +53,21 @@
             </el-select>
           </el-form-item>
         </div>
-         <!-- Reporte de excel -->
-      
-           <div class="col-span-5 col-start-5 space-x-4" >
-          <el-form-item prop="" label="Seleccion el reporte a">
-            <el-radio-group v-model="radio" 
-             >
-               <el-radio disabled  border  size="small"
-                >Reporte de Excel</el-radio> 
-               <el-radio disabled border  size="small"
-               >Reporte de Pdf </el-radio>
-              </el-radio-group>
+        <!-- Reporte de excel -->
+
+        <div class="col-span-5 col-start-5 space-x-4">
+          <el-form-item prop="" label="Formato de reporte">
+            <el-radio-group
+              v-model="reportForm.radio"
+              :disabled="reportForm.reportType ? false : true"
+            >
+              <el-radio label="pdf" border size="small">Reporte PDF</el-radio>
+              <el-radio label="excel" border size="small"
+                >Reporte Excel
+              </el-radio>
+            </el-radio-group>
           </el-form-item>
         </div>
-        
       </div>
 
       <!-- seleccionar fecha -->
@@ -132,7 +133,7 @@
       <div class="grid grid-cols-12 gap-4">
         <div class="col-start-9 col-span-2">
           <el-button
-            :disabled="reportForm.reportType == null"
+            :disabled="reportForm.reportType ? false : true"
             type="primary"
             class="w-full"
             size="small"
@@ -181,7 +182,7 @@ export default {
         reportType: "",
         catalogo: "",
         dateRange: new Date(),
-        radio: 3, 
+        radio: "pdf",
       },
       reportFormRules: {
         reportType: selectValidation("change", true),
