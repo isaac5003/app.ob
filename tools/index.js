@@ -150,6 +150,7 @@ function amountValidate(trigger, required = false, min = null, max = null) {
  * @param {text} storagekey Nombre de la llave a usar en localstorage
  * @param {function} next Funcion para conginuar
  */
+
 function checkBeforeLeave(self, storagekey, next) {
   const stored = localStorage.getItem(storagekey);
   if (!stored) {
