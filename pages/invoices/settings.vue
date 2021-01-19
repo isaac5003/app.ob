@@ -610,7 +610,6 @@ import {
   inputValidation,
   selectValidation,
 } from "../../tools";
-import * as R from "ramda";
 
 export default {
   name: "InvoicesSettings",
