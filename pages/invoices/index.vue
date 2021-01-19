@@ -19,19 +19,19 @@
           <div class="col-start-10 col-span-4">
             <el-form-item>
               <el-input
-            suffix-icon="el-icon-search"
-            placeholder="Buscar..."
-            v-model="searchValue"
-            size="small"
-              v-debounce:500ms="fetchInvoices"
-              @change="fetchInvoices"
-          />
+                suffix-icon="el-icon-search"
+                placeholder="Buscar..."
+                v-model="searchValue"
+                size="small"
+                v-debounce:500ms="fetchInvoices"
+                @change="fetchInvoices"
+              />
             </el-form-item>
           </div>
         </div>
-       
+
         <div class="grid grid-cols-12 gap-4">
-            <div class=" col-span-4">
+          <div class=" col-span-4">
             <el-form-item label="Rango de fechas:">
               <el-date-picker
                 v-model="filter.dateRange"
@@ -45,7 +45,7 @@
               </el-date-picker>
             </el-form-item>
           </div>
-           <div class="col-span-4">
+          <div class="col-span-4">
             <el-form-item label="Cliente:">
               <el-select
                 v-model="filter.customer"
@@ -55,13 +55,11 @@
                 filterable
                 default-first-option
                 placeholder="Todos los clientes:"
-              v-debounce:500ms="fetchInvoices"
-              @change="fetchInvoices"
+                v-debounce:500ms="fetchInvoices"
+                @change="fetchInvoices"
               >
                 <el-option-group key="ACTIVOS" label="ACTIVOS">
-                  <el-option
-                  label="Todos los clientes"
-                  value=""/>
+                  <el-option label="Todos los clientes" value="" />
                   <el-option
                     v-for="item in activeCustomers"
                     :key="item.id"
@@ -630,7 +628,8 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-
+import { numeroALetras, calculatedAmount } from "../../tools";
+import jsPDF from "jspdf";
 export default {
   name: "InvoicesIndex",
   components: { LayoutContent, Notification },
