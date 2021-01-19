@@ -32,7 +32,7 @@
       <!-- first row -->
       <div class="grid grid-cols-12 gap-4">
         <!-- Tipos de reporte -->
-        <div class="col-span-3">
+        <div class="col-span-4">
           <el-form-item label="Seleccione el reporte" prop="reportType">
             <el-select
               v-model="reportForm.reportType"
@@ -61,16 +61,30 @@
             </el-select>
           </el-form-item>
         </div>
+<<<<<<< HEAD
 
         <div class="col-span-5">
+=======
+        <!-- Reporte de excel -->
+
+        <div class="col-span-5 col-start-5 space-x-4">
+>>>>>>> 89c3f9287e43a10b38f21c52f85d7372fbe8dc9f
           <el-form-item prop="" label="Formato de reporte">
             <el-radio-group
               v-model="reportForm.radio"
               :disabled="reportForm.reportType ? false : true"
+<<<<<<< HEAD
               class="w-full"
             >
               <el-radio border size="small" label="pdf">PDF</el-radio>
               <el-radio border size="small" label="excel">Excel</el-radio>
+=======
+            >
+              <el-radio label="pdf" border size="small">Reporte PDF</el-radio>
+              <el-radio label="excel" border size="small"
+                >Reporte Excel
+              </el-radio>
+>>>>>>> 89c3f9287e43a10b38f21c52f85d7372fbe8dc9f
             </el-radio-group>
           </el-form-item>
         </div>
