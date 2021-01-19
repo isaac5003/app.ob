@@ -1850,6 +1850,7 @@ export default {
           this.showAddAccountEstado = true;
           this.selectedParentAccountEstado = { ...parent };
           this.filteredCatalog = [];
+          this.selectedCatalogEstado = "";
           break;
       }
     },
