@@ -666,15 +666,15 @@
 </template>
 
 <script>
-import LayoutContent from "../../../components/layout/Content";
+import LayoutContent from "../../components/layout/Content";
 import {
   inputValidation,
   selectValidation,
   checkBeforeLeave,
   checkBeforeEnter,
   amountValidate,
-} from "../../../tools";
-import Notification from "../../../components/Notification";
+} from "../../tools";
+import Notification from "../../components/Notification";
 
 const storagekey = "Edit-sales";
 
@@ -683,7 +683,7 @@ export default {
   components: { LayoutContent, Notification },
   fetch() {
     this.$axios
-      .get(`/invoices/${this.$route.params.id}`)
+      .get(`/invoices/${this.$route.query.ref}`)
       .then(({ data }) => {
         const customer = () =>
           this.$axios.get(`/customers/${data.invoice.customer.id}`, {
