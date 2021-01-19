@@ -399,7 +399,7 @@
           v-loading="tableloading"
         >
           <el-table-column prop="index" min-width="40" />
-          <el-table-column label="# Venta" min-width="120">
+          <el-table-column label="# Documento" min-width="120">
             <template slot-scope="scope">
               <span>
                 {{ scope.row.authorization }}-{{ scope.row.sequence }}
@@ -474,13 +474,13 @@
                     "
                     v-if="scope.row.status.id == '1'"
                   >
-                    <i class="el-icon-edit-outline"></i> Editar venta
+                    <i class="el-icon-edit-outline"></i> Editar documento
                   </el-dropdown-item>
                   <el-dropdown-item v-if="scope.row.status.id == 1">
-                    <i class="el-icon-printer"></i> Imprimir venta
+                    <i class="el-icon-printer"></i> Imprimir documento
                   </el-dropdown-item>
                   <el-dropdown-item v-if="scope.row.status.id == 2">
-                    <i class="el-icon-printer"></i> Re imprimir venta
+                    <i class="el-icon-printer"></i> Re imprimir documento
                   </el-dropdown-item>
                   <el-dropdown-item
                     :divided="true"
@@ -496,7 +496,7 @@
                     v-if="scope.row.status.id == '1'"
                     @click.native="deleteInvoice(scope.row)"
                   >
-                    <i class="el-icon-delete"></i> Eliminar venta
+                    <i class="el-icon-delete"></i> Eliminar documento
                   </el-dropdown-item>
                   <el-dropdown-item
                     :divided="true"
