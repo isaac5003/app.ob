@@ -1,11 +1,11 @@
 <template>
   <layout-content
     v-loading="loading"
-    page-title="Nuevo Documento"
+    page-title="Nueva venta"
     :breadcrumb="[
-      { name: 'Documento', to: '/sales' },
+      { name: 'Ventas', to: '/invoices' },
 
-      { name: 'Nuevo Documento', to: null },
+      { name: 'Nuevo documento', to: null },
     ]"
   >
     <!-- dialogo addservicio-->
@@ -308,7 +308,7 @@
               </el-form-item>
             </div>
             <!-- n° autorizacion -->
-            <div class="col-span-2 col-start-6">
+            <div class="col-span-2 col-start-7">
               <el-form-item label="N° de autorización">
                 <el-input
                   size="small"
@@ -334,8 +334,8 @@
               </el-form-item>
             </div>
             <!-- Fecha documento -->
-            <div class="col-span-3">
-              <el-form-item  label="Fecha de documento" prop="invoiceDate">
+            <div class="col-span-2">
+              <el-form-item  label="Fecha de venta" prop="invoiceDate">
                 <el-date-picker
                   v-model="salesNewForm.invoiceDate"
                   size="small"
@@ -427,7 +427,7 @@
 
             <!-- Venta a cuenta de -->
             <div class="col-span-3">
-              <el-form-item label="Documento a cuenta de" prop="invoicesSellers">
+              <el-form-item label="Venta a cuenta de" prop="invoicesSellers">
                 <el-select
                   v-model="salesNewForm.invoicesSellers"
                   class="w-full"

@@ -1,6 +1,6 @@
 <template>
   <div class="flex">
-    <layout-submenu page-name="Documento" :menu="menu" icon="document-text" />
+    <layout-submenu page-name="Ventas" :menu="menu" icon="dolar" />
     <nuxt-child />
   </div>
 </template>
