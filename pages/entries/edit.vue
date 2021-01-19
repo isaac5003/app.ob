@@ -635,7 +635,7 @@ export default {
       console.log({ accountingEntryType, rawDate });
       if (accountingEntryType && rawDate) {
         this.$axios
-          .get(`entries/serie`, { params: accountingEntryType.id, rawDate })
+          .get(`entries/serie`, { params:{ accountingEntryType: accountingEntryType, date:rawDate }})
           .then((res) => {
             this.editEntryForm.serie = res.data.nextSerie;
             this.checkEntry();
@@ -752,7 +752,7 @@ export default {
                   instance.confirmButtonLoading = true;
                   instance.confirmButtonText = "Procesando...";
                   this.$axios
-                    .put(`/entries/${this.$route.params.id}`, {
+                    .put(`/entries/${this.$route.query.ref}` , {
                       header: {
                         title: formData.title,
                         date: formData.rawDate,
