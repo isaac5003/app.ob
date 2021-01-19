@@ -662,7 +662,7 @@
             native-type="submit"
             >Guardar</el-button
           >
-          <el-button size="small">Cancelar</el-button>
+          <el-button size="small" @click="$router.push('/invoices')">Cancelar</el-button>
         </div>
       </div>
     </el-form>
@@ -1144,7 +1144,7 @@ export default {
             for (const d of details) {
               if (d.sellingType === 3) {
                 sumas +=
-                  parseInt(d.quantity) *
+                  parseFloat(d.quantity) *
                   parseFloat(d.unitPrice) *
                   (d.incTax ? 1 : 1.13);
               }
@@ -1154,7 +1154,7 @@ export default {
             for (const d of details) {
               if (d.sellingType === 3) {
                 sumas +=
-                  (parseInt(d.quantity) * parseFloat(d.unitPrice)) /
+                  (parseFloat(d.quantity) * parseFloat(d.unitPrice)) /
                   (d.incTax ? 1.13 : 1);
               }
             }
@@ -1172,10 +1172,12 @@ export default {
             for (const d of details) {
               if (d.sellingType === 3) {
                 if (d.incTax) {
-                  const total = parseInt(d.quantity) * parseFloat(d.unitPrice);
+                  const total =
+                    parseFloat(d.quantity) * parseFloat(d.unitPrice);
                   taxes += total - total / 1.13;
                 } else {
-                  const total = parseInt(d.quantity) * parseFloat(d.unitPrice);
+                  const total =
+                    parseFloat(d.quantity) * parseFloat(d.unitPrice);
                   taxes += total * 1.13 - total;
                 }
               }
