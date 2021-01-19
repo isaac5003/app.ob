@@ -474,13 +474,13 @@
                     "
                     v-if="scope.row.status.id == '1'"
                   >
-                    <i class="el-icon-edit-outline"></i> Editar factura
+                    <i class="el-icon-edit-outline"></i> Editar venta
                   </el-dropdown-item>
                   <el-dropdown-item v-if="scope.row.status.id == 1">
-                    <i class="el-icon-printer"></i> Imprimir factura
+                    <i class="el-icon-printer"></i> Imprimir venta
                   </el-dropdown-item>
                   <el-dropdown-item v-if="scope.row.status.id == 2">
-                    <i class="el-icon-printer"></i> Re imprimir factura
+                    <i class="el-icon-printer"></i> Re imprimir venta
                   </el-dropdown-item>
                   <el-dropdown-item
                     :divided="true"
@@ -496,7 +496,7 @@
                     v-if="scope.row.status.id == '1'"
                     @click.native="deleteInvoice(scope.row)"
                   >
-                    <i class="el-icon-delete"></i> Eliminar factura
+                    <i class="el-icon-delete"></i> Eliminar venta
                   </el-dropdown-item>
                   <el-dropdown-item
                     :divided="true"
@@ -506,7 +506,7 @@
                       scope.row.status.id == '2' && scope.row.status.id != '3'
                     "
                   >
-                    Anular factura
+                    Anular venta
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
