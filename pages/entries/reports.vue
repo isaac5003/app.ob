@@ -32,7 +32,7 @@
       <!-- first row -->
       <div class="grid grid-cols-12 gap-4">
         <!-- Tipos de reporte -->
-        <div class="col-span-3">
+        <div class="col-span-4">
           <el-form-item label="Seleccione el reporte" prop="reportType">
             <el-select
               v-model="reportForm.reportType"
@@ -59,6 +59,33 @@
                 ></el-option>
               </el-option-group>
             </el-select>
+          </el-form-item>
+        </div>
+<<<<<<< HEAD
+
+        <div class="col-span-5">
+=======
+        <!-- Reporte de excel -->
+
+        <div class="col-span-5 col-start-5 space-x-4">
+>>>>>>> 89c3f9287e43a10b38f21c52f85d7372fbe8dc9f
+          <el-form-item prop="" label="Formato de reporte">
+            <el-radio-group
+              v-model="reportForm.radio"
+              :disabled="reportForm.reportType ? false : true"
+<<<<<<< HEAD
+              class="w-full"
+            >
+              <el-radio border size="small" label="pdf">PDF</el-radio>
+              <el-radio border size="small" label="excel">Excel</el-radio>
+=======
+            >
+              <el-radio label="pdf" border size="small">Reporte PDF</el-radio>
+              <el-radio label="excel" border size="small"
+                >Reporte Excel
+              </el-radio>
+>>>>>>> 89c3f9287e43a10b38f21c52f85d7372fbe8dc9f
+            </el-radio-group>
           </el-form-item>
         </div>
       </div>
@@ -154,6 +181,7 @@ import Notification from "../../components/Notification";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import XLSX from "xlsx";
 import { selectValidation } from "../../tools";
 import { getHeader, getFooter } from "../../tools/utils";
 export default {
@@ -187,6 +215,7 @@ export default {
       reportForm: {
         reportType: "",
         dateRange: new Date(),
+        radio: "pdf",
       },
       reportFormRules: {
         reportType: selectValidation("change", true),
@@ -234,7 +263,7 @@ export default {
         }
       }
     },
-    generateReport(formName, { dateRange, reportType }, catalogos) {
+    generateReport(formName, { dateRange, reportType, radio }, catalogos) {
       this.$refs[formName].validate((valid) => {
         if (!valid) {
           return false;
@@ -252,90 +281,121 @@ export default {
             this.generateBalanceComprobacion(dateRange);
             break;
           case "diarioMayor":
-            this.getDiarioMayor(dateRange);
+            this.getDiarioMayor(dateRange, radio);
             break;
           case "libroAuxiliares":
-            this.getAuxiliares(dateRange);
+            this.getAuxiliares(dateRange, radio);
             break;
           case "catalogoCuentas":
-            this.getAccountingCatalog(dateRange);
+            this.getAccountingCatalog(radio);
             break;
             // case "detalleCuentas":
             // this.generateDetalleCuentas(dateRange, catalogList);
             break;
           case "movimientoCuentas":
-            this.generateDetalleCuentas(dateRange, catalogos);
+            this.generateDetalleCuentas(dateRange, catalogos, radio);
             break;
         }
       });
     },
-    getAccountingCatalog() {
+    getAccountingCatalog(fileType) {
       const catalog = () => this.$axios.get("/entries/catalog");
       const bussinesInfo = () => this.$axios.get("/business/info");
-      Promise.all([catalog(), bussinesInfo()]).then((res) => {
-        const [catalog, bussinesInfo] = res;
-        const catalogReport = catalog.data.accountingCatalog;
-        const { name, nit, nrc } = bussinesInfo.data.info;
-        const values = catalogReport.map((c) => {
-          return [
-            { bold: c.isParent, text: c.code },
-            { bold: c.isParent, text: c.name },
+      switch (fileType) {
+        case "pdf":
+          Promise.all([catalog(), bussinesInfo()]).then((res) => {
+            const [catalog, bussinesInfo] = res;
+            const catalogReport = catalog.data.accountingCatalog;
+            const { name, nit, nrc } = bussinesInfo.data.info;
+            const values = catalogReport.map((c) => {
+              return [
+                { bold: c.isParent, text: c.code },
+                { bold: c.isParent, text: c.name },
 
-            {
-              bold: c.isParent,
-              text: c.isParent ? "N" : "S",
-              alignment: "center",
-            },
-          ];
-        });
+                {
+                  bold: c.isParent,
+                  text: c.isParent ? "N" : "S",
+                  alignment: "center",
+                },
+              ];
+            });
 
-        const docDefinition = {
-          pageSize: "LETTER",
-          pageOrientation: "portrait",
-          pageMargins: [20, 60, 20, 40],
-          header: getHeader(name, nit, nrc, null, "CATALOGO DE CUENTAS"),
-          footer: getFooter(),
-          content: [
-            {
-              fontSize: 9,
-              layout: "noBorders",
-              table: {
-                headerRows: 1,
-                widths: ["20%", "70%", "10%"],
-                heights: -5,
-                body: [
-                  [
-                    {
-                      text: "CUENTA",
-                      style: "tableHeader",
-                    },
-                    {
-                      text: "DESCRIPCIÓN LA CUENTA",
-                      style: "tableHeader",
-                    },
-                    {
-                      alignment: "center",
-                      text: "ASIGNABLE",
-                      style: "tableHeader",
-                    },
-                  ],
-                  ...values,
-                ],
+            const docDefinition = {
+              pageSize: "LETTER",
+              pageOrientation: "portrait",
+              pageMargins: [20, 60, 20, 40],
+              header: getHeader(name, nit, nrc, null, "CATALOGO DE CUENTAS"),
+              footer: getFooter(),
+              content: [
+                {
+                  fontSize: 9,
+                  layout: "noBorders",
+                  table: {
+                    headerRows: 1,
+                    widths: ["20%", "70%", "10%"],
+                    heights: -5,
+                    body: [
+                      [
+                        {
+                          text: "CUENTA",
+                          style: "tableHeader",
+                        },
+                        {
+                          text: "DESCRIPCIÓN LA CUENTA",
+                          style: "tableHeader",
+                        },
+                        {
+                          alignment: "center",
+                          text: "ASIGNABLE",
+                          style: "tableHeader",
+                        },
+                      ],
+                      ...values,
+                    ],
+                  },
+                },
+              ],
+              styles: {
+                tableHeader: {
+                  bold: true,
+                  fontSize: 9,
+                },
               },
-            },
-          ],
-          styles: {
-            tableHeader: {
-              bold: true,
-              fontSize: 9,
-            },
-          },
-        };
-        this.generating = false;
-        pdfMake.createPdf(docDefinition).open();
-      });
+            };
+            this.generating = false;
+            pdfMake.createPdf(docDefinition).open();
+          });
+          break;
+        case "excel":
+          Promise.all([catalog(), bussinesInfo()]).then((res) => {
+            const [catalog, bussinesInfo] = res;
+            const { name, nit, nrc } = bussinesInfo.data.info;
+            const data = [];
+            for (const acc of catalog.data.accountingCatalog) {
+              data.push([
+                acc.code,
+                acc.name,
+                acc.isParent || acc.subAccounts ? "N" : "S",
+              ]);
+            }
+            const document = [
+              [name],
+              ["CATALOGO DE CUENTAS", `NIT: ${nit}`, `NRC: ${nrc}`],
+              [""],
+              ...data,
+            ];
+
+            const sheet = XLSX.utils.aoa_to_sheet(document);
+            const workbook = XLSX.utils.book_new();
+            const fileName = "report";
+            XLSX.utils.book_append_sheet(workbook, sheet, fileName);
+            XLSX.writeFile(workbook, `${fileName}.xlsx`);
+            this.generating = false;
+          });
+          break;
+      }
     },
-    getDiarioMayor(dateRange) {
+    getDiarioMayor(dateRange, fileType) {
       const bussinesInfo = () => this.$axios.get("/business/info");
       const libroMayor = () => {
         return this.$axios.get("/entries/report/diario-mayor", {
@@ -344,176 +404,250 @@ export default {
           },
         });
       };
-      Promise.all([bussinesInfo(), libroMayor()]).then((res) => {
-        const [bussinesInfo, libroMayor] = res;
-        const { name, nit, nrc } = bussinesInfo.data.info;
-        const lib = libroMayor.data.accounts;
-        const values = [];
-        const emptyRow = [{}, {}, {}, {}, {}, {}];
+      switch (fileType) {
+        case "pdf":
+          Promise.all([bussinesInfo(), libroMayor()]).then((res) => {
+            const [bussinesInfo, libroMayor] = res;
+            const { name, nit, nrc } = bussinesInfo.data.info;
+            const lib = libroMayor.data.accounts;
+            const values = [];
+            const emptyRow = [{}, {}, {}, {}, {}, {}];
 
-        for (const i of lib) {
-          values.push(emptyRow);
-          values.push([
-            {
-              bold: true,
-              text: i.code,
-            },
-            {
-              bold: true,
-              text: i.name,
-            },
-            {
-              bold: true,
-              text: "Saldo inicial",
-              alignment: "center",
-            },
-            {},
-            {},
-            {
-              bold: true,
-              text: this.$options.filters.formatMoney(i.initialBalance),
-              alignment: "right",
-            },
-          ]);
+            for (const i of lib) {
+              values.push(emptyRow);
+              values.push([
+                {
+                  bold: true,
+                  text: i.code,
+                },
+                {
+                  bold: true,
+                  text: i.name,
+                },
+                {
+                  bold: true,
+                  text: "Saldo inicial",
+                  alignment: "center",
+                },
+                {},
+                {},
+                {
+                  bold: true,
+                  text: this.$options.filters.formatMoney(i.initialBalance),
+                  alignment: "right",
+                },
+              ]);
 
-          for (const j of i.movements) {
-            // values.push(emptyRow);
-            values.push([
-              {},
-              {
-                text: "MOVIMIENTOS DEL DIA",
-              },
-              {
-                text: j.date,
-                alignment: "center",
-              },
-              {
-                text: this.$options.filters.formatMoney(j.cargo),
-                alignment: "right",
-              },
-              {
-                text: this.$options.filters.formatMoney(j.abono),
-                alignment: "right",
-              },
-              {
-                text: this.$options.filters.formatMoney(j.balance),
-                alignment: "right",
-              },
-            ]);
-          }
+              for (const j of i.movements) {
+                // values.push(emptyRow);
+                values.push([
+                  {},
+                  {
+                    text: "MOVIMIENTOS DEL DIA",
+                  },
+                  {
+                    text: j.date,
+                    alignment: "center",
+                  },
+                  {
+                    text: this.$options.filters.formatMoney(j.cargo),
+                    alignment: "right",
+                  },
+                  {
+                    text: this.$options.filters.formatMoney(j.abono),
+                    alignment: "right",
+                  },
+                  {
+                    text: this.$options.filters.formatMoney(j.balance),
+                    alignment: "right",
+                  },
+                ]);
+              }
 
-          values.push([
-            {},
-            {},
-            {
-              bold: true,
-              text: "Saldo actual",
-              alignment: "center",
-            },
-            {
-              bold: true,
-              text: this.$options.filters.formatMoney(i.totalCargo),
-              alignment: "right",
-            },
-            {
-              bold: true,
-              text: this.$options.filters.formatMoney(i.totalAbono),
-              alignment: "right",
-            },
-            {
-              bold: true,
-              text: this.$options.filters.formatMoney(i.currentBalance),
-              alignment: "right",
-            },
-          ]);
-        }
+              values.push([
+                {},
+                {},
+                {
+                  bold: true,
+                  text: "Saldo actual",
+                  alignment: "center",
+                },
+                {
+                  bold: true,
+                  text: this.$options.filters.formatMoney(i.totalCargo),
+                  alignment: "right",
+                },
+                {
+                  bold: true,
+                  text: this.$options.filters.formatMoney(i.totalAbono),
+                  alignment: "right",
+                },
+                {
+                  bold: true,
+                  text: this.$options.filters.formatMoney(i.currentBalance),
+                  alignment: "right",
+                },
+              ]);
+            }
 
-        const docDefinition = {
-          pageSize: "LETTER",
-          pageOrientation: "portrait",
-          pageMargins: [20, 60, 20, 40],
-          header: getHeader(
-            name,
-            nit,
-            nrc,
-            this.$dateFns.lastDayOfMonth(new Date(dateRange)),
-            "LIBRO DIARIO MAYOR",
-            "month"
-          ),
-          footer: getFooter(),
-          content: [
-            {
-              fontSize: 9,
-              layout: "noBorders",
-              table: {
-                headerRows: 2,
-                widths: ["12%", "auto", "10%", "9%", "9%", "10%"],
-                heights: -5,
-                body: [
-                  [
-                    {
-                      text: "CÓD. DE LA CUENTA",
-                      style: "tableHeader",
-                      rowSpan: 2,
-                    },
-                    {
-                      text: "NOMBRE DE LA CUENTA",
-                      style: "tableHeader",
-                      rowSpan: 2,
-                    },
-                    {
-                      alignment: "center",
-                      text: "FECHA DE\nPARTIDA",
-                      style: "tableHeader",
-                      rowSpan: 2,
-                    },
-                    {
-                      alignment: "center",
-                      text: "MES ACTUAL",
-                      style: "tableHeader",
-                      colSpan: 2,
-                    },
-                    {},
-                    {
-                      alignment: "center",
-                      text: "SALDO DEL\nPERÍODO",
-                      style: "tableHeader",
-                      rowSpan: 2,
-                    },
-                  ],
-                  [
-                    {},
-                    {},
-                    {},
-                    {
-                      alignment: "center",
-                      text: "CARGOS",
-                      style: "tableHeader",
-                    },
-                    {
-                      alignment: "center",
-                      text: "ABONOS",
-                      style: "tableHeader",
-                    },
-                    {},
-                  ],
-                  ...values,
-                ],
+            const docDefinition = {
+              pageSize: "LETTER",
+              pageOrientation: "portrait",
+              pageMargins: [20, 60, 20, 40],
+              header: getHeader(
+                name,
+                nit,
+                nrc,
+                this.$dateFns.lastDayOfMonth(new Date(dateRange)),
+                "LIBRO DIARIO MAYOR",
+                "month"
+              ),
+              footer: getFooter(),
+              content: [
+                {
+                  fontSize: 9,
+                  layout: "noBorders",
+                  table: {
+                    headerRows: 2,
+                    widths: ["12%", "auto", "10%", "9%", "9%", "10%"],
+                    heights: -5,
+                    body: [
+                      [
+                        {
+                          text: "CÓD. DE LA CUENTA",
+                          style: "tableHeader",
+                          rowSpan: 2,
+                        },
+                        {
+                          text: "NOMBRE DE LA CUENTA",
+                          style: "tableHeader",
+                          rowSpan: 2,
+                        },
+                        {
+                          alignment: "center",
+                          text: "FECHA DE\nPARTIDA",
+                          style: "tableHeader",
+                          rowSpan: 2,
+                        },
+                        {
+                          alignment: "center",
+                          text: "MES ACTUAL",
+                          style: "tableHeader",
+                          colSpan: 2,
+                        },
+                        {},
+                        {
+                          alignment: "center",
+                          text: "SALDO DEL\nPERÍODO",
+                          style: "tableHeader",
+                          rowSpan: 2,
+                        },
+                      ],
+                      [
+                        {},
+                        {},
+                        {},
+                        {
+                          alignment: "center",
+                          text: "CARGOS",
+                          style: "tableHeader",
+                        },
+                        {
+                          alignment: "center",
+                          text: "ABONOS",
+                          style: "tableHeader",
+                        },
+                        {},
+                      ],
+                      ...values,
+                    ],
+                  },
+                },
+              ],
+              styles: {
+                tableHeader: {
+                  bold: true,
+                  fontSize: 9,
+                },
               },
-            },
-          ],
-          styles: {
-            tableHeader: {
-              bold: true,
-              fontSize: 9,
-            },
-          },
-        };
-        this.generating = false;
-        pdfMake.createPdf(docDefinition).open();
-      });
+            };
+            this.generating = false;
+            pdfMake.createPdf(docDefinition).open();
+          });
+          break;
+        case "excel":
+          Promise.all([bussinesInfo(), libroMayor()]).then((res) => {
+            const [bussinesInfo, libroMayor] = res;
+            const { name, nit, nrc } = bussinesInfo.data.info;
+
+            const data = [];
+            for (const account of libroMayor.data.accounts) {
+              data.push([
+                account.code,
+                account.name,
+                "Saldo inicial",
+                "",
+                "",
+                account.initialBalance,
+              ]);
+              for (const movement of account.movements) {
+                data.push([
+                  "",
+                  "MOVIMIENTOS DEL DIA",
+                  movement.date,
+                  movement.cargo,
+                  movement.abono,
+                  movement.balance,
+                ]);
+              }
+              data.push([
+                "",
+                "",
+                "Saldo actual",
+                account.totalCargo,
+                account.totalAbono,
+                account.currentBalance,
+              ]);
+              data.push([""]);
+            }
+            const document = [
+              [name],
+              [
+                `LIBRO DIARIO MAYOR PARA EL MES DE ${this.$dateFns.format(
+                  new Date(dateRange),
+                  "MMMM - yyyy"
+                )}`,
+                "",
+                "",
+                "",
+                `NIT: ${nit}`,
+                `NRC: ${nrc}`,
+              ],
+              [""],
+              [
+                "CÓD. DE LA",
+                "NOMBRE DE LA CUENTA",
+                "FECHA DE",
+                "MES ACTUAL",
+                "",
+                "SALDO DEL",
+              ],
+              ["CUENTA", "", "PARTIDA", "CARGOS", "ABONO", "PERIODO"],
+              [""],
+              ...data,
+            ];
+
+            const sheet = XLSX.utils.aoa_to_sheet(document);
+            const workbook = XLSX.utils.book_new();
+            const fileName = "report";
+            XLSX.utils.book_append_sheet(workbook, sheet, fileName);
+            XLSX.writeFile(workbook, `${fileName}.xlsx`);
+            this.generating = false;
+          });
+          break;
+      }
     },
-    getAuxiliares(dateRange) {
+    getAuxiliares(dateRange, fileType) {
       const bussinesInfo = () => this.$axios.get("/business/info");
       const auxiliares = () => {
         return this.$axios.get("/entries/report/auxiliares", {
@@ -522,179 +656,260 @@ export default {
           },
         });
       };
-      Promise.all([bussinesInfo(), auxiliares()]).then((res) => {
-        const [bussinesInfo, auxiliares] = res;
-        const { name, nit, nrc } = bussinesInfo.data.info;
-        const reporteAuxiliares = auxiliares.data.accounts;
-        const values = [];
-        const emptyRow = [{}, {}, {}, {}, {}, {}];
+      switch (fileType) {
+        case "pdf":
+          Promise.all([bussinesInfo(), auxiliares()]).then((res) => {
+            const [bussinesInfo, auxiliares] = res;
+            const { name, nit, nrc } = bussinesInfo.data.info;
+            const reporteAuxiliares = auxiliares.data.accounts;
+            const values = [];
+            const emptyRow = [{}, {}, {}, {}, {}, {}];
 
-        for (const i of reporteAuxiliares) {
-          values.push(emptyRow);
-          values.push([
-            {
-              bold: true,
-              text: i.code,
-            },
-            {
-              bold: true,
-              text: i.name,
-            },
-            {
-              bold: true,
-              text: "Saldo inicial",
-              alignment: "center",
-            },
-            {},
-            {},
-            {
-              bold: true,
-              text: this.$options.filters.formatMoney(i.initialBalance),
-              alignment: "right",
-            },
-          ]);
+            for (const i of reporteAuxiliares) {
+              values.push(emptyRow);
+              values.push([
+                {
+                  bold: true,
+                  text: i.code,
+                },
+                {
+                  bold: true,
+                  text: i.name,
+                },
+                {
+                  bold: true,
+                  text: "Saldo inicial",
+                  alignment: "center",
+                },
+                {},
+                {},
+                {
+                  bold: true,
+                  text: this.$options.filters.formatMoney(i.initialBalance),
+                  alignment: "right",
+                },
+              ]);
 
-          for (const j of i.movements) {
-            // values.push(emptyRow);
-            values.push([
-              {
-                text: j.entryNumber,
-                alignment: "right",
-              },
-              {
-                text: j.entryName,
-              },
-              {
-                text: j.date,
-                alignment: "center",
-              },
-              {
-                text: this.$options.filters.formatMoney(j.cargo),
-                alignment: "right",
-              },
-              {
-                text: this.$options.filters.formatMoney(j.abono),
-                alignment: "right",
-              },
-              {
-                text: this.$options.filters.formatMoney(j.balance),
-                alignment: "right",
-              },
-            ]);
-          }
+              for (const j of i.movements) {
+                // values.push(emptyRow);
+                values.push([
+                  {
+                    text: j.entryNumber,
+                    alignment: "right",
+                  },
+                  {
+                    text: j.entryName,
+                  },
+                  {
+                    text: j.date,
+                    alignment: "center",
+                  },
+                  {
+                    text: this.$options.filters.formatMoney(j.cargo),
+                    alignment: "right",
+                  },
+                  {
+                    text: this.$options.filters.formatMoney(j.abono),
+                    alignment: "right",
+                  },
+                  {
+                    text: this.$options.filters.formatMoney(j.balance),
+                    alignment: "right",
+                  },
+                ]);
+              }
 
-          values.push([
-            {},
-            {},
-            {
-              bold: true,
-              text: "Saldo actual",
-              alignment: "center",
-            },
-            {
-              bold: true,
-              text: this.$options.filters.formatMoney(i.totalCargo),
-              alignment: "right",
-            },
-            {
-              bold: true,
-              text: this.$options.filters.formatMoney(i.totalAbono),
-              alignment: "right",
-            },
-            {
-              bold: true,
-              text: this.$options.filters.formatMoney(i.currentBalance),
-              alignment: "right",
-            },
-          ]);
-        }
+              values.push([
+                {},
+                {},
+                {
+                  bold: true,
+                  text: "Saldo actual",
+                  alignment: "center",
+                },
+                {
+                  bold: true,
+                  text: this.$options.filters.formatMoney(i.totalCargo),
+                  alignment: "right",
+                },
+                {
+                  bold: true,
+                  text: this.$options.filters.formatMoney(i.totalAbono),
+                  alignment: "right",
+                },
+                {
+                  bold: true,
+                  text: this.$options.filters.formatMoney(i.currentBalance),
+                  alignment: "right",
+                },
+              ]);
+            }
 
-        const docDefinition = {
-          pageSize: "LETTER",
-          pageOrientation: "portrait",
-          pageMargins: [20, 60, 20, 40],
-          header: getHeader(
-            name,
-            nit,
-            nrc,
-            this.$dateFns.lastDayOfMonth(new Date(dateRange)),
-            "LIBROS DE AUXILIARES",
-            "month"
-          ),
-          footer: getFooter(),
-          content: [
-            {
-              fontSize: 9,
-              layout: "noBorders",
-              table: {
-                headerRows: 2,
-                widths: ["12%", "auto", "10%", "9%", "9%", "10%"],
-                heights: -5,
-                body: [
-                  [
-                    {
-                      text: "CÓD. DE LA CUENTA\nN° DE PARTIDA",
-                      style: "tableHeader",
-                      rowSpan: 2,
-                    },
-                    {
-                      text: "NOMBRE DE LA CUENTA\nCONCEPTO",
-                      style: "tableHeader",
-                      rowSpan: 2,
-                    },
-                    {
-                      alignment: "center",
-                      text: "FECHA DE\nPARTIDA",
-                      style: "tableHeader",
-                      rowSpan: 2,
-                    },
-                    {
-                      alignment: "center",
-                      text: "MES ACTUAL",
-                      style: "tableHeader",
-                      colSpan: 2,
-                    },
-                    {},
-                    {
-                      alignment: "center",
-                      text: "SALDO DEL\nPERÍODO",
-                      style: "tableHeader",
-                      rowSpan: 2,
-                    },
-                  ],
-                  [
-                    {},
-                    {},
-                    {},
-                    {
-                      alignment: "center",
-                      text: "CARGOS",
-                      style: "tableHeader",
-                    },
-                    {
-                      alignment: "center",
-                      text: "ABONOS",
-                      style: "tableHeader",
-                    },
-                    {},
-                  ],
-                  ...values,
-                ],
+            const docDefinition = {
+              pageSize: "LETTER",
+              pageOrientation: "portrait",
+              pageMargins: [20, 60, 20, 40],
+              header: getHeader(
+                name,
+                nit,
+                nrc,
+                this.$dateFns.lastDayOfMonth(new Date(dateRange)),
+                "LIBROS DE AUXILIARES",
+                "month"
+              ),
+              footer: getFooter(),
+              content: [
+                {
+                  fontSize: 9,
+                  layout: "noBorders",
+                  table: {
+                    headerRows: 2,
+                    widths: ["12%", "auto", "10%", "9%", "9%", "10%"],
+                    heights: -5,
+                    body: [
+                      [
+                        {
+                          text: "CÓD. DE LA CUENTA\nN° DE PARTIDA",
+                          style: "tableHeader",
+                          rowSpan: 2,
+                        },
+                        {
+                          text: "NOMBRE DE LA CUENTA\nCONCEPTO",
+                          style: "tableHeader",
+                          rowSpan: 2,
+                        },
+                        {
+                          alignment: "center",
+                          text: "FECHA DE\nPARTIDA",
+                          style: "tableHeader",
+                          rowSpan: 2,
+                        },
+                        {
+                          alignment: "center",
+                          text: "MES ACTUAL",
+                          style: "tableHeader",
+                          colSpan: 2,
+                        },
+                        {},
+                        {
+                          alignment: "center",
+                          text: "SALDO DEL\nPERÍODO",
+                          style: "tableHeader",
+                          rowSpan: 2,
+                        },
+                      ],
+                      [
+                        {},
+                        {},
+                        {},
+                        {
+                          alignment: "center",
+                          text: "CARGOS",
+                          style: "tableHeader",
+                        },
+                        {
+                          alignment: "center",
+                          text: "ABONOS",
+                          style: "tableHeader",
+                        },
+                        {},
+                      ],
+                      ...values,
+                    ],
+                  },
+                },
+              ],
+              styles: {
+                tableHeader: {
+                  bold: true,
+                  fontSize: 9,
+                },
               },
-            },
-          ],
-          styles: {
-            tableHeader: {
-              bold: true,
-              fontSize: 9,
-            },
-          },
-        };
-        this.generating = false;
-        pdfMake.createPdf(docDefinition).open();
-      });
+            };
+            this.generating = false;
+            pdfMake.createPdf(docDefinition).open();
+          });
+          break;
+        case "excel":
+          Promise.all([bussinesInfo(), auxiliares()]).then((res) => {
+            const [bussinesInfo, auxiliares] = res;
+            const { name, nit, nrc } = bussinesInfo.data.info;
+
+            const data = [];
+            for (const account of auxiliares.data.accounts) {
+              data.push([
+                account.code,
+                account.name,
+                "Saldo inicial",
+                "",
+                "",
+                account.initialBalance,
+              ]);
+              for (const movement of account.movements) {
+                data.push([
+                  movement.entryNumber,
+                  movement.entryName,
+                  movement.date,
+                  movement.cargo,
+                  movement.abono,
+                  movement.balance,
+                ]);
+              }
+              data.push([
+                "",
+                "",
+                "Saldo actual",
+                account.totalCargo,
+                account.totalAbono,
+                account.currentBalance,
+              ]);
+              data.push([""]);
+            }
+            const document = [
+              [name],
+              [
+                `LIBROS DE AUXILIARES PARA EL MES DE ${this.$dateFns.format(
+                  new Date(dateRange),
+                  "MMMM - yyyy"
+                )}`,
+                "",
+                "",
+                "",
+                `NIT: ${nit}`,
+                `NRC: ${nrc}`,
+              ],
+              [""],
+              [
+                "CÓD. DE LA CUENTA",
+                "NOMBRE DE LA CUENTA",
+                "FECHA DE",
+                "MES ACTUAL",
+                "",
+                "SALDO DEL",
+              ],
+              [
+                "N° DE PARTIDA",
+                "CONCEPTO",
+                "PARTIDA",
+                "CARGOS",
+                "ABONO",
+                "PERIODO",
+              ],
+              [""],
+              ...data,
+            ];
+
+            const sheet = XLSX.utils.aoa_to_sheet(document);
+            const workbook = XLSX.utils.book_new();
+            const fileName = "report";
+            XLSX.utils.book_append_sheet(workbook, sheet, fileName);
+            XLSX.writeFile(workbook, `${fileName}.xlsx`);
+            this.generating = false;
+          });
+          break;
+      }
     },
-    generateDetalleCuentas(dateRange, catalogos) {
+    generateDetalleCuentas(dateRange, catalogos, fileType) {
       const bussinesInfo = () => this.$axios.get("/business/info");
       const movements = () =>
         this.$axios.get("/entries/report/account-movements", {
@@ -704,178 +919,263 @@ export default {
             selectedAccounts: JSON.stringify(catalogos),
           },
         });
-      Promise.all([bussinesInfo(), movements()]).then((res) => {
-        const [bussinesInfo, movements] = res;
-        const { name, nit, nrc } = bussinesInfo.data.info;
-        const movementsReport = movements.data.accounts;
+      switch (fileType) {
+        case "pdf":
+          Promise.all([bussinesInfo(), movements()]).then((res) => {
+            const [bussinesInfo, movements] = res;
+            const { name, nit, nrc } = bussinesInfo.data.info;
+            const movementsReport = movements.data.accounts;
 
-        const values = [];
-        const emptyRow = [{}, {}, {}, {}, {}, {}];
+            const values = [];
+            const emptyRow = [{}, {}, {}, {}, {}, {}];
 
-        for (const i of movementsReport) {
-          values.push(emptyRow);
-          values.push([
-            {
-              bold: true,
-              text: i.code,
-            },
-            {
-              bold: true,
-              text: i.name,
-            },
-            {
-              bold: true,
-              text: "Saldo\ninicial",
-              alignment: "center",
-            },
-            {},
-            {},
-            {
-              bold: true,
-              text: this.$options.filters.formatMoney(i.initialBalance),
-              alignment: "right",
-            },
-          ]);
+            for (const i of movementsReport) {
+              values.push(emptyRow);
+              values.push([
+                {
+                  bold: true,
+                  text: i.code,
+                },
+                {
+                  bold: true,
+                  text: i.name,
+                },
+                {
+                  bold: true,
+                  text: "Saldo\ninicial",
+                  alignment: "center",
+                },
+                {},
+                {},
+                {
+                  bold: true,
+                  text: this.$options.filters.formatMoney(i.initialBalance),
+                  alignment: "right",
+                },
+              ]);
 
-          for (const j of i.movements) {
-            // values.push(emptyRow);
-            values.push([
-              {
-                text: j.entryNumber,
-                alignment: "right",
-              },
-              {
-                text: j.entryName,
-              },
-              {
-                text: j.date,
-                alignment: "center",
-              },
-              {
-                text: this.$options.filters.formatMoney(j.cargo),
-                alignment: "right",
-              },
-              {
-                text: this.$options.filters.formatMoney(j.abono),
-                alignment: "right",
-              },
-              {
-                text: this.$options.filters.formatMoney(j.balance),
-                alignment: "right",
-              },
-            ]);
-          }
+              for (const j of i.movements) {
+                // values.push(emptyRow);
+                values.push([
+                  {
+                    text: j.entryNumber,
+                    alignment: "right",
+                  },
+                  {
+                    text: j.entryName,
+                  },
+                  {
+                    text: j.date,
+                    alignment: "center",
+                  },
+                  {
+                    text: this.$options.filters.formatMoney(j.cargo),
+                    alignment: "right",
+                  },
+                  {
+                    text: this.$options.filters.formatMoney(j.abono),
+                    alignment: "right",
+                  },
+                  {
+                    text: this.$options.filters.formatMoney(j.balance),
+                    alignment: "right",
+                  },
+                ]);
+              }
 
-          values.push([
-            {},
-            {},
-            {
-              bold: true,
-              text: "Saldo\nactual",
-              alignment: "center",
-            },
-            {
-              bold: true,
-              text: this.$options.filters.formatMoney(i.totalCargo),
-              alignment: "right",
-            },
-            {
-              bold: true,
-              text: this.$options.filters.formatMoney(i.totalAbono),
-              alignment: "right",
-            },
-            {
-              bold: true,
-              text: this.$options.filters.formatMoney(i.currentBalance),
-              alignment: "right",
-            },
-          ]);
-        }
+              values.push([
+                {},
+                {},
+                {
+                  bold: true,
+                  text: "Saldo\nactual",
+                  alignment: "center",
+                },
+                {
+                  bold: true,
+                  text: this.$options.filters.formatMoney(i.totalCargo),
+                  alignment: "right",
+                },
+                {
+                  bold: true,
+                  text: this.$options.filters.formatMoney(i.totalAbono),
+                  alignment: "right",
+                },
+                {
+                  bold: true,
+                  text: this.$options.filters.formatMoney(i.currentBalance),
+                  alignment: "right",
+                },
+              ]);
+            }
 
-        const docDefinition = {
-          pageSize: "LETTER",
-          pageOrientation: "portrait",
-          pageMargins: [20, 60, 20, 40],
-          header: getHeader(
-            name,
-            nit,
-            nrc,
-            [new Date(dateRange[0]), new Date(dateRange[1])],
-            "DETALLE DE MOVIMIENTO DE CUENTAS",
-            "period"
-          ),
-          footer: getFooter(),
-          content: [
-            {
-              fontSize: 9,
-              layout: "noBorders",
-              table: {
-                headerRows: 2,
-                widths: ["12%", "52%", "9%", "9%", "9%", "9%"],
-                heights: -5,
-                body: [
-                  [
-                    {
-                      text: "CÓD. DE LA CUENTA\nN° DE PARTIDA",
-                      style: "tableHeader",
-                      rowSpan: 2,
-                    },
-                    {
-                      text: "NOMBRE DE LA CUENTA\nCONCEPTO",
-                      style: "tableHeader",
-                      rowSpan: 2,
-                    },
-                    {
-                      alignment: "center",
-                      text: "FECHA DE\nPARTIDA",
-                      style: "tableHeader",
-                      rowSpan: 2,
-                    },
-                    {
-                      alignment: "center",
-                      text: "MES ACTUAL",
-                      style: "tableHeader",
-                      colSpan: 2,
-                    },
-                    {},
-                    {
-                      alignment: "center",
-                      text: "SALDO DEL\nPERÍODO",
-                      style: "tableHeader",
-                      rowSpan: 2,
-                    },
-                  ],
-                  [
-                    {},
-                    {},
-                    {},
-                    {
-                      alignment: "center",
-                      text: "CARGOS",
-                      style: "tableHeader",
-                    },
-                    {
-                      alignment: "center",
-                      text: "ABONOS",
-                      style: "tableHeader",
-                    },
-                    {},
-                  ],
-                  ...values,
-                ],
+            const docDefinition = {
+              pageSize: "LETTER",
+              pageOrientation: "portrait",
+              pageMargins: [20, 60, 20, 40],
+              header: getHeader(
+                name,
+                nit,
+                nrc,
+                [new Date(dateRange[0]), new Date(dateRange[1])],
+                "DETALLE DE MOVIMIENTO DE CUENTAS",
+                "period"
+              ),
+              footer: getFooter(),
+              content: [
+                {
+                  fontSize: 9,
+                  layout: "noBorders",
+                  table: {
+                    headerRows: 2,
+                    widths: ["12%", "52%", "9%", "9%", "9%", "9%"],
+                    heights: -5,
+                    body: [
+                      [
+                        {
+                          text: "CÓD. DE LA CUENTA\nN° DE PARTIDA",
+                          style: "tableHeader",
+                          rowSpan: 2,
+                        },
+                        {
+                          text: "NOMBRE DE LA CUENTA\nCONCEPTO",
+                          style: "tableHeader",
+                          rowSpan: 2,
+                        },
+                        {
+                          alignment: "center",
+                          text: "FECHA DE\nPARTIDA",
+                          style: "tableHeader",
+                          rowSpan: 2,
+                        },
+                        {
+                          alignment: "center",
+                          text: "MES ACTUAL",
+                          style: "tableHeader",
+                          colSpan: 2,
+                        },
+                        {},
+                        {
+                          alignment: "center",
+                          text: "SALDO DEL\nPERÍODO",
+                          style: "tableHeader",
+                          rowSpan: 2,
+                        },
+                      ],
+                      [
+                        {},
+                        {},
+                        {},
+                        {
+                          alignment: "center",
+                          text: "CARGOS",
+                          style: "tableHeader",
+                        },
+                        {
+                          alignment: "center",
+                          text: "ABONOS",
+                          style: "tableHeader",
+                        },
+                        {},
+                      ],
+                      ...values,
+                    ],
+                  },
+                },
+              ],
+              styles: {
+                tableHeader: {
+                  bold: true,
+                  fontSize: 9,
+                },
               },
-            },
-          ],
-          styles: {
-            tableHeader: {
-              bold: true,
-              fontSize: 9,
-            },
-          },
-        };
-        this.generating = false;
-        pdfMake.createPdf(docDefinition).open();
-      });
+            };
+            this.generating = false;
+            pdfMake.createPdf(docDefinition).open();
+          });
+
+          break;
+        case "excel":
+          Promise.all([bussinesInfo(), movements()]).then((res) => {
+            const [bussinesInfo, movements] = res;
+            const { name, nit, nrc } = bussinesInfo.data.info;
+
+            const data = [];
+            for (const account of movements.data.accounts) {
+              data.push([
+                account.code,
+                account.name,
+                "Saldo inicial",
+                "",
+                "",
+                account.initialBalance,
+              ]);
+              for (const movement of account.movements) {
+                data.push([
+                  movement.entryNumber,
+                  movement.entryName,
+                  movement.date,
+                  movement.cargo,
+                  movement.abono,
+                  movement.balance,
+                ]);
+              }
+              data.push([
+                "",
+                "",
+                "Saldo actual",
+                account.totalCargo,
+                account.totalAbono,
+                account.currentBalance,
+              ]);
+              data.push([""]);
+            }
+            const document = [
+              [name],
+              [
+                `DETALLE DE MOVIMIENTO DE CUENTAS EN EL PERÍODO DEL ${this.$dateFns.format(
+                  new Date(dateRange[0]),
+                  "dd/MM/yyyy"
+                )} AL ${this.$dateFns.format(
+                  new Date(dateRange[1]),
+                  "dd/MM/yyyy"
+                )}`,
+                "",
+                "",
+                "",
+                `NIT: ${nit}`,
+                `NRC: ${nrc}`,
+              ],
+              [""],
+              [
+                "CÓD. DE LA CUENTA",
+                "NOMBRE DE LA CUENTA",
+                "FECHA DE",
+                "MES ACTUAL",
+                "",
+                "SALDO DEL",
+              ],
+              [
+                "N° DE PARTIDA",
+                "CONCEPTO",
+                "PARTIDA",
+                "CARGOS",
+                "ABONO",
+                "PERIODO",
+              ],
+              [""],
+              ...data,
+            ];
+
+            const sheet = XLSX.utils.aoa_to_sheet(document);
+            const workbook = XLSX.utils.book_new();
+            const fileName = "report";
+            XLSX.utils.book_append_sheet(workbook, sheet, fileName);
+            XLSX.writeFile(workbook, `${fileName}.xlsx`);
+            this.generating = false;
+          });
+          break;
+      }
     },
     async getCalogs() {
       const { data } = await this.$axios.get("/entries/catalog");
