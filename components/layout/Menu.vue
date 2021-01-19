@@ -206,8 +206,8 @@ export default {
           always: false,
           id: "cfb8addb-541b-482f-8fa1-dfe5db03fdf4",
           path: "/invoices",
-          name: "Ventas",
-          icon: getIcon("dolar"),
+          name: "Documento",
+          icon: getIcon("document-text"),
           exact: false,
         },
         {

@@ -3,7 +3,7 @@
     v-loading="pageloading"
     page-title="Listado de ventas"
     :breadcrumb="[
-      { name: 'Ventas', to: '/invoices' },
+      { name: 'Documento', to: '/invoices' },
       { name: 'Listado de ventas', to: null },
     ]"
   >

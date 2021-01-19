@@ -1,6 +1,6 @@
 <template>
   <div class="flex">
-    <layout-submenu page-name="Ventas" :menu="menu" icon="dolar" />
+    <layout-submenu page-name="Documento" :menu="menu" icon="document-text" />
     <nuxt-child />
   </div>
 </template>
@@ -19,12 +19,12 @@ export default {
     return {
       menu: [
         {
-          name: "Nueva venta",
+          name: "Nuevo Documento",
           icon: getIcon("plus"),
           path: "/invoices/new",
         },
         {
-          name: "Listado de ventas",
+          name: "Listado de documentos",
           icon: getIcon("menu"),
           path: "/invoices",
           epath: ["/invoices/edit"],
