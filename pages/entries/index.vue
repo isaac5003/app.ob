@@ -1,13 +1,12 @@
 <template>
   <layout-content
-    v-loading="loading" 
+    v-loading="loading"
     page-title="Partidas contables"
     :breadcrumb="[
       { name: 'Contabilidad', to: '/entries' },
       { name: 'Partidas contables', to: null },
     ]"
   >
-  
     <div class="flex flex-col space-y-2">
       <div class="flex justify-center" v-if="errorMessage">
         <Notification
@@ -111,9 +110,9 @@
           :summary-method="getSummaries"
         >
           <el-table-column type="index" prop="quantity" label="#" width="50" />
-          <el-table-column  label="Cta. Contable." width="120">
+          <el-table-column label="Cta. Contable." width="120">
             <template slot-scope="scope">
-              <span>{{scope.row.accountingCatalog.code }}</span>
+              <span>{{ scope.row.accountingCatalog.code }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="concept" label="Concepto" width="500" />
@@ -266,7 +265,9 @@
                   <i class="el-icon-view"></i> Vista previa
                 </el-dropdown-item>
                 <el-dropdown-item
-                  @click.native="$router.push(`entries/edit/${scope.row.id}`)"
+                  @click.native="
+                    $router.push(`/entries/edit?ref=${scope.row.id}`)
+                  "
                 >
                   <i class="el-icon-edit-outline"></i> Editar partida
                 </el-dropdown-item>
@@ -314,7 +315,7 @@ export default {
       .then((res) => {
         const [entries, entryType] = res;
         this.entries = entries.data;
-       // this.count = entries.data.count;
+        // this.count = entries.data.count;
         this.entryType = entryType.data.entryTypes;
       })
       .catch((err) => {
@@ -342,9 +343,9 @@ export default {
         searchValue: "",
         squared: false,
         accounted: false,
-        active:false
+        active: false,
       },
-    
+
       entries: {
         entries: [],
         count: 0,
@@ -364,7 +365,7 @@ export default {
       if (this.filterBy.entryType != "") {
         params = {
           ...params,
-         entryType: this.filterBy.entryType,
+          entryType: this.filterBy.entryType,
         };
       }
       if (this.filterBy.searchValue != "") {
@@ -398,7 +399,7 @@ export default {
       this.page.limit = val;
       this.page.fetchEntries();
     },
- getSummaries(param) {
+    getSummaries(param) {
       const { columns, data } = param;
       const totalAbono = data.reduce((a, b) => a + (b.abono ? b.abono : 0), 0);
       const totalCargo = data.reduce((a, b) => a + (b.cargo ? b.cargo : 0), 0);
@@ -415,7 +416,7 @@ export default {
       });
       return resutls;
     },
-    
+
     // changeActive({ id, isActiveInvoice }) {
     //   const action = isActiveInvoice ? "desactivar" : "activar";
     //   this.$confirm(
@@ -498,13 +499,9 @@ export default {
       const { data } = await this.$axios.get(`/entries/${id}`);
       console.log(data.entry);
       this.selecEntries = data.entry;
-    
+
       this.showInvoicePreview = true;
     },
   },
-  
-  
-
-
 };
 </script>

@@ -3,7 +3,7 @@
     v-loading="pageloading"
     page-title="Listado de ventas"
     :breadcrumb="[
-      { name: 'Ventas', to: '/invoices' },
+      { name: 'Documento', to: '/invoices' },
       { name: 'Listado de ventas', to: null },
     ]"
   >
@@ -15,119 +15,6 @@
       :append-to-body="true"
     >
       <div class="flex flex-col space-y-3">
-        <div class="grid grid-cols-12 gap-4">
-          <div class="col-start-10 col-span-4">
-            <el-form-item>
-              <el-input
-            suffix-icon="el-icon-search"
-            placeholder="Buscar..."
-            v-model="searchValue"
-            size="small"
-              v-debounce:500ms="fetchInvoices"
-              @change="fetchInvoices"
-          />
-            </el-form-item>
-          </div>
-        </div>
-       
-        <div class="grid grid-cols-12 gap-4">
-            <div class=" col-span-4">
-            <el-form-item label="Rango de fechas:">
-              <el-date-picker
-                v-model="filter.dateRange"
-                style="width:100%"
-                size="small"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="Fecha inicial"
-                end-placeholder="Fecha final"
-              >
-              </el-date-picker>
-            </el-form-item>
-          </div>
-           <div class="col-span-4">
-            <el-form-item label="Cliente:">
-              <el-select
-                v-model="filter.customer"
-                size="small"
-                class="w-full"
-                clearable
-                filterable
-                default-first-option
-                placeholder="Todos los clientes:"
-              v-debounce:500ms="fetchInvoices"
-              @change="fetchInvoices"
-              >
-                <el-option-group key="ACTIVOS" label="ACTIVOS">
-                  <el-option
-                  label="Todos los clientes"
-                  value=""/>
-                  <el-option
-                    v-for="item in activeCustomers"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"
-                  >
-                  </el-option>
-                </el-option-group>
-                <el-option-group key="INACTIVOS" label="INACTIVOS">
-                  <el-option
-                    v-for="item in inactiveCustomers"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"
-                  >
-                  </el-option>
-                </el-option-group>
-              </el-select>
-            </el-form-item>
-          </div>
-          <div class="col-span-2">
-            <span class="font-semibold">No. autorización</span>
-            <p>{{ selectedInvoice ? selectedInvoice.authorization : "" }}</p>
-          </div>
-          <div class="col-span-2">
-            <span class="font-semibold"> Correlativo</span>
-            <p>{{ selectedInvoice ? selectedInvoice.sequence : "" }}</p>
-          </div>
-          <div class="col-span-2">
-            <span class="font-semibold"> Fecha de factura</span>
-            <p>{{ selectedInvoice ? selectedInvoice.invoiceDate : "" }}</p>
-          </div>
-          <div class="col-span-2">
-            <span class="font-semibold">Estado</span>
-            <div>
-              <el-tag
-                size="small"
-                type="info"
-                v-if="
-                  selectedInvoice.status ? selectedInvoice.status.id == '1' : ''
-                "
-              >
-                {{ selectedInvoice.status.name }}
-              </el-tag>
-              <el-tag
-                size="small"
-                type="success"
-                v-if="
-                  selectedInvoice.status ? selectedInvoice.status.id == '2' : ''
-                "
-              >
-                {{ `${selectedInvoice.status.name}` }}
-              </el-tag>
-
-              <el-tag
-                size="small"
-                type="danger"
-                v-if="
-                  selectedInvoice.status ? selectedInvoice.status.id == '3' : ''
-                "
-              >
-                {{ `${selectedInvoice.status.name}` }}
-              </el-tag>
-            </div>
-          </div>
-        </div>
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-5">
             <span class="font-semibold">Cliente:</span>
@@ -208,19 +95,39 @@
           >
             <template slot-scope="scope">
               <span>{{
-                calcUniPrice(selectedInvoice.documentType, scope.row)
+                calcUnitPrice(selectedInvoice.documentType, scope.row)
                   | formatMoney
               }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="address" label="V. No sujeta" min-width="100">
-          </el-table-column>
-          <el-table-column prop="address" label="V. Extenta" min-width="100">
-          </el-table-column>
-          <el-table-column prop="ventaPrice" label="V. Gravada" min-width="100">
+          <el-table-column
+            prop="ventasNoSujetas"
+            label="V. No sujeta"
+            min-width="100"
+          >
             <template slot-scope="scope">
-              <span>{{
-                calcUniPrice(selectedInvoice.ventaTotal, scope.row)
+              <span v-if="scope.row.sellingType.id == 1">{{
+                calcSujeta(selectedInvoice.documentType, scope.row)
+                  | formatMoney
+              }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="ventasExentas"
+            label="V. Extenta"
+            min-width="100"
+          >
+            <template slot-scope="scope">
+              <span v-if="scope.row.sellingType.id == 2">{{
+                calcExenta(selectedInvoice.documentType, scope.row)
+                  | formatMoney
+              }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="V. Gravada" min-width="100">
+            <template slot-scope="scope">
+              <span v-if="scope.row.sellingType.id == 3">{{
+                calcGravada(selectedInvoice.documentType, scope.row)
                   | formatMoney
               }}</span>
             </template>
@@ -266,17 +173,13 @@
               </td>
             </tr>
             <tr>
-              <td align="right" class="w-40">
-                Ventas no sujetas:
-              </td>
+              <td align="right" class="w-40">Ventas no sujetas:</td>
               <td align="right" class="w-25">
                 {{ selectedInvoice.ventasNoSujetas | formatMoney }}
               </td>
             </tr>
             <tr>
-              <td align="right" class="ont-semibold w-40">
-                Venta total:
-              </td>
+              <td align="right" class="ont-semibold w-40">Venta total:</td>
               <td align="right" class="w-25">
                 {{ selectedInvoice.ventaTotal | formatMoney }}
               </td>
@@ -496,7 +399,7 @@
           v-loading="tableloading"
         >
           <el-table-column prop="index" min-width="40" />
-          <el-table-column label="# Factura" min-width="120">
+          <el-table-column label="# Documento" min-width="120">
             <template slot-scope="scope">
               <span>
                 {{ scope.row.authorization }}-{{ scope.row.sequence }}
@@ -571,13 +474,13 @@
                     "
                     v-if="scope.row.status.id == '1'"
                   >
-                    <i class="el-icon-edit-outline"></i> Editar factura
+                    <i class="el-icon-edit-outline"></i> Editar documento
                   </el-dropdown-item>
                   <el-dropdown-item v-if="scope.row.status.id == 1">
-                    <i class="el-icon-printer"></i> Imprimir factura
+                    <i class="el-icon-printer"></i> Imprimir documento
                   </el-dropdown-item>
                   <el-dropdown-item v-if="scope.row.status.id == 2">
-                    <i class="el-icon-printer"></i> Re imprimir factura
+                    <i class="el-icon-printer"></i> Re imprimir documento
                   </el-dropdown-item>
                   <el-dropdown-item
                     :divided="true"
@@ -593,7 +496,7 @@
                     v-if="scope.row.status.id == '1'"
                     @click.native="deleteInvoice(scope.row)"
                   >
-                    <i class="el-icon-delete"></i> Eliminar factura
+                    <i class="el-icon-delete"></i> Eliminar documento
                   </el-dropdown-item>
                   <el-dropdown-item
                     :divided="true"
@@ -603,7 +506,7 @@
                       scope.row.status.id == '2' && scope.row.status.id != '3'
                     "
                   >
-                    Anular factura
+                    Anular venta
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
@@ -630,7 +533,8 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-
+import { numeroALetras, calculatedAmount } from "../../tools";
+import jsPDF from "jspdf";
 export default {
   name: "InvoicesIndex",
   components: { LayoutContent, Notification },
@@ -841,26 +745,63 @@ export default {
     //   );
     // },
 
-    calcUniPrice(documentType, { unitPrice, incTax, sellingType }) {
+    calcUnitPrice(documentType, { unitPrice, incTax, sellingType }) {
+      let uniPrice = null;
       const amount = parseFloat(unitPrice);
       let message = null;
       if (sellingType.id == 1 || sellingType.id == 2) {
-        unitPrice = amount;
+        uniPrice = amount;
       } else {
         if (documentType) {
           switch (documentType.id) {
             case 1:
-              unitPrice = amount * (incTax ? 1 : 1.13);
+              uniPrice = amount * (incTax ? 1 : 1.13);
               break;
             case 2:
-              unitPrice = amount / (incTax ? 1.13 : 1);
+              uniPrice = amount / (incTax ? 1.13 : 1);
               break;
           }
         } else {
           message = "Debe seleccionar un tipo de docuemnto";
         }
       }
-      return unitPrice;
+      return uniPrice;
+    },
+    calcSujeta(documentType, { unitPrice, incTax, sellingType, quantity }) {
+      let uniPrice = null;
+      const amount = parseFloat(unitPrice);
+
+      if ((sellingType.id == 1) | (sellingType.id == 2)) {
+        uniPrice = amount * quantity;
+      }
+
+      return uniPrice;
+    },
+    calcGravada(documentType, { unitPrice, incTax, sellingType, quantity }) {
+      let uniPrice = null;
+      const amount = parseFloat(unitPrice);
+      switch (documentType.id) {
+        case 1:
+          uniPrice = amount * (incTax ? 1 : 1.13) * quantity;
+
+          break;
+        case 2:
+          uniPrice = (amount / (incTax ? 1.13 : 1)) * quantity;
+
+          break;
+      }
+
+      return uniPrice;
+    },
+    calcExenta(documentType, { unitPrice, incTax, sellingType, quantity }) {
+      let uniPrice = null;
+      const amount = parseFloat(unitPrice);
+
+      if ((sellingType.id == 1) | (sellingType.id == 2)) {
+        uniPrice = amount * quantity;
+      }
+
+      return uniPrice;
     },
   },
   computed: {

@@ -1,11 +1,11 @@
 <template>
   <layout-content
     v-loading="loading"
-    page-title="Nueva Factura"
+    page-title="Nueva venta"
     :breadcrumb="[
-      { name: 'Facturas', to: '/sales' },
+      { name: 'Ventas', to: '/invoices' },
 
-      { name: 'Nueva factura', to: null },
+      { name: 'Nuevo documento', to: null },
     ]"
   >
     <!-- dialogo addservicio-->
@@ -333,12 +333,13 @@
                 </el-input>
               </el-form-item>
             </div>
-            <!-- Fecha Factura -->
+            <!-- Fecha documento -->
             <div class="col-span-2">
-              <el-form-item label="Fecha de factura" prop="invoiceDate">
+              <el-form-item  label="Fecha de venta" prop="invoiceDate">
                 <el-date-picker
                   v-model="salesNewForm.invoiceDate"
                   size="small"
+                  class="w-full"
                   type="date"
                   placeholder=""
                   :picker-options="pickerOptions"
@@ -662,7 +663,7 @@
             native-type="submit"
             >Guardar</el-button
           >
-          <el-button size="small">Cancelar</el-button>
+          <el-button size="small" @click="$router.push('/invoices')">Cancelar</el-button>
         </div>
       </div>
     </el-form>
@@ -1144,7 +1145,7 @@ export default {
             for (const d of details) {
               if (d.sellingType === 3) {
                 sumas +=
-                  parseInt(d.quantity) *
+                  parseFloat(d.quantity) *
                   parseFloat(d.unitPrice) *
                   (d.incTax ? 1 : 1.13);
               }
@@ -1154,7 +1155,7 @@ export default {
             for (const d of details) {
               if (d.sellingType === 3) {
                 sumas +=
-                  (parseInt(d.quantity) * parseFloat(d.unitPrice)) /
+                  (parseFloat(d.quantity) * parseFloat(d.unitPrice)) /
                   (d.incTax ? 1.13 : 1);
               }
             }
@@ -1172,10 +1173,12 @@ export default {
             for (const d of details) {
               if (d.sellingType === 3) {
                 if (d.incTax) {
-                  const total = parseInt(d.quantity) * parseFloat(d.unitPrice);
+                  const total =
+                    parseFloat(d.quantity) * parseFloat(d.unitPrice);
                   taxes += total - total / 1.13;
                 } else {
-                  const total = parseInt(d.quantity) * parseFloat(d.unitPrice);
+                  const total =
+                    parseFloat(d.quantity) * parseFloat(d.unitPrice);
                   taxes += total * 1.13 - total;
                 }
               }
