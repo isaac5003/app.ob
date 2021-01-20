@@ -398,8 +398,8 @@
           size="mini"
           v-loading="tableloading"
         >
-          <el-table-column prop="index" min-width="40" />
-          <el-table-column label="# Documento" min-width="120">
+          <el-table-column prop="index" width="40" />
+          <el-table-column label="# Documento" width="120">
             <template slot-scope="scope">
               <span>
                 {{ scope.row.authorization }}-{{ scope.row.sequence }}
@@ -409,15 +409,15 @@
           <el-table-column
             label="Tipo doc."
             prop="documentType.code"
-            min-width="80"
+            width="80"
           />
-          <el-table-column label="Fecha" prop="invoiceDate" min-width="90" />
+          <el-table-column label="Fecha" prop="invoiceDate" width="90" />
           <el-table-column
             label="Cliente"
             prop="customerName"
-            min-width="385"
+             width="375"
           />
-          <el-table-column label="Estado" min-width="110">
+          <el-table-column label="Estado" width="110">
             <template slot-scope="scope">
               <el-tag
                 size="small"
@@ -453,12 +453,12 @@
               >
             </template>
           </el-table-column>
-          <el-table-column label="Total" min-width="80" align="right">
+          <el-table-column label="Total" width="80" align="right">
             <template slot-scope="scope">
               <span>{{ scope.row.ventaTotal | formatMoney }}</span>
             </template>
           </el-table-column>
-          <el-table-column label min-width="65" align="center">
+          <el-table-column label width="65" align="center">
             <template slot-scope="scope">
               <el-dropdown trigger="click" szie="mini">
                 <el-button icon="el-icon-more" size="mini" />
