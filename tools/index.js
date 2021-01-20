@@ -335,6 +335,7 @@ const numeroALetras = (num, currency) => {
 }
 
 const calculatedAmount = (sellingType, documentType, cost, quantity, incTax) => {
+  console.log(sellingType, documentType, cost, quantity, incTax)
   let sujeta = null
   let exenta = null
   let gravada = null
