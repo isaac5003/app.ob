@@ -313,7 +313,6 @@ const numeroALetras = (num, currency) => {
 }
 
 const calculatedAmount = (sellingType, documentType, cost, quantity, incTax) => {
-  console.log(sellingType, documentType, cost, quantity, incTax)
   let sujeta = null
   let exenta = null
   let gravada = null
@@ -421,7 +420,6 @@ const getHeader = (name, nit, nrc, lastDay, docName, dateType = 'date', preTitle
         title = `${docName} PARA EL MES DE ${date}`
         break
       case 'period':
-        console.log(lastDay);
         const fromDate = format(lastDay[0], 'dd/MM/yyyy')
         const toDate = format(lastDay[1], 'dd/MM/yyyy')
         title = `${docName} EN EL PERÍODO DEL ${fromDate} AL ${toDate}`
