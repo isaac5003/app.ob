@@ -219,27 +219,27 @@
           type="index"
           label="#"
           prop="index"
-          min-width="60"
+          width="40"
           align="center"
         />
-        <el-table-column label="Serie" prop="serie" min-width="50" />
-        <el-table-column label="Fecha" prop="date" min-width="90">
+        <el-table-column label="Serie" prop="serie" width="50" />
+        <el-table-column label="Fecha" prop="date"  width="90">
           <template slot-scope="scope">
             <span>{{ scope.row.date | formatDate("YYYY-MM-DD") }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Titulo" prop="title" min-width="400" />
-        <el-table-column label="Cargo" min-width="90" align="right">
+        <el-table-column label="Titulo" prop="title" width="400" />
+        <el-table-column label="Cargo" width="110" align="right">
           <template slot-scope="scope">
             <span>{{ scope.row.cargo | formatMoney }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Tipo" min-width="80" align="center">
+        <el-table-column label="Tipo" width="90" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.accountingEntryType.name }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Estado" min-width="99">
+        <el-table-column label="Estado" width="110">
           <template slot-scope="scope">
             <el-tag
               size="small"
@@ -256,7 +256,7 @@
             <el-tag size="small" type="danger" v-else>Incompleta</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label min-width="60" align="center">
+        <el-table-column label width="70" align="center">
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />
@@ -397,7 +397,7 @@ export default {
     },
     handleSizeChange(val) {
       this.page.limit = val;
-      this.page.fetchEntries();
+      this.fetchEntries();
     },
     getSummaries(param) {
       const { columns, data } = param;
