@@ -829,20 +829,15 @@
               <el-form-item label="Utilidad ejercicios anteriores">
                 <el-select
                   filterable
-                  remote
-                  reserve-keyword
                   default-first-option
                   clearable
                   v-model="specialAccounts.accum_gain"
                   placeholder="Escribe el numero o nombre de la cuenta"
-                  :remote-method="findAccount"
-                  :loading="loadingAccount"
                   class="w-full"
                   size="small"
-                  @focus="filteredCatalog = []"
                 >
                   <el-option
-                    v-for="item in filteredCatalog"
+                    v-for="item in catalogs"
                     :key="item.id"
                     :label="`${item.code} - ${item.name}`"
                     :value="item.id"
@@ -854,20 +849,15 @@
               <el-form-item label="Perdida ejercicios anteriores">
                 <el-select
                   filterable
-                  remote
-                  reserve-keyword
                   default-first-option
                   clearable
                   v-model="specialAccounts.accum_lost"
                   placeholder="Escribe el numero o nombre de la cuenta"
-                  :remote-method="findAccount"
-                  :loading="loadingAccount"
                   class="w-full"
                   size="small"
-                  @focus="filteredCatalog = []"
                 >
                   <el-option
-                    v-for="item in filteredCatalog"
+                    v-for="item in catalogs"
                     :key="item.id"
                     :label="`${item.code} - ${item.name}`"
                     :value="item.id"
@@ -879,20 +869,15 @@
               <el-form-item label="Utilidad presente ejercicio">
                 <el-select
                   filterable
-                  remote
-                  reserve-keyword
                   default-first-option
                   clearable
                   v-model="specialAccounts.curre_gain"
                   placeholder="Escribe el numero o nombre de la cuenta"
-                  :remote-method="findAccount"
-                  :loading="loadingAccount"
                   class="w-full"
                   size="small"
-                  @focus="filteredCatalog = []"
                 >
                   <el-option
-                    v-for="item in filteredCatalog"
+                    v-for="item in catalogs"
                     :key="item.id"
                     :label="`${item.code} - ${item.name}`"
                     :value="item.id"
@@ -904,20 +889,15 @@
               <el-form-item label="Perdida presente ejercicio">
                 <el-select
                   filterable
-                  remote
-                  reserve-keyword
                   default-first-option
                   clearable
                   v-model="specialAccounts.curre_lost"
                   placeholder="Escribe el numero o nombre de la cuenta"
-                  :remote-method="findAccount"
-                  :loading="loadingAccount"
                   class="w-full"
                   size="small"
-                  @focus="filteredCatalog = []"
                 >
                   <el-option
-                    v-for="item in filteredCatalog"
+                    v-for="item in catalogs"
                     :key="item.id"
                     :label="`${item.code} - ${item.name}`"
                     :value="item.id"
@@ -936,6 +916,7 @@
               border
               default-expand-all
               size="mini"
+              v-loading="tableloading"
             >
               <el-table-column label="Cuenta" min-width="200">
                 <template slot-scope="scope">
@@ -1005,7 +986,16 @@
         </div>
 
         <div class="flex justify-end mt-4">
-          <el-button type="primary" size="small" native-type="submit"
+          <el-button
+            type="primary"
+            size="small"
+            @click.native="
+              submitBalance(
+                tableData,
+
+                specialAccounts
+              )
+            "
             >Guardar</el-button
           >
           <el-button size="small">Cancelar</el-button>
@@ -1211,12 +1201,15 @@ export default {
     const accountCatalogs = () =>
       this.$axios.get("/entries/catalog", { params: this.page });
     const accounts = () => this.$axios.get("/entries/catalog");
-    Promise.all([accountCatalogs(), accounts()])
+    const balance = () => this.$axios.get("/entries/setting/balance-general");
+    Promise.all([accountCatalogs(), accounts(), balance()])
       .then((res) => {
-        const [accountCatalogs, accounts] = res;
+        const [accountCatalogs, accounts, balance] = res;
         this.accounts = accountCatalogs.data.accountingCatalog;
         this.accountsCount = accountCatalogs.data.count;
         this.catalogs = accounts.data.accountingCatalog;
+        this.tableData = balance.data.balanceGeneral.report;
+        this.specialAccounts = { ...balance.data.balanceGeneral.special };
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
@@ -1284,64 +1277,7 @@ export default {
       showEditMayorDialog: false,
       showEditAccount: false,
       searchValue: "",
-      tableData: [
-        {
-          id: 1,
-          name: "ACTIVO",
-          display: "ACTIVO",
-          children: [
-            {
-              id: 11,
-              name: "ACTIVO CORRIENTE",
-              display: "ACTIVO CORRIENTE",
-              showAdd: true,
-              children: [],
-            },
-            {
-              id: 12,
-              name: "ACTIVO NO CORRIENTE",
-              display: "ACTIVO NO CORRIENTE",
-              showAdd: true,
-              children: [],
-            },
-          ],
-        },
-        {
-          id: 2,
-          name: "PASIVO",
-          display: "PASIVO",
-          children: [
-            {
-              id: 21,
-              name: "PASIVO CORRIENTE",
-              display: "PASIVO CORRIENTE",
-              showAdd: true,
-              children: [],
-            },
-            {
-              id: 22,
-              name: "PASIVO NO CORRIENTE",
-              display: "PASIVO NO CORRIENTE",
-              showAdd: true,
-              children: [],
-            },
-          ],
-        },
-        {
-          id: 3,
-          name: "PATRIMONIO",
-          display: "PATRIMONIO",
-          children: [
-            {
-              id: 31,
-              name: "CAPITAL Y RESERVAS",
-              display: "CAPITAL Y RESERVAS",
-              showAdd: true,
-              children: [],
-            },
-          ],
-        },
-      ],
+      tableData: [],
       specialAccounts: {
         accum_gain: "",
         accum_lost: "",
@@ -1537,6 +1473,7 @@ export default {
       showChangeDisplayNameEstado: false,
       allowNewDisplayNameEstado: false,
       newDisplayNameEstado: "",
+      filteredCatalogBalance: [],
     };
   },
   methods: {
@@ -1927,7 +1864,77 @@ export default {
           break;
       }
     },
+    findAccountBalance(query) {
+      if (query !== "") {
+        this.loadingAccount = true;
+        setTimeout(() => {
+          this.filteredCatalogBalance = this.catalogs.filter((c) => {
+            return (
+              c.id.includes(query.toLowerCase()) ||
+              c.code.toLowerCase().includes(query.toLowerCase()) ||
+              c.name.toLowerCase().includes(query.toLowerCase())
+            );
+          });
+          this.loadingAccount = false;
+        }, 200);
+      } else {
+        this.filteredCatalogBalance = this.catalogs;
+      }
+    },
+    fetchBalance() {
+      this.$axios
+        .get("/entries/setting/balance-general")
+        .then((res) => {
+          this.tableData = balance.data.balanceGeneral.report;
+        })
+        .catch((err) => {
+          this.errorMessage = err.response.data.message;
+        })
+        .then((alw) => (this.tableloading = false));
+    },
+    submitBalance(report, special) {
+      this.$confirm(
+        "¿Estás seguro que deseas actualizar balance General?",
+        "Confirmación",
+        {
+          confirmButtonText: "Si, guardar",
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
 
+              this.$axios
+                .put(`/entries/setting/balance-general`, {
+                  settings: {
+                    report: report,
+                    special: special,
+                  },
+                })
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Exito",
+                    message: res.data.message,
+                  });
+                  this.fetchBalance();
+
+                  done();
+                })
+                .catch((err) => (this.errorMessage = err.response.data.message))
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = "Si, guardar";
+                });
+            } else {
+              instance.confirmButtonLoading = false;
+              instance.confirmButtonText = "Si, guardar";
+              done();
+            }
+          },
+        }
+      );
+    },
     //estado de resultados
 
     addSubAccountEstado(selected, list) {
