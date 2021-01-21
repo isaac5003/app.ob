@@ -1,11 +1,11 @@
 <template>
   <layout-content
     v-loading="loading"
-    page-title="Editar Factura"
+    page-title="Editar documento"
     :breadcrumb="[
-      { name: 'Facturas', to: '/sales' },
+      { name: 'Ventas', to: '/invoices' },
 
-      { name: 'Editar factura', to: null },
+      { name: 'Editar documento', to: null },
     ]"
   >
     <!-- dialogo addservicio-->
@@ -330,7 +330,7 @@
             </div>
             <!-- Fecha Factura -->
             <div class="col-span-2">
-              <el-form-item label="Fecha de factura" prop="invoiceRawDate">
+              <el-form-item label="Fecha de venta" prop="invoiceRawDate">
                 <el-date-picker
                   v-model="salesEditForm.invoiceRawDate"
                   size="small"
@@ -656,7 +656,9 @@
             native-type="submit"
             >Guardar</el-button
           >
-          <el-button size="small">Cancelar</el-button>
+          <el-button size="small" @click="$router.push('/invoices')"
+            >Cancelar</el-button
+          >
         </div>
       </div>
     </el-form>
@@ -664,15 +666,15 @@
 </template>
 
 <script>
-import LayoutContent from "../../../components/layout/Content";
+import LayoutContent from "../../components/layout/Content";
 import {
   inputValidation,
   selectValidation,
   checkBeforeLeave,
   checkBeforeEnter,
   amountValidate,
-} from "../../../tools";
-import Notification from "../../../components/Notification";
+} from "../../tools";
+import Notification from "../../components/Notification";
 
 const storagekey = "Edit-sales";
 
@@ -681,7 +683,7 @@ export default {
   components: { LayoutContent, Notification },
   fetch() {
     this.$axios
-      .get(`/invoices/${this.$route.params.id}`)
+      .get(`/invoices/${this.$route.query.ref}`)
       .then(({ data }) => {
         const customer = () =>
           this.$axios.get(`/customers/${data.invoice.customer.id}`, {
@@ -1162,7 +1164,7 @@ export default {
             for (const d of details) {
               if (d.sellingType === 3) {
                 sumas +=
-                  parseInt(d.quantity) *
+                  parseFloat(d.quantity) *
                   parseFloat(d.unitPrice) *
                   (d.incTax ? 1 : 1.13);
               }
@@ -1172,7 +1174,7 @@ export default {
             for (const d of details) {
               if (d.sellingType === 3) {
                 sumas +=
-                  (parseInt(d.quantity) * parseFloat(d.unitPrice)) /
+                  (parseFloat(d.quantity) * parseFloat(d.unitPrice)) /
                   (d.incTax ? 1.13 : 1);
               }
             }
@@ -1190,10 +1192,12 @@ export default {
             for (const d of details) {
               if (d.sellingType === 3) {
                 if (d.incTax) {
-                  const total = parseInt(d.quantity) * parseFloat(d.unitPrice);
+                  const total =
+                    parseFloat(d.quantity) * parseFloat(d.unitPrice);
                   taxes += total - total / 1.13;
                 } else {
-                  const total = parseInt(d.quantity) * parseFloat(d.unitPrice);
+                  const total =
+                    parseFloat(d.quantity) * parseFloat(d.unitPrice);
                   taxes += total * 1.13 - total;
                 }
               }

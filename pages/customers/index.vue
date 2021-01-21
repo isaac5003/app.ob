@@ -163,13 +163,13 @@
         v-loading="tableloading"
       >
         <el-table-column prop="index" width="40" />
-        <el-table-column label="Nombre" prop="name" min-width="370" />
+        <el-table-column label="Nombre" prop="name" min-width="360" />
         <el-table-column
           label="Tipo"
           prop="customerType.name"
           min-width="130"
         />
-        <el-table-column label="NIT" prop="nit" min-width="160" />
+        <el-table-column label="NIT" prop="nit" min-width="150" />
         <el-table-column label="NRC" prop="nrc" min-width="90" />
         <el-table-column label="Estado" width="110">
           <template slot-scope="scope">
@@ -187,7 +187,7 @@
             >
           </template>
         </el-table-column>
-        <el-table-column label width="70" align="center">
+        <el-table-column label width="80" align="center">
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />

@@ -1,3 +1,6 @@
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+
 function getIcon(icon) {
   switch (icon) {
     case "user":
@@ -120,7 +123,6 @@ function amountValidate(trigger, required = false, min = null, max = null) {
 
 }
 
-
 function amountValidate(trigger, required = false, min = null, max = null) {
   const validation = (rule, value, callback) => {
     if (value == "" && required) {
@@ -144,12 +146,229 @@ function amountValidate(trigger, required = false, min = null, max = null) {
   ];
 }
 
+const numeroALetras = (num, currency) => {
+  currency = currency || {};
+  var data = {
+    numero: num,
+    enteros: Math.floor(num),
+    centavos: (((Math.round(num * 100)) - (Math.floor(num) * 100))),
+    letrasCentavos: '',
+    letrasMonedaPlural: currency.plural || 'DOLARES',//'PESOS', 'DÃƒÂ³lares', 'BolÃƒÂ­vares', 'etcs'
+    letrasMonedaSingular: currency.singular || 'DOLAR', //'PESO', 'DÃƒÂ³lar', 'Bolivar', 'etc'
+    letrasMonedaCentavoPlural: currency.centPlural || 'CENTAVOS',
+    letrasMonedaCentavoSingular: currency.centSingular || 'CENTAVO'
+  };
+
+  if (data.centavos == 100) {
+    data.letrasCentavos = '00/100';
+    data.enteros++
+  } else if (data.centavos > 0) {
+    data.letrasCentavos = `${data.centavos.toString().length == 1 ? '0' : ''}${data.centavos}/100`;
+  } else {
+    data.letrasCentavos = '00/100';
+  };
+
+  if (data.enteros == 0)
+    return 'CERO ' + data.letrasMonedaPlural + ' ' + data.letrasCentavos;
+  if (data.enteros == 1)
+    return Millones(data.enteros) + ' ' + data.letrasMonedaSingular + ' ' + data.letrasCentavos;
+  else
+    return Millones(data.enteros) + ' ' + data.letrasMonedaPlural + ' ' + data.letrasCentavos;
+
+  // CÃ³digo basado en https://gist.github.com/alfchee/e563340276f89b22042a
+  function Unidades(num) {
+
+    switch (num) {
+      case 1:
+        return 'UN';
+      case 2:
+        return 'DOS';
+      case 3:
+        return 'TRES';
+      case 4:
+        return 'CUATRO';
+      case 5:
+        return 'CINCO';
+      case 6:
+        return 'SEIS';
+      case 7:
+        return 'SIETE';
+      case 8:
+        return 'OCHO';
+      case 9:
+        return 'NUEVE';
+    }
+
+    return '';
+  }//Unidades()
+
+  function Decenas(num) {
+
+    var decena = Math.floor(num / 10);
+    var unidad = num - (decena * 10);
+
+    switch (decena) {
+      case 1:
+        switch (unidad) {
+          case 0:
+            return 'DIEZ';
+          case 1:
+            return 'ONCE';
+          case 2:
+            return 'DOCE';
+          case 3:
+            return 'TRECE';
+          case 4:
+            return 'CATORCE';
+          case 5:
+            return 'QUINCE';
+          default:
+            return 'DIECI' + Unidades(unidad);
+        }
+      case 2:
+        switch (unidad) {
+          case 0:
+            return 'VEINTE';
+          default:
+            return 'VEINTI' + Unidades(unidad);
+        }
+      case 3:
+        return DecenasY('TREINTA', unidad);
+      case 4:
+        return DecenasY('CUARENTA', unidad);
+      case 5:
+        return DecenasY('CINCUENTA', unidad);
+      case 6:
+        return DecenasY('SESENTA', unidad);
+      case 7:
+        return DecenasY('SETENTA', unidad);
+      case 8:
+        return DecenasY('OCHENTA', unidad);
+      case 9:
+        return DecenasY('NOVENTA', unidad);
+      case 0:
+        return Unidades(unidad);
+    }
+  }//Unidades()
+
+  function DecenasY(strSin, numUnidades) {
+    if (numUnidades > 0)
+      return strSin + ' Y ' + Unidades(numUnidades)
+
+    return strSin;
+  }//DecenasY()
+
+  function Centenas(num) {
+    var centenas = Math.floor(num / 100);
+    var decenas = num - (centenas * 100);
+
+    switch (centenas) {
+      case 1:
+        if (decenas > 0)
+          return 'CIENTO ' + Decenas(decenas);
+        return 'CIEN';
+      case 2:
+        return 'DOSCIENTOS ' + Decenas(decenas);
+      case 3:
+        return 'TRESCIENTOS ' + Decenas(decenas);
+      case 4:
+        return 'CUATROCIENTOS ' + Decenas(decenas);
+      case 5:
+        return 'QUINIENTOS ' + Decenas(decenas);
+      case 6:
+        return 'SEISCIENTOS ' + Decenas(decenas);
+      case 7:
+        return 'SETECIENTOS ' + Decenas(decenas);
+      case 8:
+        return 'OCHOCIENTOS ' + Decenas(decenas);
+      case 9:
+        return 'NOVECIENTOS ' + Decenas(decenas);
+    }
+
+    return Decenas(decenas);
+  }//Centenas()
+
+  function Seccion(num, divisor, strSingular, strPlural) {
+    var cientos = Math.floor(num / divisor)
+    var resto = num - (cientos * divisor)
+
+    var letras = '';
+
+    if (cientos > 0)
+      if (cientos > 1)
+        letras = Centenas(cientos) + ' ' + strPlural;
+      else
+        letras = strSingular;
+
+    if (resto > 0)
+      letras += '';
+
+    return letras;
+  }//Seccion()
+
+  function Miles(num) {
+    var divisor = 1000;
+    var cientos = Math.floor(num / divisor)
+    var resto = num - (cientos * divisor)
+
+    var strMiles = Seccion(num, divisor, 'UN MIL', 'MIL');
+    var strCentenas = Centenas(resto);
+
+    if (strMiles == '')
+      return strCentenas;
+
+    return strMiles + ' ' + strCentenas;
+  }//Miles()
+
+  function Millones(num) {
+    var divisor = 1000000;
+    var cientos = Math.floor(num / divisor)
+    var resto = num - (cientos * divisor)
+
+    var strMillones = Seccion(num, divisor, 'UN MILLON DE', 'MILLONES DE');
+    var strMiles = Miles(resto);
+
+    if (strMillones == '')
+      return strMiles;
+
+    return strMillones + ' ' + strMiles;
+  }//Millones()
+
+}
+
+const calculatedAmount = (sellingType, documentType, cost, quantity, incTax) => {
+  let sujeta = null
+  let exenta = null
+  let gravada = null
+  const amount = parseFloat(quantity) * parseFloat(cost)
+  switch (sellingType) {
+    case '1':
+      sujeta = amount
+      break;
+    case '2':
+      exenta = amount
+      break;
+    case '3':
+      switch (documentType) {
+        case "1":
+          gravada = amount * (incTax ? 1 : 1.13);
+          break;
+        case "2":
+          gravada = amount / (incTax ? 1.13 : 1);
+          break;
+      }
+      break;
+  }
+  return { sujeta, exenta, gravada }
+}
+
 /**
  * Funcion que permite identificar si hay informacion sin guardar
  * @param {object} self Referencia a this.
  * @param {text} storagekey Nombre de la llave a usar en localstorage
  * @param {function} next Funcion para conginuar
  */
+
 function checkBeforeLeave(self, storagekey, next) {
   const stored = localStorage.getItem(storagekey);
   if (!stored) {
@@ -211,6 +430,125 @@ function hasModule(module, user) {
   return branch.modules.map((m) => m.id).includes(module);
 }
 
+const getHeader = (name, nit, nrc, lastDay, docName, dateType = 'date', preTitle = null) => {
+  let title = docName
+  if (lastDay) {
+    let date = null
+    switch (dateType) {
+      case 'date':
+        date = format(lastDay, 'dd - MMMM - yyyy', { locale: es }).split('-').join('de')
+        title = `${docName} AL ${date}`
+        break;
+      case 'month':
+        date = format(lastDay, 'MMMM - yyyy', { locale: es }).split('-').join('de')
+        title = `${docName} PARA EL MES DE ${date}`
+        break
+      case 'period':
+        console.log(lastDay);
+        const fromDate = format(lastDay[0], 'dd/MM/yyyy')
+        const toDate = format(lastDay[1], 'dd/MM/yyyy')
+        title = `${docName} EN EL PERÍODO DEL ${fromDate} AL ${toDate}`
+        break
+    }
+  }
+  return (currentPage, pageCount, pageSize) => {
+    let header = [
+      {
+        columns: [
+          {
+            text: name.toUpperCase(),
+            fontSize: 12,
+            bold: true,
+
+          }
+        ],
+        margin: [20, 15, 20, 0],
+      },
+    ]
+
+    if (!preTitle === null) {
+      header.push(
+        {
+          columns: [
+            {
+              text: preTitle,
+              fontSize: 10,
+              margin: [0, 5, 0, 0],
+            },
+          ],
+          margin: [20, 0, 20, 0],
+        },
+      )
+    }
+    header.push(
+      {
+        columns: [
+          {
+            text: title.toUpperCase(),
+            fontSize: 10,
+            margin: [0, 5, 0, 0],
+            width: '70%'
+          },
+          {
+            text: [
+              {
+                text: 'NIT: ',
+                bold: true
+              },
+              {
+                text: nit
+              },
+              {
+                text: '  NRC: ',
+                bold: true
+              },
+              {
+                text: nrc
+              }
+            ],
+            fontSize: 9,
+            alignment: 'right',
+            margin: [0, 5, 0, 0],
+            width: '30%'
+          }
+        ],
+        margin: [20, 0, 20, 0],
+      },
+      {
+        canvas: [{ type: 'line', x1: 20, y1: 5, x2: pageSize.width - 20, y2: 5, lineWidth: 1 }]
+      }
+    )
+    return header
+  }
+}
+
+const getFooter = () => {
+  return (currentPage, pageCount, pageSize) => {
+    return [
+      {
+        canvas: [{ type: 'line', x1: 20, y1: 5, x2: pageSize.width - 20, y2: 5, lineWidth: 1 }]
+      },
+      {
+        columns: [
+          {
+            text: format(new Date(), 'dd/MM/yyyy HH:mm:ss'),
+            fontSize: 9,
+            margin: [0, 5, 0, 0]
+
+          },
+          {
+            text: `${currentPage.toString()} / ${pageCount}`,
+            fontSize: 9,
+            alignment: 'right',
+            margin: [0, 5, 0, 0]
+          }
+        ],
+        margin: [20, 0, 20, 0],
+      }
+    ]
+  }
+}
+
 module.exports = {
   getIcon,
   inputValidation,
@@ -219,4 +557,8 @@ module.exports = {
   checkBeforeLeave,
   checkBeforeEnter,
   hasModule,
+  numeroALetras,
+  calculatedAmount,
+  getHeader,
+  getFooter
 };

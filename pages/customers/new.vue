@@ -363,7 +363,7 @@
           </div>
         </div>
       </div>
-      <div class="flex justify-end" v-if="activeTab != 'integrations'">
+      <div class="flex justify-end">
         <el-button type="primary" size="small" native-type="submit"
           >Guardar</el-button
         >
@@ -429,7 +429,7 @@ export default {
       })
       .catch((err) => {
         this.$message.error(err.response.data.message);
-        this.$router.push("/services");
+        this.$router.push("/customers");
       })
       .then((alw) => (this.pageloading = false));
 

@@ -7,100 +7,85 @@
       { name: 'Nueva partida', to: null },
     ]"
   >
-    <!-- dialogo editdetalledepartida-->
+    <!-- dialogo agregar detalle partida-->
     <el-dialog
-      title="Editar detalle de partida"
-      :visible.sync="showAccountingDetail"
+      title="Agregar detalle de partida"
+      :visible.sync="showNewEntryDetail"
       width="550px"
       :close-on-click-modal="false"
       :append-to-body="true"
     >
       <el-form
-        :model="formAccountingDetail"
+        :model="newEntryDetailForm"
         status-icon
-        :rules="entryDetailFormRules"
-        ref="formAccountingDetail"
+        :rules="newEntryDetailFormRules"
+        ref="newEntryDetailForm"
       >
-        <!-- first row -->
-        <div class="grid grid-cols-12">
-          <!-- cuenta contable -->
-          <div class="col-span-12">
-            <el-form-item label="Cuenta contable" prop="accountingCatalog">
-              <el-select
-                v-model="formAccountingDetail.accountingCatalog"
-                clearable
-                filterable
-                default-first-option
-                size="small"
-                class="w-full"
-                placeholder="Seleccionar"
-              >
-                <el-option
-                  v-for="a in accountingCatalog"
-                  :key="a.id"
-                  :label="`${a.code} - ${a.name}`"
-                  :value="a.id"
-                >
-                </el-option>
-              </el-select>
-            </el-form-item>
-          </div>
-        </div>
-        <!-- second row -->
+        <el-form-item label="Cuenta contable" prop="accountingCatalog">
+          <el-select
+            v-model="newEntryDetailForm.accountingCatalog"
+            clearable
+            filterable
+            default-first-option
+            size="small"
+            class="w-full"
+            placeholder="Seleccionar"
+          >
+            <el-option
+              v-for="a in accountingCatalog"
+              :key="a.id"
+              :label="`${a.code} - ${a.name}`"
+              :value="a.id"
+              :disabled="a.isParent == true"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Concepto" prop="concept">
+          <el-input
+            v-model="newEntryDetailForm.concept"
+            size="small"
+            autocomplete="off"
+            class="w-full"
+            :disabled="newEntryDetailForm.accountingCatalog === ''"
+          />
+        </el-form-item>
         <div class="grid grid-cols-12 gap-4">
-          <!-- concepto -->
-          <div class="col-span-12">
-            <el-form-item label="Concepto" prop="concept">
-              <el-input
-                v-model="formAccountingDetail.concept"
-                size="small"
-                autocomplete="off"
-                style="width: 100%"
-                :disabled="formAccountingDetail.accountingCatalog === ''"
-              />
-            </el-form-item>
-          </div>
-        </div>
-        <!-- third row -->
-        <div class="grid grid-cols-12 gap-4">
-          <!-- Cargo -->
           <div class="col-span-6">
             <el-form-item label="Cargo" prop="cargo">
               <el-input-number
                 type="number"
                 :min="0"
                 :step="0.01"
-                v-model="formAccountingDetail.cargo"
+                v-model="newEntryDetailForm.cargo"
                 size="small"
                 autocomplete="off"
                 style="width: 100%"
-                :disabled="formAccountingDetail.entryAccounting === ''"
+                :disabled="newEntryDetailForm.accountingCatalog === ''"
               />
             </el-form-item>
           </div>
-          <!-- Cargo -->
           <div class="col-span-6">
             <el-form-item label="Abono" prop="abono">
               <el-input-number
                 type="number"
                 :min="0"
                 :step="0.01"
-                v-model="formAccountingDetail.abono"
+                v-model="newEntryDetailForm.abono"
                 size="small"
                 autocomplete="off"
                 style="width: 100%"
-                :disabled="formAccountingDetail.entryAccounting === ''"
+                :disabled="newEntryDetailForm.accountingCatalog === ''"
               />
             </el-form-item>
           </div>
         </div>
-        <!-- boton guardar cancelar -->
-        <div class="flex justify-end dialog-footer">
+        <div class="flex justify-end">
           <el-button
             type="primary"
             size="small"
             @click.native="
-              addToEntryDetails('formAccountingDetail', formAccountingDetail)
+              addToEntryDetails('newEntryDetailForm', newEntryDetailForm)
             "
             >Guardar</el-button
           >
@@ -111,160 +96,262 @@
       </el-form>
     </el-dialog>
 
-    <div class="flex flex-col space-y-2">
-      <el-form label-position="top">
-        <!-- primer div tipo partida, correlativo y rango de fechas -->
-        <div class="grid grid-cols-12 gap-4 relative">
-          <div class="col-span-4">
-            <el-form-item label="Tipo de patida" prop="select">
+    <!-- dialogo editdetalledepartida-->
+    <el-dialog
+      title="Editar detalle de partida"
+      :visible.sync="showEditEntryDetail"
+      width="550px"
+      :close-on-click-modal="false"
+      :append-to-body="true"
+    >
+      <el-form
+        :model="editEntryDetailForm"
+        status-icon
+        :rules="editEntryDetailFormRules"
+        ref="editEntryDetailForm"
+      >
+        <div class="grid grid-cols-12">
+          <div class="col-span-12">
+            <el-form-item label="Cuenta contable" prop="accountingCatalog">
               <el-select
-                v-model="formAccountingDetail.select"
+                v-model="editEntryDetailForm.accountingCatalog"
+                clearable
+                filterable
+                default-first-option
                 size="small"
                 class="w-full"
-                placeholder="Select"
-                @change="changeEntryType(formAccountingDetail)"
+                placeholder="Seleccionar"
               >
                 <el-option
-                  v-for="e in entryTypes"
-                  :key="e.id"
-                  :label="`${e.code} - ${e.name}`"
-                  :value="e.id"
-                >
-                </el-option>
+                  v-for="aC in accountingCatalog"
+                  :key="aC.id"
+                  :label="`${aC.code} - ${aC.name}`"
+                  :value="aC.id"
+                  :disabled="aC.isParent == true"
+                />
               </el-select>
             </el-form-item>
           </div>
-          <div class="col-start-8 col-span-2">
-            <el-form-item label="N° de correlativo">
+        </div>
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-12">
+            <el-form-item label="Concepto" prop="concept">
               <el-input
-                v-model="formAccountingDetail.serie"
-                :disabled="true"
+                v-model="editEntryDetailForm.concept"
+                size="small"
+                autocomplete="off"
+                style="width: 100%"
+                :disabled="editEntryDetailForm.accountingCatalog === ''"
+              />
+            </el-form-item>
+          </div>
+        </div>
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-6">
+            <el-form-item label="Cargo" prop="cargo">
+              <el-input-number
+                type="number"
+                :min="0"
+                :step="0.01"
+                v-model="editEntryDetailForm.cargo"
+                size="small"
+                autocomplete="off"
+                style="width: 100%"
+                :disabled="editEntryDetailForm.accountingCatalog === ''"
+              />
+            </el-form-item>
+          </div>
+          <div class="col-span-6">
+            <el-form-item label="Abono" prop="abono">
+              <el-input-number
+                type="number"
+                :min="0"
+                :step="0.01"
+                v-model="editEntryDetailForm.abono"
+                size="small"
+                autocomplete="off"
+                style="width: 100%"
+                :disabled="editEntryDetailForm.accountingCatalog === ''"
+              />
+            </el-form-item>
+          </div>
+        </div>
+        <div class="flex justify-end dialog-footer">
+          <el-button
+            type="primary"
+            @click.native="
+              updateDetail(
+                editingEntryDetail,
+                'editEntryDetailForm',
+                editEntryDetailForm
+              )
+            "
+            size="small"
+            >Guardar</el-button
+          >
+          <el-button @click="showEditEntryDetail = false" size="small"
+            >Cancelar</el-button
+          >
+        </div>
+      </el-form>
+    </el-dialog>
+
+    <div class="flex flex-col">
+      <el-form
+        label-position="top"
+        :model="newEntryForm"
+        :rules="newEntryFormRules"
+        class="flex flex-col space-y-4"
+        @submit.native.prevent="
+          saveEntry('newEntryForm', newEntryForm, accountingEntryDetails)
+        "
+        ref="newEntryForm"
+      >
+        <div class="flex flex-col">
+          <div class="grid grid-cols-12 gap-4">
+            <div class="col-span-3">
+              <el-form-item label="Tipo de patida" prop="entryType">
+                <el-select
+                  v-model="newEntryForm.entryType"
+                  size="small"
+                  class="w-full"
+                  placeholder="Seleccionar"
+                  @change="changeEntryType(newEntryForm)"
+                >
+                  <el-option
+                    v-for="e in entryTypes"
+                    :key="e.id"
+                    :label="`${e.code} - ${e.name}`"
+                    :value="e.id"
+                  />
+                </el-select>
+              </el-form-item>
+            </div>
+            <div class="col-start-9 col-span-2">
+              <el-form-item label="N° de correlativo" prop="serie">
+                <el-input
+                  v-model="newEntryForm.serie"
+                  :disabled="true"
+                  class="w-full"
+                  size="small"
+                />
+              </el-form-item>
+            </div>
+            <div class="col-start-11 col-span-3">
+              <el-form-item label="Fecha de partida :" prop="date">
+                <el-date-picker
+                  v-model="newEntryForm.date"
+                  size="small"
+                  style="width: 100%"
+                  type="date"
+                  format="dd MMMM yyyy"
+                  value-format="yyyy-MM-dd"
+                  :picker-options="datePickerOptions"
+                  @change="changeEntryType(newEntryForm)"
+                />
+              </el-form-item>
+            </div>
+          </div>
+          <div class="grid grid-cols-12 gap-4">
+            <div class="col-span-8">
+              <el-form-item label="Titulo de la partida" prop="title">
+                <el-input
+                  v-model="newEntryForm.title"
+                  class="w-full"
+                  size="small"
+                />
+              </el-form-item>
+            </div>
+            <div class="col-span-2">
+              <el-form-item label="Opciones de partida" prop="scuared">
+                <el-checkbox
+                  v-model="newEntryForm.scuared"
+                  disabled
+                  border
+                  size="small"
+                  class="w-full"
+                  >Cuadrada</el-checkbox
+                >
+              </el-form-item>
+            </div>
+            <div class="col-span-2">
+              <el-form-item label="Fecha de partida" prop="accounted">
+                <el-checkbox
+                  v-model="newEntryForm.accounted"
+                  disabled
+                  border
+                  size="small"
+                  class="w-full"
+                  >Contabilizada</el-checkbox
+                >
+              </el-form-item>
+            </div>
+          </div>
+          <div class="grid grid-cols-12 gap-4">
+            <div class="col-start-11 col-span-2">
+              <el-button
+                @click="openNewEntryDetail()"
+                type="primary"
+                icon="el-icon-plus"
                 class="w-full"
                 size="small"
+                >Agregar detalle</el-button
               >
-              </el-input>
-            </el-form-item>
-          </div>
-          <div class="col-start-10 col-span-3">
-            <el-form-item label="Fecha de partida :">
-              <el-date-picker
-                v-model="formAccountingDetail.fecha"
-                size="small"
-                style="width: 100%"
-                type="date"
-                format="dd MMMM yyyy"
-                value-format="yyyy-MM-dd"
-                @change="changeEntryType(formAccountingDetail)"
-              >
-                >
-              </el-date-picker>
-            </el-form-item>
+            </div>
           </div>
         </div>
-        <!-- segundo div para titulo partida, opciones de partida -->
-        <div class="grid grid-cols-12 gap-4 relative">
-          <div class="col-start-1 col-span-8">
-            <el-form-item label="Titulo de la partida">
-              <el-input v-model="input" class="w-full" size="small"> </el-input>
-            </el-form-item>
-          </div>
-          <div class="col-span-2">
-            <el-form-item label="Opciones de partida">
-              <el-checkbox v-model="checked" border size="small" class="w-full"
-                >Cuadrada</el-checkbox
-              >
-            </el-form-item>
-          </div>
-          <div class="col-span-2">
-            <el-form-item label=" ">
-              <el-checkbox v-model="checked" border size="small" class="w-full"
-                >Contabilizada</el-checkbox
-              >
-            </el-form-item>
-          </div>
-        </div>
-        <!-- boton de Agregar -->
-        <div class="grid grid-cols-12 gap-4 relative">
-          <div class="col-start-11 col-span-2">
-            <el-button
-              @click="showAccountingDetail = true"
-              type="primary"
-              icon="el-icon-plus"
-              class="w-full"
-              size="small"
-              >Agregar detalle</el-button
-            >
-          </div>
-        </div>
-        <!-- Tabla -->
-        <div class="mt-4">
-          <el-table
-            :data="accountingEntryDetails"
-            stripe
+        <el-table
+          :data="accountingEntryDetails"
+          stripe
+          size="mini"
+          :summary-method="getSummaries"
+          show-summary
+        >
+          <el-table-column type="index" label="#" min-width="70" />
+          <el-table-column
+            label="Cuenta contable"
+            prop="catalogCode"
+            min-width="150"
+          />
+          <el-table-column label="Concepto" prop="concept" min-width="425" />
+          <el-table-column label="Cargo" min-width="100">
+            <template slot-scope="scope">
+              <span> {{ scope.row.cargo | formatMoney }} </span>
+            </template>
+          </el-table-column>
+          <el-table-column label="Abono" min-width="100">
+            <template slot-scope="scope">
+              <span> {{ scope.row.abono | formatMoney }} </span>
+            </template>
+          </el-table-column>
+          <el-table-column min-width="120">
+            <template slot-scope="scope">
+              <div class="flex flex-row items-center justify-center">
+                <el-button
+                  type="primary"
+                  size="small"
+                  icon="el-icon-edit"
+                  @click="openEditEntryDetail(scope.$index, scope.row)"
+                />
+                <el-button
+                  type="danger"
+                  size="small"
+                  icon="el-icon-delete"
+                  @click="deleteDetail(scope.$index)"
+                />
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+        <div class="flex flex-row justify-end space-x-4">
+          <el-button
+            type="primary"
+            icon="el-icon-check"
             size="small"
-            :summary-method="getSummaries"
-            show-summary
+            native-type="submit"
+            >Guardar</el-button
           >
-            <el-table-column label="#" min-width="70"> </el-table-column>
-            <el-table-column
-              label="Cuenta contable"
-              prop="catalogCode"
-              min-width="180"
-            >
-            </el-table-column>
-            <el-table-column
-              label="Concepto"
-              prop="concept"
-              min-width="180"
-            ></el-table-column>
-            <el-table-column label="Cargo" min-width="180">
-              <template slot-scope="scope">
-                <span> {{ scope.row.cargo | formatMoney }} </span>
-              </template></el-table-column
-            >
-            <el-table-column label="Abono" min-width="180">
-              <template slot-scope="scope">
-                <span> {{ scope.row.abono | formatMoney }} </span>
-              </template>
-            </el-table-column>
-            <el-table-column
-              style="margin-left: 20px"
-              label="Opciones"
-              min-width="180"
-            >
-              <template slot-scope="">
-                <div class="flex flex-row items-center justify-center">
-                  <el-button
-                    type="primary"
-                    size="small"
-                    icon="el-icon-edit"
-                  ></el-button>
-                  <el-button
-                    type="danger"
-                    size="small"
-                    icon="el-icon-delete"
-                  ></el-button>
-                </div>
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
-        <!-- Guardar y Cancelar -->
-        <div class="grid grid-cols-12 gap-4 relative mt-4">
-          <div class="col-start-9 col-span-2">
-            <el-button
-              type="primary"
-              icon="el-icon-check"
-              class="w-full"
-              size="small"
-              >Guardar</el-button
-            >
-          </div>
-          <div class="col-start-11 col-span-2">
-            <el-button icon="el-icon-close" class="w-full" size="small"
-              >Cancelar</el-button
-            >
-          </div>
+          <el-button icon="el-icon-close" size="small">Cancelar</el-button>
         </div>
       </el-form>
     </div>
@@ -284,25 +371,16 @@ import {
 } from "../../tools";
 import Notification from "../../components/Notification";
 
-const storagekey = "new-customer";
-
 export default {
-  name: "CustomerNew",
+  name: "EntryNew",
   components: { LayoutContent, Notification },
   fetch() {
-    const entryTypes = () => {
-      return this.$axios.get("/entries/types");
-    };
+    const entryTypes = () => this.$axios.get("/entries/types");
 
-    const accountingCatalog = () => {
-      return this.$axios.get("/entries/catalog");
-    };
-
-    Promise.all([entryTypes(), accountingCatalog()])
+    Promise.all([entryTypes()])
       .then((res) => {
-        const [entryTypes, accountingCatalog] = res;
+        const [entryTypes] = res;
         this.entryTypes = entryTypes.data.entryTypes;
-        this.accountingCatalog = accountingCatalog.data.accountingCatalog;
         this.loading = false;
       })
       .catch((err) => {
@@ -310,10 +388,50 @@ export default {
       });
   },
   data() {
+    const newCargoValidateCompare = (rule, value, callback) => {
+      const abono =
+        this.newEntryDetailForm.abono > 0
+          ? this.newEntryDetailForm.abono.toFixed(2)
+          : 0;
+      const val = value > 0 ? value.toFixed(2) : 0;
+      if (!abono) {
+        if (!val) {
+          callback(new Error("Este campo es requerido."));
+        } else {
+          callback();
+        }
+      } else if (abono && val) {
+        return callback(
+          new Error("No puedes agregar cargo y abono al mismo tiempo")
+        );
+      } else {
+        callback();
+      }
+    };
+    const newAbonoValidateCompare = (rule, value, callback) => {
+      const cargo =
+        this.newEntryDetailForm.cargo > 0
+          ? this.newEntryDetailForm.cargo.toFixed(2)
+          : 0;
+      const val = value > 0 ? value.toFixed(2) : 0;
+      if (!cargo) {
+        if (!val) {
+          callback(new Error("Este campo es requerido."));
+        } else {
+          callback();
+        }
+      } else if (cargo && val) {
+        return callback(
+          new Error("No puedes agregar abono y cargo al mismo tiempo")
+        );
+      } else {
+        callback();
+      }
+    };
     const editCargoValidateCompare = (rule, value, callback) => {
       const abono =
-        this.formAccountingDetail.abono > 0
-          ? this.formAccountingDetail.abono.toFixed(2)
+        this.editEntryDetailForm.abono > 0
+          ? this.editEntryDetailForm.abono.toFixed(2)
           : "";
       const val = value > 0 ? value.toFixed(2) : "";
       if (!abono) {
@@ -332,8 +450,8 @@ export default {
     };
     const editAbonoValidateCompare = (rule, value, callback) => {
       const cargo =
-        this.formAccountingDetail.cargo > 0
-          ? this.formAccountingDetail.cargo.toFixed(2)
+        this.editEntryDetailForm.cargo > 0
+          ? this.editEntryDetailForm.cargo.toFixed(2)
           : "";
       const val = value > 0 ? value.toFixed(2) : "";
       if (!cargo) {
@@ -351,22 +469,53 @@ export default {
       }
     };
     return {
-      checked: "",
+      loading: false,
       entryTypes: [],
       accountingCatalog: [],
+      newEntryForm: {
+        entryType: "",
+        date: this.$dateFns.format(new Date(), "yyyy-MM-dd"),
+        serie: "",
+        scuared: "",
+        accounted: "",
+        title: "",
+      },
+      newEntryFormRules: {
+        entryType: selectValidation(true),
+        date: selectValidation(true),
+        title: inputValidation(true),
+      },
       accountingEntryDetails: [],
-      accountingDetail: "",
-      showAccountingDetail: false,
-      formAccountingDetail: {
-        fecha: new Date(),
+      showNewEntryDetail: false,
+      newEntryDetailForm: {
         accountingCatalog: "",
         concept: "",
-        select: "",
         cargo: "",
         abono: "",
-        serie: "",
       },
-      entryDetailFormRules: {
+      newEntryDetailFormRules: {
+        accountingCatalog: selectValidation(true),
+        concept: inputValidation(true),
+        cargo: [
+          {
+            validator: newCargoValidateCompare,
+            trigger: ["blur", "change"],
+          },
+        ],
+        abono: [
+          {
+            validator: newAbonoValidateCompare,
+            trigger: ["blur", "change"],
+          },
+        ],
+      },
+      editEntryDetailForm: {
+        accountingCatalog: "",
+        concept: "",
+        cargo: "",
+        abono: "",
+      },
+      editEntryDetailFormRules: {
         accountingCatalog: selectValidation(true),
         concept: inputValidation(true),
         cargo: [
@@ -382,11 +531,9 @@ export default {
           },
         ],
       },
-      loading: false,
-      option: {
-        name: "",
-      },
-      pickerOptions: {
+      editingEntryDetail: "",
+      showEditEntryDetail: false,
+      datePickerOptions: {
         shortcuts: [
           {
             text: "Ahora",
@@ -415,26 +562,9 @@ export default {
     };
   },
   methods: {
-    closeDialog(name) {
-      this.$refs[name].resetFields();
-    },
-    addToEntryDetails(formName, data) {
-      this.$refs[formName].validate(async (valid) => {
-        if (!valid) {
-          return false;
-        }
-        this.accountingEntryDetails.push({
-          ...data,
-          catalogCode: this.accountingCatalog.find(
-            (c) => c.id == this.formAccountingDetail.accountingCatalog
-          ).code,
-        });
-        this.showAccountingDetail = false;
-      });
-    },
     getSummaries(param) {
       const { columns, data } = param;
-      const totalAbono = data.reduce((a, b) => (a + b.abono ? b.abono : 0), 0);
+      const totalAbono = data.reduce((a, b) => a + (b.abono ? b.abono : 0), 0);
       const totalCargo = data.reduce((a, b) => a + (b.cargo ? b.cargo : 0), 0);
       const resutls = columns.map((column) => {
         if (column.label == "Abono") {
@@ -449,26 +579,221 @@ export default {
       });
       return resutls;
     },
-    changeEntryType(formAccountingDetail) {
-      // console.log(formAccountingDetail);
-      let params = "";
-      if (formAccountingDetail.select && formAccountingDetail.fecha) {
-        params = {
-          accountingEntryType: formAccountingDetail.select,
-          date: formAccountingDetail.fecha,
-        };
+    addToEntryDetails(formName, data) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+        this.accountingEntryDetails.push({
+          ...data,
+          catalogCode: this.accountingCatalog.find(
+            (c) => c.id == data.accountingCatalog
+          ).code,
+        });
+        this.showNewEntryDetail = false;
+        this.checkEntry();
+      });
+    },
+    changeEntryType({ entryType, date }) {
+      // console.log(`ENTRY TYPE :::${entryType} FECHA ::: ${date}`);
+      if (entryType && date) {
         this.$axios
-          .get("/entries/serie", { params })
-          .then((res) => {
-            console.log(res);
-            formAccountingDetail.serie = res.data.nextSerie;
+          .get("/entries/serie", {
+            params: {
+              accountingEntryType: entryType,
+              date,
+            },
+          })
+          .then(({ data }) => {
+            console.log(data);
+            this.newEntryForm.serie = data.nextSerie;
           })
           .catch((err) => {
             this.errorMessage = err.response.data.message;
           });
       }
     },
+    deleteDetail(index) {
+      this.$confirm(
+        "¿Estás seguro que deseas eliminar este detalle?",
+        "Confirmación",
+        {
+          confirmButtonText: "Si, eliminar",
+          cancelButtonText: "Cancelar",
+          type: "warning",
+        }
+      ).then(() => {
+        this.accountingEntryDetails.splice(index, 1);
+      });
+    },
+    async getAccountingCatalog() {
+      try {
+        const { data } = await this.$axios.get("/entries/catalog");
+        this.accountingCatalog = data.accountingCatalog;
+      } catch (error) {
+        this.errorMessage = err.response.data.message;
+      }
+    },
+    openNewEntryDetail() {
+      this.getAccountingCatalog();
+      this.showNewEntryDetail = true;
+      if (this.$refs["newEntryDetailForm"]) {
+        this.$refs["newEntryDetailForm"].resetFields();
+      }
+    },
+    openEditEntryDetail(index, details) {
+      this.getAccountingCatalog();
+      this.editingEntryDetail = index;
+      this.editEntryDetailForm = { ...details };
+      this.showEditEntryDetail = true;
+      if (this.$refs["editEntryDetailForm"]) {
+        this.$refs["editEntryDetailForm"].resetFields();
+      }
+    },
+    updateDetail(index, formName, form) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+        this.accountingEntryDetails.splice(index, 1, { ...form });
+        this.showEditEntryDetail = false;
+        this.checkEntry();
+      });
+    },
+    checkEntry() {
+      let totalCargo = this.accountingEntryDetails.reduce(
+        (a, b) => a + (b.cargo ? b.cargo : 0),
+        0
+      );
+      let totalAbono = this.accountingEntryDetails.reduce(
+        (a, b) => a + (b.abono ? b.abono : 0),
+        0
+      );
+      this.newEntryForm.scuared =
+        totalAbono.toFixed(3) === totalCargo.toFixed(3);
+      this.newEntryForm.accounted = false;
+    },
+    saveEntry(formName, formData, details) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+        console.log(formData);
+
+        const save = () => {
+          this.$confirm(
+            "¿Estás seguro que deseas guardar esta partida?",
+            "Confirmación",
+            {
+              confirmButtonText: "Si, guardar",
+              cancelButtonText: "Cancelar",
+              type: "warning",
+              beforeClose: (action, instance, done) => {
+                if (action === "confirm") {
+                  instance.confirmButtonLoading = true;
+                  instance.confirmButtonText = "Procesando...";
+                  this.$axios
+                    .post("/entries", {
+                      header: {
+                        title: formData.title,
+                        serie: formData.serie,
+                        date: formData.date,
+                        squared: formData.scuared,
+                        accounted: formData.accounted,
+                        accountingEntryType: formData.entryType,
+                      },
+                      details: details.map((d) => {
+                        return {
+                          ...d,
+                          accountingCatalog: d.accountingCatalog,
+                          concept: d.concept,
+                          cargo: d.cargo,
+                          abono: d.abono,
+                        };
+                      }),
+                    })
+                    .then((res) => {
+                      this.$notify.success({
+                        title: "Exito",
+                        message: res.data.message,
+                      });
+                      setTimeout(() => {
+                        this.$confirm(
+                          "¿Deseas crear una nueva partida?",
+                          "Confirmación",
+                          {
+                            confirmButtonText: "Si, porfavor",
+                            cancelButtonText: "No, gracias",
+                            type: "warning",
+                            closeOnClickModal: false,
+                            closeOnPressEscape: false,
+                          }
+                        )
+                          .then(() => {
+                            if (this.$refs["newEntryForm"]) {
+                              this.$refs["newEntryForm"].resetFields();
+                            }
+                            this.salesNewForm.documentType = 1;
+                            this.salesNewForm.customerBranch = "";
+                            this.details = [];
+                            this.branches = [];
+                            this.branch = {};
+                            this.tributary = {};
+                          })
+                          .catch(() => {
+                            this.$router.push("/entries");
+                          });
+                      }, 2000);
+                    })
+                    .catch((err) => {
+                      this.$notify.error({
+                        title: "Error",
+                        message: err.response.data.message,
+                      });
+                    })
+                    .then((alw) => {
+                      instance.confirmButtonLoading = false;
+                      instance.confirmButtonText = "Si, guardar";
+                      done();
+                    });
+                } else {
+                  done();
+                }
+              },
+            }
+          );
+        };
+
+        this.checkEntry();
+        const originalAccounted = formData.accounted;
+        if (formData.squared && !formData.accounted) {
+          this.$confirm(
+            "Esta partida esta cuadrada, ¿deseas marcarla como completada?",
+            "Confirmación",
+            {
+              type: "warning",
+              distinguishCancelAndClose: true,
+              confirmButtonText: "Si, porfavor",
+              cancelButtonText: "No, gracias",
+            }
+          )
+            .then(() => {
+              formData.accounted = true;
+              save();
+            })
+            .catch((action) => {
+              if (action === "cancel") {
+                formData.accounted = false;
+                save();
+              } else {
+                return false;
+              }
+            });
+        } else {
+          save();
+        }
+      });
+    },
   },
-  computed: {},
 };
 </script>
