@@ -78,13 +78,13 @@
         size="mini"
       >
         <el-table-column prop="index" width="40" />
-        <el-table-column label="Nombre" prop="name" min-width="530" />
-        <el-table-column label="Precio" width="100" align="right">
+        <el-table-column label="Nombre" prop="name" min-width="520" />
+        <el-table-column label="Precio" width="120" align="right">
           <template slot-scope="scope">
             <span>{{ scope.row.cost | formatMoney }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Tipo de venta" prop="type" width="120">
+        <el-table-column label="Tipo de venta" prop="type" width="110">
           <template slot-scope="scope">
             <span>{{ scope.row.sellingType.name }}</span>
           </template>
