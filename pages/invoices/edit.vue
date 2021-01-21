@@ -259,17 +259,16 @@
       </span>
     </el-dialog>
     <!-- noticication -->
-    <!-- <div class="grid grid-cols-12">
+    <div class="grid grid-cols-12" v-if="activeNotification">
       <div class="col-span-12">
         <Notification
-          
           class="mb-4 w-full"
           type="danger"
           title="Atención"
           message="No puede dar crédito fiscal a un cliente que no declare IVA."
         />
       </div>
-    </div> -->
+    </div>
     <el-form
       :model="salesEditForm"
       :rules="salesEditFormRules"
@@ -357,7 +356,7 @@
                   filterable
                   default-first-option
                   placeholder="Seleccionar"
-                  disabled
+                  @change="getCustomerDetails(salesEditForm.customer)"
                 >
                   <el-option
                     v-for="c in customers"
@@ -371,7 +370,7 @@
             </div>
             <!-- sucursal -->
             <div class="col-span-2">
-              <el-form-item label="Sucursal" prop="customerBranch">
+              <el-form-item label="Sucursal" prop="customerBranch" ref="branch">
                 <el-select
                   v-model="salesEditForm.customerBranch"
                   class="w-full"
@@ -380,7 +379,7 @@
                   default-first-option
                   size="small"
                   placeholder="Seleccionar"
-                  @change="selectBranch(salesEditForm.branch, branches)"
+                  @change="selectBranch(salesEditForm.customerBranch, branches)"
                 >
                   <el-option
                     v-for="br in branches"
@@ -686,7 +685,7 @@ export default {
       .get(`/invoices/${this.$route.query.ref}`)
       .then(({ data }) => {
         const customer = () =>
-          this.$axios.get(`/customers/${data.invoice.customer.id}`, {
+          this.$axios.get(`/customers`, {
             params: { isActiveCustomer: true },
           });
         const branches = () =>
@@ -716,7 +715,7 @@ export default {
               branches,
             ] = res;
 
-            this.customers = [customer.data.customer];
+            this.customers = customer.data.customers;
             this.documents = documentTypes.data.documentTypes;
             this.sellers = sellers.data.sellers;
             this.paymentConditions = paymentConditions.data.paymentConditions;
@@ -754,7 +753,6 @@ export default {
             this.loading = false;
           })
           .catch((err) => {
-            console.log(err);
             this.errorMessage = err.response.data.message;
           });
       })
@@ -903,7 +901,6 @@ export default {
       if (id) {
         const branch = branches.find((b) => b.id == id);
         this.branch = { ...branch };
-        this.salesEditForm.branch = this.branch;
       } else {
         this.branch = {};
       }
@@ -921,7 +918,7 @@ export default {
           .then((res) => {
             const [branches, tributary, taxerType] = res;
             this.branches = branches.data.branches;
-            // this.$refs.branch.resetField()
+            this.$refs.branch.resetField();
             this.branch = {};
             this.tributary = tributary.data.customer;
             this.loading = false;
@@ -929,10 +926,9 @@ export default {
               this.salesEditForm.documentType,
               this.tributary
             );
-            console.log(this.salesEditForm.documentType, this.tributary);
+
             this.$refs.branch.resetField();
             this.branch = {};
-            this.selectBranch(this.salesEditForm.customer, this.branches);
           })
           .catch((err) => {
             this.errorMessage = err.response.data.message;
@@ -945,7 +941,6 @@ export default {
       }
     },
     validateDocumentType(id, tributary) {
-      this.setStorage(this.salesEditForm);
       if (tributary) {
         switch (id) {
           case 2:
@@ -1013,7 +1008,6 @@ export default {
       });
     },
     saveUpdateInvoice(formName, formData, details) {
-      console.log(formData);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -1031,7 +1025,7 @@ export default {
                 instance.confirmButtonLoading = true;
                 instance.confirmButtonText = "Procesando...";
                 this.$axios
-                  .put(`/invoices/${this.$route.params.id}`, {
+                  .put(`/invoices/${this.$route.query.ref}`, {
                     header: {
                       documentType: formData.documentType,
                       authorization: formData.authorization,
@@ -1039,7 +1033,7 @@ export default {
                       invoiceDate: formData.invoiceRawDate,
 
                       customer: formData.customer,
-                      customerBranch: formData.customerBranch.id,
+                      customerBranch: formData.customerBranch,
                       invoicesPaymentsCondition:
                         formData.invoicesPaymentsCondition.id,
                       invoicesSeller: formData.invoicesSellers,
@@ -1087,6 +1081,8 @@ export default {
                     done();
                   });
               } else {
+                instance.confirmButtonLoading = false;
+                instance.confirmButtonText = "Si, guardar";
                 done();
               }
             },
