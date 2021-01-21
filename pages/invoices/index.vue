@@ -1,10 +1,10 @@
 <template>
   <layout-content
     v-loading="pageloading"
-    page-title="Listado de ventas"
+    page-title="Listado de documentos"
     :breadcrumb="[
-      { name: 'Documento', to: '/invoices' },
-      { name: 'Listado de ventas', to: null },
+      { name: 'Ventas', to: '/invoices' },
+      { name: 'Listado de documentos', to: null },
     ]"
   >
     <el-dialog
@@ -412,11 +412,7 @@
             width="80"
           />
           <el-table-column label="Fecha" prop="invoiceDate" width="90" />
-          <el-table-column
-            label="Cliente"
-            prop="customerName"
-             width="375"
-          />
+          <el-table-column label="Cliente" prop="customerName" width="375" />
           <el-table-column label="Estado" width="110">
             <template slot-scope="scope">
               <el-tag
@@ -470,14 +466,18 @@
                   </el-dropdown-item>
                   <el-dropdown-item
                     @click.native="
-                      $router.push(`/invoices/edit/${scope.row.id}`)
+                      $router.push(`/invoices/edit?ref=${scope.row.id}`)
                     "
                     v-if="scope.row.status.id == '1'"
                   >
                     <i class="el-icon-edit-outline"></i> Editar documento
                   </el-dropdown-item>
-                  <el-dropdown-item v-if="scope.row.status.id == 1">
-                    <i class="el-icon-printer"></i> Imprimir documento
+                  <el-dropdown-item
+                    v-if="scope.row.status.id == 1"
+                    @click.native="printInvoice(scope.row)"
+                  >
+                    <i class="el-icon-printer"></i>
+                    Imprimir documento
                   </el-dropdown-item>
                   <el-dropdown-item v-if="scope.row.status.id == 2">
                     <i class="el-icon-printer"></i> Re imprimir documento
@@ -487,6 +487,7 @@
                     v-if="
                       scope.row.status.id == '2' || scope.row.status.id == '3'
                     "
+                    @click.native="reverseDocument(scope.row)"
                   >
                     <i class="el-icon-refresh-left"></i> Revertir estado
                   </el-dropdown-item>
@@ -500,12 +501,13 @@
                   </el-dropdown-item>
                   <el-dropdown-item
                     :divided="true"
-                    icon="el-icon-circle-close"
-                    class="font-semibold"
+                    class="text-red-500 font-semibold"
+                    @click.native="voidDocument(scope.row)"
                     v-if="
-                      scope.row.status.id == '2' && scope.row.status.id != '3'
+                      scope.row.status.id == '2' || scope.row.status.id == '1'
                     "
                   >
+                    <i class="el-icon-circle-close"></i>
                     Anular venta
                   </el-dropdown-item>
                 </el-dropdown-menu>
@@ -667,6 +669,82 @@ export default {
       this.selectedInvoice = data.invoice;
       this.showInvoicePreview = true;
     },
+    voidDocument({ id }) {
+      this.$confirm(
+        `¿Estás seguro que deseas anular este documento?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, anular`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .put(`/invoices/status/void/${id}`)
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchInvoices();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, anular`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
+    },
+    reverseDocument({ id }) {
+      this.$confirm(
+        `¿Estás seguro que deseas revertir el estado de este documento?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, revertir`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .put(`/invoices/status/reverse/${id}`)
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchInvoices();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, revertir`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
+    },
     deleteInvoice({ id }) {
       this.$confirm(
         `¿Estás seguro que deseas eliminar esta venta?`,
@@ -802,6 +880,412 @@ export default {
       }
 
       return uniPrice;
+    },
+    printInvoice({ id, documentType }) {
+      this.$confirm(
+        `¿Estás seguro que deseas imprimir esta factura?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, imprimir`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              // /invoices/documents/:id/layout documentType.id
+              this.$axios
+                .get(`/invoices/${id}`)
+                .then((res) => {
+                  const data = res.data;
+                  if (data) {
+                    try {
+                      const vadd = 1;
+                      const hadd = 3;
+                      const conf = {
+                        configuration: "positions",
+                        resolution: [216, 279],
+                        header: [
+                          {
+                            position: [[160, 31]],
+                            lenght: 30,
+                            value: "invoice_autorization",
+                            type: "text",
+                          },
+                          {
+                            position: [[190, 31]],
+                            lenght: 15,
+                            value: "invoice_number",
+                            type: "text",
+                          },
+                          {
+                            position: [[25, 54]],
+                            lenght: 105,
+                            value: "customer_name",
+                            type: "text",
+                          },
+                          {
+                            position: [[145, 54]],
+                            lenght: 60,
+                            value: "invoice_date",
+                            type: "date",
+                          },
+                          {
+                            position: [[30, 60]],
+                            lenght: 100,
+                            value: "customer_address1",
+                            type: "text",
+                          },
+                          {
+                            position: [[153, 66]],
+                            lenght: 55,
+                            value: "customer_nit",
+                            type: "text",
+                          },
+                          {
+                            position: [[45, 66]],
+                            lenght: 85,
+                            value: "seller_name",
+                            type: "text",
+                          },
+                        ],
+                        details: {
+                          position_y: 80,
+                          quantity: {
+                            position: [12],
+                            value: "charge_quantity",
+                            type: "text",
+                          },
+                          description: {
+                            position: [23],
+                            value: "charge_description",
+                            lenght: 110,
+                            type: "text",
+                          },
+                          price: {
+                            position: [140],
+                            value: "unit_price",
+                            type: "text",
+                          },
+                          sujeto: {
+                            position: [154],
+                            value: "unit_price",
+                            type: "text",
+                          },
+                          exento: {
+                            position: [168],
+                            value: "unit_price",
+                            type: "text",
+                          },
+                          afecto: {
+                            position: [187],
+                            value: "venta_price",
+                            type: "text",
+                          },
+                        },
+                        totals: [
+                          {
+                            position: [185, 138],
+                            value: "subtotal",
+                            type: "money",
+                          },
+                          {
+                            position: [185, 144],
+                            value: "iva_retenido",
+                            type: "money",
+                          },
+                          {
+                            position: [185, 152],
+                            value: "subtotal",
+                            type: "money",
+                          },
+                          {
+                            position: [185, 159],
+                            value: "ventas_no_sujetas",
+                            type: "money",
+                          },
+                          {
+                            position: [185, 165],
+                            value: "ventas_exentas",
+                            type: "money",
+                          },
+                          {
+                            position: [185, 171],
+                            value: "venta_total",
+                            type: "money",
+                          },
+                          {
+                            position: [10, 143],
+                            value: "venta_total_text",
+                            type: "text",
+                          },
+                        ],
+                      };
+
+                      // Crea el documento base
+                      const pdfDocument = new jsPDF({
+                        orientation: "portrait",
+                        unit: "mm",
+                        format: conf.resolution,
+                      });
+                      pdfDocument.setFontSize(9.5);
+
+                      // Agrega el encabezado
+                      for (const header of conf.header) {
+                        let value = "";
+                        switch (header.value) {
+                          case "invoice_autorization":
+                            value = data.invoice.authorization;
+                            break;
+                          case "invoice_number":
+                            value = data.invoice.sequence;
+                            break;
+                          case "customer_name":
+                            value = data.invoice.customerName;
+                            break;
+                          case "invoice_date":
+                            value = data.invoice.invoiceDate;
+                            break;
+                          case "customer_address1":
+                            value = data.invoice.customerAddress1;
+                            break;
+                          case "customer_address2":
+                            value = data.invoice.customerAddress2;
+                            break;
+                          case "customer_nrc":
+                            value = data.invoice.customerNrc;
+                            break;
+                          case "customer_nit":
+                            value = data.invoice.customerNit;
+                            break;
+                          case "customer_city":
+                            value = data.invoice.customerCity;
+                            break;
+                          case "customer_giro":
+                            value = data.invoice.customerGiro;
+                            break;
+                          case "customer_state":
+                            value = data.invoice.customerState;
+                            break;
+                          case "seller_name":
+                            value = data.invoice.invoicesSeller.name;
+                            break;
+                          case "payment_condition":
+                            value = data.invoice.invoicesPaymentsCondition.name;
+                            break;
+                        }
+
+                        const splitText = pdfDocument.splitTextToSize(
+                          value,
+                          header.lenght
+                        );
+
+                        pdfDocument.text(
+                          splitText[0],
+                          parseInt(header.position[0][0]) + vadd,
+                          parseInt(header.position[0][1]) + hadd
+                        );
+                      }
+
+                      // Agrega los detalles
+                      let acumRows = 0;
+                      for (const detail of data.invoice.details) {
+                        const acumHeight = acumRows * 5;
+                        const position_x = 1;
+                        const position_y =
+                          acumHeight + hadd + conf.details.position_y;
+                        const {
+                          quantity,
+                          chargeDescription,
+                          unitPrice,
+                          sellingType,
+                          incTax,
+                          ventaPrice,
+                        } = detail;
+
+                        // Quantity
+                        pdfDocument.text(
+                          parseFloat(quantity).toFixed(2),
+                          conf.details.quantity.position[0] + position_x,
+                          position_y
+                        );
+                        // Description
+                        const splitDescription = pdfDocument.splitTextToSize(
+                          chargeDescription,
+                          conf.details.description.lenght
+                        );
+                        acumRows = acumRows + splitDescription.length;
+                        pdfDocument.text(
+                          splitDescription,
+                          conf.details.description.position[0] + position_x,
+                          position_y
+                        );
+                        // Price
+                        pdfDocument.text(
+                          this.$options.filters.formatMoney(unitPrice),
+                          conf.details.price.position[0] + position_x,
+                          position_y
+                        );
+                        const documentType = data.invoice.documentType;
+                        // Ventas no sujetas
+                        pdfDocument.text(
+                          sellingType.id == 1
+                            ? this.$options.filters.formatMoney(ventaPrice)
+                            : "",
+                          conf.details.sujeto.position[0] + position_x,
+                          position_y
+                        );
+                        // Ventas exentas
+                        pdfDocument.text(
+                          sellingType.id == 2
+                            ? this.$options.filters.formatMoney(ventaPrice)
+                            : "",
+                          conf.details.exento.position[0] + position_x,
+                          position_y
+                        );
+                        // Ventas afectas
+                        pdfDocument.text(
+                          sellingType.id == 3
+                            ? this.$options.filters.formatMoney(ventaPrice)
+                            : "",
+                          conf.details.afecto.position[0] + position_x,
+                          position_y
+                        );
+                      }
+
+                      // Agrega los totales
+                      for (const total of conf.totals) {
+                        let value = "";
+                        switch (total.value) {
+                          case "sum":
+                            value = this.$options.filters.formatMoney(
+                              data.invoice.sum
+                            );
+                            break;
+                          case "iva":
+                            value = this.$options.filters.formatMoney(
+                              data.invoice.iva
+                            );
+                            break;
+                          case "subtotal":
+                            value = this.$options.filters.formatMoney(
+                              data.invoice.subtotal
+                            );
+                            break;
+                          case "iva_retenido":
+                            value = this.$options.filters.formatMoney(
+                              data.invoice.ivaRetenido
+                            );
+                            break;
+                          case "ventas_exentas":
+                            value = this.$options.filters.formatMoney(
+                              data.invoice.ventasExentas
+                            );
+                            break;
+                          case "ventas_no_sujetas":
+                            value = this.$options.filters.formatMoney(
+                              data.invoice.ventasNoSujetas
+                            );
+                            break;
+                          case "venta_total":
+                            value = this.$options.filters.formatMoney(
+                              data.invoice.ventaTotal
+                            );
+                            break;
+                          case "venta_total_text":
+                            value = numeroALetras(data.invoice.ventaTotal);
+                            break;
+                        }
+                        const splitText = pdfDocument.splitTextToSize(
+                          value,
+                          total.lenght
+                        );
+                        pdfDocument.text(
+                          splitText,
+                          parseInt(total.position[0]) + vadd,
+                          parseInt(total.position[1]) + hadd
+                        );
+                      }
+
+                      setTimeout(() => {
+                        this.$confirm(
+                          "¿Se ha impreso la factura correctamente?",
+                          "Confirmación",
+                          {
+                            confirmButtonText: "Si, gracias",
+                            cancelButtonText: "No",
+                            type: "warning",
+                            beforeClose: (action, instance, done) => {
+                              if (action === "confirm") {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = "Procesando...";
+                                //PUT invoices/status/printed/:id
+                                this.processUpdateStatus(invoice.id, 2).then(
+                                  (res) => {
+                                    const { data, errors } = res.data;
+                                    if (!errors) {
+                                      this.rawInvoices =
+                                        data.invoiceUpdateStatus;
+                                    } else {
+                                      this.$notify({
+                                        title: "Error",
+                                        message: errors[0].message,
+                                        type: "error",
+                                        duration: 3500,
+                                      });
+                                    }
+                                    instance.confirmButtonLoading = false;
+                                    instance.confirmButtonText = "Si, gracias";
+                                    done();
+                                  }
+                                );
+                              } else {
+                                done();
+                              }
+                            },
+                          }
+                        ).catch(() => {
+                          this.$confirm(
+                            "¿Deseas intentar imprimirlo nuevamente?",
+                            "Confirmación",
+                            {
+                              confirmButtonText: "Si, porfavor",
+                              cancelButtonText: "No, gracias",
+                              type: "warning",
+                            }
+                          ).then(() => {
+                            this.printInvoice({ id, documentType });
+                          });
+                        });
+                      }, 3000);
+
+                      pdfDocument.autoPrint();
+
+                      window.open(pdfDocument.output("bloburl"), "_blank");
+                    } catch (error) {
+                      this.$message.error(
+                        "Error al generar el PDF, contacta con tu administrador."
+                      );
+                    }
+                  } else {
+                    this.$notify({
+                      title: "Error",
+                      message:
+                        "Ha ocurrido un error al obtener la informacion. Contacta con tu administrador.",
+                      type: "error",
+                    });
+                  }
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, imprimir`;
+                  done();
+                })
+                .catch((err) => this.$message.error(err));
+            } else {
+              done();
+            }
+          },
+        }
+      );
     },
   },
   computed: {
