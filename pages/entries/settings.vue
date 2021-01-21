@@ -1277,7 +1277,64 @@ export default {
       showEditMayorDialog: false,
       showEditAccount: false,
       searchValue: "",
-      tableData: [],
+      tableData: [
+        {
+          id: 1,
+          name: "ACTIVO",
+          display: "ACTIVO",
+          children: [
+            {
+              id: 11,
+              name: "ACTIVO CORRIENTE",
+              display: "ACTIVO CORRIENTE",
+              showAdd: true,
+              children: [],
+            },
+            {
+              id: 12,
+              name: "ACTIVO NO CORRIENTE",
+              display: "ACTIVO NO CORRIENTE",
+              showAdd: true,
+              children: [],
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: "PASIVO",
+          display: "PASIVO",
+          children: [
+            {
+              id: 21,
+              name: "PASIVO CORRIENTE",
+              display: "PASIVO CORRIENTE",
+              showAdd: true,
+              children: [],
+            },
+            {
+              id: 22,
+              name: "PASIVO NO CORRIENTE",
+              display: "PASIVO NO CORRIENTE",
+              showAdd: true,
+              children: [],
+            },
+          ],
+        },
+        {
+          id: 3,
+          name: "PATRIMONIO",
+          display: "PATRIMONIO",
+          children: [
+            {
+              id: 31,
+              name: "CAPITAL Y RESERVAS",
+              display: "CAPITAL Y RESERVAS",
+              showAdd: true,
+              children: [],
+            },
+          ],
+        },
+      ],
       specialAccounts: {
         accum_gain: "",
         accum_lost: "",
