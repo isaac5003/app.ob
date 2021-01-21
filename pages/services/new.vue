@@ -60,9 +60,9 @@
           >
             <el-row :gutter="15">
               <el-col :span="8" v-for="(s, k) in sellingTypes" :key="k">
-                <el-radio :label="s.id" border class="w-full" size="small">{{
-                  s.name
-                }}</el-radio>
+                <el-radio :label="s.id " border class="w-full" size="small">
+                  {{ s.name}}   
+                  </el-radio>
               </el-col>
             </el-row>
           </el-radio-group>
@@ -136,7 +136,7 @@ export default {
       servicesNewForm: {
         name: "",
         cost: "",
-        sellingType: "",
+        sellingType:3,
         description: "",
       },
       servicesNewFormRules: {
