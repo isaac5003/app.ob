@@ -487,12 +487,7 @@
                     v-if="
                       scope.row.status.id == '2' || scope.row.status.id == '3'
                     "
-                    @click.native="
-                      updateStatus(
-                        scope.row.id,
-                        parseInt(scope.row.status.id) - 1
-                      )
-                    "
+                    @click.native="reverseDocument(scope.row)"
                   >
                     <i class="el-icon-refresh-left"></i> Revertir estado
                   </el-dropdown-item>
@@ -506,12 +501,13 @@
                   </el-dropdown-item>
                   <el-dropdown-item
                     :divided="true"
-                    icon="el-icon-circle-close"
-                    class="font-semibold"
+                    class="text-red-500 font-semibold"
+                    @click.native="voidDocument(scope.row)"
                     v-if="
-                      scope.row.status.id == '2' && scope.row.status.id != '3'
+                      scope.row.status.id == '2' || scope.row.status.id == '1'
                     "
                   >
+                    <i class="el-icon-circle-close"></i>
                     Anular venta
                   </el-dropdown-item>
                 </el-dropdown-menu>
@@ -673,10 +669,47 @@ export default {
       this.selectedInvoice = data.invoice;
       this.showInvoicePreview = true;
     },
-    updateStatus({ id }) {
-      console.log(id);
+    voidDocument({ id }) {
       this.$confirm(
-        `¿Estás seguro que deseas revertir esta venta?`,
+        `¿Estás seguro que deseas anular este documento?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, anular`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .put(`/invoices/status/void/${id}`)
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchInvoices();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, anular`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
+    },
+    reverseDocument({ id }) {
+      this.$confirm(
+        `¿Estás seguro que deseas revertir el estado de este documento?`,
         "Confirmación",
         {
           confirmButtonText: `Si, revertir`,
@@ -687,7 +720,7 @@ export default {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
               this.$axios
-                .delete(`/invoices/${id}`)
+                .put(`/invoices/status/reverse/${id}`)
                 .then((res) => {
                   this.$notify.success({
                     title: "Éxito",
