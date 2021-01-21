@@ -168,8 +168,7 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import XLSX from "xlsx";
-import { selectValidation } from "../../tools";
-import { getHeader, getFooter } from "../../tools/utils";
+import { selectValidation, getHeader, getFooter } from "../../tools";
 export default {
   name: "EntriesReports",
   components: {
