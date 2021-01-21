@@ -411,21 +411,21 @@
 </template>
 
 <script>
-import LayoutContent from "../../../components/layout/Content";
+import LayoutContent from "../../components/layout/Content";
 import {
   inputValidation,
   selectValidation,
   checkBeforeLeave,
   checkBeforeEnter,
-} from "../../../tools";
-import Notification from "../../../components/Notification";
+} from "../../tools";
+import Notification from "../../components/Notification";
 const storagekey = "edit-entries";
 export default {
   name: "editEntry",
   components: { LayoutContent, Notification },
   fetch() {
     const entryTypes = () => this.$axios.get(`/entries/types`);
-    const entry = () => this.$axios.get(`/entries/${this.$route.params.id}`);
+    const entry = () => this.$axios.get(`/entries/${this.$route.query.ref}`);
 
     Promise.all([entryTypes(), entry()])
       .then((res) => {
