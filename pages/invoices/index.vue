@@ -882,7 +882,6 @@ export default {
       return uniPrice;
     },
     printInvoice({ id, documentType }) {
-      console.log(id);
       this.$confirm(
         `¿Estás seguro que deseas imprimir esta factura?`,
         "Confirmación",
@@ -899,7 +898,6 @@ export default {
                 .get(`/invoices/${id}`)
                 .then((res) => {
                   const data = res.data;
-                  console.log(data);
                   if (data) {
                     try {
                       const vadd = 1;
