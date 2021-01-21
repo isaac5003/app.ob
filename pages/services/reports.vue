@@ -71,8 +71,13 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-// import { getHeader, getFooter } from "../../tools/utils";
-import { getIcon, hasModule, selectValidation } from "../../tools";
+import {
+  getIcon,
+  hasModule,
+  selectValidation,
+  getHeader,
+  getFooter,
+} from "../../tools";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -125,13 +130,14 @@ export default {
             const { company, services } = service.data;
             const values = services.map((s) => {
               return [
+                { bold: false, text: s.index },
                 { bold: false, text: s.name },
                 { bold: false, text: s.description },
                 {
                   bold: false,
                   text: this.$options.filters.formatMoney(s.cost),
                 },
-                { bold: false, text: s.sellingType.name },
+                { bold: false, text: s.sellingType.name, alignment: "center" },
               ];
             });
 
@@ -139,18 +145,28 @@ export default {
               pageSize: "LETTER",
               pageOrientation: "portrait",
               pageMargins: [20, 60, 20, 40],
-              // header: getHeader(name, nit, nrc, null, "CATALOGO DE CUENTAS"),
-              // footer: getFooter(),
+              header: getHeader(
+                company.name,
+                company.nit,
+                company.nrc,
+                null,
+                "REPORTE GENERAL DE SERVICIOS"
+              ),
+              footer: getFooter(),
               content: [
                 {
                   fontSize: 9,
                   layout: "noBorders",
                   table: {
                     headerRows: 1,
-                    widths: ["40%", "40%", "10%", "10%"],
+                    widths: ["3%", "40%", "40%", "8.5%", "8.5%"],
                     heights: -5,
                     body: [
                       [
+                        {
+                          text: "#",
+                          style: "tableHeader",
+                        },
                         {
                           text: "Nombre",
                           style: "tableHeader",
@@ -166,6 +182,7 @@ export default {
                         {
                           text: "Tipo de \nventa",
                           style: "tableHeader",
+                          alignment: "center",
                         },
                       ],
                       ...values,
@@ -192,6 +209,7 @@ export default {
 
             const data = services.map((s) => {
               return [
+                s.index,
                 s.name,
                 s.description,
                 this.$options.filters.formatMoney(s.cost),
@@ -204,11 +222,12 @@ export default {
               [
                 "Reporte de servicios",
                 "",
+                "",
                 `NIT: ${company.nit}`,
                 `NRC: ${company.nrc}`,
               ],
               [""],
-              ["Nombre", "Descripción", "Costo", "Tipo de venta"],
+              ["#", "Nombre", "Descripción", "Costo", "Tipo de venta"],
               [""],
               ...data,
             ];
