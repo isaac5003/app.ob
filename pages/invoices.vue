@@ -19,7 +19,7 @@ export default {
     return {
       menu: [
         {
-          name: "Nuevo Documento",
+          name: "Nuevo documento",
           icon: getIcon("plus"),
           path: "/invoices/new",
         },
