@@ -1,10 +1,10 @@
 <template>
   <layout-content
     v-loading="pageloading"
-    page-title="Listado de ventas"
+    page-title="Listado de documentos"
     :breadcrumb="[
-      { name: 'Documento', to: '/invoices' },
-      { name: 'Listado de ventas', to: null },
+      { name: 'Ventas', to: '/invoices' },
+      { name: 'Listado de documentos', to: null },
     ]"
   >
     <el-dialog
@@ -412,11 +412,7 @@
             width="80"
           />
           <el-table-column label="Fecha" prop="invoiceDate" width="90" />
-          <el-table-column
-            label="Cliente"
-            prop="customerName"
-             width="375"
-          />
+          <el-table-column label="Cliente" prop="customerName" width="375" />
           <el-table-column label="Estado" width="110">
             <template slot-scope="scope">
               <el-tag
@@ -490,6 +486,12 @@
                     :divided="true"
                     v-if="
                       scope.row.status.id == '2' || scope.row.status.id == '3'
+                    "
+                    @click.native="
+                      updateStatus(
+                        scope.row.id,
+                        parseInt(scope.row.status.id) - 1
+                      )
                     "
                   >
                     <i class="el-icon-refresh-left"></i> Revertir estado
@@ -670,6 +672,45 @@ export default {
       const { data } = await this.$axios.get(`/invoices/${id}`);
       this.selectedInvoice = data.invoice;
       this.showInvoicePreview = true;
+    },
+    updateStatus({ id }) {
+      console.log(id);
+      this.$confirm(
+        `¿Estás seguro que deseas revertir esta venta?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, revertir`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .delete(`/invoices/${id}`)
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchInvoices();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, revertir`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
     },
     deleteInvoice({ id }) {
       this.$confirm(
