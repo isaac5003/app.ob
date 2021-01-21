@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col items-center py-6 px-4 bg-white w-60 border-r space-y-14"
+    class="flex flex-col items-center py-6 px-4 bg-white w-64 border-r space-y-14"
   >
     <div class="flex items-center w-full text-gray-800 space-x-2">
       <svg
