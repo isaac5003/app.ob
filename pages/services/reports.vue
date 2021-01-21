@@ -6,7 +6,13 @@
       { name: 'Reportes', to: null },
     ]"
   >
-    <el-form :model="reportForm" :rules="reportFormRules" status-icon>
+    <el-form
+      :model="reportForm"
+      :rules="reportFormRules"
+      ref="reportForm"
+      @submit.native.prevent="generateReport('reportForm', reportForm)"
+      status-icon
+    >
       <div class="grid grid-cols-12 gap-4">
         <div class="col-span-3">
           <el-form-item label="Seleccione el reporte" prop="reportType">
@@ -28,15 +34,15 @@
             </el-select>
           </el-form-item>
         </div>
-        <div class="col-span-5 col-start-5 space-x-4">
-          <el-form-item prop="" label="Seleccione ">
+        <div class="col-span-5">
+          <el-form-item prop="radio" label="Tipo de reporte">
             <el-radio-group
               class="w-full"
               v-model="reportForm.radio"
               :disabled="reportForm.reportType ? false : true"
             >
-              <el-radio border size="small">PDF</el-radio>
-              <el-radio border size="small">EXCEL</el-radio>
+              <el-radio border label="pdf" size="small">PDF</el-radio>
+              <el-radio border label="excel" size="small">EXCEL</el-radio>
             </el-radio-group>
           </el-form-item>
         </div>
@@ -49,6 +55,8 @@
             class="w-full"
             size="small"
             icon="el-icon-download"
+            native-type="submit"
+            :loading="generating"
             >Descargar</el-button
           >
         </div>
@@ -63,7 +71,12 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
+// import { getHeader, getFooter } from "../../tools/utils";
 import { getIcon, hasModule, selectValidation } from "../../tools";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import XLSX from "xlsx";
 
 export default {
   name: "CustomerSettings",
@@ -72,6 +85,7 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+      generating: false,
       reports: [
         {
           id: "servicios",
@@ -80,12 +94,134 @@ export default {
       ],
       reportForm: {
         reportType: "",
-        radio: "excel",
+        radio: "pdf",
       },
       reportFormRules: {
         reportType: selectValidation("change", true),
       },
     };
+  },
+  methods: {
+    generateReport(formName, { reportType, radio }) {
+      this.$refs[formName].validate((valid) => {
+        if (!valid) {
+          return false;
+        }
+        this.generating = true;
+        switch (reportType) {
+          case "servicios":
+            this.generateServiceReport(radio);
+            break;
+        }
+      });
+    },
+
+    generateServiceReport(fileType) {
+      const service = () => this.$axios.get("/services/report/general");
+      switch (fileType) {
+        case "pdf":
+          Promise.all([service()]).then((res) => {
+            const [service] = res;
+            const { company, services } = service.data;
+            const values = services.map((s) => {
+              return [
+                { bold: false, text: s.name },
+                { bold: false, text: s.description },
+                {
+                  bold: false,
+                  text: this.$options.filters.formatMoney(s.cost),
+                },
+                { bold: false, text: s.sellingType.name },
+              ];
+            });
+
+            const docDefinition = {
+              pageSize: "LETTER",
+              pageOrientation: "portrait",
+              pageMargins: [20, 60, 20, 40],
+              // header: getHeader(name, nit, nrc, null, "CATALOGO DE CUENTAS"),
+              // footer: getFooter(),
+              content: [
+                {
+                  fontSize: 9,
+                  layout: "noBorders",
+                  table: {
+                    headerRows: 1,
+                    widths: ["40%", "40%", "10%", "10%"],
+                    heights: -5,
+                    body: [
+                      [
+                        {
+                          text: "Nombre",
+                          style: "tableHeader",
+                        },
+                        {
+                          text: "Descripción",
+                          style: "tableHeader",
+                        },
+                        {
+                          text: "Costo",
+                          style: "tableHeader",
+                        },
+                        {
+                          text: "Tipo de \nventa",
+                          style: "tableHeader",
+                        },
+                      ],
+                      ...values,
+                    ],
+                  },
+                },
+              ],
+              styles: {
+                tableHeader: {
+                  bold: true,
+                  fontSize: 9,
+                },
+              },
+            };
+
+            this.generating = false;
+            pdfMake.createPdf(docDefinition).open();
+          });
+          break;
+        case "excel":
+          Promise.all([service()]).then((res) => {
+            const [service] = res;
+            const { company, services } = service.data;
+
+            const data = services.map((s) => {
+              return [
+                s.name,
+                s.description,
+                this.$options.filters.formatMoney(s.cost),
+                s.sellingType.name,
+              ];
+            });
+
+            const document = [
+              [company.name],
+              [
+                "Reporte de servicios",
+                "",
+                `NIT: ${company.nit}`,
+                `NRC: ${company.nrc}`,
+              ],
+              [""],
+              ["Nombre", "Descripción", "Costo", "Tipo de venta"],
+              [""],
+              ...data,
+            ];
+            const sheet = XLSX.utils.aoa_to_sheet(document);
+            const workbook = XLSX.utils.book_new();
+            const fileName = "report";
+            XLSX.utils.book_append_sheet(workbook, sheet, fileName);
+            XLSX.writeFile(workbook, `${fileName}.xlsx`);
+            this.generating = false;
+          });
+          break;
+      }
+    },
   },
   computed: {},
 };

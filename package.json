@@ -20,8 +20,10 @@
     "element-ui": "^2.14.0",
     "install": "^0.13.0",
     "nuxt": "^2.14.7",
+    "pdfmake": "^0.1.70",
     "simplebar-vue": "^1.6.0",
-    "vue-debounce": "^2.5.7"
+    "vue-debounce": "^2.5.7",
+    "xlsx": "^0.16.9"
   },
   "devDependencies": {
     "@nuxtjs/date-fns": "^1.4.3",
