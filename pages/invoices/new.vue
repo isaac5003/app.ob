@@ -1,11 +1,11 @@
 <template>
   <layout-content
     v-loading="loading"
-    page-title="Nueva Factura"
+    page-title="Nueva venta"
     :breadcrumb="[
-      { name: 'Facturas', to: '/sales' },
+      { name: 'Ventas', to: '/invoices' },
 
-      { name: 'Nueva factura', to: null },
+      { name: 'Nuevo documento', to: null },
     ]"
   >
     <!-- dialogo addservicio-->
@@ -333,12 +333,13 @@
                 </el-input>
               </el-form-item>
             </div>
-            <!-- Fecha Factura -->
+            <!-- Fecha documento -->
             <div class="col-span-2">
-              <el-form-item label="Fecha de factura" prop="invoiceDate">
+              <el-form-item  label="Fecha de venta" prop="invoiceDate">
                 <el-date-picker
                   v-model="salesNewForm.invoiceDate"
                   size="small"
+                  class="w-full"
                   type="date"
                   placeholder=""
                   :picker-options="pickerOptions"

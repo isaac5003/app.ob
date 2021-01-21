@@ -61,18 +61,16 @@
             </el-select>
           </el-form-item>
         </div>
-        <!-- Reporte de excel -->
 
-        <div class="col-span-5 col-start-5 space-x-4">
+        <div class="col-span-5">
           <el-form-item prop="" label="Formato de reporte">
             <el-radio-group
               v-model="reportForm.radio"
               :disabled="reportForm.reportType ? false : true"
+              class="w-full"
             >
-              <el-radio label="pdf" border size="small">Reporte PDF</el-radio>
-              <el-radio label="excel" border size="small"
-                >Reporte Excel
-              </el-radio>
+              <el-radio border size="small" label="pdf">PDF</el-radio>
+              <el-radio border size="small" label="excel">Excel</el-radio>
             </el-radio-group>
           </el-form-item>
         </div>
@@ -170,8 +168,7 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import XLSX from "xlsx";
-import { selectValidation } from "../../tools";
-import { getHeader, getFooter } from "../../tools/utils";
+import { selectValidation, getHeader, getFooter } from "../../tools";
 export default {
   name: "EntriesReports",
   components: {

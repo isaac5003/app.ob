@@ -25,6 +25,7 @@
     "pdfmake": "^0.1.69",
     "simplebar-vue": "^1.6.0",
     "vue-debounce": "^2.5.7",
+    "vue-the-mask": "^0.11.1",
     "xlsx": "^0.16.9"
   },
   "devDependencies": {

@@ -411,21 +411,21 @@
 </template>
 
 <script>
-import LayoutContent from "../../../components/layout/Content";
+import LayoutContent from "../../components/layout/Content";
 import {
   inputValidation,
   selectValidation,
   checkBeforeLeave,
   checkBeforeEnter,
-} from "../../../tools";
-import Notification from "../../../components/Notification";
+} from "../../tools";
+import Notification from "../../components/Notification";
 const storagekey = "edit-entries";
 export default {
   name: "editEntry",
   components: { LayoutContent, Notification },
   fetch() {
     const entryTypes = () => this.$axios.get(`/entries/types`);
-    const entry = () => this.$axios.get(`/entries/${this.$route.params.id}`);
+    const entry = () => this.$axios.get(`/entries/${this.$route.query.ref}`);
 
     Promise.all([entryTypes(), entry()])
       .then((res) => {
@@ -635,7 +635,7 @@ export default {
       console.log({ accountingEntryType, rawDate });
       if (accountingEntryType && rawDate) {
         this.$axios
-          .get(`entries/serie`, { params: accountingEntryType.id, rawDate })
+          .get(`entries/serie`, { params:{ accountingEntryType: accountingEntryType, date:rawDate }})
           .then((res) => {
             this.editEntryForm.serie = res.data.nextSerie;
             this.checkEntry();
@@ -752,7 +752,7 @@ export default {
                   instance.confirmButtonLoading = true;
                   instance.confirmButtonText = "Procesando...";
                   this.$axios
-                    .put(`/entries/${this.$route.params.id}`, {
+                    .put(`/entries/${this.$route.query.ref}` , {
                       header: {
                         title: formData.title,
                         date: formData.rawDate,
