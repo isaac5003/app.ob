@@ -85,7 +85,10 @@
                 >
                 </el-input-number>
                 <el-checkbox
-                  v-if="newServiceForm.sellingType == 3"
+                  v-if="
+                    newServiceForm.sellingType == 3 &&
+                    salesNewForm.documentType != 3
+                  "
                   border
                   v-model="newServiceForm.incTax"
                   size="small"
@@ -213,7 +216,10 @@
                 />
                 <el-checkbox
                   border
-                  v-if="editServiceForm.sellingType == 3"
+                  v-if="
+                    newServiceForm.sellingType == 3 &&
+                    salesNewForm.documentType != 3
+                  "
                   v-model="editServiceForm.incTax"
                   size="small"
                   class="px-3 mt-1"
@@ -543,28 +549,42 @@
               </el-table-column>
               <el-table-column
                 prop="vnosujeta"
-                label="V. No sujeta"
+                :label="
+                  this.salesNewForm.documentType != 3 ? 'V. No sujeta' : ''
+                "
                 min-width="75"
                 align="right"
               >
                 <template slot-scope="scope">
-                  <span v-if="scope.row.sellingType == 1">{{
-                    calcSujeta(salesNewForm.documentType, scope.row)
-                      | formatMoney
-                  }}</span>
+                  <span
+                    v-if="
+                      scope.row.sellingType == 1 &&
+                      salesNewForm.documentType != 3
+                    "
+                    >{{
+                      calcSujeta(salesNewForm.documentType, scope.row)
+                        | formatMoney
+                    }}</span
+                  >
                 </template>
               </el-table-column>
               <el-table-column
                 prop="vexenta"
-                label="V. Exenta"
+                :label="this.salesNewForm.documentType != 3 ? 'V. Exenta' : ''"
                 min-width="75"
                 align="right"
               >
                 <template slot-scope="scope">
-                  <span v-if="scope.row.sellingType == 2">{{
-                    calcExenta(salesNewForm.documentType, scope.row)
-                      | formatMoney
-                  }}</span>
+                  <span
+                    v-if="
+                      scope.row.sellingType == 2 &&
+                      salesNewForm.documentType != 3
+                    "
+                    >{{
+                      calcExenta(salesNewForm.documentType, scope.row)
+                        | formatMoney
+                    }}</span
+                  >
                 </template>
               </el-table-column>
               <el-table-column
@@ -574,10 +594,16 @@
                 align="right"
               >
                 <template slot-scope="scope">
-                  <span v-if="scope.row.sellingType == 3">{{
-                    calcGravada(salesNewForm.documentType, scope.row)
-                      | formatMoney
-                  }}</span>
+                  <span
+                    v-if="
+                      scope.row.sellingType == 3 ||
+                      salesNewForm.documentType == 3
+                    "
+                    >{{
+                      calcGravada(salesNewForm.documentType, scope.row)
+                        | formatMoney
+                    }}</span
+                  >
                 </template>
               </el-table-column>
               <el-table-column min-width="80">
@@ -606,7 +632,7 @@
         <!-- sumas -->
         <table class="flex justify-end">
           <tbody class="text-sm divide-y divide-gray-300">
-            <tr class="flex space-x-16">
+            <tr class="flex space-x-16" v-if="salesNewForm.documentType != 3">
               <td align="right" class="text-blue-900 w-50">SUMAS:</td>
               <td align="right" class="text-gray-800">
                 {{ sumas | formatMoney }}
@@ -618,25 +644,25 @@
                 {{ taxes | formatMoney }}
               </td>
             </tr>
-            <tr class="flex space-x-16">
+            <tr class="flex space-x-16" v-if="salesNewForm.documentType != 3">
               <td align="right" class="text-blue-900 w-50">Subtotal:</td>
               <td align="right" class="text-gray-800">
                 {{ subtotal | formatMoney }}
               </td>
             </tr>
-            <tr class="flex space-x-16">
+            <tr class="flex space-x-16" v-if="salesNewForm.documentType != 3">
               <td align="right" class="text-blue-900 w-50">Iva retenido:</td>
               <td align="right" class="text-gray-800">
                 {{ ivaRetenido | formatMoney }}
               </td>
             </tr>
-            <tr class="flex space-x-16">
+            <tr class="flex space-x-16" v-if="salesNewForm.documentType != 3">
               <td align="right" class="text-blue-900 w-50">Ventas exentas:</td>
               <td align="right" class="text-gray-800">
                 {{ ventasExentas | formatMoney }}
               </td>
             </tr>
-            <tr class="flex space-x-16">
+            <tr class="flex space-x-16" v-if="salesNewForm.documentType != 3">
               <td align="right" class="text-blue-900 w-50">
                 Ventas no sujetas:
               </td>
@@ -711,7 +737,14 @@ export default {
         this.sellers = sellers.data.sellers;
         this.paymentConditions = paymentConditions.data.paymentConditions;
         this.customers = customers.data.customers;
-        this.documents = documents.data.documentTypes;
+        this.documents = [
+          ...documents.data.documentTypes,
+          {
+            id: 3,
+            name: "Comprobante exportacion",
+            code: "FCE",
+          },
+        ];
         this.loading = false;
         this.salesNewForm.documentType = 1;
         this.validateDocumentType(
@@ -1071,6 +1104,8 @@ export default {
                     done();
                   });
               } else {
+                instance.confirmButtonLoading = false;
+                instance.confirmButtonText = "Si, guardar";
                 done();
               }
             },
@@ -1095,6 +1130,10 @@ export default {
             case 2:
               uniPrice = amount / (incTax ? 1.13 : 1);
               this.newServiceForm.unitPrice = uniPrice;
+              break;
+            case 3:
+              uniPrice = amount;
+
               break;
           }
         }
@@ -1121,6 +1160,20 @@ export default {
           break;
         case 2:
           uniPrice = (amount / (incTax ? 1.13 : 1)) * quantity;
+
+          break;
+        case 3:
+          switch (sellingType) {
+            case 1:
+              uniPrice = amount * quantity;
+              break;
+            case 2:
+              uniPrice = amount * quantity;
+              break;
+            case 3:
+              uniPrice = amount * quantity;
+              break;
+          }
 
           break;
       }
@@ -1163,8 +1216,15 @@ export default {
               }
             }
             break;
+          case 3:
+            for (const d of details) {
+              sumas += parseFloat(d.quantity) * parseFloat(d.unitPrice);
+            }
+
+            break;
         }
       }
+
       return sumas;
     },
     sumasCF() {
@@ -1220,6 +1280,9 @@ export default {
               }
             }
             break;
+          case 3:
+            taxes = 0;
+            break;
         }
       }
       return taxes;
@@ -1253,12 +1316,16 @@ export default {
       ).total;
     },
     ventaTotal() {
-      return (
-        this.subtotal +
-        this.ventasExentas +
-        this.ventasNoSujetas +
-        this.ivaRetenido
-      );
+      if (this.salesNewForm.documentType == 3) {
+        return this.subtotal;
+      } else {
+        return (
+          this.subtotal +
+          this.ventasExentas +
+          this.ventasNoSujetas +
+          this.ivaRetenido
+        );
+      }
     },
     ivaRetenido() {
       let ivaRetenido = 0;

@@ -528,48 +528,66 @@
               >
                 <template slot-scope="scope">
                   <span>{{
-                    calcUniPrice(salesEditForm.documentType, scope.row)
+                    calcUnitPrice(salesEditForm.documentType, scope.row)
                       | formatMoney
                   }}</span>
                 </template>
               </el-table-column>
               <el-table-column
                 prop="vnosujeta"
-                label="V. No sujeta"
+                :label="salesEditForm.documentType != 3 ? 'V. No sujeta' : ''"
                 min-width="75"
                 align="right"
               >
                 <template slot-scope="scope">
-                  <span v-if="scope.row.sellingType == 1">{{
-                    calcSujeta(salesEditForm.documentType, scope.row)
-                      | formatMoney
-                  }}</span>
+                  <span
+                    v-if="
+                      scope.row.sellingType == 1 &&
+                      salesEditForm.documentType != 3
+                    "
+                    >{{
+                      calcSujeta(salesEditForm.documentType, scope.row)
+                        | formatMoney
+                    }}</span
+                  >
                 </template>
               </el-table-column>
               <el-table-column
                 prop="vexenta"
-                label="V. Exenta"
+                :label="salesEditForm.documentType != 3 ? 'V. Exenta' : ''"
                 min-width="75"
                 align="right"
               >
                 <template slot-scope="scope">
-                  <span v-if="scope.row.sellingType == 2">{{
-                    calcExenta(salesEditForm.documentType, scope.row)
-                      | formatMoney
-                  }}</span>
+                  <span
+                    v-if="
+                      scope.row.sellingType == 2 &&
+                      salesEditForm.documentType != 3
+                    "
+                    >{{
+                      calcExenta(salesEditForm.documentType, scope.row)
+                        | formatMoney
+                    }}</span
+                  >
                 </template>
               </el-table-column>
               <el-table-column
-                prop="vgravada"
+                prop="vgrabada"
                 label="V. Gravada"
                 min-width="75"
                 align="right"
               >
                 <template slot-scope="scope">
-                  <span v-if="scope.row.sellingType == 3">{{
-                    calcGravada(salesEditForm.documentType, scope.row)
-                      | formatMoney
-                  }}</span>
+                  <span
+                    v-if="
+                      scope.row.sellingType == 3 ||
+                      salesEditForm.documentType == 3
+                    "
+                    >{{
+                      calcGravada(salesEditForm.documentType, scope.row)
+                        | formatMoney
+                    }}</span
+                  >
                 </template>
               </el-table-column>
               <el-table-column min-width="80">
@@ -598,7 +616,7 @@
         <!-- sumas -->
         <table class="flex justify-end">
           <tbody class="text-sm divide-y divide-gray-300">
-            <tr class="flex space-x-16">
+            <tr class="flex space-x-16" v-if="salesEditForm.documentType != 3">
               <td align="right" class="text-blue-900 w-50">SUMAS:</td>
               <td align="right" class="text-gray-800">
                 {{ sumas | formatMoney }}
@@ -610,25 +628,25 @@
                 {{ taxes | formatMoney }}
               </td>
             </tr>
-            <tr class="flex space-x-16">
+            <tr class="flex space-x-16" v-if="salesEditForm.documentType != 3">
               <td align="right" class="text-blue-900 w-50">Subtotal:</td>
               <td align="right" class="text-gray-800">
                 {{ subtotal | formatMoney }}
               </td>
             </tr>
-            <tr class="flex space-x-16">
+            <tr class="flex space-x-16" v-if="salesEditForm.documentType != 3">
               <td align="right" class="text-blue-900 w-50">Iva retenido:</td>
               <td align="right" class="text-gray-800">
                 {{ ivaRetenido | formatMoney }}
               </td>
             </tr>
-            <tr class="flex space-x-16">
+            <tr class="flex space-x-16" v-if="salesEditForm.documentType != 3">
               <td align="right" class="text-blue-900 w-50">Ventas exentas:</td>
               <td align="right" class="text-gray-800">
                 {{ ventasExentas | formatMoney }}
               </td>
             </tr>
-            <tr class="flex space-x-16">
+            <tr class="flex space-x-16" v-if="salesEditForm.documentType != 3">
               <td align="right" class="text-blue-900 w-50">
                 Ventas no sujetas:
               </td>
@@ -760,7 +778,7 @@ export default {
         this.errorMessage = err.response.data.message;
       });
 
-    // checkBeforeEnter(this, storagekey, "salesNewForm");
+    // checkBeforeEnter(this, storagekey, "salesEditForm");
   },
   fetchOnServer: false,
   beforeRouteLeave(to, from, next) {
@@ -1027,7 +1045,6 @@ export default {
                 this.$axios
                   .put(`/invoices/${this.$route.query.ref}`, {
                     header: {
-                      documentType: formData.documentType,
                       authorization: formData.authorization,
                       sequence: formData.sequence,
                       invoiceDate: formData.invoiceRawDate,
@@ -1092,7 +1109,7 @@ export default {
       });
     },
 
-    calcUniPrice(documentType, { unitPrice, incTax, sellingType }) {
+    calcUnitPrice(documentType, { unitPrice, incTax, sellingType }) {
       let uniPrice = null;
       const amount = parseFloat(unitPrice);
       let message = null;
@@ -1103,10 +1120,14 @@ export default {
           switch (documentType) {
             case 1:
               uniPrice = amount * (incTax ? 1 : 1.13);
-
+              this.newServiceForm.unitPrice = uniPrice;
               break;
             case 2:
               uniPrice = amount / (incTax ? 1.13 : 1);
+              this.newServiceForm.unitPrice = uniPrice;
+              break;
+            case 3:
+              uniPrice = amount;
 
               break;
           }
@@ -1134,6 +1155,20 @@ export default {
           break;
         case 2:
           uniPrice = (amount / (incTax ? 1.13 : 1)) * quantity;
+
+          break;
+        case 3:
+          switch (sellingType) {
+            case 1:
+              uniPrice = amount * quantity;
+              break;
+            case 2:
+              uniPrice = amount * quantity;
+              break;
+            case 3:
+              uniPrice = amount * quantity;
+              break;
+          }
 
           break;
       }
@@ -1176,8 +1211,15 @@ export default {
               }
             }
             break;
+          case 3:
+            for (const d of details) {
+              sumas += parseFloat(d.quantity) * parseFloat(d.unitPrice);
+            }
+
+            break;
         }
       }
+
       return sumas;
     },
     sumasCF() {
@@ -1233,6 +1275,9 @@ export default {
               }
             }
             break;
+          case 3:
+            taxes = 0;
+            break;
         }
       }
       return taxes;
@@ -1266,12 +1311,16 @@ export default {
       ).total;
     },
     ventaTotal() {
-      return (
-        this.subtotal +
-        this.ventasExentas +
-        this.ventasNoSujetas +
-        this.ivaRetenido
-      );
+      if (this.salesEditForm.documentType == 3) {
+        return this.subtotal;
+      } else {
+        return (
+          this.subtotal +
+          this.ventasExentas +
+          this.ventasNoSujetas +
+          this.ivaRetenido
+        );
+      }
     },
     ivaRetenido() {
       let ivaRetenido = 0;
