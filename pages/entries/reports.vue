@@ -506,89 +506,44 @@ export default {
               );
               for (const i of mresults) {
                 data.push([
-                  {
-                    bold: i.code.length == 1,
-                    text: i.code,
-                  },
-                  {
-                    bold: i.code.length == 1,
-                    text: i.name,
-                  },
+                  i.code,
 
-                  {
-                    bold: i.code.length == 1,
-                    text:
-                      i.code.length == 1
-                        ? ""
-                        : this.$options.filters.formatMoney(i.initialBalance),
-                    alignment: "right",
-                  },
-                  {
-                    bold: i.code.length == 1,
-                    text:
-                      i.code.length == 1
-                        ? ""
-                        : this.$options.filters.formatMoney(i.cargo),
-                    alignment: "right",
-                  },
-                  {
-                    bold: i.code.length == 1,
-                    text:
-                      i.code.length == 1
-                        ? ""
-                        : this.$options.filters.formatMoney(i.abono),
-                    alignment: "right",
-                  },
-                  {
-                    bold: i.code.length == 1,
-                    text:
-                      i.code.length == 1
-                        ? ""
-                        : this.$options.filters.formatMoney(i.currentBalance),
-                    alignment: "right",
-                  },
-                  {
-                    bold: i.code.length == 1,
-                    text:
-                      i.code.length == 1
-                        ? ""
-                        : this.$options.filters.formatMoney(i.actualBalance),
-                    alignment: "right",
-                  },
+                  i.name,
+
+                  i.code.length == 1
+                    ? ""
+                    : this.$options.filters.formatMoney(i.initialBalance),
+
+                  i.code.length == 1
+                    ? ""
+                    : this.$options.filters.formatMoney(i.cargo),
+
+                  i.code.length == 1
+                    ? ""
+                    : this.$options.filters.formatMoney(i.abono),
+
+                  i.code.length == 1
+                    ? ""
+                    : this.$options.filters.formatMoney(i.currentBalance),
+
+                  i.code.length == 1
+                    ? ""
+                    : this.$options.filters.formatMoney(i.actualBalance),
                 ]);
               }
               data.push([
-                {
-                  bold: true,
-                  text: `*** TOTAL ${m.code} ${m.name} ***`,
-                  colSpan: 2,
-                },
-                {},
-                {
-                  bold: true,
-                  text: this.$options.filters.formatMoney(m.initialBalance),
-                  alignment: "right",
-                },
-                {
-                  bold: true,
-                  text: this.$options.filters.formatMoney(m.cargo),
-                  alignment: "right",
-                },
-                {
-                  bold: true,
-                  text: this.$options.filters.formatMoney(m.abono),
-                  alignment: "right",
-                },
-                {
-                  bold: true,
-                  text: this.$options.filters.formatMoney(m.currentBalance),
-                  alignment: "right",
-                },
-                {
-                  bold: true,
-                  text: this.$options.filters.formatMoney(m.actualBalance),
-                  alignment: "right",
-                },
+                `*** TOTAL ${m.code} ${m.name} ***`,
+
+                "",
+
+                this.$options.filters.formatMoney(m.initialBalance),
+
+                this.$options.filters.formatMoney(m.cargo),
+
+                this.$options.filters.formatMoney(m.abono),
+
+                this.$options.filters.formatMoney(m.currentBalance),
+                this.$options.filters.formatMoney(m.actualBalance),
               ]);
             }
             const document = [
