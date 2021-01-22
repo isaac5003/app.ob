@@ -737,15 +737,7 @@ export default {
         this.sellers = sellers.data.sellers;
         this.paymentConditions = paymentConditions.data.paymentConditions;
         this.customers = customers.data.customers;
-        this.documents = [
-          ...documents.data.documentTypes,
-          {
-            id: 3,
-            name: "Comprobante exportacion",
-            code: "FCE",
-          },
-        ];
-        this.loading = false;
+        (this.documents = documents.data.documentTypes), (this.loading = false);
         this.salesNewForm.documentType = 1;
         this.validateDocumentType(
           this.salesNewForm.documentType,
