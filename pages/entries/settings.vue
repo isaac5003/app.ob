@@ -744,10 +744,9 @@
           size="mini"
         >
           <el-table-column
-            sortable="true"
             prop="index"
             label="#"
-            min-width="50"
+            min-width="40"
             align="center"
           />
           <el-table-column prop="code" label="Código" min-width="90" />
@@ -759,11 +758,11 @@
           <el-table-column
             prop="description"
             label="Descripción general"
-            min-width="300"
+            min-width="290"
           />
           <el-table-column
             label="	(A)creedor/(D)eudor"
-            min-width="150"
+            min-width="160"
             align="center"
           >
             <template slot-scope="scope">{{
@@ -1018,6 +1017,7 @@
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-12">
             <el-table
+              v-loading="tableloading"
               ref="table"
               :data="tablesData"
               row-key="id"
@@ -1123,7 +1123,10 @@
         </div>
 
         <div class="flex justify-end mt-4">
-          <el-button type="primary" size="small" native-type="submit"
+          <el-button
+            type="primary"
+            size="small"
+            @click.native="submitResults(tablesData)"
             >Guardar</el-button
           >
           <el-button size="small">Cancelar</el-button>
@@ -1202,14 +1205,16 @@ export default {
       this.$axios.get("/entries/catalog", { params: this.page });
     const accounts = () => this.$axios.get("/entries/catalog");
     const balance = () => this.$axios.get("/entries/setting/balance-general");
-    Promise.all([accountCatalogs(), accounts(), balance()])
+    const results = () => this.$axios.get("/entries/setting/estado-resultados");
+    Promise.all([accountCatalogs(), accounts(), balance(), results()])
       .then((res) => {
-        const [accountCatalogs, accounts, balance] = res;
+        const [accountCatalogs, accounts, balance, results] = res;
         this.accounts = accountCatalogs.data.accountingCatalog;
         this.accountsCount = accountCatalogs.data.count;
         this.catalogs = accounts.data.accountingCatalog;
         this.tableData = balance.data.balanceGeneral.report;
         this.specialAccounts = { ...balance.data.balanceGeneral.special };
+        this.tablesData = results.data.estadoResultados;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
@@ -2050,7 +2055,58 @@ export default {
         ? newDisplayNameEstado
         : account.display;
     },
+    fetchResults() {
+      this.$axios
+        .get("/entries/setting/estado-resultados")
+        .then((res) => {
+          this.tablesData = res.data.estadoResultados;
+        })
+        .catch((err) => {
+          this.errorMessage = err.response.data.message;
+        })
+        .then((alw) => (this.tableloading = false));
+    },
 
+    submitResults(tablesData) {
+      this.$confirm(
+        "¿Estás seguro que deseas actualizar Estado de resultados?",
+        "Confirmación",
+        {
+          confirmButtonText: "Si, guardar",
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+
+              this.$axios
+                .put(`/entries/setting/estado-resultados`, {
+                  settings: tablesData,
+                })
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Exito",
+                    message: res.data.message,
+                  });
+                  this.fetchResults();
+
+                  done();
+                })
+                .catch((err) => (this.errorMessage = err.response.data.message))
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = "Si, guardar";
+                });
+            } else {
+              instance.confirmButtonLoading = false;
+              instance.confirmButtonText = "Si, guardar";
+              done();
+            }
+          },
+        }
+      );
+    },
     cancel() {
       this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
         confirmButtonText: "Si, salir",
