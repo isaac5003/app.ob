@@ -335,7 +335,7 @@
             </div>
             <!-- Fecha documento -->
             <div class="col-span-2">
-              <el-form-item  label="Fecha de venta" prop="invoiceDate">
+              <el-form-item label="Fecha de venta" prop="invoiceDate">
                 <el-date-picker
                   v-model="salesNewForm.invoiceDate"
                   size="small"
@@ -663,7 +663,9 @@
             native-type="submit"
             >Guardar</el-button
           >
-          <el-button size="small" @click="$router.push('/invoices')">Cancelar</el-button>
+          <el-button size="small" @click="$router.push('/invoices')"
+            >Cancelar</el-button
+          >
         </div>
       </div>
     </el-form>
@@ -1004,7 +1006,8 @@ export default {
                       invoicesPaymentsCondition:
                         formData.invoicesPaymentsCondition,
                       invoicesSeller: formData.invoicesSellers,
-                      sum: this.sumas,
+                      sum:
+                        formData.documentType == 1 ? this.sumasCF : this.sumas,
                       iva: this.taxes,
                       subtotal: this.subtotal,
                       ivaRetenido: this.ivaRetenido,
@@ -1164,11 +1167,44 @@ export default {
       }
       return sumas;
     },
+    sumasCF() {
+      const details = this.details;
+      let sumasCF = 0;
+      if (details) {
+        switch (this.salesNewForm.documentType) {
+          case 1:
+            for (const d of details) {
+              if (d.sellingType === 3) {
+                sumasCF +=
+                  (parseFloat(d.quantity) * parseFloat(d.unitPrice)) /
+                  (d.incTax ? 1.13 : 1);
+              }
+            }
+            break;
+        }
+      }
+      return sumasCF;
+    },
     taxes() {
       const details = this.details;
       let taxes = 0;
       if (details) {
         switch (this.salesNewForm.documentType) {
+          case 1:
+            for (const d of details) {
+              if (d.sellingType === 3) {
+                if (d.incTax) {
+                  const total =
+                    parseFloat(d.quantity) * parseFloat(d.unitPrice);
+                  taxes += total - total / 1.13;
+                } else {
+                  const total =
+                    parseFloat(d.quantity) * parseFloat(d.unitPrice);
+                  taxes += total * 0.13;
+                }
+              }
+            }
+            break;
           case 2:
             for (const d of details) {
               if (d.sellingType === 3) {
@@ -1189,7 +1225,9 @@ export default {
       return taxes;
     },
     subtotal() {
-      return this.sumas + this.taxes;
+      return this.salesNewForm.documentType == 1
+        ? this.sumasCF + this.taxes
+        : this.sumas + this.taxes;
     },
 
     ventasExentas() {
