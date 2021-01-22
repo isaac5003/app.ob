@@ -263,7 +263,7 @@ export default {
             this.generateEstadoResultados(dateRange);
             break;
           case "balanceComprobacion":
-            this.generateBalanceComprobacion(dateRange);
+            this.generateBalanceComprobacion(dateRange, radio);
             break;
           case "diarioMayor":
             this.getDiarioMayor(dateRange, radio);
@@ -283,6 +283,352 @@ export default {
         }
       });
     },
+    generateBalanceComprobacion(dateRange, fileType) {
+      const bussinesInfo = () => this.$axios.get("/business/info");
+      const balanceComprobacion = () =>
+        this.$axios.get("/entries/report/balance-comprobacion", {
+          params: { date: dateRange },
+        });
+
+      switch (fileType) {
+        case "pdf":
+          Promise.all([bussinesInfo(), balanceComprobacion()]).then((res) => {
+            const [bussinesInfo, balanceComprobacion] = res;
+            const { name, nit, nrc } = bussinesInfo.data.info;
+            const comprobationBalance =
+              balanceComprobacion.data.balanceComprobacion;
+
+            const values = [];
+            const emptyRow = [{}, {}, {}, {}, {}, {}, {}];
+            const mayores = comprobationBalance.filter(
+              (d) => d.code.length == 1
+            );
+
+            for (const m of mayores) {
+              values.push(emptyRow);
+              const mresults = comprobationBalance.filter((d) =>
+                d.code.startsWith(m.code)
+              );
+              for (const i of mresults) {
+                values.push([
+                  {
+                    bold: i.code.length == 1,
+                    text: i.code,
+                  },
+                  {
+                    bold: i.code.length == 1,
+                    text: i.name,
+                  },
+
+                  {
+                    bold: i.code.length == 1,
+                    text:
+                      i.code.length == 1
+                        ? ""
+                        : this.$options.filters.formatMoney(i.initialBalance),
+                    alignment: "right",
+                  },
+                  {
+                    bold: i.code.length == 1,
+                    text:
+                      i.code.length == 1
+                        ? ""
+                        : this.$options.filters.formatMoney(i.cargo),
+                    alignment: "right",
+                  },
+                  {
+                    bold: i.code.length == 1,
+                    text:
+                      i.code.length == 1
+                        ? ""
+                        : this.$options.filters.formatMoney(i.abono),
+                    alignment: "right",
+                  },
+                  {
+                    bold: i.code.length == 1,
+                    text:
+                      i.code.length == 1
+                        ? ""
+                        : this.$options.filters.formatMoney(i.currentBalance),
+                    alignment: "right",
+                  },
+                  {
+                    bold: i.code.length == 1,
+                    text:
+                      i.code.length == 1
+                        ? ""
+                        : this.$options.filters.formatMoney(i.actualBalance),
+                    alignment: "right",
+                  },
+                ]);
+              }
+              values.push([
+                {
+                  bold: true,
+                  text: `*** TOTAL ${m.code} ${m.name} ***`,
+                  colSpan: 2,
+                },
+                {},
+                {
+                  bold: true,
+                  text: this.$options.filters.formatMoney(m.initialBalance),
+                  alignment: "right",
+                },
+                {
+                  bold: true,
+                  text: this.$options.filters.formatMoney(m.cargo),
+                  alignment: "right",
+                },
+                {
+                  bold: true,
+                  text: this.$options.filters.formatMoney(m.abono),
+                  alignment: "right",
+                },
+                {
+                  bold: true,
+                  text: this.$options.filters.formatMoney(m.currentBalance),
+                  alignment: "right",
+                },
+                {
+                  bold: true,
+                  text: this.$options.filters.formatMoney(m.actualBalance),
+                  alignment: "right",
+                },
+              ]);
+            }
+            const docDefinition = {
+              pageSize: "LETTER",
+              pageOrientation: "portrait",
+              pageMargins: [15, 60, 15, 40],
+              header: getHeader(
+                name,
+                nit,
+                nrc,
+                this.$dateFns.lastDayOfMonth(new Date(dateRange)),
+                "BALANCE DE COMPROBACIÓN"
+              ),
+              footer: getFooter(),
+              content: [
+                {
+                  fontSize: 9,
+                  layout: "noBorders",
+                  table: {
+                    headerRows: 2,
+                    widths: ["12%", "auto", "10%", "9%", "9%", "9%", "10%"],
+                    heights: -5,
+                    body: [
+                      [
+                        {
+                          text: "CÓDIGO\nDE LA CUENTA",
+                          style: "tableHeader",
+                          rowSpan: 2,
+                        },
+                        {
+                          text: "NOMBRE\nDE LA CUENTA",
+                          style: "tableHeader",
+                          rowSpan: 2,
+                        },
+                        {
+                          alignment: "center",
+                          text: "BALANCE\nINICIAL",
+                          style: "tableHeader",
+                          rowSpan: 2,
+                        },
+                        {
+                          alignment: "center",
+                          text: "MES ACTUAL",
+                          style: "tableHeader",
+                          colSpan: 2,
+                        },
+                        {},
+                        {
+                          alignment: "center",
+                          text: "SALDO DEL\nPERÍODO",
+                          style: "tableHeader",
+                          rowSpan: 2,
+                        },
+                        {
+                          alignment: "center",
+                          text: "SALDO\nACTUAL",
+                          style: "tableHeader",
+                          rowSpan: 2,
+                        },
+                      ],
+                      [
+                        {},
+                        {},
+                        {},
+                        {
+                          alignment: "center",
+                          text: "CARGOS",
+                          style: "tableHeader",
+                        },
+                        {
+                          alignment: "center",
+                          text: "ABONOS",
+                          style: "tableHeader",
+                        },
+                        {},
+                        {},
+                      ],
+                      ...values,
+                    ],
+                  },
+                },
+              ],
+              styles: {
+                tableHeader: {
+                  bold: true,
+                  fontSize: 9,
+                },
+              },
+            };
+            this.generating = false;
+            pdfMake.createPdf(docDefinition).open();
+          });
+          break;
+        case "excel":
+          Promise.all([bussinesInfo(), balanceComprobacion()]).then((res) => {
+            const [bussinesInfo, balanceComprobacion] = res;
+            const { name, nit, nrc } = bussinesInfo.data.info;
+            const comprobationBalance =
+              balanceComprobacion.data.balanceComprobacion;
+
+            const data = [];
+
+            const mayores = comprobationBalance.filter(
+              (d) => d.code.length == 1
+            );
+
+            for (const m of mayores) {
+              const mresults = comprobationBalance.filter((d) =>
+                d.code.startsWith(m.code)
+              );
+              for (const i of mresults) {
+                data.push([
+                  {
+                    bold: i.code.length == 1,
+                    text: i.code,
+                  },
+                  {
+                    bold: i.code.length == 1,
+                    text: i.name,
+                  },
+
+                  {
+                    bold: i.code.length == 1,
+                    text:
+                      i.code.length == 1
+                        ? ""
+                        : this.$options.filters.formatMoney(i.initialBalance),
+                    alignment: "right",
+                  },
+                  {
+                    bold: i.code.length == 1,
+                    text:
+                      i.code.length == 1
+                        ? ""
+                        : this.$options.filters.formatMoney(i.cargo),
+                    alignment: "right",
+                  },
+                  {
+                    bold: i.code.length == 1,
+                    text:
+                      i.code.length == 1
+                        ? ""
+                        : this.$options.filters.formatMoney(i.abono),
+                    alignment: "right",
+                  },
+                  {
+                    bold: i.code.length == 1,
+                    text:
+                      i.code.length == 1
+                        ? ""
+                        : this.$options.filters.formatMoney(i.currentBalance),
+                    alignment: "right",
+                  },
+                  {
+                    bold: i.code.length == 1,
+                    text:
+                      i.code.length == 1
+                        ? ""
+                        : this.$options.filters.formatMoney(i.actualBalance),
+                    alignment: "right",
+                  },
+                ]);
+              }
+              data.push([
+                {
+                  bold: true,
+                  text: `*** TOTAL ${m.code} ${m.name} ***`,
+                  colSpan: 2,
+                },
+                {},
+                {
+                  bold: true,
+                  text: this.$options.filters.formatMoney(m.initialBalance),
+                  alignment: "right",
+                },
+                {
+                  bold: true,
+                  text: this.$options.filters.formatMoney(m.cargo),
+                  alignment: "right",
+                },
+                {
+                  bold: true,
+                  text: this.$options.filters.formatMoney(m.abono),
+                  alignment: "right",
+                },
+                {
+                  bold: true,
+                  text: this.$options.filters.formatMoney(m.currentBalance),
+                  alignment: "right",
+                },
+                {
+                  bold: true,
+                  text: this.$options.filters.formatMoney(m.actualBalance),
+                  alignment: "right",
+                },
+              ]);
+            }
+            const document = [
+              [name],
+              [
+                `BALANCE DE COMPROBACIÓN AL ${this.$dateFns.format(
+                  new Date(dateRange),
+                  "dd/MM/yyyy"
+                )}`,
+                "",
+                "",
+                "",
+                `NIT: ${nit}`,
+                `NRC: ${nrc}`,
+              ],
+              [""],
+              [
+                "CÓD. DE LA CUENTA",
+                "NOMBRE DE LA CUENTA",
+                "BALANCE INICIAL",
+                "MES ACTUAL",
+                "",
+                "SALDO DEL",
+                "SALDO ACTUAL",
+              ],
+              ["", "", "", "CARGOS", "ABONO", "PERIODO"],
+              [""],
+              ...data,
+            ];
+
+            const sheet = XLSX.utils.aoa_to_sheet(document);
+            const workbook = XLSX.utils.book_new();
+            const fileName = "report";
+            XLSX.utils.book_append_sheet(workbook, sheet, fileName);
+            XLSX.writeFile(workbook, `${fileName}.xlsx`);
+            this.generating = false;
+          });
+          break;
+      }
+    },
     getAccountingCatalog(fileType) {
       const catalog = () => this.$axios.get("/entries/catalog");
       const bussinesInfo = () => this.$axios.get("/business/info");
@@ -292,7 +638,7 @@ export default {
             const [catalog, bussinesInfo] = res;
             const catalogReport = catalog.data.accountingCatalog;
             const { name, nit, nrc } = bussinesInfo.data.info;
-            const values = catalogReport.map((c) => {
+            const data = catalogReport.map((c) => {
               return [
                 { bold: c.isParent, text: c.code },
                 { bold: c.isParent, text: c.name },
