@@ -744,10 +744,9 @@
           size="mini"
         >
           <el-table-column
-            sortable="true"
             prop="index"
             label="#"
-            min-width="50"
+            min-width="40"
             align="center"
           />
           <el-table-column prop="code" label="Código" min-width="90" />
@@ -759,11 +758,11 @@
           <el-table-column
             prop="description"
             label="Descripción general"
-            min-width="300"
+            min-width="290"
           />
           <el-table-column
             label="	(A)creedor/(D)eudor"
-            min-width="150"
+            min-width="160"
             align="center"
           >
             <template slot-scope="scope">{{
@@ -2083,9 +2082,7 @@ export default {
 
               this.$axios
                 .put(`/entries/setting/estado-resultados`, {
-                  settings: {
-                    estadoResultados: tablesData,
-                  },
+                  settings: tablesData,
                 })
                 .then((res) => {
                   this.$notify.success({
