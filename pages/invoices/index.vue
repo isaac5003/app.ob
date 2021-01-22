@@ -883,7 +883,25 @@ export default {
 
       return uniPrice;
     },
+    // updateStatus({ id }) {
+    //   this.$axios
+    //     .put(`/invoices/status/printed/${id}`)
+    //     .then((res) => {
+    //       this.$notify.success({
+    //         title: "Éxito",
+    //         message: res.data.message,
+    //       });
+    //       this.fetchInvoices();
+    //     })
+    //     .catch((err) => {
+    //       this.$notify.error({
+    //         title: "Error",
+    //         message: err.response.data.message,
+    //       });
+    //     });
+    // },
     printInvoice(id, documentType) {
+      console.log(id);
       this.$confirm(
         `¿Estás seguro que deseas imprimir esta factura?`,
         "Confirmación",
@@ -1109,25 +1127,21 @@ export default {
                             if (action === "confirm") {
                               //PUT invoices/status/printed/:id
                               //esta parte imagino que no esta todacia
-                              // this.processUpdateStatus(invoice.id, 2).then(
-                              //   (res) => {
-                              //     const { data, errors } = res.data;
-                              //     if (!errors) {
-                              //       this.rawInvoices =
-                              //         invoice.data.invoiceUpdateStatus;
-                              //     } else {
-                              //       this.$notify({
-                              //         title: "Error",
-                              //         message: errors[0].message,
-                              //         type: "error",
-                              //         duration: 3500,
-                              //       });
-                              //     }
-                              //     instance.confirmButtonLoading = false;
-                              //     instance.confirmButtonText = "Si, gracias";
-                              //     done();
-                              //   }
-                              // );
+                              this.$axios
+                                .put(`/invoices/status/printed/${id}`)
+                                .then((res) => {
+                                  this.$notify.success({
+                                    title: "Éxito",
+                                    message: res.data.message,
+                                  });
+                                  this.fetchInvoices();
+                                })
+                                .catch((err) => {
+                                  this.$notify.error({
+                                    title: "Error",
+                                    message: err.response.data.message,
+                                  });
+                                });
                               done();
                             } else {
                               done();
