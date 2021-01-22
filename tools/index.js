@@ -1,6 +1,6 @@
 const { format } = require('date-fns')
 const { es } = require('date-fns/locale')
-const { } = require('date-fns-tz')
+const { zonedTimeToUtc } = require('date-fns-tz')
 
 function getIcon(icon) {
   switch (icon) {
