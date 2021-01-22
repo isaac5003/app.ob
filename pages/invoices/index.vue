@@ -496,7 +496,14 @@
                   <el-dropdown-item
                     :divided="true"
                     class="font-semibold"
-                    v-if="scope.row.status.id == '1'"
+                    v-if="
+                      scope.row.status.id == '1' &&
+                      !isLastInvoice(
+                        scope.row.sequence,
+                        scope.row.documentType.id,
+                        scope.row.authorization
+                      )
+                    "
                     @click.native="deleteInvoice(scope.row)"
                   >
                     <i class="el-icon-delete"></i> Eliminar documento
@@ -506,11 +513,17 @@
                     class="text-red-500 font-semibold"
                     @click.native="voidDocument(scope.row)"
                     v-if="
-                      scope.row.status.id == '2' || scope.row.status.id == '1'
+                      scope.row.status.id === '2' ||
+                      (isLastInvoice(
+                        scope.row.sequence,
+                        scope.row.documentType.id,
+                        scope.row.authorization
+                      ) &&
+                        scope.row.status.id != '3')
                     "
                   >
                     <i class="el-icon-circle-close"></i>
-                    Anular venta
+                    Anular documento
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
@@ -621,6 +634,23 @@ export default {
     };
   },
   methods: {
+    isLastInvoice(sequence, documentTypeId, authorization) {
+      // Filtra las facturas del mismo tipo y numero de autorizacion.
+      const invoices = this.invoices.invoices.filter(
+        (invoice) =>
+          invoice.documentType.id === documentTypeId &&
+          invoice.authorization === authorization
+      );
+
+      // Obtiene la secuencia maxima de las facturas
+      const maxSequence = Math.max.apply(
+        Math,
+        invoices.map((invoice) => invoice.sequence)
+      );
+
+      // Verifica si la secuencia a analizar es menor que la secuencia maxima
+      return sequence < maxSequence;
+    },
     fetchInvoices() {
       this.tableloading = true;
       let params = this.page;
@@ -883,23 +913,6 @@ export default {
 
       return uniPrice;
     },
-    // updateStatus({ id }) {
-    //   this.$axios
-    //     .put(`/invoices/status/printed/${id}`)
-    //     .then((res) => {
-    //       this.$notify.success({
-    //         title: "Éxito",
-    //         message: res.data.message,
-    //       });
-    //       this.fetchInvoices();
-    //     })
-    //     .catch((err) => {
-    //       this.$notify.error({
-    //         title: "Error",
-    //         message: err.response.data.message,
-    //       });
-    //     });
-    // },
     printInvoice(id, documentType) {
       console.log(id);
       this.$confirm(
