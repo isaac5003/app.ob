@@ -10,11 +10,76 @@
     <el-dialog
       title="Vista previa"
       size="mini"
+      v-if="selectedInvoice"
       :visible.sync="showInvoicePreview"
       width="1000px"
       :append-to-body="true"
     >
-      <div class="flex flex-col space-y-3">
+      <div class="text-xs">
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-3 flex flex-col">
+            <span class="font-semibold">Tipo de documento</span>
+            <span>{{
+              selectedInvoice
+                ? `${selectedInvoice.documentType.code} -
+                  ${selectedInvoice.documentType.name}`
+                : ""
+            }}</span>
+          </div>
+          <div class="col-span-2 flex flex-col">
+            <span class="font-semibold">No. autorización</span>
+            <span>{{
+              selectedInvoice ? `${selectedInvoice.authorization}` : ""
+            }}</span>
+          </div>
+          <div class="col-span-2 flex flex-col">
+            <span class="font-semibold">Correlativo</span>
+            <span>{{
+              selectedInvoice ? `${selectedInvoice.sequence}` : ""
+            }}</span>
+          </div>
+          <div class="col-span-3 flex flex-col">
+            <span class="font-semibold">Fecha de factura</span>
+            <span>{{
+              selectedInvoice ? `${selectedInvoice.invoiceDate}` : ""
+            }}</span>
+          </div>
+          <div class="col-span-2 flex flex-col">
+            <span class="font-semibold">Estado</span>
+            <el-tag
+              size="small"
+              type="info"
+              v-if="selectedInvoice && selectedInvoice.status.id === 1"
+            >
+              <i class="el-icon-warning"></i>
+              {{ selectedInvoice.status.name }}</el-tag
+            >
+            <el-tag
+              size="small"
+              type="success"
+              v-else-if="selectedInvoice && selectedInvoice.status.id === 2"
+            >
+              <i class="el-icon-success"></i
+              >{{ selectedInvoice.status.name }}</el-tag
+            >
+            <el-tag
+              size="small"
+              type="warning"
+              v-else-if="selectedInvoice && selectedInvoice.status.id === 4"
+            >
+              <i class="el-icon-question"></i
+              >{{ selectedInvoice.status.name }}</el-tag
+            >
+            <el-tag
+              size="small"
+              type="danger"
+              v-else-if="selectedInvoice && selectedInvoice.status.id === 3"
+            >
+              <i class="el-icon-error"></i
+              >{{ selectedInvoice.status.name }}</el-tag
+            >
+          </div>
+        </div>
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-5">
             <span class="font-semibold">Cliente:</span>
@@ -85,61 +150,82 @@
           <el-table-column prop="quantity" label="Cant." min-width="55" />
           <el-table-column
             prop="chargeDescription"
-            label="Description"
-            min-width="500"
+            label="Descripción"
+            width="270"
           />
-          <el-table-column
-            prop="unitPrice"
-            label="Precio Unit."
-            min-width="100"
-          >
+          <el-table-column label="Precio Unit." min-width="75" align="right">
             <template slot-scope="scope">
-              <span>{{
-                calcUnitPrice(selectedInvoice.documentType, scope.row)
-                  | formatMoney
-              }}</span>
+              <span>{{ parseFloat(scope.row.unitPrice) | formatMoney }}</span>
             </template>
           </el-table-column>
           <el-table-column
-            prop="ventasNoSujetas"
-            label="V. No sujeta"
-            min-width="100"
+            prop="vnosujeta"
+            :label="selectedInvoice.documentType.id != 3 ? 'V. No sujeta' : ''"
+            min-width="75"
+            align="right"
           >
             <template slot-scope="scope">
-              <span v-if="scope.row.sellingType.id == 1">{{
-                calcSujeta(selectedInvoice.documentType, scope.row)
-                  | formatMoney
-              }}</span>
+              <span
+                v-if="
+                  scope.row.sellingType.id == 1 &&
+                  selectedInvoice.documentType.id != 3
+                "
+                >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
+              >
             </template>
           </el-table-column>
           <el-table-column
-            prop="ventasExentas"
-            label="V. Extenta"
-            min-width="100"
+            prop="vexenta"
+            :label="selectedInvoice.documentType.id != 3 ? 'V. Exenta' : ''"
+            min-width="75"
+            align="right"
           >
             <template slot-scope="scope">
-              <span v-if="scope.row.sellingType.id == 2">{{
-                calcExenta(selectedInvoice.documentType, scope.row)
-                  | formatMoney
-              }}</span>
+              <span
+                v-if="
+                  scope.row.sellingType.id == 2 &&
+                  selectedInvoice.documentType.id != 3
+                "
+                >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
+              >
             </template>
           </el-table-column>
-          <el-table-column label="V. Gravada" min-width="100">
+          <el-table-column
+            prop="vgrabada"
+            label="V. Gravada"
+            min-width="75"
+            align="right"
+          >
             <template slot-scope="scope">
-              <span v-if="scope.row.sellingType.id == 3">{{
-                calcGravada(selectedInvoice.documentType, scope.row)
-                  | formatMoney
-              }}</span>
+              <span
+                v-if="
+                  scope.row.sellingType.id == 3 ||
+                  selectedInvoice.documentType.id == 3
+                "
+                >{{
+                  (selectedInvoice.documentType.id == 1
+                    ? parseFloat(scope.row.ventaPrice) *
+                      (scope.row.incTax ? 1 : 1.13)
+                    : selectedInvoice.documentType.id == 2
+                    ? parseFloat(scope.row.ventaPrice) /
+                      (scope.row.incTax ? 1.13 : 1)
+                    : parseFloat(scope.row.ventaPrice)) | formatMoney
+                }}</span
+              >
             </template>
           </el-table-column>
         </el-table>
 
         <table class="flex justify-end">
           <tbody class="divide-y divide-gray-300">
-            <tr>
+            <tr v-if="selectedInvoice.documentType.id != 3">
               <td align="right" class="w-40">SUMAS:</td>
               <td align="right" class="w-25">
-                {{ selectedInvoice.sum | formatMoney }}
+                {{
+                  selectedInvoice.documentType.id == 1
+                    ? selectedInvoice.subtotal
+                    : selectedInvoice.sum | formatMoney
+                }}
               </td>
             </tr>
             <tr
@@ -154,32 +240,32 @@
                 {{ selectedInvoice.iva | formatMoney }}
               </td>
             </tr>
-            <tr>
+            <tr v-if="selectedInvoice.documentType.id != 3">
               <td align="right" class="w-40">Subtotal:</td>
               <td align="right" class="w-25">
                 {{ selectedInvoice.subtotal | formatMoney }}
               </td>
             </tr>
-            <tr>
+            <tr v-if="selectedInvoice.documentType.id != 3">
               <td align="right" class="w-40">Iva retenido:</td>
               <td align="right" class="w-25">
                 {{ selectedInvoice.ivaRetenido | formatMoney }}
               </td>
             </tr>
-            <tr>
+            <tr v-if="selectedInvoice.documentType.id != 3">
               <td align="right" class="w-40">Ventas exentas:</td>
               <td align="right" class="w-25">
                 {{ selectedInvoice.ventasExentas | formatMoney }}
               </td>
             </tr>
-            <tr>
+            <tr v-if="selectedInvoice.documentType.id != 3">
               <td align="right" class="w-40">Ventas no sujetas:</td>
               <td align="right" class="w-25">
                 {{ selectedInvoice.ventasNoSujetas | formatMoney }}
               </td>
             </tr>
             <tr>
-              <td align="right" class="ont-semibold w-40">Venta total:</td>
+              <td align="right" class="font-semibold w-40">Venta total:</td>
               <td align="right" class="w-25">
                 {{ selectedInvoice.ventaTotal | formatMoney }}
               </td>
@@ -393,13 +479,19 @@
       </el-form>
       <div class="flex flex-col space-y-2">
         <el-table
+          @sort-change="sortBy"
           :data="invoices.invoices"
           stripe
           size="mini"
           v-loading="tableloading"
         >
           <el-table-column prop="index" width="40" />
-          <el-table-column label="# Documento" width="120">
+          <el-table-column
+            label="# Documento"
+            prop="sequence"
+            width="140"
+            sortable="custom"
+          >
             <template slot-scope="scope">
               <span>
                 {{ scope.row.authorization }}-{{ scope.row.sequence }}
@@ -408,12 +500,34 @@
           </el-table-column>
           <el-table-column
             label="Tipo doc."
-            prop="documentType.code"
-            width="80"
+            prop="documentType.id"
+            width="100"
+            sortable="custom"
+          >
+            <template slot-scope="scope">
+              <span>
+                {{ scope.row.documentType.code }}
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="Fecha"
+            prop="invoiceDate"
+            width="90"
+            sortable="custom"
           />
-          <el-table-column label="Fecha" prop="invoiceDate" width="90" />
-          <el-table-column label="Cliente" prop="customerName" width="375" />
-          <el-table-column label="Estado" width="110">
+          <el-table-column
+            label="Cliente"
+            prop="customerName"
+            min-width="330"
+            sortable="custom"
+          />
+          <el-table-column
+            label="Estado"
+            prop="status.id"
+            width="110"
+            sortable="custom"
+          >
             <template slot-scope="scope">
               <el-tag
                 size="small"
@@ -449,7 +563,13 @@
               >
             </template>
           </el-table-column>
-          <el-table-column label="Total" width="80" align="right">
+          <el-table-column
+            label="Total"
+            width="80"
+            align="right"
+            prop="ventaTotal"
+            sortable="custom"
+          >
             <template slot-scope="scope">
               <span>{{ scope.row.ventaTotal | formatMoney }}</span>
             </template>
@@ -474,7 +594,9 @@
                   </el-dropdown-item>
                   <el-dropdown-item
                     v-if="scope.row.status.id == 1"
-                    @click.native="printInvoice(scope.row)"
+                    @click.native="
+                      printInvoice(scope.row.id, scope.row.documentType)
+                    "
                   >
                     <i class="el-icon-printer"></i>
                     Imprimir documento
@@ -494,7 +616,14 @@
                   <el-dropdown-item
                     :divided="true"
                     class="font-semibold"
-                    v-if="scope.row.status.id == '1'"
+                    v-if="
+                      scope.row.status.id == '1' &&
+                      !isLastInvoice(
+                        scope.row.sequence,
+                        scope.row.documentType.id,
+                        scope.row.authorization
+                      )
+                    "
                     @click.native="deleteInvoice(scope.row)"
                   >
                     <i class="el-icon-delete"></i> Eliminar documento
@@ -504,11 +633,17 @@
                     class="text-red-500 font-semibold"
                     @click.native="voidDocument(scope.row)"
                     v-if="
-                      scope.row.status.id == '2' || scope.row.status.id == '1'
+                      scope.row.status.id === '2' ||
+                      (isLastInvoice(
+                        scope.row.sequence,
+                        scope.row.documentType.id,
+                        scope.row.authorization
+                      ) &&
+                        scope.row.status.id != '3')
                     "
                   >
                     <i class="el-icon-circle-close"></i>
-                    Anular venta
+                    Anular documento
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
@@ -613,12 +748,37 @@ export default {
         service: "",
         searchValue: "",
         documentType: "",
+        prop: "",
+        order: null,
       },
+
       showInvoicePreview: false,
-      selectedInvoice: {},
+      selectedInvoice: null,
     };
   },
   methods: {
+    sortBy({ column, prop, order }) {
+      this.filter.prop = prop;
+      this.filter.order = order;
+      this.fetchInvoices();
+    },
+    isLastInvoice(sequence, documentTypeId, authorization) {
+      // Filtra las facturas del mismo tipo y numero de autorizacion.
+      const invoices = this.invoices.invoices.filter(
+        (invoice) =>
+          invoice.documentType.id === documentTypeId &&
+          invoice.authorization === authorization
+      );
+
+      // Obtiene la secuencia maxima de las facturas
+      const maxSequence = Math.max.apply(
+        Math,
+        invoices.map((invoice) => invoice.sequence)
+      );
+
+      // Verifica si la secuencia a analizar es menor que la secuencia maxima
+      return sequence < maxSequence;
+    },
     fetchInvoices() {
       this.tableloading = true;
       let params = this.page;
@@ -649,6 +809,13 @@ export default {
       }
       if (this.filter.service !== "") {
         params = { ...params, service: this.filter.service };
+      }
+      if (this.filter.order) {
+        params = {
+          ...params,
+          prop: this.filter.prop,
+          order: this.filter.order,
+        };
       }
       this.$axios
         .get("/invoices", { params })
@@ -881,7 +1048,7 @@ export default {
 
       return uniPrice;
     },
-    printInvoice({ id, documentType }) {
+    printInvoice(id, documentType) {
       this.$confirm(
         `¿Estás seguro que deseas imprimir esta factura?`,
         "Confirmación",
@@ -893,393 +1060,276 @@ export default {
             if (action === "confirm") {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
-              // /invoices/documents/:id/layout documentType.id
-              this.$axios
-                .get(`/invoices/${id}`)
+              const invoice = () => this.$axios.get(`/invoices/${id}`);
+              const document = () =>
+                this.$axios.get(
+                  `/invoices/documents/${documentType.id}/layout`
+                );
+              Promise.all([invoice(), document()])
                 .then((res) => {
-                  const data = res.data;
-                  if (data) {
-                    try {
-                      const vadd = 1;
-                      const hadd = 3;
-                      const conf = {
-                        configuration: "positions",
-                        resolution: [216, 279],
-                        header: [
-                          {
-                            position: [[160, 31]],
-                            lenght: 30,
-                            value: "invoice_autorization",
-                            type: "text",
-                          },
-                          {
-                            position: [[190, 31]],
-                            lenght: 15,
-                            value: "invoice_number",
-                            type: "text",
-                          },
-                          {
-                            position: [[25, 54]],
-                            lenght: 105,
-                            value: "customer_name",
-                            type: "text",
-                          },
-                          {
-                            position: [[145, 54]],
-                            lenght: 60,
-                            value: "invoice_date",
-                            type: "date",
-                          },
-                          {
-                            position: [[30, 60]],
-                            lenght: 100,
-                            value: "customer_address1",
-                            type: "text",
-                          },
-                          {
-                            position: [[153, 66]],
-                            lenght: 55,
-                            value: "customer_nit",
-                            type: "text",
-                          },
-                          {
-                            position: [[45, 66]],
-                            lenght: 85,
-                            value: "seller_name",
-                            type: "text",
-                          },
-                        ],
-                        details: {
-                          position_y: 80,
-                          quantity: {
-                            position: [12],
-                            value: "charge_quantity",
-                            type: "text",
-                          },
-                          description: {
-                            position: [23],
-                            value: "charge_description",
-                            lenght: 110,
-                            type: "text",
-                          },
-                          price: {
-                            position: [140],
-                            value: "unit_price",
-                            type: "text",
-                          },
-                          sujeto: {
-                            position: [154],
-                            value: "unit_price",
-                            type: "text",
-                          },
-                          exento: {
-                            position: [168],
-                            value: "unit_price",
-                            type: "text",
-                          },
-                          afecto: {
-                            position: [187],
-                            value: "venta_price",
-                            type: "text",
-                          },
-                        },
-                        totals: [
-                          {
-                            position: [185, 138],
-                            value: "subtotal",
-                            type: "money",
-                          },
-                          {
-                            position: [185, 144],
-                            value: "iva_retenido",
-                            type: "money",
-                          },
-                          {
-                            position: [185, 152],
-                            value: "subtotal",
-                            type: "money",
-                          },
-                          {
-                            position: [185, 159],
-                            value: "ventas_no_sujetas",
-                            type: "money",
-                          },
-                          {
-                            position: [185, 165],
-                            value: "ventas_exentas",
-                            type: "money",
-                          },
-                          {
-                            position: [185, 171],
-                            value: "venta_total",
-                            type: "money",
-                          },
-                          {
-                            position: [10, 143],
-                            value: "venta_total_text",
-                            type: "text",
-                          },
-                        ],
-                      };
+                  const [invoice, document] = res;
+                  try {
+                    const vadd = 1;
+                    const hadd = 3;
+                    const conf = document.data.layout;
 
-                      // Crea el documento base
-                      const pdfDocument = new jsPDF({
-                        orientation: "portrait",
-                        unit: "mm",
-                        format: conf.resolution,
-                      });
-                      pdfDocument.setFontSize(9.5);
+                    // Crea el documento base
+                    const pdfDocument = new jsPDF({
+                      orientation: "portrait",
+                      unit: "mm",
+                      format: conf.resolution,
+                    });
+                    pdfDocument.setFontSize(9.5);
 
-                      // Agrega el encabezado
-                      for (const header of conf.header) {
-                        let value = "";
-                        switch (header.value) {
-                          case "invoice_autorization":
-                            value = data.invoice.authorization;
-                            break;
-                          case "invoice_number":
-                            value = data.invoice.sequence;
-                            break;
-                          case "customer_name":
-                            value = data.invoice.customerName;
-                            break;
-                          case "invoice_date":
-                            value = data.invoice.invoiceDate;
-                            break;
-                          case "customer_address1":
-                            value = data.invoice.customerAddress1;
-                            break;
-                          case "customer_address2":
-                            value = data.invoice.customerAddress2;
-                            break;
-                          case "customer_nrc":
-                            value = data.invoice.customerNrc;
-                            break;
-                          case "customer_nit":
-                            value = data.invoice.customerNit;
-                            break;
-                          case "customer_city":
-                            value = data.invoice.customerCity;
-                            break;
-                          case "customer_giro":
-                            value = data.invoice.customerGiro;
-                            break;
-                          case "customer_state":
-                            value = data.invoice.customerState;
-                            break;
-                          case "seller_name":
-                            value = data.invoice.invoicesSeller.name;
-                            break;
-                          case "payment_condition":
-                            value = data.invoice.invoicesPaymentsCondition.name;
-                            break;
-                        }
-
-                        const splitText = pdfDocument.splitTextToSize(
-                          value,
-                          header.lenght
-                        );
-
-                        pdfDocument.text(
-                          splitText[0],
-                          parseInt(header.position[0][0]) + vadd,
-                          parseInt(header.position[0][1]) + hadd
-                        );
+                    // Agrega el encabezado
+                    for (const header of conf.header) {
+                      let value = "";
+                      switch (header.value) {
+                        case "invoice_autorization":
+                          value = invoice.data.invoice.authorization;
+                          break;
+                        case "invoice_number":
+                          value = invoice.data.invoice.sequence;
+                          break;
+                        case "customer_name":
+                          value = invoice.data.invoice.customerName;
+                          break;
+                        case "invoice_date":
+                          value = invoice.data.invoice.invoiceDate;
+                          break;
+                        case "customer_address1":
+                          value = invoice.data.invoice.customerAddress1;
+                          break;
+                        case "customer_address2":
+                          value = invoice.data.invoice.customerAddress2;
+                          break;
+                        case "customer_nrc":
+                          value = invoice.data.invoice.customerNrc;
+                          break;
+                        case "customer_nit":
+                          value = invoice.data.invoice.customerNit;
+                          break;
+                        case "customer_city":
+                          value = invoice.data.invoice.customerCity;
+                          break;
+                        case "customer_giro":
+                          value = invoice.data.invoice.customerGiro;
+                          break;
+                        case "customer_state":
+                          value = invoice.data.invoice.customerState;
+                          break;
+                        case "seller_name":
+                          value = invoice.data.invoice.invoicesSeller.name;
+                          break;
+                        case "payment_condition":
+                          value =
+                            invoice.data.invoice.invoicesPaymentsCondition.name;
+                          break;
                       }
 
-                      // Agrega los detalles
-                      let acumRows = 0;
-                      for (const detail of data.invoice.details) {
-                        const acumHeight = acumRows * 5;
-                        const position_x = 1;
-                        const position_y =
-                          acumHeight + hadd + conf.details.position_y;
-                        const {
-                          quantity,
-                          chargeDescription,
-                          unitPrice,
-                          sellingType,
-                          incTax,
-                          ventaPrice,
-                        } = detail;
+                      const splitText = pdfDocument.splitTextToSize(
+                        value,
+                        header.lenght
+                      );
 
-                        // Quantity
-                        pdfDocument.text(
-                          parseFloat(quantity).toFixed(2),
-                          conf.details.quantity.position[0] + position_x,
-                          position_y
-                        );
-                        // Description
-                        const splitDescription = pdfDocument.splitTextToSize(
-                          chargeDescription,
-                          conf.details.description.lenght
-                        );
-                        acumRows = acumRows + splitDescription.length;
-                        pdfDocument.text(
-                          splitDescription,
-                          conf.details.description.position[0] + position_x,
-                          position_y
-                        );
-                        // Price
-                        pdfDocument.text(
-                          this.$options.filters.formatMoney(unitPrice),
-                          conf.details.price.position[0] + position_x,
-                          position_y
-                        );
-                        const documentType = data.invoice.documentType;
-                        // Ventas no sujetas
-                        pdfDocument.text(
-                          sellingType.id == 1
-                            ? this.$options.filters.formatMoney(ventaPrice)
-                            : "",
-                          conf.details.sujeto.position[0] + position_x,
-                          position_y
-                        );
-                        // Ventas exentas
-                        pdfDocument.text(
-                          sellingType.id == 2
-                            ? this.$options.filters.formatMoney(ventaPrice)
-                            : "",
-                          conf.details.exento.position[0] + position_x,
-                          position_y
-                        );
-                        // Ventas afectas
-                        pdfDocument.text(
-                          sellingType.id == 3
-                            ? this.$options.filters.formatMoney(ventaPrice)
-                            : "",
-                          conf.details.afecto.position[0] + position_x,
-                          position_y
-                        );
-                      }
-
-                      // Agrega los totales
-                      for (const total of conf.totals) {
-                        let value = "";
-                        switch (total.value) {
-                          case "sum":
-                            value = this.$options.filters.formatMoney(
-                              data.invoice.sum
-                            );
-                            break;
-                          case "iva":
-                            value = this.$options.filters.formatMoney(
-                              data.invoice.iva
-                            );
-                            break;
-                          case "subtotal":
-                            value = this.$options.filters.formatMoney(
-                              data.invoice.subtotal
-                            );
-                            break;
-                          case "iva_retenido":
-                            value = this.$options.filters.formatMoney(
-                              data.invoice.ivaRetenido
-                            );
-                            break;
-                          case "ventas_exentas":
-                            value = this.$options.filters.formatMoney(
-                              data.invoice.ventasExentas
-                            );
-                            break;
-                          case "ventas_no_sujetas":
-                            value = this.$options.filters.formatMoney(
-                              data.invoice.ventasNoSujetas
-                            );
-                            break;
-                          case "venta_total":
-                            value = this.$options.filters.formatMoney(
-                              data.invoice.ventaTotal
-                            );
-                            break;
-                          case "venta_total_text":
-                            value = numeroALetras(data.invoice.ventaTotal);
-                            break;
-                        }
-                        const splitText = pdfDocument.splitTextToSize(
-                          value,
-                          total.lenght
-                        );
-                        pdfDocument.text(
-                          splitText,
-                          parseInt(total.position[0]) + vadd,
-                          parseInt(total.position[1]) + hadd
-                        );
-                      }
-
-                      setTimeout(() => {
-                        this.$confirm(
-                          "¿Se ha impreso la factura correctamente?",
-                          "Confirmación",
-                          {
-                            confirmButtonText: "Si, gracias",
-                            cancelButtonText: "No",
-                            type: "warning",
-                            beforeClose: (action, instance, done) => {
-                              if (action === "confirm") {
-                                instance.confirmButtonLoading = true;
-                                instance.confirmButtonText = "Procesando...";
-                                //PUT invoices/status/printed/:id
-                                this.processUpdateStatus(invoice.id, 2).then(
-                                  (res) => {
-                                    const { data, errors } = res.data;
-                                    if (!errors) {
-                                      this.rawInvoices =
-                                        data.invoiceUpdateStatus;
-                                    } else {
-                                      this.$notify({
-                                        title: "Error",
-                                        message: errors[0].message,
-                                        type: "error",
-                                        duration: 3500,
-                                      });
-                                    }
-                                    instance.confirmButtonLoading = false;
-                                    instance.confirmButtonText = "Si, gracias";
-                                    done();
-                                  }
-                                );
-                              } else {
-                                done();
-                              }
-                            },
-                          }
-                        ).catch(() => {
-                          this.$confirm(
-                            "¿Deseas intentar imprimirlo nuevamente?",
-                            "Confirmación",
-                            {
-                              confirmButtonText: "Si, porfavor",
-                              cancelButtonText: "No, gracias",
-                              type: "warning",
-                            }
-                          ).then(() => {
-                            this.printInvoice({ id, documentType });
-                          });
-                        });
-                      }, 3000);
-
-                      pdfDocument.autoPrint();
-
-                      window.open(pdfDocument.output("bloburl"), "_blank");
-                    } catch (error) {
-                      this.$message.error(
-                        "Error al generar el PDF, contacta con tu administrador."
+                      pdfDocument.text(
+                        splitText[0],
+                        parseInt(header.position[0][0]) + vadd,
+                        parseInt(header.position[0][1]) + hadd
                       );
                     }
-                  } else {
-                    this.$notify({
-                      title: "Error",
-                      message:
-                        "Ha ocurrido un error al obtener la informacion. Contacta con tu administrador.",
-                      type: "error",
-                    });
+
+                    // Agrega los detalles
+                    let acumRows = 0;
+                    for (const detail of invoice.data.invoice.details) {
+                      const acumHeight = acumRows * 5;
+                      const position_x = 1;
+                      const position_y =
+                        acumHeight + hadd + conf.details.position_y;
+                      const {
+                        quantity,
+                        chargeDescription,
+                        unitPrice,
+                        sellingType,
+                        incTax,
+                        ventaPrice,
+                      } = detail;
+
+                      // Quantity
+                      pdfDocument.text(
+                        parseFloat(quantity).toFixed(2),
+                        conf.details.quantity.position[0] + position_x,
+                        position_y
+                      );
+                      // Description
+                      const splitDescription = pdfDocument.splitTextToSize(
+                        chargeDescription,
+                        conf.details.description.lenght
+                      );
+                      acumRows = acumRows + splitDescription.length;
+                      pdfDocument.text(
+                        splitDescription,
+                        conf.details.description.position[0] + position_x,
+                        position_y
+                      );
+                      // Price
+                      pdfDocument.text(
+                        this.$options.filters.formatMoney(unitPrice),
+                        conf.details.price.position[0] + position_x,
+                        position_y
+                      );
+                      const documentType = invoice.data.invoice.documentType;
+                      // Ventas no sujetas
+                      pdfDocument.text(
+                        sellingType.id == 1
+                          ? this.$options.filters.formatMoney(ventaPrice)
+                          : "",
+                        conf.details.sujeto.position[0] + position_x,
+                        position_y
+                      );
+                      // Ventas exentas
+                      pdfDocument.text(
+                        sellingType.id == 2
+                          ? this.$options.filters.formatMoney(ventaPrice)
+                          : "",
+                        conf.details.exento.position[0] + position_x,
+                        position_y
+                      );
+                      // Ventas afectas
+                      pdfDocument.text(
+                        sellingType.id == 3
+                          ? this.$options.filters.formatMoney(ventaPrice)
+                          : "",
+                        conf.details.afecto.position[0] + position_x,
+                        position_y
+                      );
+                    }
+
+                    // Agrega los totales
+                    for (const total of conf.totals) {
+                      let value = "";
+                      switch (total.value) {
+                        case "sum":
+                          value = this.$options.filters.formatMoney(
+                            invoice.data.invoice.sum
+                          );
+                          break;
+                        case "iva":
+                          value = this.$options.filters.formatMoney(
+                            invoice.data.invoice.iva
+                          );
+                          break;
+                        case "subtotal":
+                          value = this.$options.filters.formatMoney(
+                            invoice.data.invoice.subtotal
+                          );
+                          break;
+                        case "iva_retenido":
+                          value = this.$options.filters.formatMoney(
+                            invoice.data.invoice.ivaRetenido
+                          );
+                          break;
+                        case "ventas_exentas":
+                          value = this.$options.filters.formatMoney(
+                            invoice.data.invoice.ventasExentas
+                          );
+                          break;
+                        case "ventas_no_sujetas":
+                          value = this.$options.filters.formatMoney(
+                            invoice.data.invoice.ventasNoSujetas
+                          );
+                          break;
+                        case "venta_total":
+                          value = this.$options.filters.formatMoney(
+                            invoice.data.invoice.ventaTotal
+                          );
+                          break;
+                        case "venta_total_text":
+                          value = numeroALetras(
+                            invoice.data.invoice.ventaTotal
+                          );
+                          break;
+                      }
+                      const splitText = pdfDocument.splitTextToSize(
+                        value,
+                        total.lenght
+                      );
+                      pdfDocument.text(
+                        splitText,
+                        parseInt(total.position[0]) + vadd,
+                        parseInt(total.position[1]) + hadd
+                      );
+                    }
+
+                    setTimeout(() => {
+                      this.$confirm(
+                        "¿Se ha impreso la factura correctamente?",
+                        "Confirmación",
+                        {
+                          confirmButtonText: "Si, gracias",
+                          cancelButtonText: "No",
+                          type: "warning",
+                          beforeClose: (action, instance, done) => {
+                            if (action === "confirm") {
+                              //PUT invoices/status/printed/:id
+                              //esta parte imagino que no esta todacia
+                              this.$axios
+                                .put(`/invoices/status/printed/${id}`)
+                                .then((res) => {
+                                  this.$notify.success({
+                                    title: "Éxito",
+                                    message: res.data.message,
+                                  });
+                                  this.fetchInvoices();
+                                })
+                                .catch((err) => {
+                                  this.$notify.error({
+                                    title: "Error",
+                                    message: err.response.data.message,
+                                  });
+                                });
+                              done();
+                            } else {
+                              done();
+                            }
+                          },
+                        }
+                      ).catch(() => {
+                        this.$confirm(
+                          "¿Deseas intentar imprimirlo nuevamente?",
+                          "Confirmación",
+                          {
+                            confirmButtonText: "Si, porfavor",
+                            cancelButtonText: "No, gracias",
+                            type: "warning",
+                          }
+                        )
+                          .then(() => {
+                            this.printInvoice(id, documentType);
+                          })
+                          .catch(() => {
+                            done();
+                          });
+                      });
+                    }, 3000);
+
+                    pdfDocument.autoPrint();
+
+                    window.open(pdfDocument.output("bloburl"), "_blank");
+                  } catch (error) {
+                    this.$message.error(
+                      "Error al generar el PDF, contacta con tu administrador."
+                    );
                   }
+                })
+                .catch((err) => {
+                  this.errorMessage = err.response.data.message;
+                })
+                .then((alw) => {
                   instance.confirmButtonLoading = false;
                   instance.confirmButtonText = `Si, imprimir`;
                   done();
-                })
-                .catch((err) => this.$message.error(err));
+                });
             } else {
               done();
             }
