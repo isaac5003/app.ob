@@ -19,12 +19,12 @@ export default {
     return {
       menu: [
         {
-          name: "Nueva factura",
+          name: "Nuevo documento",
           icon: getIcon("plus"),
           path: "/invoices/new",
         },
         {
-          name: "Listado de facturas",
+          name: "Listado de documentos",
           icon: getIcon("menu"),
           path: "/invoices",
           epath: ["/invoices/edit"],

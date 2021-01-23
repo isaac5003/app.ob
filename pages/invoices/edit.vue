@@ -1,11 +1,11 @@
 <template>
   <layout-content
     v-loading="loading"
-    page-title="Editar Factura"
+    page-title="Editar documento"
     :breadcrumb="[
-      { name: 'Facturas', to: '/sales' },
+      { name: 'Ventas', to: '/invoices' },
 
-      { name: 'Editar factura', to: null },
+      { name: 'Editar documento', to: null },
     ]"
   >
     <!-- dialogo addservicio-->
@@ -259,17 +259,16 @@
       </span>
     </el-dialog>
     <!-- noticication -->
-    <!-- <div class="grid grid-cols-12">
+    <div class="grid grid-cols-12" v-if="activeNotification">
       <div class="col-span-12">
         <Notification
-          
           class="mb-4 w-full"
           type="danger"
           title="Atención"
           message="No puede dar crédito fiscal a un cliente que no declare IVA."
         />
       </div>
-    </div> -->
+    </div>
     <el-form
       :model="salesEditForm"
       :rules="salesEditFormRules"
@@ -330,7 +329,7 @@
             </div>
             <!-- Fecha Factura -->
             <div class="col-span-2">
-              <el-form-item label="Fecha de factura" prop="invoiceRawDate">
+              <el-form-item label="Fecha de venta" prop="invoiceRawDate">
                 <el-date-picker
                   v-model="salesEditForm.invoiceRawDate"
                   size="small"
@@ -357,7 +356,7 @@
                   filterable
                   default-first-option
                   placeholder="Seleccionar"
-                  disabled
+                  @change="getCustomerDetails(salesEditForm.customer)"
                 >
                   <el-option
                     v-for="c in customers"
@@ -371,7 +370,7 @@
             </div>
             <!-- sucursal -->
             <div class="col-span-2">
-              <el-form-item label="Sucursal" prop="customerBranch">
+              <el-form-item label="Sucursal" prop="customerBranch" ref="branch">
                 <el-select
                   v-model="salesEditForm.customerBranch"
                   class="w-full"
@@ -380,7 +379,7 @@
                   default-first-option
                   size="small"
                   placeholder="Seleccionar"
-                  @change="selectBranch(salesEditForm.branch, branches)"
+                  @change="selectBranch(salesEditForm.customerBranch, branches)"
                 >
                   <el-option
                     v-for="br in branches"
@@ -529,48 +528,66 @@
               >
                 <template slot-scope="scope">
                   <span>{{
-                    calcUniPrice(salesEditForm.documentType, scope.row)
+                    calcUnitPrice(salesEditForm.documentType, scope.row)
                       | formatMoney
                   }}</span>
                 </template>
               </el-table-column>
               <el-table-column
                 prop="vnosujeta"
-                label="V. No sujeta"
+                :label="salesEditForm.documentType != 3 ? 'V. No sujeta' : ''"
                 min-width="75"
                 align="right"
               >
                 <template slot-scope="scope">
-                  <span v-if="scope.row.sellingType == 1">{{
-                    calcSujeta(salesEditForm.documentType, scope.row)
-                      | formatMoney
-                  }}</span>
+                  <span
+                    v-if="
+                      scope.row.sellingType == 1 &&
+                      salesEditForm.documentType != 3
+                    "
+                    >{{
+                      calcSujeta(salesEditForm.documentType, scope.row)
+                        | formatMoney
+                    }}</span
+                  >
                 </template>
               </el-table-column>
               <el-table-column
                 prop="vexenta"
-                label="V. Exenta"
+                :label="salesEditForm.documentType != 3 ? 'V. Exenta' : ''"
                 min-width="75"
                 align="right"
               >
                 <template slot-scope="scope">
-                  <span v-if="scope.row.sellingType == 2">{{
-                    calcExenta(salesEditForm.documentType, scope.row)
-                      | formatMoney
-                  }}</span>
+                  <span
+                    v-if="
+                      scope.row.sellingType == 2 &&
+                      salesEditForm.documentType != 3
+                    "
+                    >{{
+                      calcExenta(salesEditForm.documentType, scope.row)
+                        | formatMoney
+                    }}</span
+                  >
                 </template>
               </el-table-column>
               <el-table-column
-                prop="vgravada"
+                prop="vgrabada"
                 label="V. Gravada"
                 min-width="75"
                 align="right"
               >
                 <template slot-scope="scope">
-                  <span v-if="scope.row.sellingType == 3">{{
-                    calcGravada(salesEditForm.documentType, scope.row)
-                      | formatMoney
-                  }}</span>
+                  <span
+                    v-if="
+                      scope.row.sellingType == 3 ||
+                      salesEditForm.documentType == 3
+                    "
+                    >{{
+                      calcGravada(salesEditForm.documentType, scope.row)
+                        | formatMoney
+                    }}</span
+                  >
                 </template>
               </el-table-column>
               <el-table-column min-width="80">
@@ -599,7 +616,7 @@
         <!-- sumas -->
         <table class="flex justify-end">
           <tbody class="text-sm divide-y divide-gray-300">
-            <tr class="flex space-x-16">
+            <tr class="flex space-x-16" v-if="salesEditForm.documentType != 3">
               <td align="right" class="text-blue-900 w-50">SUMAS:</td>
               <td align="right" class="text-gray-800">
                 {{ sumas | formatMoney }}
@@ -611,25 +628,25 @@
                 {{ taxes | formatMoney }}
               </td>
             </tr>
-            <tr class="flex space-x-16">
+            <tr class="flex space-x-16" v-if="salesEditForm.documentType != 3">
               <td align="right" class="text-blue-900 w-50">Subtotal:</td>
               <td align="right" class="text-gray-800">
                 {{ subtotal | formatMoney }}
               </td>
             </tr>
-            <tr class="flex space-x-16">
+            <tr class="flex space-x-16" v-if="salesEditForm.documentType != 3">
               <td align="right" class="text-blue-900 w-50">Iva retenido:</td>
               <td align="right" class="text-gray-800">
                 {{ ivaRetenido | formatMoney }}
               </td>
             </tr>
-            <tr class="flex space-x-16">
+            <tr class="flex space-x-16" v-if="salesEditForm.documentType != 3">
               <td align="right" class="text-blue-900 w-50">Ventas exentas:</td>
               <td align="right" class="text-gray-800">
                 {{ ventasExentas | formatMoney }}
               </td>
             </tr>
-            <tr class="flex space-x-16">
+            <tr class="flex space-x-16" v-if="salesEditForm.documentType != 3">
               <td align="right" class="text-blue-900 w-50">
                 Ventas no sujetas:
               </td>
@@ -656,7 +673,9 @@
             native-type="submit"
             >Guardar</el-button
           >
-          <el-button size="small">Cancelar</el-button>
+          <el-button size="small" @click="$router.push('/invoices')"
+            >Cancelar</el-button
+          >
         </div>
       </div>
     </el-form>
@@ -664,15 +683,15 @@
 </template>
 
 <script>
-import LayoutContent from "../../../components/layout/Content";
+import LayoutContent from "../../components/layout/Content";
 import {
   inputValidation,
   selectValidation,
   checkBeforeLeave,
   checkBeforeEnter,
   amountValidate,
-} from "../../../tools";
-import Notification from "../../../components/Notification";
+} from "../../tools";
+import Notification from "../../components/Notification";
 
 const storagekey = "Edit-sales";
 
@@ -681,10 +700,10 @@ export default {
   components: { LayoutContent, Notification },
   fetch() {
     this.$axios
-      .get(`/invoices/${this.$route.params.id}`)
+      .get(`/invoices/${this.$route.query.ref}`)
       .then(({ data }) => {
         const customer = () =>
-          this.$axios.get(`/customers/${data.invoice.customer.id}`, {
+          this.$axios.get(`/customers`, {
             params: { isActiveCustomer: true },
           });
         const branches = () =>
@@ -714,7 +733,7 @@ export default {
               branches,
             ] = res;
 
-            this.customers = [customer.data.customer];
+            this.customers = customer.data.customers;
             this.documents = documentTypes.data.documentTypes;
             this.sellers = sellers.data.sellers;
             this.paymentConditions = paymentConditions.data.paymentConditions;
@@ -722,7 +741,7 @@ export default {
             this.salesEditForm = {
               ...data.invoice,
               customer: data.invoice.customer.id,
-              branch: data.invoice.customerBranch.id,
+              customerBranch: data.invoice.customerBranch.id,
               invoicesPaymentsConditions:
                 data.invoice.invoicesPaymentsCondition.id,
               invoicesSellers: data.invoice.invoicesSeller.id,
@@ -752,7 +771,6 @@ export default {
             this.loading = false;
           })
           .catch((err) => {
-            console.log(err);
             this.errorMessage = err.response.data.message;
           });
       })
@@ -760,7 +778,7 @@ export default {
         this.errorMessage = err.response.data.message;
       });
 
-    // checkBeforeEnter(this, storagekey, "salesNewForm");
+    // checkBeforeEnter(this, storagekey, "salesEditForm");
   },
   fetchOnServer: false,
   beforeRouteLeave(to, from, next) {
@@ -901,7 +919,6 @@ export default {
       if (id) {
         const branch = branches.find((b) => b.id == id);
         this.branch = { ...branch };
-        this.salesEditForm.branch = this.branch;
       } else {
         this.branch = {};
       }
@@ -919,7 +936,7 @@ export default {
           .then((res) => {
             const [branches, tributary, taxerType] = res;
             this.branches = branches.data.branches;
-            // this.$refs.branch.resetField()
+            this.$refs.branch.resetField();
             this.branch = {};
             this.tributary = tributary.data.customer;
             this.loading = false;
@@ -927,10 +944,9 @@ export default {
               this.salesEditForm.documentType,
               this.tributary
             );
-            console.log(this.salesEditForm.documentType, this.tributary);
+
             this.$refs.branch.resetField();
             this.branch = {};
-            this.selectBranch(this.salesEditForm.customer, this.branches);
           })
           .catch((err) => {
             this.errorMessage = err.response.data.message;
@@ -943,7 +959,6 @@ export default {
       }
     },
     validateDocumentType(id, tributary) {
-      this.setStorage(this.salesEditForm);
       if (tributary) {
         switch (id) {
           case 2:
@@ -1011,7 +1026,6 @@ export default {
       });
     },
     saveUpdateInvoice(formName, formData, details) {
-      console.log(formData);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -1029,19 +1043,19 @@ export default {
                 instance.confirmButtonLoading = true;
                 instance.confirmButtonText = "Procesando...";
                 this.$axios
-                  .put(`/invoices/${this.$route.params.id}`, {
+                  .put(`/invoices/${this.$route.query.ref}`, {
                     header: {
-                      documentType: formData.documentType,
                       authorization: formData.authorization,
                       sequence: formData.sequence,
                       invoiceDate: formData.invoiceRawDate,
 
                       customer: formData.customer,
-                      customerBranch: formData.customerBranch.id,
+                      customerBranch: formData.customerBranch,
                       invoicesPaymentsCondition:
                         formData.invoicesPaymentsCondition.id,
                       invoicesSeller: formData.invoicesSellers,
-                      sum: this.sumas,
+                      sum:
+                        formData.documentType == 1 ? this.sumasCF : this.sumas,
                       iva: this.taxes,
                       subtotal: this.subtotal,
                       ivaRetenido: this.ivaRetenido,
@@ -1085,6 +1099,8 @@ export default {
                     done();
                   });
               } else {
+                instance.confirmButtonLoading = false;
+                instance.confirmButtonText = "Si, guardar";
                 done();
               }
             },
@@ -1093,149 +1109,182 @@ export default {
       });
     },
 
-    calcUniPrice(documentType, { unitPrice, incTax, sellingType }) {
-      let uniPrice = null;
-      const amount = parseFloat(unitPrice);
-      let message = null;
-      if ((sellingType == 1) | (sellingType == 2)) {
-        uniPrice = amount;
+    calcUnitPrice(documentType, { unitPrice, incTax, sellingType }) {
+      if (sellingType == 1 || sellingType == 2) {
+        return unitPrice;
       } else {
         if (documentType) {
           switch (documentType) {
             case 1:
-              uniPrice = amount * (incTax ? 1 : 1.13);
+              return unitPrice * (incTax ? 1 : 1.13);
 
-              break;
             case 2:
-              uniPrice = amount / (incTax ? 1.13 : 1);
+              return unitPrice / (incTax ? 1.13 : 1);
 
-              break;
+            case 3:
+              return unitPrice;
           }
         }
       }
       return uniPrice;
     },
     calcSujeta(documentType, { unitPrice, incTax, sellingType, quantity }) {
-      let uniPrice = null;
-      const amount = parseFloat(unitPrice);
-
-      if ((sellingType == 1) | (sellingType == 2)) {
-        uniPrice = amount * quantity;
-      }
-
-      return uniPrice;
-    },
-    calcGravada(documentType, { unitPrice, incTax, sellingType, quantity }) {
-      let uniPrice = null;
-      const amount = parseFloat(unitPrice);
       switch (documentType) {
         case 1:
-          uniPrice = amount * (incTax ? 1 : 1.13) * quantity;
-
-          break;
         case 2:
-          uniPrice = (amount / (incTax ? 1.13 : 1)) * quantity;
-
+          return unitPrice * quantity;
+          break;
+        case 3:
+          return 0;
           break;
       }
-
-      return uniPrice;
     },
-    calcExenta(documentType, { unitPrice, incTax, sellingType, quantity }) {
-      let uniPrice = null;
-      const amount = parseFloat(unitPrice);
+    calcGravada(documentType, { unitPrice, incTax, sellingType, quantity }) {
+      switch (documentType) {
+        case 1:
+          return unitPrice * (incTax ? 1 : 1.13) * quantity;
 
-      if ((sellingType == 1) | (sellingType == 2)) {
-        uniPrice = amount * quantity;
+        case 2:
+          return (unitPrice / (incTax ? 1.13 : 1)) * quantity;
+
+        case 3:
+          switch (sellingType) {
+            case 1:
+              return unitPrice * quantity;
+
+            case 2:
+              return unitPrice * quantity;
+
+            case 3:
+              return unitPrice * quantity;
+          }
       }
+    },
+    calcExenta(documentType, { unitPrice, quantity }) {
+      switch (documentType) {
+        case 1:
+        case 2:
+          return unitPrice * quantity;
 
-      return uniPrice;
+        case 3:
+          return 0;
+      }
     },
   },
   computed: {
     sumas() {
-      const details = this.details;
       let sumas = 0;
-      if (details) {
+      if (this.details) {
         switch (this.salesEditForm.documentType) {
           case 1:
-            for (const d of details) {
+            for (const d of this.details) {
               if (d.sellingType === 3) {
                 sumas +=
-                  parseInt(d.quantity) *
+                  parseFloat(d.quantity) *
                   parseFloat(d.unitPrice) *
                   (d.incTax ? 1 : 1.13);
               }
             }
             break;
           case 2:
-            for (const d of details) {
+            for (const d of this.details) {
               if (d.sellingType === 3) {
                 sumas +=
-                  (parseInt(d.quantity) * parseFloat(d.unitPrice)) /
+                  (parseFloat(d.quantity) * parseFloat(d.unitPrice)) /
+                  (d.incTax ? 1.13 : 1);
+              }
+            }
+            break;
+          case 3:
+            for (const d of this.details) {
+              sumas += parseFloat(d.quantity) * parseFloat(d.unitPrice);
+            }
+
+            break;
+        }
+      }
+
+      return sumas;
+    },
+    sumasCF() {
+      let sumasCF = 0;
+      if (this.details) {
+        switch (this.salesEditForm.documentType) {
+          case 1:
+            for (const d of this.details) {
+              if (d.sellingType === 3) {
+                sumasCF +=
+                  (parseFloat(d.quantity) * parseFloat(d.unitPrice)) /
                   (d.incTax ? 1.13 : 1);
               }
             }
             break;
         }
       }
-      return sumas;
+      return sumasCF;
     },
     taxes() {
-      const details = this.details;
       let taxes = 0;
-      if (details) {
+      if (this.details) {
         switch (this.salesEditForm.documentType) {
-          case 2:
-            for (const d of details) {
+          case 1:
+            for (const d of this.details) {
               if (d.sellingType === 3) {
-                if (d.incTax) {
-                  const total = parseInt(d.quantity) * parseFloat(d.unitPrice);
-                  taxes += total - total / 1.13;
-                } else {
-                  const total = parseInt(d.quantity) * parseFloat(d.unitPrice);
-                  taxes += total * 1.13 - total;
-                }
+                const total = parseFloat(d.quantity) * parseFloat(d.unitPrice);
+                taxes += d.incTax ? total - total / 1.13 : total * 0.13;
               }
             }
+            break;
+          case 2:
+            for (const d of this.details) {
+              if (d.sellingType === 3) {
+                const total = parseFloat(d.quantity) * parseFloat(d.unitPrice);
+                taxes += d.incTax ? total - total / 1.13 : total * 1.13 - total;
+              }
+            }
+            break;
+          case 3:
+            taxes = 0;
             break;
         }
       }
       return taxes;
     },
     subtotal() {
-      return this.sumas + this.taxes;
+      return this.salesEditForm.documentType == 1
+        ? this.sumasCF + this.taxes
+        : this.sumas + this.taxes;
     },
 
     ventasExentas() {
-      const details = this.details.filter((d) => d.sellingType == 2);
-      return details.reduce(
-        (a, b) => {
-          return {
-            total: a.total + b.unitPrice * b.quantity,
-          };
-        },
-        { total: 0 }
-      ).total;
+      let exentas = 0;
+      if (this.salesEditForm.documentType != 3) {
+        exentas = this.details
+          .filter((d) => d.sellingType == 2)
+          .reduce((a, b) => a + b.unitPrice * b.quantity, 0);
+      }
+      return exentas;
     },
     ventasNoSujetas() {
-      const details = this.details.filter((d) => d.sellingType == 1);
-      return details.reduce(
-        (a, b) => {
-          return {
-            total: a.total + b.unitPrice * b.quantity,
-          };
-        },
-        { total: 0 }
-      ).total;
+      let nosujeta = 0;
+      if (this.salesEditForm.documentType != 3) {
+        nosujeta = this.details
+          .filter((d) => d.sellingType == 1)
+          .reduce((a, b) => a + b.unitPrice * b.quantity, 0);
+      }
+      return nosujeta;
     },
     ventaTotal() {
-      return (
-        this.subtotal +
-        this.ventasExentas +
-        this.ventasNoSujetas +
-        this.ivaRetenido
-      );
+      if (this.salesEditForm.documentType == 3) {
+        return this.subtotal;
+      } else {
+        return (
+          this.subtotal +
+          this.ventasExentas +
+          this.ventasNoSujetas +
+          this.ivaRetenido
+        );
+      }
     },
     ivaRetenido() {
       let ivaRetenido = 0;

@@ -1,13 +1,12 @@
 <template>
   <layout-content
-    v-loading="loading" 
+    v-loading="loading"
     page-title="Partidas contables"
     :breadcrumb="[
       { name: 'Contabilidad', to: '/entries' },
       { name: 'Partidas contables', to: null },
     ]"
   >
-  
     <div class="flex flex-col space-y-2">
       <div class="flex justify-center" v-if="errorMessage">
         <Notification
@@ -111,9 +110,9 @@
           :summary-method="getSummaries"
         >
           <el-table-column type="index" prop="quantity" label="#" width="50" />
-          <el-table-column  label="Cta. Contable." width="120">
+          <el-table-column label="Cta. Contable." width="120">
             <template slot-scope="scope">
-              <span>{{scope.row.accountingCatalog.code }}</span>
+              <span>{{ scope.row.accountingCatalog.code }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="concept" label="Concepto" width="500" />
@@ -215,32 +214,59 @@
           </div>
         </div>
       </el-form>
-      <el-table :data="entries.entries" stripe size="mini">
+      <!-- ----dddddd -->
+      <el-table
+        @sort-change="sortBy"
+        :data="entries.entries"
+        stripe
+        size="mini"
+      >
         <el-table-column
           type="index"
           label="#"
           prop="index"
-          min-width="60"
+          width="40"
           align="center"
         />
-        <el-table-column label="Serie" prop="serie" min-width="50" />
-        <el-table-column label="Fecha" prop="date" min-width="90">
+        <el-table-column
+          sortable="custom"
+          label="Serie"
+          prop="serie"
+          width="80"
+        />
+        <el-table-column sortable="custom" label="Fecha" prop="date" width="90">
           <template slot-scope="scope">
-            <span>{{ scope.row.date | formatDate("YYYY-MM-DD") }}</span>
+            <span>{{ scope.row.date }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Titulo" prop="title" min-width="400" />
-        <el-table-column label="Cargo" min-width="90" align="right">
+        <el-table-column
+          sortable="custom"
+          label="Titulo"
+          prop="title"
+          min-width="370"
+        />
+        <el-table-column label="Cargo" width="110" align="right">
           <template slot-scope="scope">
             <span>{{ scope.row.cargo | formatMoney }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Tipo" min-width="80" align="center">
+        <el-table-column
+          sortable="custom"
+          label="Tipo"
+          width="90"
+          align="center"
+          prop="accountingEntryType.id"
+        >
           <template slot-scope="scope">
             <span>{{ scope.row.accountingEntryType.name }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Estado" min-width="99">
+        <el-table-column
+          prop="squared"
+          sortable="custom"
+          label="Estado"
+          width="110"
+        >
           <template slot-scope="scope">
             <el-tag
               size="small"
@@ -257,7 +283,7 @@
             <el-tag size="small" type="danger" v-else>Incompleta</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label min-width="60" align="center">
+        <el-table-column label width="70" align="center">
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />
@@ -266,7 +292,9 @@
                   <i class="el-icon-view"></i> Vista previa
                 </el-dropdown-item>
                 <el-dropdown-item
-                  @click.native="$router.push(`entries/edit/${scope.row.id}`)"
+                  @click.native="
+                    $router.push(`/entries/edit?ref=${scope.row.id}`)
+                  "
                 >
                   <i class="el-icon-edit-outline"></i> Editar partida
                 </el-dropdown-item>
@@ -314,7 +342,7 @@ export default {
       .then((res) => {
         const [entries, entryType] = res;
         this.entries = entries.data;
-       // this.count = entries.data.count;
+        // this.count = entries.data.count;
         this.entryType = entryType.data.entryTypes;
       })
       .catch((err) => {
@@ -342,16 +370,11 @@ export default {
         searchValue: "",
         squared: false,
         accounted: false,
+        active: false,
+        prop: "",
+        order: null,
       },
-      tipoPartida: [
-        {
-          id: "a0dea81f-e5e4-4253-a587-716102dfc6ab",
-          name: "Diario",
-          name: "Ingreso",
-          name: "Egreso",
-          name: "DIA",
-        },
-      ],
+
       entries: {
         entries: [],
         count: 0,
@@ -371,7 +394,7 @@ export default {
       if (this.filterBy.entryType != "") {
         params = {
           ...params,
-          sec: this.filterBy.entryType,
+          entryType: this.filterBy.entryType,
         };
       }
       if (this.filterBy.searchValue != "") {
@@ -392,6 +415,13 @@ export default {
           accounted: this.filterBy.accounted,
         };
       }
+      if (this.filterBy.order) {
+        params = {
+          ...params,
+          prop: this.filterBy.prop,
+          order: this.filterBy.order,
+        };
+      }
       this.$axios
         .get("/entries", { params })
         .then((res) => {
@@ -403,18 +433,16 @@ export default {
     },
     handleSizeChange(val) {
       this.page.limit = val;
-      this.page.fetchEntries();
+      this.fetchEntries();
     },
-    getSummaries(value) {
-      const { columns, data } = value;
-      const totalAbono = data.reduce((a,b)=>a+b.abono ? b.abono:0, 0);
-      const totalCargo = data.reduce((a,b) =>a+b.cargo ? b.cargo : 0, 0);
-
-      const result = columns.map((column) => {
-        console.log(column.label)
+    getSummaries(param) {
+      const { columns, data } = param;
+      const totalAbono = data.reduce((a, b) => a + (b.abono ? b.abono : 0), 0);
+      const totalCargo = data.reduce((a, b) => a + (b.cargo ? b.cargo : 0), 0);
+      const resutls = columns.map((column) => {
         if (column.label == "Abono") {
           return this.$options.filters.formatMoney(totalAbono);
-        } else if (column.label == "Cargo" ) {
+        } else if (column.label == "Cargo") {
           return this.$options.filters.formatMoney(totalCargo);
         } else if (column.label == "Concepto") {
           return "TOTALES";
@@ -422,8 +450,14 @@ export default {
           return "";
         }
       });
-      return result;
+      return resutls;
     },
+    sortBy({ column, prop, order }) {
+      this.filterBy.prop = prop;
+      this.filterBy.order = order;
+      this.fetchEntries();
+    },
+
     // changeActive({ id, isActiveInvoice }) {
     //   const action = isActiveInvoice ? "desactivar" : "activar";
     //   this.$confirm(
@@ -502,17 +536,10 @@ export default {
     //   );
     // },
     async openPreviewEntry({ id }) {
-      console.log(id);
       const { data } = await this.$axios.get(`/entries/${id}`);
-      console.log(data.entry);
       this.selecEntries = data.entry;
-    
       this.showInvoicePreview = true;
     },
   },
-  
-  
-
-
 };
 </script>

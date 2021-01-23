@@ -3,7 +3,7 @@
     page-title="Escritorio"
     :breadcrumb="[{ name: 'Escritorio', to: null }]"
   >
-    <div class="flex flex-col items-center w-full space-y-4">
+    <div class="flex flex-col items-center w-full space-y-2">
       <Notification
         class="w-1/2"
         type="info"
@@ -27,6 +27,9 @@ import LayoutContent from "../components/layout/Content";
 import Notification from "../components/Notification";
 export default {
   name: "Index",
+  head: {
+    titleTemplate: `%s | Escritorio`,
+  },
   components: { LayoutContent, Notification },
 };
 </script>

@@ -1,9 +1,9 @@
 <template>
   <layout-content
+    v-loading="pageloading"
     page-title="Editar servicio"
     :breadcrumb="[
       { name: 'Servicios', to: '/services' },
-      { name: 'Listado de servicios', to: '/services' },
       { name: 'Editar servicio', to: null },
     ]"
   >
@@ -17,65 +17,66 @@
       "
     >
       <div class="grid grid-cols-12 gap-4">
-        <div class="col-span-6">
-          <el-form-item label="Nombre del servicio" prop="name">
-            <el-input
-              ref="name"
-              type="text"
-              v-model="servicesEditForm.name"
-              size="small"
-              autocomplete="off"
-              minlength="5"
-              maxlength="60"
-              show-word-limit
-            />
-          </el-form-item>
-        </div>
-        <div class="col-span-2">
-          <el-form-item label="Costo" prop="cost">
-            <el-input-number
-              ref="cost"
-              type="number"
-              :min="0.01"
-              :step="0.01"
-              v-model="servicesEditForm.cost"
-              size="small"
-              autocomplete="off"
-              style="width: 100%"
-            />
-          </el-form-item>
-        </div>
-        <div class="col-span-4">
-          <el-form-item label="Tipo de venta" prop="sellingType">
-            <el-radio-group
-              ref="sellingType"
-              v-model="servicesEditForm.sellingType"
-              class="w-full"
-            >
-              <el-row :gutter="15">
-                <el-col :span="8" v-for="(s, k) in sellingTypes" :key="k">
-                  <el-radio :label="s.id" border class="w-full" size="small">{{
-                    s.name
-                  }}</el-radio>
-                </el-col>
-              </el-row>
-            </el-radio-group>
-          </el-form-item>
-        </div>
-      </div>
-      <div>
-        <el-form-item label="Descripción del servicio" prop="description">
+        <el-form-item
+          label="Nombre del servicio"
+          prop="name"
+          class="col-span-6"
+        >
           <el-input
-            ref="description"
-            type="textarea"
-            :rows="4"
-            v-model="servicesEditForm.description"
+            ref="name"
+            type="text"
+            v-model="servicesEditForm.name"
+            size="small"
+            autocomplete="off"
             minlength="5"
-            maxlength="5000"
+            maxlength="60"
             show-word-limit
-          ></el-input>
+          />
+        </el-form-item>
+        <el-form-item label="Costo" prop="cost" class="col-span-2">
+          <el-input-number
+            ref="cost"
+            type="number"
+            :min="0.01"
+            :step="0.01"
+            v-model="servicesEditForm.cost"
+            size="small"
+            autocomplete="off"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item
+          label="Tipo de venta"
+          prop="sellingType"
+          class="col-span-4"
+        >
+          <el-radio-group
+            ref="sellingType"
+            v-model="servicesEditForm.sellingType"
+            class="w-full"
+          >
+            <el-row :gutter="15">
+              <el-col :span="8" v-for="(s, k) in sellingTypes" :key="k">
+                <el-radio :label="s.id" border class="w-full" size="small">{{
+                  s.name
+                }}</el-radio>
+              </el-col>
+            </el-row>
+          </el-radio-group>
         </el-form-item>
       </div>
+      <el-form-item label="Descripción del servicio" prop="description">
+        <el-input
+          ref="description"
+          type="textarea"
+          :rows="4"
+          v-model="servicesEditForm.description"
+          minlength="5"
+          maxlength="5000"
+          show-word-limit
+          class="mt-1"
+        />
+      </el-form-item>
       <div class="flex justify-end">
         <el-button type="primary" size="small" native-type="submit"
           >Guardar</el-button
@@ -101,6 +102,9 @@ const storagekey = "edit-service";
 
 export default {
   name: "ServicesEdit",
+  head: {
+    titleTemplate: `%s | Editar servicio`,
+  },
   components: { LayoutContent },
   fetch() {
     const sellingTypes = () => this.$axios.get("/services/selling-types");
@@ -117,7 +121,8 @@ export default {
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
-      });
+      })
+      .then((alw) => (this.pageloading = false));
 
     checkBeforeEnter(this, storagekey, "servicesNewForm");
   },
@@ -127,6 +132,7 @@ export default {
   },
   data() {
     return {
+      pageloading: true,
       sellingTypes: [],
       servicesEditForm: {
         name: "",
