@@ -171,10 +171,15 @@
          sortable="custom" />
         <el-table-column
           label="Tipo"
-          prop="customerType.name"
+          prop="customerType.id"
           width="130"
           sortable="custom"
-        />
+        ><template slot-scope="scope">
+              <span>
+                {{ scope.row.customerType.name }}
+              </span>
+              </template>
+        </el-table-column>
         <el-table-column 
         label="NIT" 
         prop="nit" 
@@ -190,6 +195,7 @@
         <el-table-column 
         label="Estado" 
         width="110"
+        prop="isActiveCustomer"
         sortable="custom"
         >
           <template slot-scope="scope">
