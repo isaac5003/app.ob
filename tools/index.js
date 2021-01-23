@@ -1,5 +1,6 @@
 const { format } = require('date-fns')
 const { es } = require('date-fns/locale')
+const { zonedTimeToUtc } = require('date-fns-tz')
 
 function getIcon(icon) {
   switch (icon) {
@@ -412,11 +413,11 @@ const getHeader = (name, nit, nrc, lastDay, docName, dateType = 'date', preTitle
     let date = null
     switch (dateType) {
       case 'date':
-        date = format(lastDay, 'dd - MMMM - yyyy', { locale: es }).split('-').join('de')
+        date = format(zonedTimeToUtc(lastDay), 'dd - MMMM - yyyy', { locale: es }).split('-').join('de')
         title = `${docName} AL ${date}`
         break;
       case 'month':
-        date = format(lastDay, 'MMMM - yyyy', { locale: es }).split('-').join('de')
+        date = format(zonedTimeToUtc(lastDay), 'MMMM - yyyy', { locale: es }).split('-').join('de')
         title = `${docName} PARA EL MES DE ${date}`
         break
       case 'period':
