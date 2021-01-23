@@ -214,7 +214,13 @@
           </div>
         </div>
       </el-form>
-      <el-table :data="entries.entries" stripe size="mini">
+      <!-- ----dddddd -->
+      <el-table
+        @sort-change="sortBy"
+        :data="entries.entries"
+        stripe
+        size="mini"
+      >
         <el-table-column
           type="index"
           label="#"
@@ -222,24 +228,51 @@
           width="40"
           align="center"
         />
-        <el-table-column label="Serie" prop="serie" width="50" />
-        <el-table-column label="Fecha" prop="date"  width="90">
+        <el-table-column
+          sortable="custom"
+          label="Serie"
+          prop="serie"
+          width="50"
+        />
+        <el-table-column sortable="custom" label="Fecha" prop="date" width="90">
           <template slot-scope="scope">
-            <span>{{ scope.row.date | formatDate("YYYY-MM-DD") }}</span>
+            <span>{{ scope.row.date }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Titulo" prop="title" width="400" />
-        <el-table-column label="Cargo" width="110" align="right">
+        <el-table-column
+          sortable="custom"
+          label="Titulo"
+          prop="title"
+          width="400"
+        />
+        <el-table-column
+          sortable="custom"
+          label="Cargo"
+          width="110"
+          align="right"
+          prop="cargo"
+        >
           <template slot-scope="scope">
             <span>{{ scope.row.cargo | formatMoney }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Tipo" width="90" align="center">
+        <el-table-column
+          sortable="custom"
+          label="Tipo"
+          width="90"
+          align="center"
+          prop="name"
+        >
           <template slot-scope="scope">
             <span>{{ scope.row.accountingEntryType.name }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Estado" width="110">
+        <el-table-column
+          prop="accounted"
+          sortable="custom"
+          label="Estado"
+          width="110"
+        >
           <template slot-scope="scope">
             <el-tag
               size="small"
@@ -344,6 +377,8 @@ export default {
         squared: false,
         accounted: false,
         active: false,
+        prop: "",
+        order: null,
       },
 
       entries: {
@@ -386,6 +421,13 @@ export default {
           accounted: this.filterBy.accounted,
         };
       }
+      if (this.filterBy.order) {
+        params = {
+          ...params,
+          prop: this.filterBy.prop,
+          order: this.filterBy.order,
+        };
+      }
       this.$axios
         .get("/entries", { params })
         .then((res) => {
@@ -415,6 +457,12 @@ export default {
         }
       });
       return resutls;
+    },
+    sortBy({ column, prop, order }) {
+      console.log(column, prop, order);
+      this.filterBy.prop = prop;
+      this.filterBy.order = order;
+      this.fetchEntries();
     },
 
     // changeActive({ id, isActiveInvoice }) {

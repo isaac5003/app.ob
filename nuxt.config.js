@@ -30,8 +30,8 @@ export default {
     middleware: ["auth"],
   },
   axios: {
-    // baseURL: "https://v3.openbox.cloud/",
-    baseURL: "http://localhost:5001",
+    baseURL: "https://v3.openbox.cloud/",
+    // baseURL: "http://localhost:5001",
   },
   googleFonts: {
     families: {
