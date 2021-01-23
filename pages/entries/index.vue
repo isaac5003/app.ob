@@ -459,7 +459,6 @@ export default {
       return resutls;
     },
     sortBy({ column, prop, order }) {
-      console.log(column, prop, order);
       this.filterBy.prop = prop;
       this.filterBy.order = order;
       this.fetchEntries();
@@ -543,11 +542,8 @@ export default {
     //   );
     // },
     async openPreviewEntry({ id }) {
-      console.log(id);
       const { data } = await this.$axios.get(`/entries/${id}`);
-      console.log(data.entry);
       this.selecEntries = data.entry;
-
       this.showInvoicePreview = true;
     },
   },
