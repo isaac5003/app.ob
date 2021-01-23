@@ -72,24 +72,46 @@
         </div>
       </el-form>
       <el-table
+        @sort-change="sortBy"
         v-loading="tableloading"
         :data="services.services"
         stripe
         size="mini"
       >
         <el-table-column prop="index" width="40" />
-        <el-table-column label="Nombre" prop="name" min-width="520" />
-        <el-table-column label="Precio" width="120" align="right">
+        <el-table-column
+          label="Nombre"
+          prop="name"
+          min-width="520"
+          sortable="custom"
+        />
+        <el-table-column
+          label="Precio"
+          width="120"
+          align="right"
+          sortable="custom"
+          prop="cost"
+        >
           <template slot-scope="scope">
             <span>{{ scope.row.cost | formatMoney }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Tipo de venta" prop="type" width="110">
+        <el-table-column
+          label="Tipo de venta"
+          prop="sellingType"
+          width="110"
+          sortable="custom"
+        >
           <template slot-scope="scope">
             <span>{{ scope.row.sellingType.name }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Estado" prop="status" width="110">
+        <el-table-column
+          label="Estado"
+          prop="active"
+          width="110"
+          sortable="custom"
+        >
           <template slot-scope="scope">
             <el-tag size="small" type="success" v-if="scope.row.active">
               <i class="el-icon-success"></i>
@@ -184,6 +206,8 @@ export default {
         searchValue: "",
         status: "",
         type: "",
+        prop: "",
+        order: null,
       },
       sellingTypes: [],
       services: {
@@ -208,6 +232,13 @@ export default {
       }
       if (this.filter.searchValue !== "") {
         params = { ...params, search: this.filter.searchValue.toLowerCase() };
+      }
+      if (this.filter.order) {
+        params = {
+          ...params,
+          prop: this.filter.prop,
+          order: this.filter.order,
+        };
       }
 
       this.$axios
@@ -301,6 +332,11 @@ export default {
           },
         }
       );
+    },
+    sortBy({ column, prop, order }) {
+      this.filter.prop = prop;
+      this.filter.order = order;
+      this.fetchServices();
     },
   },
 };
