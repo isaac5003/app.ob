@@ -490,7 +490,11 @@
             width="80"
           />
           <el-table-column label="Fecha" prop="invoiceDate" width="90" />
-          <el-table-column label="Cliente" prop="customerName" width="375" />
+          <el-table-column
+            label="Cliente"
+            prop="customerName"
+            min-width="375"
+          />
           <el-table-column label="Estado" width="110">
             <template slot-scope="scope">
               <el-tag

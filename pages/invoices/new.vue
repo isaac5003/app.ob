@@ -1,7 +1,7 @@
 <template>
   <layout-content
     v-loading="loading"
-    page-title="Nueva venta"
+    page-title="Nuevo documento"
     :breadcrumb="[
       { name: 'Ventas', to: '/invoices' },
 
@@ -139,7 +139,7 @@
     <el-dialog
       title="Editar servicio"
       :visible.sync="showEditService"
-      width="35%"
+      width="550px"
       :append-to-body="true"
       :close-on-click-modal="false"
     >
@@ -217,7 +217,7 @@
                 <el-checkbox
                   border
                   v-if="
-                    newServiceForm.sellingType == 3 &&
+                    editServiceForm.sellingType == 3 &&
                     salesNewForm.documentType != 3
                   "
                   v-model="editServiceForm.incTax"
@@ -809,7 +809,7 @@ export default {
       },
       newServiceForm: {
         service: "",
-        quantity: null,
+        quantity: 1,
         chargeDescription: null,
         incTax: false,
         sellingType: null,
@@ -988,14 +988,19 @@ export default {
         this.details.splice(index, 1);
       });
     },
-    updateDetail(index, formName, form) {
+    updateDetail(index, formName, data) {
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
         }
         const types = this.details[index].types;
         const sellingType = this.details[index].sellingType;
-        this.details.splice(index, 1, { ...form, sellingType, types });
+        this.details.splice(index, 1, {
+          ...data,
+          sellingType,
+          types,
+          ventaPrice: data.unitPrice * data.quantity,
+        });
         this.showEditService = false;
       });
     },
@@ -1004,9 +1009,8 @@ export default {
         if (!valid) {
           return false;
         }
-
         this.$confirm(
-          "¿Estás seguro que deseas guardar esta nueva venta?",
+          "¿Estás seguro que deseas guardar esta nuevo documento?",
           "Confirmación",
           {
             confirmButtonText: "Si, guardar",
@@ -1132,15 +1136,16 @@ export default {
       }
       return uniPrice;
     },
-    calcSujeta(documentType, { unitPrice, incTax, sellingType }) {
-      let uniPrice = null;
-      const amount = parseFloat(unitPrice);
-
-      if ((sellingType == 1) | (sellingType == 2)) {
-        uniPrice = amount * quantity;
+    calcSujeta(documentType, { unitPrice, incTax, sellingType, quantity }) {
+      switch (documentType) {
+        case 1:
+        case 2:
+          return unitPrice * quantity;
+          break;
+        case 3:
+          return 0;
+          break;
       }
-
-      return uniPrice;
     },
     calcGravada(documentType, { unitPrice, incTax, sellingType, quantity }) {
       let uniPrice = null;
@@ -1286,26 +1291,22 @@ export default {
     },
 
     ventasExentas() {
-      const details = this.details.filter((d) => d.sellingType == 2);
-      return details.reduce(
-        (a, b) => {
-          return {
-            total: a.total + b.unitPrice * b.quantity,
-          };
-        },
-        { total: 0 }
-      ).total;
+      let exentas = 0;
+      if (this.salesNewForm.documentType != 3) {
+        exentas = this.details
+          .filter((d) => d.sellingType == 2)
+          .reduce((a, b) => a + b.unitPrice * b.quantity, 0);
+      }
+      return exentas;
     },
     ventasNoSujetas() {
-      const details = this.details.filter((d) => d.sellingType == 1);
-      return details.reduce(
-        (a, b) => {
-          return {
-            total: a.total + b.unitPrice * b.quantity,
-          };
-        },
-        { total: 0 }
-      ).total;
+      let nosujeta = 0;
+      if (this.salesNewForm.documentType != 3) {
+        nosujeta = this.details
+          .filter((d) => d.sellingType == 1)
+          .reduce((a, b) => a + b.unitPrice * b.quantity, 0);
+      }
+      return nosujeta;
     },
     ventaTotal() {
       if (this.salesNewForm.documentType == 3) {
