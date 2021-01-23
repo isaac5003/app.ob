@@ -202,7 +202,12 @@
                   scope.row.sellingType.id == 3 ||
                   selectedInvoice.documentType.id == 3
                 "
-                >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
+                >{{
+                  (selectedInvoice.documentType.id == 1
+                    ? parseFloat(scope.row.ventaPrice) *
+                      (scope.row.incTax ? 1 : 1.13)
+                    : parseFloat(scope.row.ventaPrice)) | formatMoney
+                }}</span
               >
             </template>
           </el-table-column>
