@@ -744,10 +744,9 @@
           size="mini"
         >
           <el-table-column
-            sortable="true"
             prop="index"
             label="#"
-            min-width="50"
+            min-width="40"
             align="center"
           />
           <el-table-column prop="code" label="Código" min-width="90" />
@@ -759,11 +758,11 @@
           <el-table-column
             prop="description"
             label="Descripción general"
-            min-width="300"
+            min-width="290"
           />
           <el-table-column
             label="	(A)creedor/(D)eudor"
-            min-width="150"
+            min-width="160"
             align="center"
           >
             <template slot-scope="scope">{{
@@ -829,20 +828,15 @@
               <el-form-item label="Utilidad ejercicios anteriores">
                 <el-select
                   filterable
-                  remote
-                  reserve-keyword
                   default-first-option
                   clearable
                   v-model="specialAccounts.accum_gain"
                   placeholder="Escribe el numero o nombre de la cuenta"
-                  :remote-method="findAccount"
-                  :loading="loadingAccount"
                   class="w-full"
                   size="small"
-                  @focus="filteredCatalog = []"
                 >
                   <el-option
-                    v-for="item in filteredCatalog"
+                    v-for="item in catalogs"
                     :key="item.id"
                     :label="`${item.code} - ${item.name}`"
                     :value="item.id"
@@ -854,20 +848,15 @@
               <el-form-item label="Perdida ejercicios anteriores">
                 <el-select
                   filterable
-                  remote
-                  reserve-keyword
                   default-first-option
                   clearable
                   v-model="specialAccounts.accum_lost"
                   placeholder="Escribe el numero o nombre de la cuenta"
-                  :remote-method="findAccount"
-                  :loading="loadingAccount"
                   class="w-full"
                   size="small"
-                  @focus="filteredCatalog = []"
                 >
                   <el-option
-                    v-for="item in filteredCatalog"
+                    v-for="item in catalogs"
                     :key="item.id"
                     :label="`${item.code} - ${item.name}`"
                     :value="item.id"
@@ -879,20 +868,15 @@
               <el-form-item label="Utilidad presente ejercicio">
                 <el-select
                   filterable
-                  remote
-                  reserve-keyword
                   default-first-option
                   clearable
                   v-model="specialAccounts.curre_gain"
                   placeholder="Escribe el numero o nombre de la cuenta"
-                  :remote-method="findAccount"
-                  :loading="loadingAccount"
                   class="w-full"
                   size="small"
-                  @focus="filteredCatalog = []"
                 >
                   <el-option
-                    v-for="item in filteredCatalog"
+                    v-for="item in catalogs"
                     :key="item.id"
                     :label="`${item.code} - ${item.name}`"
                     :value="item.id"
@@ -904,20 +888,15 @@
               <el-form-item label="Perdida presente ejercicio">
                 <el-select
                   filterable
-                  remote
-                  reserve-keyword
                   default-first-option
                   clearable
                   v-model="specialAccounts.curre_lost"
                   placeholder="Escribe el numero o nombre de la cuenta"
-                  :remote-method="findAccount"
-                  :loading="loadingAccount"
                   class="w-full"
                   size="small"
-                  @focus="filteredCatalog = []"
                 >
                   <el-option
-                    v-for="item in filteredCatalog"
+                    v-for="item in catalogs"
                     :key="item.id"
                     :label="`${item.code} - ${item.name}`"
                     :value="item.id"
@@ -936,6 +915,7 @@
               border
               default-expand-all
               size="mini"
+              v-loading="tableloading"
             >
               <el-table-column label="Cuenta" min-width="200">
                 <template slot-scope="scope">
@@ -1005,7 +985,16 @@
         </div>
 
         <div class="flex justify-end mt-4">
-          <el-button type="primary" size="small" native-type="submit"
+          <el-button
+            type="primary"
+            size="small"
+            @click.native="
+              submitBalance(
+                tableData,
+
+                specialAccounts
+              )
+            "
             >Guardar</el-button
           >
           <el-button size="small">Cancelar</el-button>
@@ -1028,6 +1017,7 @@
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-12">
             <el-table
+              v-loading="tableloading"
               ref="table"
               :data="tablesData"
               row-key="id"
@@ -1133,7 +1123,10 @@
         </div>
 
         <div class="flex justify-end mt-4">
-          <el-button type="primary" size="small" native-type="submit"
+          <el-button
+            type="primary"
+            size="small"
+            @click.native="submitResults(tablesData)"
             >Guardar</el-button
           >
           <el-button size="small">Cancelar</el-button>
@@ -1211,12 +1204,17 @@ export default {
     const accountCatalogs = () =>
       this.$axios.get("/entries/catalog", { params: this.page });
     const accounts = () => this.$axios.get("/entries/catalog");
-    Promise.all([accountCatalogs(), accounts()])
+    const balance = () => this.$axios.get("/entries/setting/balance-general");
+    const results = () => this.$axios.get("/entries/setting/estado-resultados");
+    Promise.all([accountCatalogs(), accounts(), balance(), results()])
       .then((res) => {
-        const [accountCatalogs, accounts] = res;
+        const [accountCatalogs, accounts, balance, results] = res;
         this.accounts = accountCatalogs.data.accountingCatalog;
         this.accountsCount = accountCatalogs.data.count;
         this.catalogs = accounts.data.accountingCatalog;
+        this.tableData = balance.data.balanceGeneral.report;
+        this.specialAccounts = { ...balance.data.balanceGeneral.special };
+        this.tablesData = results.data.estadoResultados;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
@@ -1537,6 +1535,7 @@ export default {
       showChangeDisplayNameEstado: false,
       allowNewDisplayNameEstado: false,
       newDisplayNameEstado: "",
+      filteredCatalogBalance: [],
     };
   },
   methods: {
@@ -1927,7 +1926,77 @@ export default {
           break;
       }
     },
+    findAccountBalance(query) {
+      if (query !== "") {
+        this.loadingAccount = true;
+        setTimeout(() => {
+          this.filteredCatalogBalance = this.catalogs.filter((c) => {
+            return (
+              c.id.includes(query.toLowerCase()) ||
+              c.code.toLowerCase().includes(query.toLowerCase()) ||
+              c.name.toLowerCase().includes(query.toLowerCase())
+            );
+          });
+          this.loadingAccount = false;
+        }, 200);
+      } else {
+        this.filteredCatalogBalance = this.catalogs;
+      }
+    },
+    fetchBalance() {
+      this.$axios
+        .get("/entries/setting/balance-general")
+        .then((res) => {
+          this.tableData = balance.data.balanceGeneral.report;
+        })
+        .catch((err) => {
+          this.errorMessage = err.response.data.message;
+        })
+        .then((alw) => (this.tableloading = false));
+    },
+    submitBalance(report, special) {
+      this.$confirm(
+        "¿Estás seguro que deseas actualizar balance General?",
+        "Confirmación",
+        {
+          confirmButtonText: "Si, guardar",
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
 
+              this.$axios
+                .put(`/entries/setting/balance-general`, {
+                  settings: {
+                    report: report,
+                    special: special,
+                  },
+                })
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Exito",
+                    message: res.data.message,
+                  });
+                  this.fetchBalance();
+
+                  done();
+                })
+                .catch((err) => (this.errorMessage = err.response.data.message))
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = "Si, guardar";
+                });
+            } else {
+              instance.confirmButtonLoading = false;
+              instance.confirmButtonText = "Si, guardar";
+              done();
+            }
+          },
+        }
+      );
+    },
     //estado de resultados
 
     addSubAccountEstado(selected, list) {
@@ -1986,7 +2055,58 @@ export default {
         ? newDisplayNameEstado
         : account.display;
     },
+    fetchResults() {
+      this.$axios
+        .get("/entries/setting/estado-resultados")
+        .then((res) => {
+          this.tablesData = res.data.estadoResultados;
+        })
+        .catch((err) => {
+          this.errorMessage = err.response.data.message;
+        })
+        .then((alw) => (this.tableloading = false));
+    },
 
+    submitResults(tablesData) {
+      this.$confirm(
+        "¿Estás seguro que deseas actualizar Estado de resultados?",
+        "Confirmación",
+        {
+          confirmButtonText: "Si, guardar",
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+
+              this.$axios
+                .put(`/entries/setting/estado-resultados`, {
+                  settings: tablesData,
+                })
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Exito",
+                    message: res.data.message,
+                  });
+                  this.fetchResults();
+
+                  done();
+                })
+                .catch((err) => (this.errorMessage = err.response.data.message))
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = "Si, guardar";
+                });
+            } else {
+              instance.confirmButtonLoading = false;
+              instance.confirmButtonText = "Si, guardar";
+              done();
+            }
+          },
+        }
+      );
+    },
     cancel() {
       this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
         confirmButtonText: "Si, salir",
