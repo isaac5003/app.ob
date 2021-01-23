@@ -1132,7 +1132,7 @@ export default {
       }
       return uniPrice;
     },
-    calcSujeta(documentType, { unitPrice, incTax, sellingType, quantity }) {
+    calcSujeta(documentType, { unitPrice, incTax, sellingType }) {
       let uniPrice = null;
       const amount = parseFloat(unitPrice);
 
@@ -1339,6 +1339,42 @@ export default {
       }
       return ivaRetenido;
     },
+    // ventaPrice() {
+    //   for (data of this.details) {
+    //     let ventaPrice = 0;
+    //     if (data.sellingType == 1 || data.sellingType == 2) {
+    //       ventaPrice = data.unitPrice * data.quantity;
+    //     } else {
+    //       switch (this.salesNewForm.documentType) {
+    //         case 1:
+    //           ventaPrice =
+    //             data.unitPrice * (data.incTax ? 1 : 1.13) * data.quantity;
+
+    //           break;
+    //         case 2:
+    //           ventaPrice =
+    //             (data.unitPrice / (data.incTax ? 1.13 : 1)) * data.quantity;
+
+    //           break;
+    //         case 3:
+    //           switch (data.sellingType) {
+    //             case 1:
+    //               ventaPrice = data.unitPrice * data.quantity;
+    //               break;
+    //             case 2:
+    //               ventaPrice = data.unitPrice * data.quantity;
+    //               break;
+    //             case 3:
+    //               ventaPrice = data.unitPrice * data.quantity;
+    //               break;
+    //           }
+
+    //           break;
+    //       }
+    //     }
+    //     this.details.push({ ...data, ventaPrice: ventaPrice });
+    //   }
+    // },
   },
 };
 </script>
