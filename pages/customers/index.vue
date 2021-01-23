@@ -157,21 +157,41 @@
         </el-form-item>
       </el-form>
       <el-table
+      @sort-change="sortBy"
         :data="customers.customers"
         stripe
         size="mini"
         v-loading="tableloading"
       >
         <el-table-column prop="index" width="40" />
-        <el-table-column label="Nombre" prop="name" min-width="360" />
+        <el-table-column 
+        label="Nombre"
+        prop="name" 
+        width="360"
+         sortable="custom" />
         <el-table-column
           label="Tipo"
           prop="customerType.name"
-          min-width="130"
+          width="130"
+          sortable="custom"
         />
-        <el-table-column label="NIT" prop="nit" min-width="150" />
-        <el-table-column label="NRC" prop="nrc" min-width="90" />
-        <el-table-column label="Estado" width="110">
+        <el-table-column 
+        label="NIT" 
+        prop="nit" 
+        width="150" 
+        sortable="custom"
+        />
+        <el-table-column 
+        label="NRC" 
+        prop="nrc" 
+        width="90"
+        sortable="custom" 
+        />
+        <el-table-column 
+        label="Estado" 
+        width="110"
+        sortable="custom"
+        >
           <template slot-scope="scope">
             <el-tag
               size="small"
@@ -282,6 +302,10 @@ export default {
         customers: [],
         count: 0,
       },
+       filter:{
+         prop:"",
+         order:null
+       },
       page: {
         limit: 10,
         page: 1,
@@ -299,6 +323,13 @@ export default {
       }
       if (this.searchValue !== "") {
         params = { ...params, search: this.searchValue.toLowerCase() };
+      }
+      if(this.filter.order){
+        params ={
+          ...params,
+          prop:this.filter.prop,
+          order:this.filter.order,
+        };
       }
 
       this.$axios
@@ -392,11 +423,18 @@ export default {
         }
       );
     },
+
     async openCustomerPreview({ id }) {
       const { data } = await this.$axios.get(`/customers/${id}`);
       this.selectedCustomer = data.customer;
       this.showCustomerPreview = true;
     },
+     
+     sortBy({column, prop, order }){
+       this.filter.prop = prop;
+       this.filter.order = order;
+       this.fetchCustomers();
+     }
   },
 };
 </script>
