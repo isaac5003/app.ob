@@ -727,7 +727,9 @@ export default {
       });
     };
     const documentTypes = () => {
-      return this.$axios.get("/invoices/document-types");
+      return this.$axios.get("/invoices/document-types", {
+        params: { actrive: true },
+      });
     };
 
     Promise.all([sellers(), paymentsConditions(), customers(), documentTypes()])
