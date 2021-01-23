@@ -10,11 +10,76 @@
     <el-dialog
       title="Vista previa"
       size="mini"
+      v-if="selectedInvoice"
       :visible.sync="showInvoicePreview"
       width="1000px"
       :append-to-body="true"
     >
-      <div class="flex flex-col space-y-3">
+      <div class="text-xs">
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-3 flex flex-col">
+            <span class="font-semibold">Tipo de documento</span>
+            <span>{{
+              selectedInvoice
+                ? `${selectedInvoice.documentType.code} -
+                  ${selectedInvoice.documentType.name}`
+                : ""
+            }}</span>
+          </div>
+          <div class="col-span-2 flex flex-col">
+            <span class="font-semibold">No. autorización</span>
+            <span>{{
+              selectedInvoice ? `${selectedInvoice.authorization}` : ""
+            }}</span>
+          </div>
+          <div class="col-span-2 flex flex-col">
+            <span class="font-semibold">Correlativo</span>
+            <span>{{
+              selectedInvoice ? `${selectedInvoice.sequence}` : ""
+            }}</span>
+          </div>
+          <div class="col-span-3 flex flex-col">
+            <span class="font-semibold">Fecha de factura</span>
+            <span>{{
+              selectedInvoice ? `${selectedInvoice.invoiceDate}` : ""
+            }}</span>
+          </div>
+          <div class="col-span-2 flex flex-col">
+            <span class="font-semibold">Estado</span>
+            <el-tag
+              size="small"
+              type="info"
+              v-if="selectedInvoice && selectedInvoice.status.id === 1"
+            >
+              <i class="el-icon-warning"></i>
+              {{ selectedInvoice.status.name }}</el-tag
+            >
+            <el-tag
+              size="small"
+              type="success"
+              v-else-if="selectedInvoice && selectedInvoice.status.id === 2"
+            >
+              <i class="el-icon-success"></i
+              >{{ selectedInvoice.status.name }}</el-tag
+            >
+            <el-tag
+              size="small"
+              type="warning"
+              v-else-if="selectedInvoice && selectedInvoice.status.id === 4"
+            >
+              <i class="el-icon-question"></i
+              >{{ selectedInvoice.status.name }}</el-tag
+            >
+            <el-tag
+              size="small"
+              type="danger"
+              v-else-if="selectedInvoice && selectedInvoice.status.id === 3"
+            >
+              <i class="el-icon-error"></i
+              >{{ selectedInvoice.status.name }}</el-tag
+            >
+          </div>
+        </div>
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-5">
             <span class="font-semibold">Cliente:</span>
@@ -85,61 +150,82 @@
           <el-table-column prop="quantity" label="Cant." min-width="55" />
           <el-table-column
             prop="chargeDescription"
-            label="Description"
-            min-width="500"
+            label="Descripción"
+            width="270"
           />
-          <el-table-column
-            prop="unitPrice"
-            label="Precio Unit."
-            min-width="100"
-          >
+          <el-table-column label="Precio Unit." min-width="75" align="right">
             <template slot-scope="scope">
-              <span>{{
-                calcUnitPrice(selectedInvoice.documentType, scope.row)
-                  | formatMoney
-              }}</span>
+              <span>{{ parseFloat(scope.row.unitPrice) | formatMoney }}</span>
             </template>
           </el-table-column>
           <el-table-column
-            prop="ventasNoSujetas"
-            label="V. No sujeta"
-            min-width="100"
+            prop="vnosujeta"
+            :label="selectedInvoice.documentType.id != 3 ? 'V. No sujeta' : ''"
+            min-width="75"
+            align="right"
           >
             <template slot-scope="scope">
-              <span v-if="scope.row.sellingType.id == 1">{{
-                calcSujeta(selectedInvoice.documentType, scope.row)
-                  | formatMoney
-              }}</span>
+              <span
+                v-if="
+                  scope.row.sellingType.id == 1 &&
+                    selectedInvoice.documentType.id != 3
+                "
+                >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
+              >
             </template>
           </el-table-column>
           <el-table-column
-            prop="ventasExentas"
-            label="V. Extenta"
-            min-width="100"
+            prop="vexenta"
+            :label="selectedInvoice.documentType.id != 3 ? 'V. Exenta' : ''"
+            min-width="75"
+            align="right"
           >
             <template slot-scope="scope">
-              <span v-if="scope.row.sellingType.id == 2">{{
-                calcExenta(selectedInvoice.documentType, scope.row)
-                  | formatMoney
-              }}</span>
+              <span
+                v-if="
+                  scope.row.sellingType.id == 2 &&
+                    selectedInvoice.documentType.id != 3
+                "
+                >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
+              >
             </template>
           </el-table-column>
-          <el-table-column label="V. Gravada" min-width="100">
+          <el-table-column
+            prop="vgrabada"
+            label="V. Gravada"
+            min-width="75"
+            align="right"
+          >
             <template slot-scope="scope">
-              <span v-if="scope.row.sellingType.id == 3">{{
-                calcGravada(selectedInvoice.documentType, scope.row)
-                  | formatMoney
-              }}</span>
+              <span
+                v-if="
+                  scope.row.sellingType.id == 3 ||
+                    selectedInvoice.documentType.id == 3
+                "
+                >{{
+                  (selectedInvoice.documentType.id == 1
+                    ? parseFloat(scope.row.ventaPrice) *
+                      (scope.row.incTax ? 1 : 1.13)
+                    : selectedInvoice.documentType.id == 2
+                    ? parseFloat(scope.row.ventaPrice) /
+                      (scope.row.incTax ? 1.13 : 1)
+                    : parseFloat(scope.row.ventaPrice)) | formatMoney
+                }}</span
+              >
             </template>
           </el-table-column>
         </el-table>
 
         <table class="flex justify-end">
           <tbody class="divide-y divide-gray-300">
-            <tr>
+            <tr v-if="selectedInvoice.documentType.id != 3">
               <td align="right" class="w-40">SUMAS:</td>
               <td align="right" class="w-25">
-                {{ selectedInvoice.sum | formatMoney }}
+                {{
+                  selectedInvoice.documentType.id == 1
+                    ? selectedInvoice.subtotal
+                    : selectedInvoice.sum | formatMoney
+                }}
               </td>
             </tr>
             <tr
@@ -154,32 +240,32 @@
                 {{ selectedInvoice.iva | formatMoney }}
               </td>
             </tr>
-            <tr>
+            <tr v-if="selectedInvoice.documentType.id != 3">
               <td align="right" class="w-40">Subtotal:</td>
               <td align="right" class="w-25">
                 {{ selectedInvoice.subtotal | formatMoney }}
               </td>
             </tr>
-            <tr>
+            <tr v-if="selectedInvoice.documentType.id != 3">
               <td align="right" class="w-40">Iva retenido:</td>
               <td align="right" class="w-25">
                 {{ selectedInvoice.ivaRetenido | formatMoney }}
               </td>
             </tr>
-            <tr>
+            <tr v-if="selectedInvoice.documentType.id != 3">
               <td align="right" class="w-40">Ventas exentas:</td>
               <td align="right" class="w-25">
                 {{ selectedInvoice.ventasExentas | formatMoney }}
               </td>
             </tr>
-            <tr>
+            <tr v-if="selectedInvoice.documentType.id != 3">
               <td align="right" class="w-40">Ventas no sujetas:</td>
               <td align="right" class="w-25">
                 {{ selectedInvoice.ventasNoSujetas | formatMoney }}
               </td>
             </tr>
             <tr>
-              <td align="right" class="ont-semibold w-40">Venta total:</td>
+              <td align="right" class="font-semibold w-40">Venta total:</td>
               <td align="right" class="w-25">
                 {{ selectedInvoice.ventaTotal | formatMoney }}
               </td>
@@ -412,7 +498,11 @@
             width="80"
           />
           <el-table-column label="Fecha" prop="invoiceDate" width="90" />
-          <el-table-column label="Cliente" prop="customerName" width="375" />
+          <el-table-column
+            label="Cliente"
+            prop="customerName"
+            min-width="375"
+          />
           <el-table-column label="Estado" width="110">
             <template slot-scope="scope">
               <el-tag
@@ -498,11 +588,11 @@
                     class="font-semibold"
                     v-if="
                       scope.row.status.id == '1' &&
-                      !isLastInvoice(
-                        scope.row.sequence,
-                        scope.row.documentType.id,
-                        scope.row.authorization
-                      )
+                        !isLastInvoice(
+                          scope.row.sequence,
+                          scope.row.documentType.id,
+                          scope.row.authorization
+                        )
                     "
                     @click.native="deleteInvoice(scope.row)"
                   >
@@ -514,12 +604,12 @@
                     @click.native="voidDocument(scope.row)"
                     v-if="
                       scope.row.status.id === '2' ||
-                      (isLastInvoice(
-                        scope.row.sequence,
-                        scope.row.documentType.id,
-                        scope.row.authorization
-                      ) &&
-                        scope.row.status.id != '3')
+                        (isLastInvoice(
+                          scope.row.sequence,
+                          scope.row.documentType.id,
+                          scope.row.authorization
+                        ) &&
+                          scope.row.status.id != '3')
                     "
                   >
                     <i class="el-icon-circle-close"></i>
@@ -630,7 +720,7 @@ export default {
         documentType: "",
       },
       showInvoicePreview: false,
-      selectedInvoice: {},
+      selectedInvoice: null,
     };
   },
   methods: {
