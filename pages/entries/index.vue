@@ -232,7 +232,7 @@
           sortable="custom"
           label="Serie"
           prop="serie"
-          width="50"
+          width="80"
         />
         <el-table-column sortable="custom" label="Fecha" prop="date" width="90">
           <template slot-scope="scope">
@@ -243,15 +243,9 @@
           sortable="custom"
           label="Titulo"
           prop="title"
-          width="400"
+          min-width="370"
         />
-        <el-table-column
-          sortable="custom"
-          label="Cargo"
-          width="110"
-          align="right"
-          prop="cargo"
-        >
+        <el-table-column label="Cargo" width="110" align="right">
           <template slot-scope="scope">
             <span>{{ scope.row.cargo | formatMoney }}</span>
           </template>
@@ -261,14 +255,14 @@
           label="Tipo"
           width="90"
           align="center"
-          prop="name"
+          prop="accountingEntryType.id"
         >
           <template slot-scope="scope">
             <span>{{ scope.row.accountingEntryType.name }}</span>
           </template>
         </el-table-column>
         <el-table-column
-          prop="accounted"
+          prop="squared"
           sortable="custom"
           label="Estado"
           width="110"
