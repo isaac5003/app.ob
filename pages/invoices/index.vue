@@ -758,7 +758,6 @@ export default {
   },
   methods: {
     sortBy({ column, prop, order }) {
-      console.log({ column, prop, order });
       this.filter.prop = prop;
       this.filter.order = order;
       this.fetchInvoices();
@@ -1050,7 +1049,6 @@ export default {
       return uniPrice;
     },
     printInvoice(id, documentType) {
-      console.log(id);
       this.$confirm(
         `¿Estás seguro que deseas imprimir esta factura?`,
         "Confirmación",
@@ -1070,7 +1068,6 @@ export default {
               Promise.all([invoice(), document()])
                 .then((res) => {
                   const [invoice, document] = res;
-                  console.log(invoice.data.invoice);
                   try {
                     const vadd = 1;
                     const hadd = 3;
@@ -1320,7 +1317,6 @@ export default {
 
                     window.open(pdfDocument.output("bloburl"), "_blank");
                   } catch (error) {
-                    console.log(error);
                     this.$message.error(
                       "Error al generar el PDF, contacta con tu administrador."
                     );
