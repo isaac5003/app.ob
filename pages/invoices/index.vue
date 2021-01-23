@@ -168,7 +168,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 1 &&
-                    selectedInvoice.documentType.id != 3
+                  selectedInvoice.documentType.id != 3
                 "
                 >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
               >
@@ -184,7 +184,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 2 &&
-                    selectedInvoice.documentType.id != 3
+                  selectedInvoice.documentType.id != 3
                 "
                 >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
               >
@@ -200,7 +200,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 3 ||
-                    selectedInvoice.documentType.id == 3
+                  selectedInvoice.documentType.id == 3
                 "
                 >{{
                   (selectedInvoice.documentType.id == 1
@@ -479,13 +479,19 @@
       </el-form>
       <div class="flex flex-col space-y-2">
         <el-table
+          @sort-change="sortBy"
           :data="invoices.invoices"
           stripe
           size="mini"
           v-loading="tableloading"
         >
           <el-table-column prop="index" width="40" />
-          <el-table-column label="# Documento" width="120">
+          <el-table-column
+            label="# Documento"
+            prop="sequence"
+            width="140"
+            sortable="custom"
+          >
             <template slot-scope="scope">
               <span>
                 {{ scope.row.authorization }}-{{ scope.row.sequence }}
@@ -494,16 +500,34 @@
           </el-table-column>
           <el-table-column
             label="Tipo doc."
-            prop="documentType.code"
-            width="80"
+            prop="documentType.id"
+            width="100"
+            sortable="custom"
+          >
+            <template slot-scope="scope">
+              <span>
+                {{ scope.row.documentType.code }}
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="Fecha"
+            prop="invoiceDate"
+            width="90"
+            sortable="custom"
           />
-          <el-table-column label="Fecha" prop="invoiceDate" width="90" />
           <el-table-column
             label="Cliente"
             prop="customerName"
-            min-width="375"
+            min-width="330"
+            sortable="custom"
           />
-          <el-table-column label="Estado" width="110">
+          <el-table-column
+            label="Estado"
+            prop="status.id"
+            width="110"
+            sortable="custom"
+          >
             <template slot-scope="scope">
               <el-tag
                 size="small"
@@ -539,7 +563,13 @@
               >
             </template>
           </el-table-column>
-          <el-table-column label="Total" width="80" align="right">
+          <el-table-column
+            label="Total"
+            width="80"
+            align="right"
+            prop="ventaTotal"
+            sortable="custom"
+          >
             <template slot-scope="scope">
               <span>{{ scope.row.ventaTotal | formatMoney }}</span>
             </template>
@@ -588,11 +618,11 @@
                     class="font-semibold"
                     v-if="
                       scope.row.status.id == '1' &&
-                        !isLastInvoice(
-                          scope.row.sequence,
-                          scope.row.documentType.id,
-                          scope.row.authorization
-                        )
+                      !isLastInvoice(
+                        scope.row.sequence,
+                        scope.row.documentType.id,
+                        scope.row.authorization
+                      )
                     "
                     @click.native="deleteInvoice(scope.row)"
                   >
@@ -604,12 +634,12 @@
                     @click.native="voidDocument(scope.row)"
                     v-if="
                       scope.row.status.id === '2' ||
-                        (isLastInvoice(
-                          scope.row.sequence,
-                          scope.row.documentType.id,
-                          scope.row.authorization
-                        ) &&
-                          scope.row.status.id != '3')
+                      (isLastInvoice(
+                        scope.row.sequence,
+                        scope.row.documentType.id,
+                        scope.row.authorization
+                      ) &&
+                        scope.row.status.id != '3')
                     "
                   >
                     <i class="el-icon-circle-close"></i>
@@ -718,12 +748,20 @@ export default {
         service: "",
         searchValue: "",
         documentType: "",
+        prop: "",
+        order: null,
       },
+
       showInvoicePreview: false,
       selectedInvoice: null,
     };
   },
   methods: {
+    sortBy({ column, prop, order }) {
+      this.filter.prop = prop;
+      this.filter.order = order;
+      this.fetchInvoices();
+    },
     isLastInvoice(sequence, documentTypeId, authorization) {
       // Filtra las facturas del mismo tipo y numero de autorizacion.
       const invoices = this.invoices.invoices.filter(
@@ -771,6 +809,13 @@ export default {
       }
       if (this.filter.service !== "") {
         params = { ...params, service: this.filter.service };
+      }
+      if (this.filter.order) {
+        params = {
+          ...params,
+          prop: this.filter.prop,
+          order: this.filter.order,
+        };
       }
       this.$axios
         .get("/invoices", { params })
@@ -1004,7 +1049,6 @@ export default {
       return uniPrice;
     },
     printInvoice(id, documentType) {
-      console.log(id);
       this.$confirm(
         `¿Estás seguro que deseas imprimir esta factura?`,
         "Confirmación",
@@ -1024,7 +1068,6 @@ export default {
               Promise.all([invoice(), document()])
                 .then((res) => {
                   const [invoice, document] = res;
-                  console.log(invoice.data.invoice);
                   try {
                     const vadd = 1;
                     const hadd = 3;
@@ -1274,7 +1317,6 @@ export default {
 
                     window.open(pdfDocument.output("bloburl"), "_blank");
                   } catch (error) {
-                    console.log(error);
                     this.$message.error(
                       "Error al generar el PDF, contacta con tu administrador."
                     );
