@@ -206,6 +206,9 @@
                   (selectedInvoice.documentType.id == 1
                     ? parseFloat(scope.row.ventaPrice) *
                       (scope.row.incTax ? 1 : 1.13)
+                    : selectedInvoice.documentType.id == 2
+                    ? parseFloat(scope.row.ventaPrice) /
+                      (scope.row.incTax ? 1.13 : 1)
                     : parseFloat(scope.row.ventaPrice)) | formatMoney
                 }}</span
               >
@@ -755,7 +758,6 @@ export default {
       const { data } = await this.$axios.get(`/invoices/${id}`);
       this.selectedInvoice = data.invoice;
       this.showInvoicePreview = true;
-      console.log(this.selectedInvoice);
     },
     voidDocument({ id }) {
       this.$confirm(
@@ -871,45 +873,6 @@ export default {
         }
       );
     },
-    // changeActive({ id, isActiveInvoice }) {
-    //   const action = isActiveInvoice ? "desactivar" : "activar";
-    //   this.$confirm(
-    //     `¿Estás seguro que deseas ${action} este cliente?`,
-    //     "Confirmación",
-    //     {
-    //       confirmButtonText: `Si, ${action}`,
-    //       cancelButtonText: "Cancelar",
-    //       type: "warning",
-    //       beforeClose: (action, instance, done) => {
-    //         if (action === "confirm") {
-    //           instance.confirmButtonLoading = true;
-    //           instance.confirmButtonText = "Procesando...";
-    //           this.$axios
-    //             .put(`/invoices/status/${id}`, { status: !isActiveInvoice })
-    //             .then((res) => {
-    //               this.$notify.success({
-    //                 title: "Éxito",
-    //                 message: res.data.message,
-    //               });
-    //               this.fetchInvoices();
-    //             })
-    //             .catch((err) => {
-    //               this.$notify.error({
-    //                 title: "Error",
-    //                 message: err.response.data.message,
-    //               });
-    //             })
-    //             .then((alw) => {
-    //               instance.confirmButtonLoading = false;
-    //               instance.confirmButtonText = `Si, ${action}`;
-    //               done();
-    //             });
-    //         }
-    //         done();
-    //       },
-    //     }
-    //   );
-    // },
   },
   computed: {
     activeCustomers() {

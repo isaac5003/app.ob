@@ -1110,90 +1110,74 @@ export default {
     },
 
     calcUnitPrice(documentType, { unitPrice, incTax, sellingType }) {
-      let uniPrice = null;
-      const amount = parseFloat(unitPrice);
-      let message = null;
-      if ((sellingType == 1) | (sellingType == 2)) {
-        uniPrice = amount;
+      if (sellingType == 1 || sellingType == 2) {
+        return unitPrice;
       } else {
         if (documentType) {
           switch (documentType) {
             case 1:
-              uniPrice = amount * (incTax ? 1 : 1.13);
-              this.newServiceForm.unitPrice = uniPrice;
-              break;
-            case 2:
-              uniPrice = amount / (incTax ? 1.13 : 1);
-              this.newServiceForm.unitPrice = uniPrice;
-              break;
-            case 3:
-              uniPrice = amount;
+              return unitPrice * (incTax ? 1 : 1.13);
 
-              break;
+            case 2:
+              return unitPrice / (incTax ? 1.13 : 1);
+
+            case 3:
+              return unitPrice;
           }
         }
       }
       return uniPrice;
     },
     calcSujeta(documentType, { unitPrice, incTax, sellingType, quantity }) {
-      let uniPrice = null;
-      const amount = parseFloat(unitPrice);
-
-      if ((sellingType == 1) | (sellingType == 2)) {
-        uniPrice = amount * quantity;
-      }
-
-      return uniPrice;
-    },
-    calcGravada(documentType, { unitPrice, incTax, sellingType, quantity }) {
-      let uniPrice = null;
-      const amount = parseFloat(unitPrice);
       switch (documentType) {
         case 1:
-          uniPrice = amount * (incTax ? 1 : 1.13) * quantity;
-
-          break;
         case 2:
-          uniPrice = (amount / (incTax ? 1.13 : 1)) * quantity;
-
+          return unitPrice * quantity;
           break;
+        case 3:
+          return 0;
+          break;
+      }
+    },
+    calcGravada(documentType, { unitPrice, incTax, sellingType, quantity }) {
+      switch (documentType) {
+        case 1:
+          return unitPrice * (incTax ? 1 : 1.13) * quantity;
+
+        case 2:
+          return (unitPrice / (incTax ? 1.13 : 1)) * quantity;
+
         case 3:
           switch (sellingType) {
             case 1:
-              uniPrice = amount * quantity;
-              break;
+              return unitPrice * quantity;
+
             case 2:
-              uniPrice = amount * quantity;
-              break;
+              return unitPrice * quantity;
+
             case 3:
-              uniPrice = amount * quantity;
-              break;
+              return unitPrice * quantity;
           }
-
-          break;
       }
-
-      return uniPrice;
     },
-    calcExenta(documentType, { unitPrice, incTax, sellingType, quantity }) {
-      let uniPrice = null;
-      const amount = parseFloat(unitPrice);
+    calcExenta(documentType, { unitPrice, quantity }) {
+      switch (documentType) {
+        case 1:
+        case 2:
+          return unitPrice * quantity;
 
-      if ((sellingType == 1) | (sellingType == 2)) {
-        uniPrice = amount * quantity;
+        case 3:
+          return 0;
       }
-
-      return uniPrice;
     },
   },
   computed: {
     sumas() {
-      const details = this.details;
       let sumas = 0;
-      if (details) {
+      if (this.details) {
         switch (this.salesEditForm.documentType) {
           case 1:
-            for (const d of details) {
+            for (const d of this.details) {
               if (d.sellingType === 3) {
                 sumas +=
                   parseFloat(d.quantity) *
@@ -1203,7 +1187,7 @@ export default {
             }
             break;
           case 2:
-            for (const d of details) {
+            for (const d of this.details) {
               if (d.sellingType === 3) {
                 sumas +=
                   (parseFloat(d.quantity) * parseFloat(d.unitPrice)) /
@@ -1212,7 +1196,7 @@ export default {
             }
             break;
           case 3:
-            for (const d of details) {
+            for (const d of this.details) {
               sumas += parseFloat(d.quantity) * parseFloat(d.unitPrice);
             }
 
@@ -1223,12 +1207,11 @@ export default {
       return sumas;
     },
     sumasCF() {
-      const details = this.details;
       let sumasCF = 0;
-      if (details) {
+      if (this.details) {
         switch (this.salesEditForm.documentType) {
           case 1:
-            for (const d of details) {
+            for (const d of this.details) {
               if (d.sellingType === 3) {
                 sumasCF +=
                   (parseFloat(d.quantity) * parseFloat(d.unitPrice)) /
@@ -1241,37 +1224,22 @@ export default {
       return sumasCF;
     },
     taxes() {
-      const details = this.details;
       let taxes = 0;
-      if (details) {
+      if (this.details) {
         switch (this.salesEditForm.documentType) {
           case 1:
-            for (const d of details) {
+            for (const d of this.details) {
               if (d.sellingType === 3) {
-                if (d.incTax) {
-                  const total =
-                    parseFloat(d.quantity) * parseFloat(d.unitPrice);
-                  taxes += total - total / 1.13;
-                } else {
-                  const total =
-                    parseFloat(d.quantity) * parseFloat(d.unitPrice);
-                  taxes += total * 0.13;
-                }
+                const total = parseFloat(d.quantity) * parseFloat(d.unitPrice);
+                taxes += d.incTax ? total - total / 1.13 : total * 0.13;
               }
             }
             break;
           case 2:
-            for (const d of details) {
+            for (const d of this.details) {
               if (d.sellingType === 3) {
-                if (d.incTax) {
-                  const total =
-                    parseFloat(d.quantity) * parseFloat(d.unitPrice);
-                  taxes += total - total / 1.13;
-                } else {
-                  const total =
-                    parseFloat(d.quantity) * parseFloat(d.unitPrice);
-                  taxes += total * 1.13 - total;
-                }
+                const total = parseFloat(d.quantity) * parseFloat(d.unitPrice);
+                taxes += d.incTax ? total - total / 1.13 : total * 1.13 - total;
               }
             }
             break;
@@ -1289,26 +1257,22 @@ export default {
     },
 
     ventasExentas() {
-      const details = this.details.filter((d) => d.sellingType == 2);
-      return details.reduce(
-        (a, b) => {
-          return {
-            total: a.total + b.unitPrice * b.quantity,
-          };
-        },
-        { total: 0 }
-      ).total;
+      let exentas = 0;
+      if (this.salesEditForm.documentType != 3) {
+        exentas = this.details
+          .filter((d) => d.sellingType == 2)
+          .reduce((a, b) => a + b.unitPrice * b.quantity, 0);
+      }
+      return exentas;
     },
     ventasNoSujetas() {
-      const details = this.details.filter((d) => d.sellingType == 1);
-      return details.reduce(
-        (a, b) => {
-          return {
-            total: a.total + b.unitPrice * b.quantity,
-          };
-        },
-        { total: 0 }
-      ).total;
+      let nosujeta = 0;
+      if (this.salesEditForm.documentType != 3) {
+        nosujeta = this.details
+          .filter((d) => d.sellingType == 1)
+          .reduce((a, b) => a + b.unitPrice * b.quantity, 0);
+      }
+      return nosujeta;
     },
     ventaTotal() {
       if (this.salesEditForm.documentType == 3) {
