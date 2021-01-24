@@ -1068,7 +1068,7 @@
                 <template slot-scope="scope">
                   <el-switch
                     v-model="scope.row.show"
-                    v-if="scope.row.showAdd"
+                    v-if="!scope.row.canDelete"
                   />
                 </template>
               </el-table-column>
@@ -1383,6 +1383,8 @@ export default {
           display: "Utilidad/Perdida bruta",
           showUpdateName: true,
           bold: true,
+
+          show: true,
         },
         {
           name: "Otros ingresos",
@@ -1390,7 +1392,7 @@ export default {
           showUpdateName: true,
           showAdd: true,
           children: [],
-          show: true,
+          show: false,
           details: false,
           id: 3,
         },
@@ -1429,6 +1431,8 @@ export default {
           display: "Utilidad/Perdida de operacion",
           showUpdateName: true,
           bold: true,
+
+          show: true,
         },
         {
           name: "Ingresos financieros",
@@ -1457,6 +1461,8 @@ export default {
             "Utiidad/Perdida antes de impuesto sobre la renta y las ganancias",
           showUpdateName: true,
           bold: true,
+
+          show: true,
         },
         {
           name: "Reserva legal",
@@ -1473,6 +1479,8 @@ export default {
           display: "Utiidad/Perdida antes de impuesto sobre la renta",
           showUpdateName: true,
           bold: true,
+
+          show: true,
         },
         {
           name: "Impuesto sobre la renta",
@@ -1491,6 +1499,8 @@ export default {
             "Utilidad/Perdida antes de contribucion especial a las ganancias",
           showUpdateName: true,
           bold: true,
+
+          show: true,
         },
         {
           name: "Contribucion especial a las ganancias",
@@ -1507,6 +1517,7 @@ export default {
           display: "Resultado del ejercicio",
           showUpdateName: true,
           bold: true,
+          show: true,
         },
         {
           name: "Otros resultados integrales del ejercicio neto de impuestos",
@@ -1524,6 +1535,8 @@ export default {
           display: "RESULTADO INTEGRAL TOTAL DEL AÑO",
           showUpdateName: true,
           bold: true,
+
+          show: true,
         },
       ],
 
