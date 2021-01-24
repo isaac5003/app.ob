@@ -97,7 +97,7 @@
           <el-form-item label="Rango de fechas:">
             <el-date-picker
               size="small"
-              v-model="reportForm.dateRange"
+              v-model="reportForm.dateRanges"
               type="daterange"
               unlink-panels
               range-separator="-"
@@ -201,6 +201,7 @@ export default {
         reportType: "",
         dateRange: new Date(),
         radio: "pdf",
+        dateRanges: "",
       },
       reportFormRules: {
         reportType: selectValidation("change", true),
@@ -211,6 +212,7 @@ export default {
         { name: "Balance general", id: "balanceGeneral" },
 
         { name: "Balance de comprobación", id: "balanceComprobacion" },
+        { name: "Estado de resultados", id: "estadoResultados" },
       ],
       auxiliarReports: [
         { name: "Libro diario mayor", id: "diarioMayor" },
@@ -248,7 +250,11 @@ export default {
         }
       }
     },
-    generateReport(formName, { dateRange, reportType, radio }, catalogos) {
+    generateReport(
+      formName,
+      { dateRange, reportType, radio, dateRanges },
+      catalogos
+    ) {
       this.$refs[formName].validate((valid) => {
         if (!valid) {
           return false;
@@ -260,7 +266,7 @@ export default {
             this.balanceGeneral(dateRange, radio);
             break;
           case "estadoResultados":
-            this.generateEstadoResultados(dateRange);
+            this.generateEstadoResultados(dateRange, radio);
             break;
           case "balanceComprobacion":
             this.generateBalanceComprobacion(dateRange, radio);
@@ -278,10 +284,163 @@ export default {
             // this.generateDetalleCuentas(dateRange, catalogList);
             break;
           case "movimientoCuentas":
-            this.generateDetalleCuentas(dateRange, catalogos, radio);
+            this.generateDetalleCuentas(dateRanges, catalogos, radio);
             break;
         }
       });
+    },
+    generateEstadoResultados(dateRange, fileType) {
+      const bussinesInfo = () => this.$axios.get("/business/info");
+      const estadoResultados = () =>
+        this.$axios.get("/entries/report/estado-resultados", {
+          params: { date: dateRange },
+        });
+      switch (fileType) {
+        case "pdf":
+          Promise.all([bussinesInfo(), estadoResultados()]).then((res) => {
+            const [bussinesInfo, estadoResultados] = res;
+            const { name, nit, nrc } = bussinesInfo.data.info;
+            const estadoResultado = estadoResultados.data.estadoResultados;
+
+            const values = [];
+            const emptyRow = [{}, {}, {}];
+
+            for (const er of estadoResultado) {
+              values.push(emptyRow);
+              values.push([
+                {
+                  bold: er.type == "total",
+                  text: er.name,
+                },
+                {},
+                {
+                  bold: er.type == "total",
+                  text: this.$options.filters.formatMoney(er.total),
+                  alignment: "right",
+                },
+              ]);
+              if (er.children) {
+                for (const ch of er.children) {
+                  values.push([
+                    {
+                      bold: false,
+                      text: ch.name,
+                      margin: [5, 0, 0, 0],
+                    },
+                    {
+                      bold: false,
+                      text: this.$options.filters.formatMoney(ch.total),
+                      alignment: "right",
+                    },
+                    {},
+                  ]);
+                }
+              }
+            }
+            const docDefinition = {
+              info: {
+                title: `estado_resultados_al_${this.$dateFns.format(
+                  new Date(dateRange),
+                  "yyyyMMdd"
+                )}`,
+              },
+              pageSize: "LETTER",
+              pageOrientation: "porttrait",
+              pageMargins: [20, 60, 20, 40],
+              header: getHeader(
+                name,
+                nit,
+                nrc,
+                this.$dateFns.lastDayOfMonth(new Date(dateRange)),
+                "ESTADO DE RESULTADOS"
+              ),
+              footer: getFooter(),
+              content: [
+                {
+                  fontSize: 9,
+                  layout: "noBorders",
+                  table: {
+                    widths: ["*", "10%", "10%"],
+                    body: [
+                      [
+                        {
+                          fontSize: 10,
+                          text: "CONCEPTOS",
+                          style: "tableHeader",
+                          margin: [0, 0, 0, 10],
+                        },
+                        {
+                          fontSize: 10,
+                          text: "SALDOS DEL PERIODO",
+                          style: "tableHeader",
+                          alignment: "right",
+                          colSpan: 2,
+                        },
+                        "",
+                      ],
+                      ...values,
+                    ],
+                  },
+                },
+              ],
+              styles: {
+                tableHeader: {
+                  bold: true,
+                  fontSize: 9,
+                },
+              },
+            };
+            this.generating = false;
+            pdfMake.createPdf(docDefinition).open();
+          });
+          break;
+        case "excel":
+          Promise.all([bussinesInfo(), estadoResultados()]).then((res) => {
+            const [bussinesInfo, estadoResultados] = res;
+            const { name, nit, nrc } = bussinesInfo.data.info;
+            const estadoResultado = estadoResultados.data.estadoResultados;
+
+            const data = [];
+
+            for (const er of estadoResultado) {
+              data.push([""]);
+              data.push([er.name, "", er.total]);
+              if (er.children) {
+                for (const ch of er.children) {
+                  data.push([ch.name, ch.total, ""]);
+                }
+              }
+            }
+            const document = [
+              [name],
+              [
+                `ESTADO DE RESULTADOS AL ${this.$dateFns.format(
+                  new Date(dateRange),
+                  "dd/MM/yyyy"
+                )}`,
+
+                `NIT: ${nit}`,
+                `NRC: ${nrc}`,
+              ],
+              [""],
+              ["CONCEPTOS", "SALDOS DEL PERÍODO"],
+              [""],
+              [""],
+              ...data,
+            ];
+
+            const sheet = XLSX.utils.aoa_to_sheet(document);
+            const workbook = XLSX.utils.book_new();
+            const fileName = `estado_resultados_al_${this.$dateFns.format(
+              new Date(dateRange),
+              "yyyyMMdd"
+            )}`;
+            XLSX.utils.book_append_sheet(workbook, sheet, fileName);
+            XLSX.writeFile(workbook, `${fileName}.xlsx`);
+            this.generating = false;
+          });
+          break;
+      }
     },
     generateBalanceComprobacion(dateRange, fileType) {
       const bussinesInfo = () => this.$axios.get("/business/info");
@@ -397,6 +556,12 @@ export default {
               ]);
             }
             const docDefinition = {
+              info: {
+                title: `balance_comprobacion_al_${this.$dateFns.format(
+                  new Date(dateRange),
+                  "yyyyMMdd"
+                )}`,
+              },
               pageSize: "LETTER",
               pageOrientation: "portrait",
               pageMargins: [15, 60, 15, 40],
@@ -510,25 +675,15 @@ export default {
 
                   i.name,
 
-                  i.code.length == 1
-                    ? ""
-                    : this.$options.filters.formatMoney(i.initialBalance),
+                  i.code.length == 1 ? "" : i.initialBalance,
 
-                  i.code.length == 1
-                    ? ""
-                    : this.$options.filters.formatMoney(i.cargo),
+                  i.code.length == 1 ? "" : i.cargo,
 
-                  i.code.length == 1
-                    ? ""
-                    : this.$options.filters.formatMoney(i.abono),
+                  i.code.length == 1 ? "" : i.abono,
 
-                  i.code.length == 1
-                    ? ""
-                    : this.$options.filters.formatMoney(i.currentBalance),
+                  i.code.length == 1 ? "" : i.currentBalance,
 
-                  i.code.length == 1
-                    ? ""
-                    : this.$options.filters.formatMoney(i.actualBalance),
+                  i.code.length == 1 ? "" : i.actualBalance,
                 ]);
               }
               data.push([
@@ -536,14 +691,14 @@ export default {
 
                 "",
 
-                this.$options.filters.formatMoney(m.initialBalance),
+                m.initialBalance,
 
-                this.$options.filters.formatMoney(m.cargo),
+                m.cargo,
 
-                this.$options.filters.formatMoney(m.abono),
+                m.abono,
 
-                this.$options.filters.formatMoney(m.currentBalance),
-                this.$options.filters.formatMoney(m.actualBalance),
+                m.currentBalance,
+                m.actualBalance,
               ]);
             }
             const document = [
@@ -576,7 +731,10 @@ export default {
 
             const sheet = XLSX.utils.aoa_to_sheet(document);
             const workbook = XLSX.utils.book_new();
-            const fileName = "report";
+            const fileName = `balancecomprobacion_al_${this.$dateFns.format(
+              new Date(dateRange),
+              "yyyyMMdd"
+            )}`;
             XLSX.utils.book_append_sheet(workbook, sheet, fileName);
             XLSX.writeFile(workbook, `${fileName}.xlsx`);
             this.generating = false;
@@ -705,6 +863,12 @@ export default {
             }
 
             const docDefinition = {
+              info: {
+                title: `balance_general_${this.$dateFns.format(
+                  new Date(dateRange),
+                  "yyyyMMdd"
+                )}`,
+              },
               pageSize: "LETTER",
               pageOrientation: "landscape",
               pageMargins: [15, 55, 15, 40],
@@ -881,7 +1045,7 @@ export default {
             this.generating = false;
             pdfMake.createPdf(docDefinition).open();
           });
-          console.log("Generando PDF");
+
           break;
         case "excel":
           Promise.all([general(), bussinesInfo()]).then((res) => {
@@ -952,13 +1116,15 @@ export default {
 
             const sheet = XLSX.utils.aoa_to_sheet(document);
             const workbook = XLSX.utils.book_new();
-            const fileName = "report";
+            const fileName = `balance_general_al_${this.$dateFns.format(
+              new Date(dateRange),
+              "yyyyMMdd"
+            )}`;
             XLSX.utils.book_append_sheet(workbook, sheet, fileName);
             XLSX.writeFile(workbook, `${fileName}.xlsx`);
             this.generating = false;
           });
 
-          console.log("Generando EXCEL");
           break;
 
         default:
@@ -988,6 +1154,12 @@ export default {
             });
 
             const docDefinition = {
+              info: {
+                title: `catalogo_cuentas_al_${this.$dateFns.format(
+                  new Date(),
+                  "yyyyMMdd"
+                )}`,
+              },
               pageSize: "LETTER",
               pageOrientation: "portrait",
               pageMargins: [20, 60, 20, 40],
@@ -1054,7 +1226,10 @@ export default {
 
             const sheet = XLSX.utils.aoa_to_sheet(document);
             const workbook = XLSX.utils.book_new();
-            const fileName = "report";
+            const fileName = `catalogo_cuentas_al_${this.$dateFns.format(
+              new Date(),
+              "yyyyMMdd"
+            )}`;
             XLSX.utils.book_append_sheet(workbook, sheet, fileName);
             XLSX.writeFile(workbook, `${fileName}.xlsx`);
             this.generating = false;
@@ -1158,6 +1333,12 @@ export default {
             }
 
             const docDefinition = {
+              info: {
+                title: `libro_diario_mayor_al_${this.$dateFns.format(
+                  new Date(dateRange),
+                  "yyyyMMdd"
+                )}`,
+              },
               pageSize: "LETTER",
               pageOrientation: "portrait",
               pageMargins: [20, 60, 20, 40],
@@ -1306,7 +1487,10 @@ export default {
 
             const sheet = XLSX.utils.aoa_to_sheet(document);
             const workbook = XLSX.utils.book_new();
-            const fileName = "report";
+            const fileName = `libro_diario_mayor_al_${this.$dateFns.format(
+              new Date(dateRange),
+              "yyyyMMdd"
+            )}`;
             XLSX.utils.book_append_sheet(workbook, sheet, fileName);
             XLSX.writeFile(workbook, `${fileName}.xlsx`);
             this.generating = false;
@@ -1413,6 +1597,12 @@ export default {
             }
 
             const docDefinition = {
+              info: {
+                title: `libro_auxiliares_al_${this.$dateFns.format(
+                  new Date(dateRange),
+                  "yyyyMMdd"
+                )}`,
+              },
               pageSize: "LETTER",
               pageOrientation: "portrait",
               pageMargins: [20, 60, 20, 40],
@@ -1568,7 +1758,10 @@ export default {
 
             const sheet = XLSX.utils.aoa_to_sheet(document);
             const workbook = XLSX.utils.book_new();
-            const fileName = "report";
+            const fileName = `libro_axuliares_al_${this.$dateFns.format(
+              new Date(dateRange),
+              "yyyyMMdd"
+            )}`;
             XLSX.utils.book_append_sheet(workbook, sheet, fileName);
             XLSX.writeFile(workbook, `${fileName}.xlsx`);
             this.generating = false;
@@ -1677,6 +1870,12 @@ export default {
             }
 
             const docDefinition = {
+              info: {
+                title: `detalle_de_cuentas_al_${this.$dateFns.format(
+                  new Date(dateRange[0]),
+                  "yyyyMMdd"
+                )}_${this.$dateFns.format(new Date(dateRange[1]), "yyyyMMdd")}`,
+              },
               pageSize: "LETTER",
               pageOrientation: "portrait",
               pageMargins: [20, 60, 20, 40],
@@ -1836,7 +2035,10 @@ export default {
 
             const sheet = XLSX.utils.aoa_to_sheet(document);
             const workbook = XLSX.utils.book_new();
-            const fileName = "report";
+            const fileName = `detallecuenta_${this.$dateFns.format(
+              new Date(dateRange[0]),
+              "yyyyMMdd"
+            )}_${this.$dateFns.format(new Date(dateRange[1]), "yyyyMMdd")}`;
             XLSX.utils.book_append_sheet(workbook, sheet, fileName);
             XLSX.writeFile(workbook, `${fileName}.xlsx`);
             this.generating = false;

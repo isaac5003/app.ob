@@ -1214,7 +1214,19 @@ export default {
         this.catalogs = accounts.data.accountingCatalog;
         this.tableData = balance.data.balanceGeneral.report;
         this.specialAccounts = { ...balance.data.balanceGeneral.special };
-        this.tablesData = results.data.estadoResultados;
+        this.tablesData = results.data.estadoResultados.map((r) => {
+          const obj = { ...r };
+          if (r.children) {
+            const children = r.children.map((ch) => {
+              return {
+                ...ch,
+                code: ch.id,
+              };
+            });
+            obj["children"] = children;
+          }
+          return obj;
+        });
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
