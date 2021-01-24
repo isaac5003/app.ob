@@ -257,7 +257,7 @@ export default {
         this.generating = true;
         switch (reportType) {
           case "balanceGeneral":
-            this.generateBalanceGeneral(dateRange);
+            this.balanceGeneral(dateRange, radio);
             break;
           case "estadoResultados":
             this.generateEstadoResultados(dateRange);
@@ -581,6 +581,387 @@ export default {
             XLSX.writeFile(workbook, `${fileName}.xlsx`);
             this.generating = false;
           });
+          break;
+      }
+    },
+    balanceGeneral(dateRange, fileType) {
+      const general = () =>
+        this.$axios.get("/entries/report/balance-general", {
+          params: {
+            date: dateRange,
+          },
+        });
+      const bussinesInfo = () => this.$axios.get("/business/info");
+      switch (fileType) {
+        case "pdf":
+          Promise.all([general(), bussinesInfo()]).then((res) => {
+            const [general, bussinesInfo] = res;
+            const [activo, pasivo, patrimonio] = general.data.balanceGeneral;
+            const { name, nit, nrc } = bussinesInfo.data.info;
+            let activoValues = [];
+            let pasivoValues = [];
+            let patrimonioValues = [];
+
+            activoValues.push([
+              {
+                fontSize: 10,
+                alignment: "center",
+                text: activo.name,
+                style: "tableHeader",
+                colSpan: 3,
+              },
+              "",
+              "",
+            ]);
+            for (const a of activo.accounts) {
+              activoValues.push([
+                [
+                  {
+                    text: a.name,
+                    style: "tableHeader",
+                  },
+                ],
+                "",
+                {
+                  text: this.$options.filters.formatMoney(a.total),
+                  style: "tableHeader",
+                },
+              ]);
+              for (const ch of a.accounts) {
+                activoValues.push([
+                  { text: ch.name, margin: [10, 0, 0, 0] },
+                  this.$options.filters.formatMoney(ch.total),
+                  "",
+                ]);
+              }
+            }
+
+            pasivoValues.push([
+              {
+                fontSize: 10,
+                alignment: "center",
+                text: pasivo.name,
+                style: "tableHeader",
+                colSpan: 3,
+              },
+              "",
+              "",
+            ]);
+            for (const a of pasivo.accounts) {
+              pasivoValues.push([
+                [
+                  {
+                    text: a.name,
+                    style: "tableHeader",
+                  },
+                ],
+                "",
+                {
+                  text: this.$options.filters.formatMoney(a.total),
+                  style: "tableHeader",
+                },
+              ]);
+              for (const ch of a.accounts) {
+                pasivoValues.push([
+                  { text: ch.name, margin: [10, 0, 0, 0] },
+                  this.$options.filters.formatMoney(ch.total),
+                  "",
+                ]);
+              }
+            }
+
+            patrimonioValues.push([
+              {
+                fontSize: 10,
+                alignment: "center",
+                text: patrimonio.name,
+                style: "tableHeader",
+                colSpan: 3,
+              },
+              "",
+              "",
+            ]);
+            for (const a of patrimonio.accounts) {
+              patrimonioValues.push([
+                [
+                  {
+                    text: a.name,
+                    style: "tableHeader",
+                  },
+                ],
+                "",
+                {
+                  text: this.$options.filters.formatMoney(a.total),
+                  style: "tableHeader",
+                },
+              ]);
+              for (const ch of a.accounts) {
+                patrimonioValues.push([
+                  { text: ch.name, margin: [10, 0, 0, 0] },
+                  this.$options.filters.formatMoney(ch.total),
+                  "",
+                ]);
+              }
+            }
+
+            const docDefinition = {
+              pageSize: "LETTER",
+              pageOrientation: "landscape",
+              pageMargins: [15, 55, 15, 40],
+              header: getHeader(
+                name,
+                nit,
+                nrc,
+                this.$dateFns.lastDayOfMonth(new Date(dateRange)),
+                "LIBRO DIARIO MAYOR",
+                "month"
+              ),
+              footer: getFooter(),
+              content: [
+                {
+                  fontSize: 9,
+                  layout: "noBorders",
+                  table: {
+                    widths: ["49.5%", "1%", "49.5%"],
+                    body: [
+                      [
+                        {
+                          layout: "noBorders",
+                          table: {
+                            widths: ["*", "auto", "auto"],
+                            body: activoValues,
+                          },
+                        },
+                        "",
+                        {
+                          layout: "noBorders",
+                          table: {
+                            widths: ["*", "auto", "auto"],
+                            body: [
+                              ...pasivoValues,
+                              ["", "", ""],
+                              ...patrimonioValues,
+                            ],
+                          },
+                        },
+                      ],
+                      [
+                        {
+                          text: "",
+                          margin: [0, 10, 0, 0],
+                        },
+                        {},
+                        {},
+                      ],
+                      [
+                        {
+                          table: {
+                            widths: ["*", "*"],
+                            body: [
+                              [
+                                {
+                                  fontSize: 10,
+                                  text: "TOTAL ACTIVO:",
+                                  style: "tableHeader",
+                                  border: [false, true, false, true],
+                                },
+                                {
+                                  alignment: "right",
+                                  fontSize: 10,
+                                  text: this.$options.filters.formatMoney(
+                                    activo.total
+                                  ),
+                                  style: "tableHeader",
+                                  border: [false, true, false, true],
+                                },
+                              ],
+                            ],
+                          },
+                        },
+                        {},
+                        {
+                          table: {
+                            widths: ["*", "*"],
+                            body: [
+                              [
+                                {
+                                  fontSize: 10,
+                                  text: "TOTAL PASIVO Y PATRIMONIO:",
+                                  style: "tableHeader",
+                                  border: [false, true, false, true],
+                                },
+                                {
+                                  alignment: "right",
+                                  fontSize: 10,
+                                  text: this.$options.filters.formatMoney(
+                                    pasivo.total + patrimonio.total
+                                  ),
+                                  style: "tableHeader",
+                                  border: [false, true, false, true],
+                                },
+                              ],
+                            ],
+                          },
+                        },
+                      ],
+                      [
+                        {
+                          text: "",
+                          margin: [0, 60, 0, 0],
+                        },
+                        {},
+                        {},
+                      ],
+                      [
+                        {
+                          colSpan: 3,
+                          table: {
+                            widths: ["*", "2%", "*", "2%", "*"],
+                            body: [
+                              [
+                                {
+                                  alignment: "center",
+                                  text: [
+                                    {
+                                      style: "tableHeader",
+                                      text: "Nombre Apellido\n",
+                                    },
+                                    "Representante legal",
+                                  ],
+                                  border: [false, true, false, false],
+                                },
+                                {
+                                  text: "",
+                                  border: [false, false, false, false],
+                                },
+                                {
+                                  alignment: "center",
+                                  text: [
+                                    {
+                                      text: "Nombre Apellido\n",
+                                      style: "tableHeader",
+                                    },
+                                    "Contador",
+                                  ],
+                                  border: [false, true, false, false],
+                                },
+                                {
+                                  text: "",
+                                  border: [false, false, false, false],
+                                },
+                                {
+                                  alignment: "center",
+                                  text: [
+                                    {
+                                      text: "Nombre Apellido\n",
+                                      style: "tableHeader",
+                                    },
+                                    "Auditor",
+                                  ],
+                                  border: [false, true, false, false],
+                                },
+                              ],
+                            ],
+                          },
+                        },
+                        {},
+                        {},
+                      ],
+                    ],
+                  },
+                },
+              ],
+              styles: {
+                tableHeader: {
+                  bold: true,
+                  fontSize: 9,
+                },
+              },
+            };
+            this.generating = false;
+            pdfMake.createPdf(docDefinition).open();
+          });
+          console.log("Generando PDF");
+          break;
+        case "excel":
+          Promise.all([general(), bussinesInfo()]).then((res) => {
+            const [general, bussinesInfo] = res;
+            const [activo, pasivo, patrimonio] = general.data.balanceGeneral;
+            const { name, nit, nrc } = bussinesInfo.data.info;
+            let activoValues = [];
+            let pasivoValues = [];
+            let patrimonioValues = [];
+
+            activoValues.push([activo.name]);
+
+            for (const ac of activo.accounts) {
+              activoValues.push([ac.name, "", ac.total]);
+              for (const acc of ac.accounts) {
+                activoValues.push([acc.name, acc.total]);
+              }
+            }
+            activoValues.push([""]);
+            activoValues.push(["TOTAL ACTIVO:", "", activo.total]);
+            activoValues.push([""]);
+            activoValues.push([""]);
+
+            //Empieza pasivos
+            pasivoValues.push([pasivo.name]);
+
+            for (const ac of pasivo.accounts) {
+              pasivoValues.push([ac.name, "", ac.total]);
+              for (const acc of ac.accounts) {
+                pasivoValues.push([acc.name, acc.total]);
+              }
+            }
+            pasivoValues.push([""]);
+
+            //Empieza patrimonio
+
+            patrimonioValues.push([patrimonio.name]);
+
+            for (const p of patrimonio.accounts) {
+              patrimonioValues.push([p.name, "", p.total]);
+              for (const pp of p.accounts) {
+                patrimonioValues.push([pp.name, pp.total]);
+              }
+            }
+
+            patrimonioValues.push([""]);
+            patrimonioValues.push([
+              "TOTAL PASIVOS Y PATRIMONIO:",
+              "",
+              pasivo.total + patrimonio.total,
+            ]);
+
+            const document = [
+              [name],
+              ["BALANCE GENERAL", `NIT: ${nit}`, `NRC: ${nrc}`],
+              [""],
+              ...activoValues,
+              ...pasivoValues,
+              ...patrimonioValues,
+              [""],
+              [""],
+              [
+                "_____________________________\nNombre Apellido\nRepresentante legal",
+                "_____________________________\nNombre Apellido\nContador",
+                "_____________________________\nNombre Apellido\nAuditor",
+              ],
+            ];
+
+            const sheet = XLSX.utils.aoa_to_sheet(document);
+            const workbook = XLSX.utils.book_new();
+            const fileName = "report";
+            XLSX.utils.book_append_sheet(workbook, sheet, fileName);
+            XLSX.writeFile(workbook, `${fileName}.xlsx`);
+            this.generating = false;
+          });
+
+          console.log("Generando EXCEL");
+          break;
+
+        default:
           break;
       }
     },
