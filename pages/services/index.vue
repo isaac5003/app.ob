@@ -82,7 +82,7 @@
         <el-table-column
           label="Nombre"
           prop="name"
-          min-width="520"
+          min-width="490"
           sortable="custom"
         />
         <el-table-column
@@ -99,7 +99,7 @@
         <el-table-column
           label="Tipo de venta"
           prop="sellingType"
-          width="110"
+          width="130"
           sortable="custom"
         >
           <template slot-scope="scope">
