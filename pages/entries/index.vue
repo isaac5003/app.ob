@@ -431,6 +431,44 @@ export default {
           this.errorMessage = err.response.data.message;
         });
     },
+    deleteEntry(id) {
+      this.$confirm(
+        `¿Estás seguro que deseas eliminar esta partida?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, eliminar`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .delete(`/entries/${id}`)
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchEntries();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, eliminar`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
+    },
     handleSizeChange(val) {
       this.page.limit = val;
       this.fetchEntries();
