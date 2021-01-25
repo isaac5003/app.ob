@@ -27,7 +27,6 @@
               placeholder="Seleccionar"
               size="small"
               class="w-full"
-              filterable
               clearable
               default-first-option
               @change="fetchServices"
@@ -43,7 +42,6 @@
               placeholder="Seleccionar"
               size="small"
               class="w-full"
-              filterable
               clearable
               default-first-option
               @change="fetchServices"

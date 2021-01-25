@@ -15,7 +15,7 @@
       width="1000px"
       :append-to-body="true"
     >
-      <div class="text-xs">
+      <div class="flex flex-col space-y-2 text-xs">
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-3 flex flex-col">
             <span class="font-semibold">Tipo de documento</span>
@@ -215,7 +215,6 @@
             </template>
           </el-table-column>
         </el-table>
-
         <table class="flex justify-end">
           <tbody class="divide-y divide-gray-300">
             <tr v-if="selectedInvoice.documentType.id != 3">
@@ -273,21 +272,25 @@
           </tbody>
         </table>
       </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showInvoicePreview = false" size="small"
+          >Cerrar</el-button
+        >
+      </span>
     </el-dialog>
 
     <div class="flex flex-col space-4">
-      <div class="flex justify-center" v-if="errorMessage">
-        <Notification
-          class="w-1/2"
-          type="danger"
-          title="Error de comunicación"
-          :message="errorMessage"
-          :action="{
-            title: 'Intentar nuevamente',
-            function: () => $router.go(),
-          }"
-        />
-      </div>
+      <Notification
+        v-if="errorMessage"
+        class="w-full"
+        type="danger"
+        title="Error de comunicación"
+        :message="errorMessage"
+        :action="{
+          title: 'Intentar nuevamente',
+          function: () => $router.go(),
+        }"
+      />
       <el-form label-position="top">
         <div class="grid grid-cols-12 gap-4">
           <el-form-item class="col-start-10 col-span-4">
@@ -499,9 +502,9 @@
             </template>
           </el-table-column>
           <el-table-column
-            label="Tipo doc."
+            label="Tipo"
             prop="documentType.id"
-            width="100"
+            width="70"
             sortable="custom"
           >
             <template slot-scope="scope">
@@ -513,13 +516,13 @@
           <el-table-column
             label="Fecha"
             prop="invoiceDate"
-            width="90"
+            width="100"
             sortable="custom"
           />
           <el-table-column
             label="Cliente"
             prop="customerName"
-            min-width="330"
+            min-width="350"
             sortable="custom"
           />
           <el-table-column
@@ -574,7 +577,7 @@
               <span>{{ scope.row.ventaTotal | formatMoney }}</span>
             </template>
           </el-table-column>
-          <el-table-column label width="65" align="center">
+          <el-table-column label width="70" align="center">
             <template slot-scope="scope">
               <el-dropdown trigger="click" szie="mini">
                 <el-button icon="el-icon-more" size="mini" />
