@@ -601,7 +601,9 @@
                     <i class="el-icon-printer"></i>
                     Imprimir documento
                   </el-dropdown-item>
-                  <el-dropdown-item v-if="scope.row.status.id == 2">
+                  <el-dropdown-item v-if="scope.row.status.id == 2"  @click.native="
+                      printInvoice(scope.row.id, scope.row.documentType)
+                    ">
                     <i class="el-icon-printer"></i> Re imprimir documento
                   </el-dropdown-item>
                   <el-dropdown-item
