@@ -344,15 +344,10 @@
           </el-table-column>
         </el-table>
         <div class="flex flex-row justify-end space-x-4">
-          <el-button
-            type="primary"
-            size="small"
-            native-type="submit"
+          <el-button type="primary" size="small" native-type="submit"
             >Guardar</el-button
           >
-          <el-button size="small"
-          @click="cancel()"
-          >Cancelar</el-button>
+          <el-button size="small" @click="cancel()">Cancelar</el-button>
         </div>
       </el-form>
     </div>
@@ -731,20 +726,13 @@ export default {
                           }
                         )
                           .then(() => {
-                            if (this.$refs["newEntryForm"]) {
-                              this.$refs["newEntryForm"].resetFields();
-                            }
-                            this.salesNewForm.documentType = 1;
-                            this.salesNewForm.customerBranch = "";
-                            this.details = [];
-                            this.branches = [];
-                            this.branch = {};
-                            this.tributary = {};
+                            this.$refs["newEntryForm"].resetFields();
+                            this.accountingEntryDetails = [];
                           })
                           .catch(() => {
                             this.$router.push("/entries");
                           });
-                      }, 2000);
+                      }, 500);
                     })
                     .catch((err) => {
                       this.$notify.error({
@@ -795,7 +783,7 @@ export default {
         }
       });
     },
-     cancel() {
+    cancel() {
       this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
         confirmButtonText: "Si, salir",
         cancelButtonText: "Cancelar",
