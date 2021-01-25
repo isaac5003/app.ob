@@ -332,6 +332,10 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
+import { getHeader, getFooter } from "../../tools";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 export default {
   name: "EntriesIndex",
   components: { LayoutContent, Notification },
@@ -495,84 +499,180 @@ export default {
       this.filterBy.order = order;
       this.fetchEntries();
     },
+    printEntry({ id }) {
+      this.$confirm(
+        `¿Estás seguro que deseas imprimir esta factura?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, imprimir`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              const entry = () => this.$axios.get(`/entries/${id}`);
+              const bussinesInfo = () => this.$axios.get("/business/info");
+              Promise.all([entry(), bussinesInfo()])
+                .then((res) => {
+                  const [entry, bussinesInfo] = res;
+                  const accountingEntry = entry.data.entry;
+                  const { name, nit, nrc } = bussinesInfo.data.info;
 
-    // changeActive({ id, isActiveInvoice }) {
-    //   const action = isActiveInvoice ? "desactivar" : "activar";
-    //   this.$confirm(
-    //     `¿Estás seguro que deseas ${action} este cliente?`,
-    //     "Confirmación",
-    //     {
-    //       confirmButtonText: `Si, ${action}`,
-    //       cancelButtonText: "Cancelar",
-    //       type: "warning",
-    //       beforeClose: (action, instance, done) => {
-    //         if (action === "confirm") {
-    //           instance.confirmButtonLoading = true;
-    //           instance.confirmButtonText = "Procesando...";
-    //           this.$axios
-    //             .put(`entreis${id}`, { status: !isActiveInvoice })
-    //             .then((res) => {
-    //               this.$notify.success({
-    //                 title: "Éxito",
-    //                 message: res.data.message,
-    //               });
-    //               this.fetchEntries();
-    //             })
-    //             .catch((err) => {
-    //               this.$notify.error({
-    //                 title: "Error",
-    //                 message: err.response.data.message,
-    //               });
-    //             })
-    //             .then((alw) => {
-    //               instance.confirmButtonLoading = false;
-    //               instance.confirmButtonText = `Si, ${action}`;
-    //               done();
-    //             });
-    //         }
-    //         done();
-    //       },
-    //     }
-    //   );
-    // },
-    // deleteInvoice({ id }) {
-    //   this.$confirm(
-    //     `¿Estás seguro que deseas eliminar este cliente?`,
-    //     "Confirmación",
-    //     {
-    //       confirmButtonText: `Si, eliminar`,
-    //       cancelButtonText: "Cancelar",
-    //       type: "warning",
-    //       beforeClose: (action, instance, done) => {
-    //         if (action === "confirm") {
-    //           instance.confirmButtonLoading = true;
-    //           instance.confirmButtonText = "Procesando...";
-    //           this.$axios
-    //             .delete(`/invoices/${id}`)
-    //             .then((res) => {
-    //               this.$notify.success({
-    //                 title: "Éxito",
-    //                 message: res.data.message,
-    //               });
-    //               this.fetchEntries();
-    //             })
-    //             .catch((err) => {
-    //               this.$notify.error({
-    //                 title: "Error",
-    //                 message: err.response.data.message,
-    //               });
-    //             })
-    //             .then((alw) => {
-    //               instance.confirmButtonLoading = false;
-    //               instance.confirmButtonText = `Si, eliminar`;
-    //               done();
-    //             });
-    //         }
-    //         done();
-    //       },
-    //     }
-    //   );
-    // },
+                  let totalAbono = 0;
+                  let totalCargo = 0;
+                  const values = accountingEntry.accountingEntryDetails.map(
+                    (a) => {
+                      totalAbono += a.abono ? a.abono : 0;
+                      totalCargo += a.cargo ? a.cargo : 0;
+
+                      return [
+                        a.accountingCatalog.code,
+                        a.accountingCatalog.name,
+                        a.concept,
+                        {
+                          text: this.$options.filters.formatMoney(a.cargo),
+                          alignment: "right",
+                        },
+                        {
+                          text: this.$options.filters.formatMoney(a.abono),
+                          alignment: "right",
+                        },
+                      ];
+                    }
+                  );
+
+                  values.push([
+                    "",
+                    "",
+                    {
+                      text: "TOTAL COMPROBANTE",
+                      bold: true,
+                      alignment: "right",
+                    },
+                    {
+                      text: this.$options.filters.formatMoney(totalCargo),
+                      bold: true,
+                      alignment: "right",
+                    },
+                    {
+                      text: this.$options.filters.formatMoney(totalAbono),
+                      bold: true,
+                      alignment: "right",
+                    },
+                  ]);
+
+                  const preTitle = [
+                    {
+                      text: "Comprobante: ",
+                      bold: true,
+                    },
+                    {
+                      text: accountingEntry.accountingEntryType.name,
+                    },
+                    {
+                      text: " | N°: ",
+                      bold: true,
+                    },
+                    {
+                      text: accountingEntry.serie,
+                    },
+                    {
+                      text: " | Fecha: ",
+                      bold: true,
+                    },
+                    {
+                      text: accountingEntry.date,
+                    },
+                  ];
+
+                  const docDefinition = {
+                    info: {
+                      title: `partida_contable_${this.$dateFns.format(
+                        new Date(accountingEntry.rawDate),
+                        "yyyyMMdd"
+                      )}`,
+                    },
+                    pageSize: "LETTER",
+                    pageOrientation: "portrait",
+                    pageMargins: [20, 80, 20, 40],
+                    header: getHeader(
+                      name,
+                      nit,
+                      nrc,
+                      null,
+                      accountingEntry.title,
+                      null,
+                      preTitle
+                    ),
+                    footer: getFooter(),
+                    content: [
+                      {
+                        fontSize: 9,
+                        layout: "noBorders",
+                        table: {
+                          headerRows: 1,
+                          widths: ["11%", "auto", "auto", "10%", "10%"],
+                          heights: -5,
+                          body: [
+                            [
+                              {
+                                text: "N° CUENTA",
+                                style: "tableHeader",
+                              },
+                              {
+                                text: "NOMBRE CUENTA",
+                                style: "tableHeader",
+                              },
+                              {
+                                text: "DESCRIPCIÓN",
+                                style: "tableHeader",
+                              },
+                              {
+                                alignment: "right",
+                                text: "CARGO",
+                                style: "tableHeader",
+                              },
+                              {
+                                alignment: "right",
+                                text: "ABONO",
+                                style: "tableHeader",
+                              },
+                            ],
+                            ...values,
+                          ],
+                        },
+                      },
+                    ],
+                    styles: {
+                      tableHeader: {
+                        bold: true,
+                        fontSize: 9,
+                      },
+                    },
+                  };
+                  this.generating = false;
+                  pdfMake.createPdf(docDefinition).open();
+                })
+                .catch((err) => {
+                  console.log(err);
+                  this.errorMessage = err.response.data.message;
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, imprimir`;
+                  done();
+                });
+            } else {
+              instance.confirmButtonLoading = false;
+              instance.confirmButtonText = `Si, imprimir`;
+              done();
+            }
+          },
+        }
+      );
+    },
+
     async openPreviewEntry({ id }) {
       const { data } = await this.$axios.get(`/entries/${id}`);
       this.selecEntries = data.entry;

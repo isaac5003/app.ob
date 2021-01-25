@@ -442,7 +442,7 @@ const getHeader = (name, nit, nrc, lastDay, docName, dateType = 'date', preTitle
       },
     ]
 
-    if (!preTitle === null) {
+    if (preTitle) {
       header.push(
         {
           columns: [
