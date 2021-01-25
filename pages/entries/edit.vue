@@ -388,7 +388,6 @@
           <div class="col-start-9 col-span-2">
             <el-button
               type="primary"
-              icon="el-icon-check"
               class="w-full"
               size="small"
               native-type="submit"
@@ -397,7 +396,6 @@
           </div>
           <div class="col-start-11 col-span-2">
             <el-button
-              icon="el-icon-close"
               @click="cancel()"
               class="w-full"
               size="small"
