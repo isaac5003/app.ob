@@ -346,12 +346,13 @@
         <div class="flex flex-row justify-end space-x-4">
           <el-button
             type="primary"
-            icon="el-icon-check"
             size="small"
             native-type="submit"
             >Guardar</el-button
           >
-          <el-button icon="el-icon-close" size="small">Cancelar</el-button>
+          <el-button size="small"
+          @click="cancel()"
+          >Cancelar</el-button>
         </div>
       </el-form>
     </div>
@@ -792,6 +793,15 @@ export default {
         } else {
           save();
         }
+      });
+    },
+     cancel() {
+      this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
+        confirmButtonText: "Si, salir",
+        cancelButtonText: "Cancelar",
+        type: "warning",
+      }).then(() => {
+        this.$router.push("/entries");
       });
     },
   },
