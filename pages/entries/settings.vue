@@ -712,6 +712,140 @@
           .catch(() => {})
       "
     >
+    <!-- tab firmantes -->
+<el-tab-pane label="Firmantes" >
+        <!-- <div class="grid grid-cols-12">
+          <div class="col-span-12">
+            <Notification
+              class="mb-4 w-full"
+              type="info"
+              title="Información"
+              
+            />
+          </div>
+        </div> -->
+    <el-form
+    :model="firmantesForm"
+    :rules="firmantesFormRules"
+    >
+      <div class="grid grid-cols-12 gap-4">
+        <div class="col-span-4 ">
+          <el-form-item label="Representante legal/Administrador único" prop="representante">
+          <el-input
+           v-model="firmantesForm.representante"
+            type="text"
+           autocomplete="off"
+            maxlength="100"
+            minlength="5"
+            size="small"
+            show-word-limit
+            clearable
+            placeholder="">
+          </el-input>
+         
+          </el-form-item>
+        </div>
+
+           <div class="col-span-4">
+          <el-form-item label="Contador general" prop="contadorGeneral ">
+          <el-input
+           v-model="firmantesForm.contadorGeneral"
+           type="text"
+           autocomplete="off"
+            maxlength="100"
+            minlength="5"
+            size="small"
+            show-word-limit
+            clearable
+            placeholder="">
+          </el-input>
+          </el-form-item>
+        </div>
+
+         <div class="col-span-4">
+          <el-form-item label="Auditor" prop="auditor">
+          <el-input
+           v-model="firmantesForm.auditor"
+           size="small"
+           class="w-full"
+           autocomplete="off"
+            maxlength="100"
+            minlength="5"
+            show-word-limit
+            filterable
+            clearable
+           placeholder="">
+          </el-input>
+          </el-form-item>
+        </div>
+
+
+      </div>
+
+        <div class="flex justify-end mt-4">
+          <el-button
+            type="primary"
+            size="small"
+            @click.native="submitResults(tablesData)"
+            >Guardar</el-button
+          >
+          <el-button size="small" @click="$router.push('/entries')">Cancelar</el-button>
+        </div>
+      </el-form>
+</el-tab-pane>
+     
+    <!--  tab generales -->
+    <el-tab-pane label="Generales" >
+        <!-- <div class="grid grid-cols-12">
+          <div class="col-span-12">
+            <Notification
+              class="mb-4 w-full"
+              type="info"
+              title="Información"
+              
+            />
+          </div>
+        </div> -->
+    <el-form>
+      <div class="grid grid-cols-12 gap-4">
+        <div class="w-72">
+          <el-form-item label="Ingrese el periodo fiscal de la empresa">
+          <el-date-picker
+           v-model="value2"
+           size="small"
+           type="date"
+           placeholder="Fecha inicial">
+      </el-date-picker>
+          </el-form-item>
+        </div>
+
+           <div class="col-span-4 col-start-4 mt-4">
+          <el-form-item label=" ">
+          <el-date-picker
+           v-model="value2"
+           size="small"
+           type="date"
+           placeholder="Fecha final">
+      </el-date-picker>
+          </el-form-item>
+        </div>
+
+      </div>
+
+        <div class="flex justify-end mt-4">
+          <el-button
+            type="primary"
+            size="small"
+            @click.native="submitResults(tablesData)"
+            >Guardar</el-button
+          >
+          <el-button size="small" @click="$router.push('/entries')">Cancelar</el-button>
+        </div>
+      </el-form>
+    
+      
+      </el-tab-pane>
+      
       <!-- tab catalogo -->
       <el-tab-pane label="Catálogo de cuentas" name="catalog" class="space-y-4">
         <!-- first row -->
@@ -1132,6 +1266,8 @@
           <el-button size="small">Cancelar</el-button>
         </div>
       </el-tab-pane>
+
+      <!--  tab de firmante -->
       <!-- tab integraciones -->
       <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
         <Notification
@@ -1240,6 +1376,22 @@ export default {
       tableloading: false,
       tab: "catalog",
       utab: "invoicing",
+      input1:'',
+      input2:'',
+      input3:'',
+       
+       firmantesForm:{
+        representante:"",
+        contadorGeneral:"",
+        auditor:"",
+
+       },
+      firmantesFormRules:{
+        representante:inputValidation(true,5,100),
+        contadorGeneral:inputValidation(true,5,100),
+        auditor:inputValidation(true,5,100),
+      },
+
       integrations: [
         {
           name: "Facturación",
