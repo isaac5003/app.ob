@@ -728,6 +728,7 @@
     :model="firmantesForm"
     :rules="firmantesFormRules"
     >
+    
       <div class="grid grid-cols-12 gap-4">
         <div class="col-span-4 ">
           <el-form-item label="Representante legal/Administrador único" prop="representante">
