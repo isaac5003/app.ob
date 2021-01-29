@@ -33,6 +33,7 @@ export default {
     //baseURL: "https://v3.openbox.cloud/",
     //baseURL: "http://localhost:5001",
     baseURL: "https://v3.openbox.cloud/",
+    
   },
   googleFonts: {
     families: {
