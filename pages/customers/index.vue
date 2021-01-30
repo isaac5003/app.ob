@@ -65,8 +65,8 @@
           <template
             v-if="
               selectedCustomer &&
-              (!selectedCustomer.customerTypeNatural ||
-                selectedCustomer.customerTypeNatural.id == 2)
+                (!selectedCustomer.customerTypeNatural ||
+                  selectedCustomer.customerTypeNatural.id == 2)
             "
           >
             <div class="col-span-2 flex flex-col">
@@ -155,72 +155,46 @@
             @change="fetchCustomers"
           />
         </el-form-item>
-        
       </el-form>
       <el-table
-      @sort-change="sortBy"
+        @sort-change="sortBy"
         :data="customers.customers"
         stripe
         size="mini"
         v-loading="tableloading"
       >
         <el-table-column prop="index" width="40" />
-        <el-table-column 
-        label="Nombre"
-        width="360"
-         sortable="custom">
-            <template slot-scope="scope">
-              <div class="grid grid-rows-2">
-            <span 
-             class=" font-semibold text-gray-700 text-xs">
-             {{scope.row.shortName}}   
-             </span>
-               <span>
-              {{scope.row.name}}
+        <el-table-column label="Nombre" width="360" sortable="custom">
+          <template slot-scope="scope">
+            <div class="flex flex-col">
+              <span class=" font-semibold text-gray-700 text-xs">
+                {{ scope.row.shortName }}
               </span>
-              </div>
-           
-            
-            <!-- <div class="flex flex-cols-2" >
-              <span>{{scope.row.name}}</span>
-            </div> -->
+              <span>
+                {{ scope.row.name }}
+              </span>
+            </div>
           </template>
         </el-table-column>
-        
-         <!-- <el-table-column 
-        label="Nombre corto"
-        prop="" 
-        width="130"
-         sortable="custom" /> -->
         <el-table-column
           label="Tipo"
           prop="customerType.id"
           width="130"
           sortable="custom"
         >
-        <template slot-scope="scope">
-              <span>
-                {{ scope.row.customerType.name }}
-              </span>
-              </template>
+          <template slot-scope="scope">
+            <span>
+              {{ scope.row.customerType.name }}
+            </span>
+          </template>
         </el-table-column>
-        <el-table-column 
-        label="NIT" 
-        prop="nit" 
-        width="150" 
-        sortable="custom"
-        />
-        <el-table-column 
-        label="NRC" 
-        prop="nrc" 
-        width="90"
-        sortable="custom" 
-        />
-        <el-table-column 
-        label="Estado" 
-        width="110"
-        prop="isActiveCustomer"
-        sortable="custom"
+        <el-table-column label="NIT" prop="nit" width="150" sortable="custom" />
+        <el-table-column label="NRC" prop="nrc" width="90" sortable="custom" />
+        <el-table-column
+          label="Estado"
+          width="110"
+          prop="isActiveCustomer"
+          sortable="custom"
         >
           <template slot-scope="scope">
             <el-tag
@@ -332,10 +306,10 @@ export default {
         customers: [],
         count: 0,
       },
-       filter:{
-         prop:"",
-         order:null
-       },
+      filter: {
+        prop: "",
+        order: null,
+      },
       page: {
         limit: 10,
         page: 1,
@@ -345,7 +319,6 @@ export default {
     };
   },
   methods: {
-    
     fetchCustomers() {
       this.tableloading = true;
       let params = this.page;
@@ -355,11 +328,11 @@ export default {
       if (this.searchValue !== "") {
         params = { ...params, search: this.searchValue.toLowerCase() };
       }
-      if(this.filter.order){
-        params ={
+      if (this.filter.order) {
+        params = {
           ...params,
-          prop:this.filter.prop,
-          order:this.filter.order,
+          prop: this.filter.prop,
+          order: this.filter.order,
         };
       }
 
@@ -460,12 +433,12 @@ export default {
       this.selectedCustomer = data.customer;
       this.showCustomerPreview = true;
     },
-     
-     sortBy({column, prop, order }){
-       this.filter.prop = prop;
-       this.filter.order = order;
-       this.fetchCustomers();
-     }
+
+    sortBy({ column, prop, order }) {
+      this.filter.prop = prop;
+      this.filter.order = order;
+      this.fetchCustomers();
+    },
   },
 };
 </script>
