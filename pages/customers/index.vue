@@ -37,10 +37,7 @@
               <el-tag size="small" type="warning" v-else>Inactivo</el-tag>
             </div>
           </div>
-          <div
-            class="col-span-2 flex flex-col"
-            v-if="selectedCustomer ? selectedCustomer.module : false"
-          >
+          <div class="col-span-2 flex flex-col" v-if="hasModule()">
             <span class="font-semibold">Es proveedor</span>
             <div>
               <el-tag size="small" type="warning" class="w-auto">{{
@@ -427,16 +424,12 @@ export default {
 
     async openCustomerPreview({ id }) {
       const { data } = await this.$axios.get(`/customers/${id}`);
-      this.selectedCustomer = {
-        ...data.customer,
-        module: hasModule(
-          "f6000cbb-1e6d-4f7d-a7cc-cadd78d23076",
-          this.$auth.user
-        ),
-      };
-      this.showCustomerPreview = true;
+      (this.selectedCustomer = data.customer),
+        (this.showCustomerPreview = true);
     },
-
+    hasModule() {
+      return hasModule("f6000cbb-1e6d-4f7d-a7cc-cadd78d23076", this.$auth.user);
+    },
     sortBy({ column, prop, order }) {
       this.filter.prop = prop;
       this.filter.order = order;
