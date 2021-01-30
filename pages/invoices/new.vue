@@ -908,7 +908,7 @@ export default {
               (b) => b.default
             ).id;
 
-            this.selectBranch(this.salesNewForm.customer, this.branches);
+            this.selectBranch(this.salesNewForm.customerBranch, this.branches);
           })
           .catch((err) => {
             console.log(err);
