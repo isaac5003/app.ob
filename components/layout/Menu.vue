@@ -90,7 +90,7 @@
           >
             <span
               class="text-gray-900 font-bold text-lg uppercase tracking-tight leading-none"
-              >{{ initials }}</span
+              >{{ initials($auth.user.workspace.company.name) }}</span
             >
           </div>
         </el-popover>
@@ -253,32 +253,36 @@ export default {
                   background: "rgba(255, 255, 255, 0.8)",
                   customClass: "text-3xl",
                 });
+
                 setTimeout(() => {
                   this.$axios
                     .put("/auth/update-workspace", { cid, bid })
                     .then((res) => {
-                      this.$auth
-                        .setUserToken(res.data.access_token)
-                        .then((res) => {
-                          this.$notify.success({
-                            title: "Éxito",
-                            message:
-                              "Se ha cambiado de espacio de trabajo correctamente.",
-                          });
-                          this.$router.push("/");
-                        });
+                      this.$auth.setUserToken(res.data.access_token);
+
+                      this.$notify.success({
+                        title: "Éxito",
+                        message:
+                          "Se ha cambiado de espacio de trabajo correctamente.",
+                      });
+                      this.initials(this.$auth.user.workspace.company.name);
+
+                      this.$router.push("/");
                     })
                     .catch((err) => {
+                      console.log(err);
                       this.$notify.error({
                         title: "Error",
                         message: err.response.data.message,
                       });
                     })
+
                     .then((alw) => {
                       instance.confirmButtonLoading = false;
                       instance.confirmButtonText = "Si, cambiar";
                       done();
                     });
+
                   loading.close();
                 }, 2000);
               }
@@ -287,6 +291,10 @@ export default {
           }
         );
       });
+    },
+
+    initials(name) {
+      return name.slice(0, 2);
     },
   },
   computed: {
@@ -308,9 +316,7 @@ export default {
         return [];
       }
     },
-    initials() {
-      return this.$auth.user.workspace.company.name.slice(0, 2);
-    },
+
     modules() {
       const company = this.$auth.user.profile.access.find(
         (a) => a.id == this.$auth.user.workspace.company.id
