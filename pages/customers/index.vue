@@ -155,6 +155,7 @@
             @change="fetchCustomers"
           />
         </el-form-item>
+        
       </el-form>
       <el-table
       @sort-change="sortBy"
@@ -166,15 +167,38 @@
         <el-table-column prop="index" width="40" />
         <el-table-column 
         label="Nombre"
-        prop="name" 
         width="360"
-         sortable="custom" />
+         sortable="custom">
+            <template slot-scope="scope">
+              <div class="grid grid-rows-2">
+            <span 
+             class=" font-semibold text-gray-700 text-xs">
+             {{scope.row.shortName}}   
+             </span>
+               <span>
+              {{scope.row.name}}
+              </span>
+              </div>
+           
+            
+            <!-- <div class="flex flex-cols-2" >
+              <span>{{scope.row.name}}</span>
+            </div> -->
+          </template>
+        </el-table-column>
+        
+         <!-- <el-table-column 
+        label="Nombre corto"
+        prop="" 
+        width="130"
+         sortable="custom" /> -->
         <el-table-column
           label="Tipo"
           prop="customerType.id"
           width="130"
           sortable="custom"
-        ><template slot-scope="scope">
+        >
+        <template slot-scope="scope">
               <span>
                 {{ scope.row.customerType.name }}
               </span>
@@ -321,6 +345,7 @@ export default {
     };
   },
   methods: {
+    
     fetchCustomers() {
       this.tableloading = true;
       let params = this.page;
