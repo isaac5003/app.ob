@@ -170,7 +170,7 @@
         <el-table-column
           label="Nombre"
           prop="name"
-          width="360"
+          min-width="360"
           sortable="custom"
         />
         <el-table-column
