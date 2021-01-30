@@ -167,7 +167,7 @@
         <el-table-column label="Nombre" width="360" sortable="custom">
           <template slot-scope="scope">
             <div class="flex flex-col">
-              <span class=" font-semibold text-gray-700 text-xs">
+              <span class=" font-semibold text-xs">
                 {{ scope.row.shortName }}
               </span>
               <span>
