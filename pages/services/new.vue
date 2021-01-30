@@ -104,7 +104,9 @@ import {
 
 const storagekey = "new-service";
 
+
 export default {
+  
   name: "ServicesEdit",
   head: {
     titleTemplate: `%s | Nuevo servicio`,
@@ -137,7 +139,7 @@ export default {
         name: "",
         cost: "",
         sellingType:3,
-        description: "",
+        description: ""
       },
       servicesNewFormRules: {
         name: inputValidation(true, 5, 60),
@@ -145,6 +147,7 @@ export default {
         sellingType: selectValidation(true),
         description: inputValidation(false, 5),
       },
+      
     };
   },
   methods: {
@@ -221,5 +224,10 @@ export default {
       });
     },
   },
+  watch:{
+    'servicesNewForm.name':function (val, oldVal) { 
+      this.servicesNewForm.description = val
+     }
+  }
 };
 </script>
