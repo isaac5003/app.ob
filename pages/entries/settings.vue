@@ -747,18 +747,19 @@
           </el-form-item>
         </div>
 
-           <div class="col-span-4">
-          <el-form-item label="Contador general" prop="contadorGeneral ">
+        <div class="col-span-4">
+          <el-form-item label="Contador General" prop="contadorGeneral">
           <el-input
            v-model="firmantesForm.contadorGeneral"
-           type="text"
+           size="small"
+           class="w-full"
            autocomplete="off"
             maxlength="100"
             minlength="5"
-            size="small"
             show-word-limit
+            filterable
             clearable
-            placeholder="">
+           placeholder="">
           </el-input>
           </el-form-item>
         </div>
@@ -807,26 +808,31 @@
             />
           </div>
         </div> -->
-    <el-form>
+    <el-form :model="fiscalPeriodForm" :rules="fiscalPeriodFormRules">
       <div class="grid grid-cols-12 gap-4">
-        <div class="w-72">
-          <el-form-item label="Ingrese el periodo fiscal de la empresa">
+        <div class="col-span-4">
+          <el-form-item label="Ingrese el periodo fiscal de la empresa" prop="startDate">
           <el-date-picker
-           v-model="value2"
+           v-model="fiscalPeriodForm.startDate"
            size="small"
-           type="date"
-           placeholder="Fecha inicial">
+           type="month"
+           format="MMM-yyyy"
+           placeholder="Fecha inicial"
+           style="width:100%;">
       </el-date-picker>
           </el-form-item>
         </div>
 
-           <div class="col-span-4 col-start-4 mt-4">
-          <el-form-item label=" ">
+           <div class="col-span-4 mt-4 ">
+          <el-form-item label=" " prop="endDate">
           <el-date-picker
-           v-model="value2"
+           v-model="fiscalPeriodForm.endDate"
            size="small"
-           type="date"
-           placeholder="Fecha final">
+           type="month"
+           format="MMM-yyyy"
+           
+           placeholder="Fecha final"
+           style="width:100%;">
       </el-date-picker>
           </el-form-item>
         </div>
@@ -1316,6 +1322,7 @@
 </template>
 
 <script>
+import { format } from 'date-fns';
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
 import { getIcon, hasModule } from "../../tools";
@@ -1372,25 +1379,109 @@ export default {
   },
   fetchOnServer: false,
   data() {
+    const newCargoValidateCompare = (rule, value, callback) => {
+      const abono =
+        this.newEntryDetailForm.abono > 0
+          ? this.newEntryDetailForm.abono.toFixed(2)
+          : "";
+      const val = value > 0 ? value.toFixed(2) : "";
+      if (!abono) {
+        if (!val) {
+          callback(new Error("Este campo es requerido."));
+        } else {
+          callback();
+        }
+      } else if (abono && val) {
+        return callback(
+          new Error("No puedes agregar cargo y abono al mismo tiempo")
+        );
+      } else {
+        callback();
+      }
+    };
+    const startDateValidateCompare = (rule, value, callback) => {
+      const startDate =
+        this.fiscalPeriodForm.startDate
+          ? new Date(this.fiscalPeriodForm.startDate)
+          : "";
+      const val = value ? new Date(value) : "";
+      if (!startDate) {
+        if (!val) {
+          callback(new Error("Este campo es requerido."));
+        } else {
+          callback();
+        }
+      } else if (startDate > val) {
+        return callback(
+          new Error("La fecha inicial no puede ser mayor")
+        );
+      } else {
+        callback();
+      }
+    };
+     const endDateValidateCompare = (rule, value, callback) => {
+      const endDate =
+        this.fiscalPeriodForm.endDate
+          ? new Date(this.fiscalPeriodForm.endDate)
+          : "";
+      const val = value ? new Date(value) : "";
+      if (!endDate) {
+        if (!val) {
+          callback(new Error("Este campo es requerido."));
+        } else {
+          callback();
+        }
+      } else if (endDate < val) {
+        return callback(
+          new Error("La fecha final no puede ser menor")
+        );
+      } else {
+        callback();
+      }
+    };
+   
     return {
       pageloading: true,
       tableloading: false,
       tab: "catalog",
-      utab: "invoicing",
-      input1:'',
-      input2:'',
-      input3:'',
-       
+      utab: "invoicing",  
+      date: new Date(2021,2),
        firmantesForm:{
         representante:"",
         contadorGeneral:"",
         auditor:"",
-
+        value1: '',
+        value2:{
+          name:{
+            
+          }
+        }
        },
+       
       firmantesFormRules:{
         representante:inputValidation(true,5,100),
         contadorGeneral:inputValidation(true,5,100),
         auditor:inputValidation(true,5,100),
+        
+        
+      },
+      fiscalPeriodForm:{
+        startDate: "",
+        endDate: ""
+      },
+      fiscalPeriodFormRules:{
+        startDate: [
+          {
+            validator: startDateValidateCompare,
+            trigger: ["blur", "change"],
+          },
+        ],
+         endDate: [
+          {
+            validator: endDateValidateCompare,
+            trigger: ["blur", "change"],
+          },
+        ],
       },
 
       integrations: [
