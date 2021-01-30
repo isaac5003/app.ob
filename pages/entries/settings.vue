@@ -712,8 +712,72 @@
           .catch(() => {})
       "
     >
-    <!-- tab firmantes -->
-<el-tab-pane label="Firmantes" >
+     <!--  tab generales -->
+    <el-tab-pane label="Generales" name="tagGeneral" >
+        <!-- <div class="grid grid-cols-12">
+          <div class="col-span-12">
+            <Notification
+              class="mb-4 w-full"
+              type="info"
+              title="Información"
+              
+            />
+          </div>
+        </div> -->
+    <el-form 
+    :model="fiscalPeriodForm" 
+    :rules="fiscalPeriodFormRules">
+      <div 
+      class="grid grid-cols-12 gap-4"
+      >
+          <el-form-item 
+          label="Ingrese el periodo fiscal de la empresa" 
+          prop="startDate"
+          class="col-span-4"
+          >
+          <el-date-picker
+           v-model="fiscalPeriodForm.startDate"
+           size="small"
+           type="month"
+           format="MMM-yyyy"
+           placeholder="Fecha inicial"
+           style="width:100%;">
+      </el-date-picker>
+          </el-form-item>
+
+          <el-form-item 
+          label=" " 
+          prop="endDate" 
+          class="col-span-4 mt-4"
+          >
+          <el-date-picker
+           v-model="fiscalPeriodForm.endDate"
+           size="small"
+           type="month"
+           format="MMM-yyyy"
+           placeholder="Fecha final"
+           style="width:100%;">
+      </el-date-picker>
+          </el-form-item>
+      </div>
+
+        <div class="flex justify-end mt-4">
+          <el-button
+            type="primary"
+            size="small"
+            @click.native="submitResults(tablesData)"
+            >Guardar</el-button
+          >
+          <el-button 
+          size="small" 
+          @click="$router.push('/entries')">
+          Cancelar
+          </el-button>
+        </div>
+      </el-form> 
+      </el-tab-pane>
+      <!-- Firmantes -->
+      <el-tab-pane label="Firmantes" >
         <!-- <div class="grid grid-cols-12">
           <div class="col-span-12">
             <Notification
@@ -728,10 +792,12 @@
     :model="firmantesForm"
     :rules="firmantesFormRules"
     >
-    
-      <div class="grid grid-cols-12 gap-4">
-        <div class="col-span-4 ">
-          <el-form-item label="Representante legal/Administrador único" prop="representante">
+   <div class="grid grid-cols-12 gap-4">
+          <el-form-item 
+          label="Representante legal/Administrador único" 
+          prop="representante"
+          class="col-span-4"
+          >
           <el-input
            v-model="firmantesForm.representante"
             type="text"
@@ -743,12 +809,12 @@
             clearable
             placeholder="">
           </el-input>
-         
           </el-form-item>
-        </div>
-
-        <div class="col-span-4">
-          <el-form-item label="Contador General" prop="contadorGeneral">
+          <el-form-item 
+          label="Contador General" 
+          prop="contadorGeneral"
+          class="col-span-4"
+          >
           <el-input
            v-model="firmantesForm.contadorGeneral"
            size="small"
@@ -762,10 +828,12 @@
            placeholder="">
           </el-input>
           </el-form-item>
-        </div>
-
-         <div class="col-span-4">
-          <el-form-item label="Auditor" prop="auditor">
+        
+          <el-form-item 
+          label="Auditor"
+           prop="auditor"
+           class="col-span-4"
+           >
           <el-input
            v-model="firmantesForm.auditor"
            size="small"
@@ -780,10 +848,6 @@
           </el-input>
           </el-form-item>
         </div>
-
-
-      </div>
-
         <div class="flex justify-end mt-4">
           <el-button
             type="primary"
@@ -795,64 +859,6 @@
         </div>
       </el-form>
 </el-tab-pane>
-     
-    <!--  tab generales -->
-    <el-tab-pane label="Generales" >
-        <!-- <div class="grid grid-cols-12">
-          <div class="col-span-12">
-            <Notification
-              class="mb-4 w-full"
-              type="info"
-              title="Información"
-              
-            />
-          </div>
-        </div> -->
-    <el-form :model="fiscalPeriodForm" :rules="fiscalPeriodFormRules">
-      <div class="grid grid-cols-12 gap-4">
-        <div class="col-span-4">
-          <el-form-item label="Ingrese el periodo fiscal de la empresa" prop="startDate">
-          <el-date-picker
-           v-model="fiscalPeriodForm.startDate"
-           size="small"
-           type="month"
-           format="MMM-yyyy"
-           placeholder="Fecha inicial"
-           style="width:100%;">
-      </el-date-picker>
-          </el-form-item>
-        </div>
-
-           <div class="col-span-4 mt-4 ">
-          <el-form-item label=" " prop="endDate">
-          <el-date-picker
-           v-model="fiscalPeriodForm.endDate"
-           size="small"
-           type="month"
-           format="MMM-yyyy"
-           
-           placeholder="Fecha final"
-           style="width:100%;">
-      </el-date-picker>
-          </el-form-item>
-        </div>
-
-      </div>
-
-        <div class="flex justify-end mt-4">
-          <el-button
-            type="primary"
-            size="small"
-            @click.native="submitResults(tablesData)"
-            >Guardar</el-button
-          >
-          <el-button size="small" @click="$router.push('/entries')">Cancelar</el-button>
-        </div>
-      </el-form>
-    
-      
-      </el-tab-pane>
-      
       <!-- tab catalogo -->
       <el-tab-pane label="Catálogo de cuentas" name="catalog" class="space-y-4">
         <!-- first row -->
@@ -1443,7 +1449,7 @@ export default {
     return {
       pageloading: true,
       tableloading: false,
-      tab: "catalog",
+      tab: "tagGeneral",
       utab: "invoicing",  
       date: new Date(2021,2),
        firmantesForm:{
