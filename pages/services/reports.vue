@@ -41,28 +41,35 @@
               v-model="reportForm.radio"
               :disabled="reportForm.reportType ? false : true"
             >
-              <el-radio border label="pdf" size="small">PDF</el-radio>
-              <el-radio border label="excel" size="small">EXCEL</el-radio>
+              <el-row :gutter="15">
+                <el-col :span="8">
+                  <el-radio border label="pdf" size="small" class="w-full"
+                    >PDF</el-radio
+                  >
+                </el-col>
+                <el-col :span="8">
+                  <el-radio border label="excel" size="small" class="w-full"
+                    >EXCEL</el-radio
+                  >
+                </el-col>
+              </el-row>
             </el-radio-group>
           </el-form-item>
         </div>
       </div>
-      <div class="grid grid-cols-12 gap-4">
-        <div class="col-start-9 col-span-2">
-          <el-button
-            :disabled="reportForm.reportType ? false : true"
-            type="primary"
-            class="w-full"
-            size="small"
-            icon="el-icon-download"
-            native-type="submit"
-            :loading="generating"
-            >Descargar</el-button
-          >
-        </div>
-        <div class="col-start-11 col-span-2">
-          <el-button class="w-full" size="small">Cancelar</el-button>
-        </div>
+      <div class="flex flex-row justify-end">
+        <el-button
+          :disabled="reportForm.reportType ? false : true"
+          type="primary"
+          size="small"
+          icon="el-icon-download"
+          native-type="submit"
+          :loading="generating"
+          >Descargar</el-button
+        >
+        <el-button size="small" @click="$router.push('/services')"
+          >Cancelar</el-button
+        >
       </div>
     </el-form>
   </layout-content>

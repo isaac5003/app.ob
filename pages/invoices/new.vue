@@ -304,7 +304,7 @@
                   "
                 >
                   <el-option
-                    v-for="d in documents"
+                    v-for="d in documentTypes"
                     :key="d.id"
                     :label="`${d.code} - ${d.name}`"
                     :value="d.id"
@@ -409,7 +409,7 @@
             <div class="col-span-3">
               <el-form-item
                 label="Condiciones de pago"
-                prop="invoicesPaymentConditions"
+                prop="invoicesPaymentsCondition"
               >
                 <el-select
                   v-model="salesNewForm.invoicesPaymentsCondition"
@@ -723,23 +723,26 @@ export default {
     };
     const customers = () => {
       return this.$axios.get("/customers", {
-        params: { isActiveCustomer: true },
+        params: { active: true },
       });
     };
-    const documentTypes = () => {
-      return this.$axios.get("/invoices/document-types", {
-        params: { actrive: true },
+    const documents = () => {
+      return this.$axios.get("/invoices/documents", {
+        params: { active: true },
       });
     };
 
-    Promise.all([sellers(), paymentsConditions(), customers(), documentTypes()])
+    Promise.all([sellers(), paymentsConditions(), customers(), documents()])
       .then((res) => {
         const [sellers, paymentConditions, customers, documents] = res;
 
         this.sellers = sellers.data.sellers;
         this.paymentConditions = paymentConditions.data.paymentConditions;
         this.customers = customers.data.customers;
-        (this.documents = documents.data.documentTypes), (this.loading = false);
+        this.documentTypes = documents.data.documents.map(
+          (d) => d.documentType
+        );
+        this.loading = false;
         this.salesNewForm.documentType = 1;
         this.validateDocumentType(
           this.salesNewForm.documentType,
@@ -774,14 +777,14 @@ export default {
         invoiceDate: selectValidation(true),
         customer: selectValidation(true),
         customerBranch: selectValidation(true),
-        invoicesPaymentConditions: selectValidation(true),
+        invoicesPaymentsCondition: selectValidation(true),
         invoicesSellers: selectValidation(true),
       },
       sellers: [],
       paymentConditions: [],
       branches: null,
       customers: [],
-      documents: [],
+      documentTypes: [],
       dialogVisible: false,
       pickerOptions: {
         shortcuts: [
