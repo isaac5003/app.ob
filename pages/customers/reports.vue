@@ -61,8 +61,14 @@
               :disabled="reportForm.reportType ? false : true"
               class="w-full"
             >
-              <el-radio border size="small" label="pdf">PDF</el-radio>
-              <el-radio border size="small" label="excel">Excel</el-radio>
+              <el-row :gutter="15">
+                <el-col :span="8">
+                <el-radio border size="small" label="pdf" class="w-full">PDF</el-radio>  
+                </el-col>
+                <el-col :span="8">
+                <el-radio border size="small" label="excel" class="w-full">EXCEL</el-radio>  
+                </el-col>
+              </el-row>
             </el-radio-group>
           </el-form-item>
         </div>
@@ -70,24 +76,19 @@
 
 
       <!-- Guardar y Cancelar -->
-      <div class="grid grid-cols-12 gap-4">
-        <div class="col-start-9 col-span-2">
+      <div class="flex flex-row justify-end">
           <el-button
             :disabled="reportForm.reportType ? false : true"
             type="primary"
-            class="w-full"
             size="small"
             icon="el-icon-download"
             native-type="submit"
             :loading="generating"
             >Descargar</el-button
           >
-        </div>
-        <div class="col-start-11 col-span-2">
-          <el-button class="w-full" size="small" @click="cancel()"
+          <el-button  size="small" @click="cancel()"
             >Cancelar</el-button
           >
-        </div>
       </div>
     </el-form>
   </layout-content>
