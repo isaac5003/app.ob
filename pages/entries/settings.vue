@@ -1331,7 +1331,7 @@ import {
 } from "../../tools";
 
 export default {
-  name: "InvoicesSettings",
+  name: "EntriesSettings",
   components: { LayoutContent, Notification },
   fetch() {
     // Se ubica en el tab correcto
@@ -2032,9 +2032,10 @@ export default {
         }
 
         // Genera el codigo real a guardar
-        const realCode = !activeAccount
-          ? `${accounts.code}`
-          : `${activeAccount.code}${accounts.code}`;
+        const realCode =
+          Object.keys(activeAccount).length > 0
+            ? `${activeAccount.code}${accounts.code}`
+            : `${accounts.code}`;
 
         // Verifica si los codigos nuevos y los guardados estan duplicados entre ellos.
         // const catalog = this.accounts.map((a) => a.code);
@@ -2065,6 +2066,7 @@ export default {
                 this.$axios
                   .put(`/entries/catalog/${accounts.id}`, {
                     ...accounts,
+                    code: realCode,
                   })
                   .then((res) => {
                     this.$notify.success({
