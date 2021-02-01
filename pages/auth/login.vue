@@ -3,7 +3,7 @@
     <div class="w-1/2 flex items-center justify-center">
       <el-form
         class="w-90 flex flex-col space-y-12"
-        @submit.native.prevent="processLogin(email, password)"
+        @submit.native.prevent="processLogin(email, password, trust)"
       >
         <div class="flex items-center justify-center h-15">
           <img
@@ -35,11 +35,25 @@
             placeholder="Contraseña"
             type="password"
             v-model="password"
-          />
-          <div class="flex items-center justify-end mt-10">
-            <a href="javascript:" class="text-xs text-blue-900 hover:underline"
-              >Olvidé mi contraseña</a
-            >
+          />          
+          <div class="flex items-center  justify-between mt-10 ">
+                 <template>
+  <!-- `checked` debe ser true o false -->
+  <el-checkbox 
+  v-model="trust">
+     <span 
+     class="text-xs">
+     Recuerdame
+     </span>
+     </el-checkbox>
+    </template>
+    <div 
+    class=" flex items-center ">
+    <a href="javascript:" 
+    class="text-xs text-blue-900 hover:underline"
+    >Olvidé mi contraseña</a>
+
+          </div>
           </div>
         </div>
         <div class="flex justify-center">
@@ -82,10 +96,12 @@ export default {
       errorMessage: "",
       email: "",
       password: "",
+      trust: false,
+      
     };
   },
   methods: {
-    async processLogin(email, password) {
+    async processLogin(email, password, trust) {
       this.errorMessage = "";
       if (email == "" || password == "") {
         this.errorMessage = "Favor ingresar correo y contraseña.";
@@ -94,7 +110,7 @@ export default {
       this.loading = true;
       try {
         let response = await this.$auth.loginWith("local", {
-          data: { email, password },
+          data: { email, password, trust },
         });
         this.$router.push("/");
       } catch (error) {
