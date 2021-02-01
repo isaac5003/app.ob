@@ -221,5 +221,10 @@ export default {
       });
     },
   },
+  watch: {
+    "servicesNewForm.name": function (val, oldVal) {
+      this.servicesNewForm.description = val;
+    },
+  },
 };
 </script>
