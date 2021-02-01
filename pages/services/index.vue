@@ -27,7 +27,6 @@
               placeholder="Seleccionar"
               size="small"
               class="w-full"
-              filterable
               clearable
               default-first-option
               @change="fetchServices"
@@ -43,7 +42,6 @@
               placeholder="Seleccionar"
               size="small"
               class="w-full"
-              filterable
               clearable
               default-first-option
               @change="fetchServices"
@@ -103,7 +101,7 @@
           sortable="custom"
         >
           <template slot-scope="scope">
-            <span>{{ scope.row.sellingType.name}}</span>
+            <span>{{ scope.row.sellingType.name }}</span>
           </template>
         </el-table-column>
         <el-table-column
