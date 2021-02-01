@@ -65,8 +65,8 @@
           <template
             v-if="
               selectedCustomer &&
-                (!selectedCustomer.customerTypeNatural ||
-                  selectedCustomer.customerTypeNatural.id == 2)
+              (!selectedCustomer.customerTypeNatural ||
+                selectedCustomer.customerTypeNatural.id == 2)
             "
           >
             <div class="col-span-2 flex flex-col">
@@ -164,18 +164,25 @@
         v-loading="tableloading"
       >
         <el-table-column prop="index" width="40" />
-        <el-table-column
-          label="Nombre"
-          prop="name"
-          min-width="360"
-          sortable="custom"
-        />
+        <el-table-column label="Nombre" min-width="360" sortable="custom">
+          <template slot-scope="scope">
+            <div class="flex flex-col">
+              <span class="font-semibold text-xs">
+                {{ scope.row.shortName }}
+              </span>
+              <span>
+                {{ scope.row.name }}
+              </span>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column
           label="Tipo"
           prop="customerType.id"
           width="130"
           sortable="custom"
-          ><template slot-scope="scope">
+        >
+          <template slot-scope="scope">
             <span>
               {{ scope.row.customerType.name }}
             </span>
