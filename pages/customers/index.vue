@@ -13,7 +13,7 @@
       width="900px"
       :append-to-body="true"
     >
-      <div class="flex flex-col space-y-2">
+      <div class="flex flex-col space-y-2 text-xs">
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-6 flex flex-col">
             <span class="font-semibold">Nombre o razón social</span>
@@ -133,7 +133,6 @@
             placeholder="Seleccionar"
             size="small"
             class="w-full"
-            filterable
             clearable
             default-first-option
             @change="fetchCustomers"
@@ -211,7 +210,7 @@
             >
           </template>
         </el-table-column>
-        <el-table-column label width="80" align="center">
+        <el-table-column label width="70" align="center">
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />

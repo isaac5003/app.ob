@@ -28,7 +28,7 @@
         :rules="rulesInputData"
         status-icon
         ref="reportsForm"
-        @submit.native.prevent="generateReport('reportsForm')"
+        @submit.native.prevent="generateReport(filterForm)"
       >
         <div class="grid grid-cols-12 gap-4">
           <div class="col-start-1 col-span-3">
@@ -37,7 +37,7 @@
               <el-select
                 filterable
                 clearable
-                v-model="filterForm.reportType"
+                v-model="filterForm.report"
                 placeholder="Seleccione el reporte"
                 size="small"
                 class="w-full"
@@ -52,8 +52,30 @@
               </el-select>
             </el-form-item>
           </div>
+          <div class="col-span-5">
+            <el-form-item prop="" label="Formato de reporte">
+              <el-radio-group
+                v-model="filterForm.radioType"
+                :disabled="filterForm.report ? false : true"
+                class="w-full"
+              >
+                <el-row :gutter="15">
+                  <el-col :span="8">
+                    <el-radio border label="pdf" size="small" class="w-full"
+                      >PDF</el-radio
+                    >
+                  </el-col>
+                  <el-col :span="8">
+                    <el-radio border label="excel" size="small" class="w-full"
+                      >EXCEL</el-radio
+                    >
+                  </el-col>
+                </el-row>
+              </el-radio-group>
+            </el-form-item>
+          </div>
         </div>
-        <div class="flex flex-col" v-if="filterForm.reportType != ''">
+        <div class="flex flex-col" v-if="filterForm.report != ''">
           <div class="grid grid-cols-12 gap-4">
             <div class="col-span-4">
               <el-form-item label="Rango de fechas:" prop="dateRange">
@@ -65,8 +87,8 @@
                   range-separator="-"
                   start-placeholder="Fecha inicial"
                   end-placeholder="Fecha final"
-                  editable="false"
                   format="dd/MM/yyyy"
+                  value-format="yyyy-MM-dd"
                 >
                 </el-date-picker>
               </el-form-item>
@@ -247,30 +269,38 @@
             </div>
           </div>
         </div>
-        <div class="flex justify-end gap-4">
-          <el-form-item>
-            <el-button
-              type="primary"
-              size="small"
-              icon="el-icon-download"
-              :disabled="filterForm.reportType ? false : true"
-              :loading="generating"
-              >Descargar
-            </el-button>
-          </el-form-item>
-
-          <el-form-item>
-            <el-button @click="cancel" size="small"> Cancelar </el-button>
-          </el-form-item>
+        <div class="flex flex-row justify-end">
+          <el-button
+            type="primary"
+            size="small"
+            icon="el-icon-download"
+            :disabled="filterForm.report ? false : true"
+            :loading="generating"
+            native-type="submit"
+            >Descargar
+          </el-button>
+          <el-button size="small" @click="$router.push('/invoices')"
+            >Cancelar</el-button
+          >
         </div>
       </el-form>
     </div>
   </layout-content>
 </template>
+
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import { inputValidation, selectValidation } from "../../tools";
+import {
+  inputValidation,
+  selectValidation,
+  getHeader,
+  getFooter,
+} from "../../tools";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import XLSX from "xlsx";
 export default {
   name: "InvoicesIndex",
   components: {
@@ -347,8 +377,9 @@ export default {
       centerDialogVisible: false,
       loading: false,
       errorMessage: "",
-
+      generating: false,
       filterForm: {
+        report: "",
         reportType: "",
         dateRange: "",
         customer: "",
@@ -357,6 +388,7 @@ export default {
         seller: "",
         zone: "",
         service: "",
+        radioType: "pdf",
       },
       rulesInputData: {
         dateRange: selectValidation("blur", true),
@@ -506,6 +538,329 @@ export default {
       const { data } = await this.$axios.get(`/invoices/${id}`);
       this.selectedInvoice = data.invoice;
       this.showInvoicePreview = true;
+    },
+    generateReport(formData) {
+      if (formData.dateRange) {
+        let params = {
+          startDate: formData.dateRange[0],
+          endDate: formData.dateRange[1],
+        };
+        if (formData.customer != "") {
+          params = { ...params, customer: formData.customer };
+        }
+        if (formData.invoiceType != "") {
+          params = { ...params, documentType: formData.invoiceType };
+        }
+        if (formData.status != "") {
+          params = { ...params, status: formData.status };
+        }
+        if (formData.seller != "") {
+          params = { ...params, invoicesSeller: formData.seller };
+        }
+        if (formData.zone != "") {
+          params = { ...params, invoicesZone: formData.zone };
+        }
+        if (formData.service != "") {
+          params = { ...params, service: formData.service };
+        }
+        const bussinesInfo = () => this.$axios.get("/business/info");
+        const generales = () =>
+          this.$axios.get("/invoices/report/general", {
+            params: { ...params },
+          });
+        switch (formData.radioType) {
+          case "pdf":
+            Promise.all([bussinesInfo(), generales()]).then((res) => {
+              const [bussinesInfo, generales] = res;
+              const { name, nit, nrc } = bussinesInfo.data.info;
+              const general = generales.data.report;
+
+              const values = [];
+              const emptyRow = [{}, {}, {}, {}, {}, {}, {}, {}, {}];
+
+              for (const r of general) {
+                values.push(emptyRow);
+                values.push([
+                  {
+                    bold: true,
+                    text: r.code,
+                  },
+                  {},
+                  {},
+                  {},
+                  {},
+                  {},
+                  {},
+                  {},
+                  {},
+                ]);
+                for (const d of r.documents) {
+                  values.push([
+                    {
+                      bold: false,
+                      text: d.customer,
+                    },
+
+                    {
+                      bold: false,
+                      text: d.date,
+                      alignment: "right",
+                    },
+                    {
+                      bold: false,
+                      text: d.documentNumber,
+                      alignment: "right",
+                    },
+                    {
+                      bold: false,
+                      text: this.$options.filters.formatMoney(d.vGravada),
+                      alignment: "right",
+                    },
+                    {
+                      bold: false,
+                      text: this.$options.filters.formatMoney(d.vNSujeta),
+                      alignment: "right",
+                    },
+                    {
+                      bold: false,
+                      text: this.$options.filters.formatMoney(d.vExenta),
+                      alignment: "right",
+                    },
+                    {
+                      bold: false,
+                      text: this.$options.filters.formatMoney(d.iva),
+                      alignment: "right",
+                    },
+                    {
+                      bold: false,
+                      text: this.$options.filters.formatMoney(d.ivaRetenido),
+                      alignment: "right",
+                    },
+                    {
+                      bold: false,
+                      text: this.$options.filters.formatMoney(d.total),
+                      alignment: "right",
+                    },
+                  ]);
+                }
+                values.push(emptyRow);
+                values.push([
+                  {
+                    bold: true,
+                    text: r.count + ` Registros para ` + r.code,
+                  },
+                  {},
+                  {},
+                  {
+                    bold: true,
+                    text: this.$options.filters.formatMoney(r.vGravadaTotal),
+                    alignment: "right",
+                  },
+                  {
+                    bold: true,
+                    text: this.$options.filters.formatMoney(r.vNSujetaTotal),
+                    alignment: "right",
+                  },
+                  {
+                    bold: true,
+                    text: this.$options.filters.formatMoney(r.vExentaTotal),
+                    alignment: "right",
+                  },
+                  {
+                    bold: true,
+                    text: this.$options.filters.formatMoney(r.ivaTotal),
+                    alignment: "right",
+                  },
+                  {
+                    bold: true,
+                    text: this.$options.filters.formatMoney(r.ivaRetenidoTotal),
+                    alignment: "right",
+                  },
+                  {
+                    bold: true,
+                    text: this.$options.filters.formatMoney(r.totalTotal),
+                    alignment: "right",
+                  },
+                ]);
+              }
+
+              const docDefinition = {
+                pageSize: "LETTER",
+                pageOrientation: "landscape",
+                pageMargins: [20, 60, 20, 40],
+                header: getHeader(
+                  name,
+                  nit,
+                  nrc,
+                  [
+                    new Date(formData.dateRange[0]),
+                    new Date(formData.dateRange[1]),
+                  ],
+                  "DETALLE DE FACTURACIÓN ",
+                  "period"
+                ),
+                footer: getFooter(),
+                content: [
+                  {
+                    fontSize: 9,
+                    layout: "noBorders",
+                    table: {
+                      headerRows: 1,
+                      widths: [
+                        "38%",
+                        "7%",
+                        "10%",
+                        "9%",
+                        "6%",
+                        "6%",
+                        "7.5%",
+                        "7.5%",
+                        "9%",
+                      ],
+                      heights: -5,
+                      body: [
+                        [
+                          {
+                            text: "CLIENTE",
+                            style: "tableHeader",
+                          },
+                          {
+                            text: "FECHA",
+                            style: "tableHeader",
+                          },
+                          {
+                            text: "DOC. N°",
+                            style: "tableHeader",
+                          },
+                          {
+                            alignment: "right",
+                            text: "V. GRAV.",
+                            style: "tableHeader",
+                          },
+                          {
+                            alignment: "right",
+                            text: "V. SUJ.",
+                            style: "tableHeader",
+                          },
+                          {
+                            alignment: "right",
+                            text: "V. EXEN.",
+                            style: "tableHeader",
+                          },
+                          {
+                            alignment: "right",
+                            text: "13% IVA",
+                            style: "tableHeader",
+                          },
+                          {
+                            alignment: "right",
+                            text: "IVA RET.",
+                            style: "tableHeader",
+                          },
+                          {
+                            alignment: "right",
+                            text: "V. TOTAL",
+                            style: "tableHeader",
+                          },
+                        ],
+                        ...values,
+                      ],
+                    },
+                  },
+                ],
+                styles: {
+                  tableHeader: {
+                    bold: true,
+                    fontSize: 9,
+                  },
+                  text: {
+                    fontSize: 8.5,
+                  },
+                },
+              };
+              this.generating = false;
+              pdfMake.createPdf(docDefinition).open();
+            });
+            break;
+          case "excel":
+            Promise.all([bussinesInfo(), generales()]).then((res) => {
+              const [bussinesInfo, generales] = res;
+              const { name, nit, nrc } = bussinesInfo.data.info;
+              const general = generales.data.report;
+
+              const data = [];
+
+              for (const r of general) {
+                data.push([""]);
+                data.push([r.code, "", "", "", "", "", "", "", ""]);
+                for (const d of r.documents) {
+                  data.push([
+                    d.customer,
+
+                    d.date,
+
+                    d.documentNumber,
+                    this.$options.filters.formatMoney(d.vGravada),
+                    this.$options.filters.formatMoney(d.vNSujeta),
+                    this.$options.filters.formatMoney(d.vExenta),
+                    this.$options.filters.formatMoney(d.iva),
+                    this.$options.filters.formatMoney(d.ivaRetenido),
+                    this.$options.filters.formatMoney(d.total),
+                  ]);
+                }
+                data.push([""]);
+                data.push([
+                  r.count + ` Registros para ` + r.code,
+
+                  "",
+                  "",
+                  this.$options.filters.formatMoney(r.vGravadaTotal),
+                  this.$options.filters.formatMoney(r.vNSujetaTotal),
+                  this.$options.filters.formatMoney(r.vExentaTotal),
+                  this.$options.filters.formatMoney(r.ivaTotal),
+                  this.$options.filters.formatMoney(r.ivaRetenidoTotal),
+                  this.$options.filters.formatMoney(r.totalTotal),
+                ]);
+              }
+              const document = [
+                [name],
+                [
+                  `DETALLE DE FACTURACIÓN EN EL PERÍODO DEL ${formData.dateRange[0]} AL ${formData.dateRange[1]}`,
+                  "",
+                  "",
+                  "",
+                  "",
+                  "",
+                  "",
+                  `NIT: ${nit}`,
+                  `NRC: ${nrc}`,
+                ],
+                [""],
+                [
+                  "CLIENTE",
+                  "FECHA",
+                  "DOC N°",
+                  "V. GRAV.",
+                  "V. SUJ.",
+                  "V. EXEN.",
+                  "13% IVA",
+                  "IVA RET.",
+                  "V. TOTAL",
+                ],
+
+                ...data,
+              ];
+
+              const sheet = XLSX.utils.aoa_to_sheet(document);
+              const workbook = XLSX.utils.book_new();
+              const fileName = "DETALLEDEFACTURACION";
+              XLSX.utils.book_append_sheet(workbook, sheet, fileName);
+              XLSX.writeFile(workbook, `${fileName}.xlsx`);
+              this.generating = false;
+            });
+            break;
+        }
+      }
     },
   },
 };

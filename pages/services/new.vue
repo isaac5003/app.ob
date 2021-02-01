@@ -20,7 +20,7 @@
         <el-form-item
           label="Nombre del servicio"
           prop="name"
-          class="col-span-6"
+          class="col-span-5"
         >
           <el-input
             ref="name"
@@ -50,7 +50,7 @@
         <el-form-item
           label="Tipo de venta"
           prop="sellingType"
-          class="col-span-4"
+          class="col-span-5"
         >
           <el-radio-group
             ref="sellingType"
@@ -60,9 +60,9 @@
           >
             <el-row :gutter="15">
               <el-col :span="8" v-for="(s, k) in sellingTypes" :key="k">
-                <el-radio :label="s.id " border class="w-full" size="small">
-                  {{ s.name}}   
-                  </el-radio>
+                <el-radio :label="s.id" border class="w-full" size="small">
+                  {{ s.name }}
+                </el-radio>
               </el-col>
             </el-row>
           </el-radio-group>
@@ -136,7 +136,7 @@ export default {
       servicesNewForm: {
         name: "",
         cost: "",
-        sellingType:3,
+        sellingType: 3,
         description: "",
       },
       servicesNewFormRules: {
