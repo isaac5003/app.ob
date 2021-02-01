@@ -80,9 +80,9 @@
       >
         <el-table-column prop="index" width="40" />
         <el-table-column
-          label="Nombre"
-          prop="name"
-          min-width="520"
+          label="Descripción"
+          prop="description"
+          min-width="490"
           sortable="custom"
         />
         <el-table-column
@@ -99,11 +99,11 @@
         <el-table-column
           label="Tipo de venta"
           prop="sellingType"
-          width="110"
+          width="130"
           sortable="custom"
         >
           <template slot-scope="scope">
-            <span>{{ scope.row.sellingType.name }}</span>
+            <span>{{ scope.row.sellingType.name}}</span>
           </template>
         </el-table-column>
         <el-table-column
