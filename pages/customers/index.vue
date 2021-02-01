@@ -37,7 +37,7 @@
               <el-tag size="small" type="warning" v-else>Inactivo</el-tag>
             </div>
           </div>
-          <div class="col-span-2 flex flex-col">
+          <div class="col-span-2 flex flex-col" v-if="hasModule()">
             <span class="font-semibold">Es proveedor</span>
             <div>
               <el-tag size="small" type="warning" class="w-auto">{{
@@ -65,8 +65,8 @@
           <template
             v-if="
               selectedCustomer &&
-                (!selectedCustomer.customerTypeNatural ||
-                  selectedCustomer.customerTypeNatural.id == 2)
+              (!selectedCustomer.customerTypeNatural ||
+                selectedCustomer.customerTypeNatural.id == 2)
             "
           >
             <div class="col-span-2 flex flex-col">
@@ -164,10 +164,10 @@
         v-loading="tableloading"
       >
         <el-table-column prop="index" width="40" />
-        <el-table-column label="Nombre" width="360" sortable="custom">
+        <el-table-column label="Nombre" min-width="360" sortable="custom">
           <template slot-scope="scope">
             <div class="flex flex-col">
-              <span class=" font-semibold text-xs">
+              <span class="font-semibold text-xs">
                 {{ scope.row.shortName }}
               </span>
               <span>
@@ -272,6 +272,7 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
+import { hasModule } from "../../tools/index.js";
 export default {
   name: "CustomersIndex",
   head: {
@@ -430,10 +431,12 @@ export default {
 
     async openCustomerPreview({ id }) {
       const { data } = await this.$axios.get(`/customers/${id}`);
-      this.selectedCustomer = data.customer;
-      this.showCustomerPreview = true;
+      (this.selectedCustomer = data.customer),
+        (this.showCustomerPreview = true);
     },
-
+    hasModule() {
+      return hasModule("f6000cbb-1e6d-4f7d-a7cc-cadd78d23076", this.$auth.user);
+    },
     sortBy({ column, prop, order }) {
       this.filter.prop = prop;
       this.filter.order = order;
