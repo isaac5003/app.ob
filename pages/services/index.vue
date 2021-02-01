@@ -78,8 +78,8 @@
       >
         <el-table-column prop="index" width="40" />
         <el-table-column
-          label="Nombre"
-          prop="name"
+          label="Descripción"
+          prop="description"
           min-width="490"
           sortable="custom"
         />
