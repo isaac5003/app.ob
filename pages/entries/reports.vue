@@ -169,6 +169,7 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import XLSX from "xlsx";
 import { selectValidation, getHeader, getFooter } from "../../tools";
+import { endOfMonth, startOfMonth } from "date-fns";
 export default {
   name: "EntriesReports",
   components: {
@@ -209,7 +210,7 @@ export default {
       },
       catalogos: [],
       reports: [
-        { name: "Balance general", id: "balanceGeneral" },
+        { name: "Balance general mensual", id: "balanceGeneral" },
 
         { name: "Balance de comprobación", id: "balanceComprobacion" },
         { name: "Estado de resultados", id: "estadoResultados" },
@@ -743,10 +744,14 @@ export default {
       }
     },
     balanceGeneral(dateRange, fileType) {
+      let startDate = startOfMonth(new Date(dateRange));
+      let endDate = endOfMonth(new Date(dateRange));
+      console.log(startDate, endDate);
       const general = () =>
         this.$axios.get("/entries/report/balance-general", {
           params: {
-            date: dateRange,
+            startDate,
+            endDate,
           },
         });
       const bussinesInfo = () => this.$axios.get("/business/info");

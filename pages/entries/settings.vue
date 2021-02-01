@@ -724,7 +724,11 @@
             />
           </div>
         </div> -->
-        <el-form :model="fiscalPeriodForm" :rules="fiscalPeriodFormRules">
+        <el-form
+          :model="fiscalPeriodForm"
+          :rules="fiscalPeriodFormRules"
+          ref="fiscalPeriodForm"
+        >
           <div class="grid grid-cols-12 gap-4">
             <el-form-item
               label="Ingrese el periodo fiscal de la empresa"
@@ -738,6 +742,7 @@
                 format="MMM-yyyy"
                 placeholder="Fecha inicial"
                 style="width: 100%"
+                value-format="yyyy-MM-dd"
               >
               </el-date-picker>
             </el-form-item>
@@ -759,7 +764,9 @@
             <el-button
               type="primary"
               size="small"
-              @click.native="submitResults(tablesData)"
+              @click.native="
+                settingsGeneral('fiscalPeriodForm', fiscalPeriodForm)
+              "
               >Guardar</el-button
             >
             <el-button size="small" @click="$router.push('/entries')">
@@ -1318,7 +1325,7 @@
 </template>
 
 <script>
-import { format } from "date-fns";
+import { endOfMonth, format, startOfMonth } from "date-fns";
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
 import { getIcon, hasModule } from "../../tools";
@@ -2370,6 +2377,53 @@ export default {
       }).then(() => {
         this.$router.push("/entries");
       });
+    },
+    settingsGeneral(formName, fiscalPeriodForm) {
+      const periodStart = fiscalPeriodForm.startDate;
+      let peridoEnd = endOfMonth(new Date(fiscalPeriodForm.endDate));
+      peridoEnd = this.$dateFns.format(new Date(peridoEnd), "yyyy-MM-dd");
+      console.log(formName);
+      this.$confirm(
+        "¿Estás seguro que deseas actualizar el periodo fiscal?",
+        "Confirmación",
+        {
+          confirmButtonText: "Si, guardar",
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+
+              this.$axios
+                .put(`/entries/setting/general`, {
+                  periodStart,
+                  peridoEnd,
+                })
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Exito",
+                    message: res.data.message,
+                  });
+                  this.$refs[formName].resetFields();
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = "Si, guardar";
+                  done();
+                })
+
+                .catch((err) => {
+                  console.log(err)(
+                    (this.errorMessage = err.response.data.message)
+                  );
+                });
+            } else {
+              instance.confirmButtonLoading = false;
+              instance.confirmButtonText = "Si, guardar";
+              done();
+            }
+          },
+        }
+      );
     },
   },
   computed: {
