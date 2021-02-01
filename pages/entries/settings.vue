@@ -712,6 +712,143 @@
           .catch(() => {})
       "
     >
+      <!--  tab generales -->
+      <el-tab-pane label="Generales" name="general">
+        <!-- <div class="grid grid-cols-12">
+          <div class="col-span-12">
+            <Notification
+              class="mb-4 w-full"
+              type="info"
+              title="Información"
+              
+            />
+          </div>
+        </div> -->
+        <el-form :model="fiscalPeriodForm" :rules="fiscalPeriodFormRules">
+          <div class="grid grid-cols-12 gap-4">
+            <el-form-item
+              label="Ingrese el periodo fiscal de la empresa"
+              prop="startDate"
+              class="col-span-4"
+            >
+              <el-date-picker
+                v-model="fiscalPeriodForm.startDate"
+                size="small"
+                type="month"
+                format="MMM-yyyy"
+                placeholder="Fecha inicial"
+                style="width: 100%"
+              >
+              </el-date-picker>
+            </el-form-item>
+
+            <el-form-item label=" " prop="endDate" class="col-span-4 mt-4">
+              <el-date-picker
+                v-model="fiscalPeriodForm.endDate"
+                size="small"
+                type="month"
+                format="MMM-yyyy"
+                placeholder="Fecha final"
+                style="width: 100%"
+              >
+              </el-date-picker>
+            </el-form-item>
+          </div>
+
+          <div class="flex justify-end mt-4">
+            <el-button
+              type="primary"
+              size="small"
+              @click.native="submitResults(tablesData)"
+              >Guardar</el-button
+            >
+            <el-button size="small" @click="$router.push('/entries')">
+              Cancelar
+            </el-button>
+          </div>
+        </el-form>
+      </el-tab-pane>
+      <!-- Firmantes -->
+      <el-tab-pane label="Firmantes" name="signatures">
+        <!-- <div class="grid grid-cols-12">
+          <div class="col-span-12">
+            <Notification
+              class="mb-4 w-full"
+              type="info"
+              title="Información"
+              
+            />
+          </div>
+        </div> -->
+        <el-form :model="firmantesForm" :rules="firmantesFormRules">
+          <div class="grid grid-cols-12 gap-4">
+            <el-form-item
+              label="Representante legal/Administrador único"
+              prop="representante"
+              class="col-span-4"
+            >
+              <el-input
+                v-model="firmantesForm.representante"
+                type="text"
+                autocomplete="off"
+                maxlength="100"
+                minlength="5"
+                size="small"
+                show-word-limit
+                clearable
+                placeholder=""
+              >
+              </el-input>
+            </el-form-item>
+            <el-form-item
+              label="Contador General"
+              prop="contadorGeneral"
+              class="col-span-4"
+            >
+              <el-input
+                v-model="firmantesForm.contadorGeneral"
+                size="small"
+                class="w-full"
+                autocomplete="off"
+                maxlength="100"
+                minlength="5"
+                show-word-limit
+                filterable
+                clearable
+                placeholder=""
+              >
+              </el-input>
+            </el-form-item>
+
+            <el-form-item label="Auditor" prop="auditor" class="col-span-4">
+              <el-input
+                v-model="firmantesForm.auditor"
+                size="small"
+                class="w-full"
+                autocomplete="off"
+                maxlength="100"
+                minlength="5"
+                show-word-limit
+                filterable
+                clearable
+                placeholder=""
+              >
+              </el-input>
+            </el-form-item>
+          </div>
+          <div class="flex justify-end mt-4">
+            <el-button
+              type="primary"
+              size="small"
+              @click.native="submitResults(tablesData)"
+              >Guardar</el-button
+            >
+            <el-button size="small" @click="$router.push('/entries')"
+              >Cancelar</el-button
+            >
+          </div>
+        </el-form>
+      </el-tab-pane>
       <!-- tab catalogo -->
       <el-tab-pane label="Catálogo de cuentas" name="catalog" class="space-y-4">
         <!-- first row -->
@@ -1002,7 +1139,7 @@
       </el-tab-pane>
 
       <!-- tab estado resultados -->
-      <el-tab-pane label="Estado de resultados" name="estado resultados">
+      <el-tab-pane label="Estado de resultados" name="estado-resultados">
         <div class="grid grid-cols-12">
           <div class="col-span-12">
             <Notification
@@ -1132,6 +1269,8 @@
           <el-button size="small">Cancelar</el-button>
         </div>
       </el-tab-pane>
+
+      <!--  tab de firmante -->
       <!-- tab integraciones -->
       <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
         <Notification
@@ -1179,6 +1318,7 @@
 </template>
 
 <script>
+import { format } from "date-fns";
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
 import { getIcon, hasModule } from "../../tools";
@@ -1235,11 +1375,101 @@ export default {
   },
   fetchOnServer: false,
   data() {
+    const newCargoValidateCompare = (rule, value, callback) => {
+      const abono =
+        this.newEntryDetailForm.abono > 0
+          ? this.newEntryDetailForm.abono.toFixed(2)
+          : "";
+      const val = value > 0 ? value.toFixed(2) : "";
+      if (!abono) {
+        if (!val) {
+          callback(new Error("Este campo es requerido."));
+        } else {
+          callback();
+        }
+      } else if (abono && val) {
+        return callback(
+          new Error("No puedes agregar cargo y abono al mismo tiempo")
+        );
+      } else {
+        callback();
+      }
+    };
+    const startDateValidateCompare = (rule, value, callback) => {
+      const startDate = this.fiscalPeriodForm.startDate
+        ? new Date(this.fiscalPeriodForm.startDate)
+        : "";
+      const val = value ? new Date(value) : "";
+      if (!startDate) {
+        if (!val) {
+          callback(new Error("Este campo es requerido."));
+        } else {
+          callback();
+        }
+      } else if (startDate > val) {
+        return callback(new Error("La fecha inicial no puede ser mayor"));
+      } else {
+        callback();
+      }
+    };
+    const endDateValidateCompare = (rule, value, callback) => {
+      const endDate = this.fiscalPeriodForm.endDate
+        ? new Date(this.fiscalPeriodForm.endDate)
+        : "";
+      const val = value ? new Date(value) : "";
+      if (!endDate) {
+        if (!val) {
+          callback(new Error("Este campo es requerido."));
+        } else {
+          callback();
+        }
+      } else if (endDate < val) {
+        return callback(new Error("La fecha final no puede ser menor"));
+      } else {
+        callback();
+      }
+    };
+
     return {
       pageloading: true,
       tableloading: false,
-      tab: "catalog",
+      tab: "general",
       utab: "invoicing",
+      date: new Date(2021, 2),
+      firmantesForm: {
+        representante: "",
+        contadorGeneral: "",
+        auditor: "",
+        value1: "",
+        value2: {
+          name: {},
+        },
+      },
+
+      firmantesFormRules: {
+        representante: inputValidation(true, 5, 100),
+        contadorGeneral: inputValidation(true, 5, 100),
+        auditor: inputValidation(true, 5, 100),
+      },
+      fiscalPeriodForm: {
+        startDate: "",
+        endDate: "",
+      },
+      fiscalPeriodFormRules: {
+        startDate: [
+          {
+            validator: startDateValidateCompare,
+            trigger: ["blur", "change"],
+          },
+        ],
+        endDate: [
+          {
+            validator: endDateValidateCompare,
+            trigger: ["blur", "change"],
+          },
+        ],
+      },
+
       integrations: [
         {
           name: "Facturación",

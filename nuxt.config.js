@@ -30,11 +30,11 @@ export default {
     middleware: ["auth"],
   },
   dateFns: {
-    defaultLocale: 'es'
+    defaultLocale: "es",
   },
   axios: {
-    baseURL: "https://api2.openbox.cloud/",
-    // baseURL: "http://localhost:5001",
+    baseURL: "https://v3.openbox.cloud/",
+    //baseURL: "http://localhost:5001",
   },
   googleFonts: {
     families: {
