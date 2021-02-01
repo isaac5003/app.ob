@@ -1345,30 +1345,30 @@ export default {
     const accountCatalogs = () =>
       this.$axios.get("/entries/catalog", { params: this.page });
     const accounts = () => this.$axios.get("/entries/catalog");
-    // const balance = () => this.$axios.get("/entries/setting/balance-general");
-    // const results = () => this.$axios.get("/entries/setting/estado-resultados");
-    Promise.all([accountCatalogs(), accounts()])
+    const balance = () => this.$axios.get("/entries/setting/balance-general");
+    const results = () => this.$axios.get("/entries/setting/estado-resultados");
+    Promise.all([accountCatalogs(), accounts(), balance(), results()])
       .then((res) => {
         const [accountCatalogs, accounts, balance, results] = res;
         this.accounts = accountCatalogs.data.accountingCatalog;
         this.accountsCount = accountCatalogs.data.count;
         this.catalogs = accounts.data.accountingCatalog;
-        // this.tableData = balance.data.balanceGeneral.report;
+        this.tableData = balance.data.balanceGeneral.report;
 
-        // this.specialAccounts = { ...balance.data.balanceGeneral.special };
-        // this.tablesData = results.data.estadoResultados.map((r) => {
-        //   const obj = { ...r };
-        //   if (r.children) {
-        //     const children = r.children.map((ch) => {
-        //       return {
-        //         ...ch,
-        //         code: ch.id,
-        //       };
-        //     });
-        //     obj["children"] = children;
-        //   }
-        //   return obj;
-        // });
+        this.specialAccounts = { ...balance.data.balanceGeneral.special };
+        this.tablesData = results.data.estadoResultados.map((r) => {
+          const obj = { ...r };
+          if (r.children) {
+            const children = r.children.map((ch) => {
+              return {
+                ...ch,
+                code: ch.id,
+              };
+            });
+            obj["children"] = children;
+          }
+          return obj;
+        });
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
