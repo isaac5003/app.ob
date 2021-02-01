@@ -543,7 +543,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 1 &&
-                      salesEditForm.documentType != 3
+                        salesEditForm.documentType != 3
                     "
                     >{{
                       calcSujeta(salesEditForm.documentType, scope.row)
@@ -562,7 +562,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 2 &&
-                      salesEditForm.documentType != 3
+                        salesEditForm.documentType != 3
                     "
                     >{{
                       calcExenta(salesEditForm.documentType, scope.row)
@@ -581,7 +581,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 3 ||
-                      salesEditForm.documentType == 3
+                        salesEditForm.documentType == 3
                     "
                     >{{
                       calcGravada(salesEditForm.documentType, scope.row)
@@ -934,19 +934,25 @@ export default {
 
         Promise.all([branches(), tributary()])
           .then((res) => {
-            const [branches, tributary, taxerType] = res;
+            const [branches, tributary] = res;
             this.branches = branches.data.branches;
-            this.$refs.branch.resetField();
+
             this.branch = {};
-            this.tributary = tributary.data.customer;
+            this.tributary = {
+              ...tributary.data.customer,
+              customerGiro: tributary.data.customer.giro,
+              customerNrc: tributary.data.customer.nrc,
+              customerNit: tributary.data.customer.nit,
+            };
             this.loading = false;
             this.validateDocumentType(
               this.salesEditForm.documentType,
               this.tributary
             );
-
-            this.$refs.branch.resetField();
-            this.branch = {};
+            this.salesEditForm.customerBranch = branches.data.branches.find(
+              (b) => b.default
+            ).id;
+            this.selectBranch(this.salesEditForm.customerBranch, this.branches);
           })
           .catch((err) => {
             this.errorMessage = err.response.data.message;
@@ -1309,6 +1315,3 @@ export default {
   },
 };
 </script>
-
-
-
