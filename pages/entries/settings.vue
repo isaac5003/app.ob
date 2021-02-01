@@ -747,7 +747,7 @@
               </el-date-picker>
             </el-form-item>
 
-            <el-form-item label=" " prop="endDate" class="col-span-4 mt-4">
+            <el-form-item label=" " prop="endDate" class="col-span-4">
               <el-date-picker
                 v-model="fiscalPeriodForm.endDate"
                 size="small"
@@ -766,6 +766,11 @@
               size="small"
               @click.native="
                 settingsGeneral('fiscalPeriodForm', fiscalPeriodForm)
+              "
+              :disabled="
+                fiscalPeriodForm.startDate  && fiscalPeriodForm.endDate 
+                  ? false
+                  : true
               "
               >Guardar</el-button
             >
@@ -1452,7 +1457,6 @@ export default {
           name: {},
         },
       },
-
       firmantesFormRules: {
         representante: inputValidation(true, 5, 100),
         contadorGeneral: inputValidation(true, 5, 100),
@@ -1463,18 +1467,8 @@ export default {
         endDate: "",
       },
       fiscalPeriodFormRules: {
-        startDate: [
-          {
-            validator: startDateValidateCompare,
-            trigger: ["blur", "change"],
-          },
-        ],
-        endDate: [
-          {
-            validator: endDateValidateCompare,
-            trigger: ["blur", "change"],
-          },
-        ],
+        startDate: selectValidation(true),
+        endDate: selectValidation(true),
       },
 
       integrations: [
