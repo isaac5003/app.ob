@@ -768,7 +768,7 @@
                 settingsGeneral('fiscalPeriodForm', fiscalPeriodForm)
               "
               :disabled="
-                fiscalPeriodForm.startDate  && fiscalPeriodForm.endDate 
+                fiscalPeriodForm.startDate && fiscalPeriodForm.endDate
                   ? false
                   : true
               "
@@ -792,15 +792,19 @@
             />
           </div>
         </div> -->
-        <el-form :model="firmantesForm" :rules="firmantesFormRules">
+        <el-form
+          :model="firmantesForm"
+          :rules="firmantesFormRules"
+          ref="firmantesForm"
+        >
           <div class="grid grid-cols-12 gap-4">
             <el-form-item
               label="Representante legal/Administrador único"
-              prop="representante"
+              prop="legal"
               class="col-span-4"
             >
               <el-input
-                v-model="firmantesForm.representante"
+                v-model="firmantesForm.legal"
                 type="text"
                 autocomplete="off"
                 maxlength="100"
@@ -814,11 +818,11 @@
             </el-form-item>
             <el-form-item
               label="Contador General"
-              prop="contadorGeneral"
+              prop="accountant"
               class="col-span-4"
             >
               <el-input
-                v-model="firmantesForm.contadorGeneral"
+                v-model="firmantesForm.accountant"
                 size="small"
                 class="w-full"
                 autocomplete="off"
@@ -852,7 +856,14 @@
             <el-button
               type="primary"
               size="small"
-              @click.native="submitResults(tablesData)"
+              @click.native="settingsSignature('firmantesForm', firmantesForm)"
+              :disabled="
+                firmantesForm.legal &&
+                firmantesForm.accountant &&
+                firmantesForm.auditor
+                  ? false
+                  : true
+              "
               >Guardar</el-button
             >
             <el-button size="small" @click="$router.push('/entries')"
@@ -1449,17 +1460,13 @@ export default {
       utab: "invoicing",
       date: new Date(2021, 2),
       firmantesForm: {
-        representante: "",
-        contadorGeneral: "",
+        legal: "",
+        accountant: "",
         auditor: "",
-        value1: "",
-        value2: {
-          name: {},
-        },
       },
       firmantesFormRules: {
-        representante: inputValidation(true, 5, 100),
-        contadorGeneral: inputValidation(true, 5, 100),
+        legal: inputValidation(true, 5, 100),
+        accountant: inputValidation(true, 5, 100),
         auditor: inputValidation(true, 5, 100),
       },
       fiscalPeriodForm: {
@@ -2376,7 +2383,6 @@ export default {
       const periodStart = fiscalPeriodForm.startDate;
       let peridoEnd = endOfMonth(new Date(fiscalPeriodForm.endDate));
       peridoEnd = this.$dateFns.format(new Date(peridoEnd), "yyyy-MM-dd");
-      console.log(formName);
       this.$confirm(
         "¿Estás seguro que deseas actualizar el periodo fiscal?",
         "Confirmación",
@@ -2409,6 +2415,47 @@ export default {
                   console.log(err)(
                     (this.errorMessage = err.response.data.message)
                   );
+                });
+            } else {
+              instance.confirmButtonLoading = false;
+              instance.confirmButtonText = "Si, guardar";
+              done();
+            }
+          },
+        }
+      );
+    },
+    settingsSignature(formName, firmantesForm) {
+      console.log(formName);
+      this.$confirm(
+        "¿Estás seguro que deseas actualizar datos de firmantes?",
+        "Confirmación",
+        {
+          confirmButtonText: "Si, guardar",
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+
+              this.$axios
+                .put(`/entries/setting/signatures`, {
+                  ...firmantesForm,
+                })
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Exito",
+                    message: res.data.message,
+                  });
+                  this.$refs[formName].resetFields();
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = "Si, guardar";
+                  done();
+                })
+
+                .catch((err) => {
+                  this.errorMessage = err.response.data.message;
                 });
             } else {
               instance.confirmButtonLoading = false;
