@@ -2403,7 +2403,6 @@ export default {
                     title: "Exito",
                     message: res.data.message,
                   });
-                  this.$refs[formName].resetFields();
                   instance.confirmButtonLoading = false;
                   instance.confirmButtonText = "Si, guardar";
                   done();
@@ -2446,7 +2445,6 @@ export default {
                     title: "Exito",
                     message: res.data.message,
                   });
-                  this.$refs[formName].resetFields();
                   instance.confirmButtonLoading = false;
                   instance.confirmButtonText = "Si, guardar";
                   done();
