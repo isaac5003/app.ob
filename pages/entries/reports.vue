@@ -210,10 +210,10 @@ export default {
       },
       catalogos: [],
       reports: [
-        { name: "Balance general mensual", id: "balanceGeneral" },
-
-        { name: "Balance de comprobación", id: "balanceComprobacion" },
+        { name: "Balance anual", id: "balanceAnual" },
         { name: "Estado de resultados", id: "estadoResultados" },
+        { name: "Balance general mensual", id: "balanceGeneral" },
+        { name: "Balance de comprobación", id: "balanceComprobacion" },
       ],
       auxiliarReports: [
         { name: "Libro diario mayor", id: "diarioMayor" },
@@ -233,8 +233,8 @@ export default {
         this.requirementForm = null;
       } else {
         switch (id) {
-          case "balanceGeneral":
           case "estadoResultados":
+          case "balanceGeneral":
           case "balanceComprobacion":
           case "diarioMayor":
           case "libroAuxiliares":
@@ -263,6 +263,9 @@ export default {
 
         this.generating = true;
         switch (reportType) {
+          case "balanceAnual":
+            this.balanceAnual(radio);
+            break;
           case "balanceGeneral":
             this.balanceGeneral(dateRange, radio);
             break;
@@ -1132,6 +1135,341 @@ export default {
 
           break;
 
+        default:
+          break;
+      }
+    },
+    balanceAnual(fileType) {
+      const bussinesInfo = () => this.$axios.get("/business/info");
+      const settingsGeneral = () => this.$axios.get("/entries/setting/general");
+      switch (fileType) {
+        case "pdf":
+          Promise.all([bussinesInfo(), settingsGeneral()]).then((res) => {
+            const [bussinesInfo, settingsGeneral] = res;
+            const { name, nit, nrc } = bussinesInfo.data.info;
+            const { periodStart, peridoEnd } = settingsGeneral.data.general;
+            const startDate = periodStart;
+            const endDate = peridoEnd;
+            console.log(startDate, endDate);
+
+            this.$axios
+              .get("/entries/report/balance-general", {
+                params: {
+                  startDate,
+                  endDate,
+                },
+              })
+              .then((res) => {
+                const [activo, pasivo, patrimonio] = res.data.balanceGeneral;
+                let activoValues = [];
+                let pasivoValues = [];
+                let patrimonioValues = [];
+
+                activoValues.push([
+                  {
+                    fontSize: 10,
+                    alignment: "center",
+                    text: activo.name,
+                    style: "tableHeader",
+                    colSpan: 3,
+                  },
+                  "",
+                  "",
+                ]);
+                for (const a of activo.accounts) {
+                  activoValues.push([
+                    [
+                      {
+                        text: a.name,
+                        style: "tableHeader",
+                      },
+                    ],
+                    "",
+                    {
+                      text: this.$options.filters.formatMoney(a.total),
+                      style: "tableHeader",
+                    },
+                  ]);
+                  for (const ch of a.accounts) {
+                    activoValues.push([
+                      { text: ch.name, margin: [10, 0, 0, 0] },
+                      this.$options.filters.formatMoney(ch.total),
+                      "",
+                    ]);
+                  }
+                }
+
+                pasivoValues.push([
+                  {
+                    fontSize: 10,
+                    alignment: "center",
+                    text: pasivo.name,
+                    style: "tableHeader",
+                    colSpan: 3,
+                  },
+                  "",
+                  "",
+                ]);
+                for (const a of pasivo.accounts) {
+                  pasivoValues.push([
+                    [
+                      {
+                        text: a.name,
+                        style: "tableHeader",
+                      },
+                    ],
+                    "",
+                    {
+                      text: this.$options.filters.formatMoney(a.total),
+                      style: "tableHeader",
+                    },
+                  ]);
+                  for (const ch of a.accounts) {
+                    pasivoValues.push([
+                      { text: ch.name, margin: [10, 0, 0, 0] },
+                      this.$options.filters.formatMoney(ch.total),
+                      "",
+                    ]);
+                  }
+                }
+
+                patrimonioValues.push([
+                  {
+                    fontSize: 10,
+                    alignment: "center",
+                    text: patrimonio.name,
+                    style: "tableHeader",
+                    colSpan: 3,
+                  },
+                  "",
+                  "",
+                ]);
+                for (const a of patrimonio.accounts) {
+                  patrimonioValues.push([
+                    [
+                      {
+                        text: a.name,
+                        style: "tableHeader",
+                      },
+                    ],
+                    "",
+                    {
+                      text: this.$options.filters.formatMoney(a.total),
+                      style: "tableHeader",
+                    },
+                  ]);
+                  for (const ch of a.accounts) {
+                    patrimonioValues.push([
+                      { text: ch.name, margin: [10, 0, 0, 0] },
+                      this.$options.filters.formatMoney(ch.total),
+                      "",
+                    ]);
+                  }
+                }
+
+                const docDefinition = {
+                  info: {
+                    title: `balance_general_${this.$dateFns.format(
+                      new Date(startDate),
+                      "yyyyMMdd"
+                    )}`,
+                  },
+                  pageSize: "LETTER",
+                  pageOrientation: "landscape",
+                  pageMargins: [15, 55, 15, 40],
+                  header: getHeader(
+                    name,
+                    nit,
+                    nrc,
+                    [new Date(periodStart), new Date(peridoEnd)],
+                    "BALANCE GENERAL",
+                    "period"
+                  ),
+                  footer: getFooter(),
+                  content: [
+                    {
+                      fontSize: 9,
+                      layout: "noBorders",
+                      table: {
+                        widths: ["49.5%", "1%", "49.5%"],
+                        body: [
+                          [
+                            {
+                              layout: "noBorders",
+                              table: {
+                                widths: ["*", "auto", "auto"],
+                                body: activoValues,
+                              },
+                            },
+                            "",
+                            {
+                              layout: "noBorders",
+                              table: {
+                                widths: ["*", "auto", "auto"],
+                                body: [
+                                  ...pasivoValues,
+                                  ["", "", ""],
+                                  ...patrimonioValues,
+                                ],
+                              },
+                            },
+                          ],
+                          [
+                            {
+                              text: "",
+                              margin: [0, 10, 0, 0],
+                            },
+                            {},
+                            {},
+                          ],
+                          [
+                            {
+                              table: {
+                                widths: ["*", "*"],
+                                body: [
+                                  [
+                                    {
+                                      fontSize: 10,
+                                      text: "TOTAL ACTIVO:",
+                                      style: "tableHeader",
+                                      border: [false, true, false, true],
+                                    },
+                                    {
+                                      alignment: "right",
+                                      fontSize: 10,
+                                      text: this.$options.filters.formatMoney(
+                                        activo.total
+                                      ),
+                                      style: "tableHeader",
+                                      border: [false, true, false, true],
+                                    },
+                                  ],
+                                ],
+                              },
+                            },
+                            {},
+                            {
+                              table: {
+                                widths: ["*", "*"],
+                                body: [
+                                  [
+                                    {
+                                      fontSize: 10,
+                                      text: "TOTAL PASIVO Y PATRIMONIO:",
+                                      style: "tableHeader",
+                                      border: [false, true, false, true],
+                                    },
+                                    {
+                                      alignment: "right",
+                                      fontSize: 10,
+                                      text: this.$options.filters.formatMoney(
+                                        pasivo.total + patrimonio.total
+                                      ),
+                                      style: "tableHeader",
+                                      border: [false, true, false, true],
+                                    },
+                                  ],
+                                ],
+                              },
+                            },
+                          ],
+                          [
+                            {
+                              text: "",
+                              margin: [0, 60, 0, 0],
+                            },
+                            {},
+                            {},
+                          ],
+                          [
+                            {
+                              colSpan: 3,
+                              table: {
+                                widths: ["*", "2%", "*", "2%", "*"],
+                                body: [
+                                  [
+                                    {
+                                      alignment: "center",
+                                      text: [
+                                        {
+                                          style: "tableHeader",
+                                          text: "Nombre Apellido\n",
+                                        },
+                                        "Representante legal",
+                                      ],
+                                      border: [false, true, false, false],
+                                    },
+                                    {
+                                      text: "",
+                                      border: [false, false, false, false],
+                                    },
+                                    {
+                                      alignment: "center",
+                                      text: [
+                                        {
+                                          text: "Nombre Apellido\n",
+                                          style: "tableHeader",
+                                        },
+                                        "Contador",
+                                      ],
+                                      border: [false, true, false, false],
+                                    },
+                                    {
+                                      text: "",
+                                      border: [false, false, false, false],
+                                    },
+                                    {
+                                      alignment: "center",
+                                      text: [
+                                        {
+                                          text: "Nombre Apellido\n",
+                                          style: "tableHeader",
+                                        },
+                                        "Auditor",
+                                      ],
+                                      border: [false, true, false, false],
+                                    },
+                                  ],
+                                ],
+                              },
+                            },
+                            {},
+                            {},
+                          ],
+                        ],
+                      },
+                    },
+                  ],
+                  styles: {
+                    tableHeader: {
+                      bold: true,
+                      fontSize: 9,
+                    },
+                  },
+                };
+                this.generating = false;
+                pdfMake.createPdf(docDefinition).open();
+              });
+          });
+          break;
+        case "excel":
+          Promise.all([bussinesInfo(), settingsGeneral()]).then((res) => {
+            const [bussinesInfo, settingsGeneral] = res;
+            const { name, nit, nrc } = bussinesInfo.data.info;
+            const { periodStart, peridoEnd } = settingsGeneral.data.general;
+            const startDate = periodStart;
+            const endDate = peridoEnd;
+
+            this.$axios
+              .get("/entries/report/balance-general", {
+                params: {
+                  startDate,
+                  endDate,
+                },
+              })
+              .then((res) => {});
+          });
+          break;
         default:
           break;
       }
