@@ -161,6 +161,7 @@
     </el-form>
   </layout-content>
 </template>
+
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
@@ -176,23 +177,6 @@ export default {
     LayoutContent,
     Notification,
   },
-  // fetch() {
-  //   const catalog = () => {
-  //     return this.$axios.get("/entries/catalog" );
-  //   };
-
-  //   Promise.all([catalog()])
-  //     .then((res) => {
-  //       const [catalog] = res;
-  //       this.catalog = catalog.data.catalog;
-  //       this.loading = false;
-  //     })
-  //     .catch((err) => {
-  //       this.errorMessage = err.response.data.message;
-  //     });
-  // },
-  // fetchOnServer: false,
-
   data() {
     return {
       generating: false,
@@ -210,9 +194,9 @@ export default {
       },
       catalogos: [],
       reports: [
-        { name: "Balance anual", id: "balanceAnual" },
-        { name: "Estado de resultados", id: "estadoResultados" },
+        { name: "Balance general anual", id: "balanceAnual" },
         { name: "Balance general mensual", id: "balanceGeneral" },
+        { name: "Estado de resultados", id: "estadoResultados" },
         { name: "Balance de comprobación", id: "balanceComprobacion" },
       ],
       auxiliarReports: [
@@ -226,7 +210,6 @@ export default {
       accountingCatalog: [],
     };
   },
-
   methods: {
     showRequirements(id) {
       if (!id) {
