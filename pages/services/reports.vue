@@ -24,6 +24,7 @@
               default-first-option
               clearable
               filterable
+              @change="showRequeriments(reportForm.reportType)"
             >
               <el-option
                 v-for="report in reports"
@@ -47,6 +48,84 @@
           </el-form-item>
         </div>
       </div>
+      <div class=" grid grid-cols-12 gap-4" v-if="requirementForm =='venta'">
+         <div class="col-span-3">
+          <el-form-item label="Seleccione el tipo de venta">
+            <el-select
+              v-model="reportForm.sellingType"
+              placeholder="Selecione reporte"
+              size="small"
+              class="w-full"
+              default-first-option
+              clearable
+              filterable
+            >
+               <el-option
+                v-for="sellingType in sellingTypes"
+                :key="sellingType.id"
+                :label="sellingType.name"
+                :value="sellingType.id"
+              />
+            </el-select>
+          </el-form-item>
+        </div>
+      </div>
+          <div class=" grid grid-cols-12 gap-4" v-if="requirementForm =='estado'">
+         <div class="col-span-3">
+          <el-form-item label="Seleccione el reporte de estado">
+            <el-select
+              v-model="reportForm.status"
+              placeholder="Selecione reporte"
+              size="small"
+              class="w-full"
+              default-first-option
+              clearable
+              filterable
+            >
+               <el-option
+                v-for="active in status"
+                :key="active.id"
+                :label="active.name"
+                :value="active.id"
+              />
+            </el-select>
+          </el-form-item>
+        </div>
+          </div>
+      
+      <div class=" grid grid-cols-12 gap-4" v-if="requirementForm == 'precio'">
+        <div class="col-span-4">
+          <el-form-item label="Desde">
+            <el-input-number
+            ref="cost"
+            type="number"
+            :min="0.01"
+            :step="0.01"
+            v-model="reportForm.initialCost"
+            size="small"
+            autocomplete="off"
+            @change="setStorage(servicesNewForm)"
+            style="width: 100%"
+          />
+          </el-form-item>
+        </div>
+          <div class="col-span-4">
+          <el-form-item label="hasta">
+            <el-input-number
+            ref="cost"
+            type="number"
+            :min="0.01"
+            :step="0.01"
+            v-model="reportForm.finalCost"
+            size="small"
+            autocomplete="off"
+            @change="setStorage(servicesNewForm)"
+            style="width: 100%"
+          />
+          </el-form-item>
+        </div>
+      </div>
+      
       <div class="grid grid-cols-12 gap-4">
         <div class="col-start-9 col-span-2">
           <el-button
@@ -91,15 +170,38 @@ export default {
   data() {
     return {
       generating: false,
+      requirementForm:"",
+      sellingTypes: [],
+        
+        status:[{
+          id:1, name:"Activo"
+        },{ id:2, name:"Inactivo"}],
       reports: [
         {
           id: "servicios",
           name: "Reporte servicios",
         },
+            {
+          id: "venta",
+          name: "Reporte por tipo de venta",
+        },
+            {
+          id: "estado",
+          name: "Reporte por tipo de estados",
+        },
+        {
+          id: "precio",
+          name: "Reporte por precios",
+        },
       ],
       reportForm: {
         reportType: "",
+        status:"",
+        initialCost:"",
+        finalCost: "",
+        sellingType:"",
         radio: "pdf",
+      
       },
       reportFormRules: {
         reportType: selectValidation("change", true),
@@ -107,20 +209,199 @@ export default {
     };
   },
   methods: {
-    generateReport(formName, { reportType, radio }) {
+    showRequeriments(id){
+     if(!id){
+       this.requirementForm=null;
+     }else {
+        switch(id){
+          case"venta":
+          this.requirementForm = "venta";
+         this.$axios.get("/services/selling-types")
+         .then((res)=> {
+            this.sellingTypes = res.data.types
+            
+         }) 
+          break;
+          case"estado":
+          this.requirementForm = "estado"
+           
+          break;
+          case"precio":
+          this.requirementForm = "precio"
+          break;
+          default: 
+          this.requirementForm = ""
+          break;  }
+     }
+    },
+    generateReport(formName, reportForm) {
       this.$refs[formName].validate((valid) => {
         if (!valid) {
           return false;
         }
         this.generating = true;
-        switch (reportType) {
+        let params = {}
+       if(reportForm.sellingType){
+       
+         params = {type: reportForm.sellingType}
+       }else if(reportForm.status){
+         switch(reportForm.status){
+           case 1:
+           params = {active: true }
+           break;
+           case 2:
+           params = {active: false }
+                       break;
+
+         }
+       }
+       
+       switch (reportForm.reportType) {
           case "servicios":
-            this.generateServiceReport(radio);
+            this.generateServiceReport(reportForm.radio);
+            break;
+          case "venta":
+          case "estado": 
+          case "precio":
+            this.generateEspecialService(params, reportForm.radio)
             break;
         }
       });
     },
+    generateEspecialService(params, fileType){
+      const bussinesInfo = () => this.$axios.get("/services/report/general")
+      const services =() => this.$axios.get("/services", { params})
+     switch(fileType){
+       case "pdf":
+          Promise.all([bussinesInfo(), services()]).then((res) =>{ 
+      
+        const [bussinesInfo, services] = res;
+        const bussines = bussinesInfo.data.company;
+        const service = services.data.services;
+        this.reportForm.sellingType = ""
+        this.reportForm.status = ""
+     // const name = this.reports.find((r)=> this.reportForm.reportType == r.id).name
+     
+            const values = service.map((s) => {
+              return [
+                { bold: false, text: s.index },
+                { bold: false, text: s.name },
+                { bold: false, text: s.description },
+                {
+                  bold: false,
+                  text: this.$options.filters.formatMoney(s.cost),
+                },
+                { bold: false, text: s.sellingType.name, alignment: "center" },
+              ];
+            });
 
+            const docDefinition = {
+              pageSize: "LETTER",
+              pageOrientation: "portrait",
+              pageMargins: [20, 60, 20, 40],
+              header: getHeader(
+                bussines.name,
+                bussines.nit,
+                bussines.nrc,
+                null,
+                name.toUpperCase()
+              ),
+              footer: getFooter(),
+              content: [
+                {
+                  fontSize: 9,
+                  layout: "noBorders",
+                  table: {
+                    headerRows: 1,
+                    widths: ["3%", "40%", "40%", "8.5%", "8.5%"],
+                    heights: -5,
+                    body: [
+                      [
+                        {
+                          text: "#",
+                          style: "tableHeader",
+                        },
+                        {
+                          text: "Nombre",
+                          style: "tableHeader",
+                        },
+                        {
+                          text: "Descripción",
+                          style: "tableHeader",
+                        },
+                        {
+                          text: "Costo",
+                          style: "tableHeader",
+                        },
+                        {
+                          text: "Tipo de \nventa",
+                          style: "tableHeader",
+                          alignment: "center",
+                        },
+                      ],
+                      ...values,
+                    ],
+                  },
+                },
+              ],
+              styles: {
+                tableHeader: {
+                  bold: true,
+                  fontSize: 9,
+                },
+              },
+            };
+
+            this.generating = false;
+            pdfMake.createPdf(docDefinition).open();
+          });
+          break;
+            case "excel":
+           Promise.all([bussinesInfo(), services()]).then((res) =>{ 
+        const [bussinesInfo, services] = res;
+        const bussines = bussinesInfo.data.company;
+        const service = services.data.services;
+        this.reportForm.sellingType = ""
+         this.reportForm.status = ""
+        
+      
+      const name = this.reports.find((r)=> this.reportForm.reportType == r.id).name
+
+            const data = service.map((s) => {
+              return [
+                s.index,
+                s.name,
+                s.description,
+                this.$options.filters.formatMoney(s.cost),
+                s.sellingType.name,
+              ];
+            });
+
+            const document = [
+              [bussines.name],
+              [
+                name,
+                "",
+                "",
+                `NIT: ${bussines.nit}`,
+                `NRC: ${bussines.nrc}`,
+              ],
+              [""],
+              ["#", "Nombre", "Descripción", "Costo", "Tipo de venta"],
+              [""],
+              ...data,
+            ];
+            const sheet = XLSX.utils.aoa_to_sheet(document);
+            const workbook = XLSX.utils.book_new();
+            const fileName = "report";
+            XLSX.utils.book_append_sheet(workbook, sheet, fileName);
+            XLSX.writeFile(workbook, `${fileName}.xlsx`);
+            this.generating = false;
+          });
+          break;
+     }
+      
+    },
     generateServiceReport(fileType) {
       const service = () => this.$axios.get("/services/report/general");
       switch (fileType) {
