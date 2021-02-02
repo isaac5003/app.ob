@@ -1058,7 +1058,6 @@ export default {
           Promise.all([general(), bussinesInfo()]).then((res) => {
             const [general, bussinesInfo] = res;
             const [activo, pasivo, patrimonio] = general.data.balanceGeneral;
-            console.log(general.data.name);
             const { name, nit, nrc } = bussinesInfo.data.info;
             let activoValues = [];
             let pasivoValues = [];
@@ -1150,7 +1149,6 @@ export default {
             const { periodStart, peridoEnd } = settingsGeneral.data.general;
             const startDate = periodStart;
             const endDate = peridoEnd;
-            console.log(startDate, endDate);
 
             this.$axios
               .get("/entries/report/balance-general", {
@@ -1467,7 +1465,80 @@ export default {
                   endDate,
                 },
               })
-              .then((res) => {});
+              .then((res) => {
+                const [activo, pasivo, patrimonio] = res.data.balanceGeneral;
+                let activoValues = [];
+                let pasivoValues = [];
+                let patrimonioValues = [];
+
+                activoValues.push([activo.name]);
+
+                for (const ac of activo.accounts) {
+                  activoValues.push([ac.name, "", ac.total]);
+                  for (const acc of ac.accounts) {
+                    activoValues.push([acc.name, acc.total]);
+                  }
+                }
+                activoValues.push([""]);
+                activoValues.push(["TOTAL ACTIVO:", "", activo.total]);
+                activoValues.push([""]);
+                activoValues.push([""]);
+
+                //Empieza pasivos
+                pasivoValues.push([pasivo.name]);
+
+                for (const ac of pasivo.accounts) {
+                  pasivoValues.push([ac.name, "", ac.total]);
+                  for (const acc of ac.accounts) {
+                    pasivoValues.push([acc.name, acc.total]);
+                  }
+                }
+                pasivoValues.push([""]);
+
+                //Empieza patrimonio
+
+                patrimonioValues.push([patrimonio.name]);
+
+                for (const p of patrimonio.accounts) {
+                  patrimonioValues.push([p.name, "", p.total]);
+                  for (const pp of p.accounts) {
+                    patrimonioValues.push([pp.name, pp.total]);
+                  }
+                }
+
+                patrimonioValues.push([""]);
+                patrimonioValues.push([
+                  "TOTAL PASIVOS Y PATRIMONIO:",
+                  "",
+                  pasivo.total + patrimonio.total,
+                ]);
+
+                const document = [
+                  [name],
+                  [res.data.name, `NIT: ${nit}`, `NRC: ${nrc}`],
+                  [""],
+                  ...activoValues,
+                  ...pasivoValues,
+                  ...patrimonioValues,
+                  [""],
+                  [""],
+                  [
+                    "_____________________________\nNombre Apellido\nRepresentante legal",
+                    "_____________________________\nNombre Apellido\nContador",
+                    "_____________________________\nNombre Apellido\nAuditor",
+                  ],
+                ];
+
+                const sheet = XLSX.utils.aoa_to_sheet(document);
+                const workbook = XLSX.utils.book_new();
+                const fileName = `balance_general_al_${this.$dateFns.format(
+                  new Date(periodStart),
+                  "yyyyMMdd"
+                )}`;
+                XLSX.utils.book_append_sheet(workbook, sheet, fileName);
+                XLSX.writeFile(workbook, `${fileName}.xlsx`);
+                this.generating = false;
+              });
           });
           break;
         default:
