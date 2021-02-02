@@ -258,16 +258,14 @@ export default {
                   this.$axios
                     .put("/auth/update-workspace", { cid, bid })
                     .then((res) => {
+                      this.$router.push("/");
                       this.$auth.setUserToken(res.data.access_token);
-
+                      this.initials(this.$auth.user.workspace.company.name);
                       this.$notify.success({
                         title: "Éxito",
                         message:
                           "Se ha cambiado de espacio de trabajo correctamente.",
                       });
-                      this.initials(this.$auth.user.workspace.company.name);
-
-                      this.$router.push("/");
                     })
                     .catch((err) => {
                       console.log(err);
@@ -280,6 +278,7 @@ export default {
                     .then((alw) => {
                       instance.confirmButtonLoading = false;
                       instance.confirmButtonText = "Si, cambiar";
+                      this.initials(this.$auth.user.workspace.company.name);
                       done();
                     });
 
