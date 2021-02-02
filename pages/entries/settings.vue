@@ -765,7 +765,7 @@
               type="primary"
               size="small"
               @click.native="
-                settingsGeneral('fiscalPeriodForm', fiscalPeriodForm)
+                saveSettingsGeneral('fiscalPeriodForm', fiscalPeriodForm)
               "
               :disabled="
                 !fiscalPeriodForm.startDate || !fiscalPeriodForm.endDate
@@ -854,7 +854,9 @@
             <el-button
               type="primary"
               size="small"
-              @click.native="settingsSignature('firmantesForm', firmantesForm)"
+              @click.native="
+                saveSettingsSignature('firmantesForm', firmantesForm)
+              "
               :disabled="
                 !firmantesForm.legal ||
                 !firmantesForm.accountant ||
@@ -2375,7 +2377,7 @@ export default {
         this.$router.push("/entries");
       });
     },
-    settingsGeneral(formName, fiscalPeriodForm) {
+    saveSettingsGeneral(formName, fiscalPeriodForm) {
       const periodStart = fiscalPeriodForm.startDate;
       let peridoEnd = endOfMonth(new Date(fiscalPeriodForm.endDate));
       peridoEnd = this.$dateFns.format(new Date(peridoEnd), "yyyy-MM-dd");
@@ -2421,7 +2423,7 @@ export default {
         }
       );
     },
-    settingsSignature(formName, firmantesForm) {
+    saveSettingsSignature(formName, firmantesForm) {
       console.log(formName);
       this.$confirm(
         "¿Estás seguro que deseas actualizar datos de firmantes?",
