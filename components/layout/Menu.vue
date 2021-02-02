@@ -90,7 +90,7 @@
           >
             <span
               class="text-gray-900 font-bold text-lg uppercase tracking-tight leading-none"
-              >{{ initials($auth.user.workspace.company.name) }}</span
+              >{{ initials }}</span
             >
           </div>
         </el-popover>
@@ -173,6 +173,7 @@
 
 <script>
 import { getIcon, selectValidation } from "../../tools";
+
 export default {
   name: "Menu",
   data() {
@@ -260,7 +261,7 @@ export default {
                     .then((res) => {
                       this.$router.push("/");
                       this.$auth.setUserToken(res.data.access_token);
-                      this.initials(this.$auth.user.workspace.company.name);
+
                       this.$notify.success({
                         title: "Éxito",
                         message:
@@ -268,7 +269,6 @@ export default {
                       });
                     })
                     .catch((err) => {
-                      console.log(err);
                       this.$notify.error({
                         title: "Error",
                         message: err.response.data.message,
@@ -278,7 +278,7 @@ export default {
                     .then((alw) => {
                       instance.confirmButtonLoading = false;
                       instance.confirmButtonText = "Si, cambiar";
-                      this.initials(this.$auth.user.workspace.company.name);
+
                       done();
                     });
 
@@ -290,10 +290,6 @@ export default {
           }
         );
       });
-    },
-
-    initials(name) {
-      return name.slice(0, 2);
     },
   },
   computed: {
@@ -315,7 +311,9 @@ export default {
         return [];
       }
     },
-
+    initials() {
+      return this.$store.state.auth.user.workspace.company.name.slice(0, 2);
+    },
     modules() {
       const company = this.$auth.user.profile.access.find(
         (a) => a.id == this.$auth.user.workspace.company.id
