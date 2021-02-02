@@ -2421,7 +2421,6 @@ export default {
       );
     },
     saveSettingsSignature(formName, firmantesForm) {
-      console.log(formName);
       this.$confirm(
         "¿Estás seguro que deseas actualizar datos de firmantes?",
         "Confirmación",
