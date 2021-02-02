@@ -29,11 +29,11 @@ export default {
           path: "/customers",
           epath: ["/customers/edit"],
         },
-        // {
-        //   name: "Reportes",
-        //   icon: getIcon("document-text"),
-        //   path: "/customers/reports",
-        // },
+        {
+          name: "Reportes",
+          icon: getIcon("document-text"),
+          path: "/customers/reports",
+        },
         // {
         //   name: "Configuraciones",
         //   icon: getIcon("cog"),

@@ -685,6 +685,15 @@ export default {
               }
 
               const docDefinition = {
+                info: {
+                  title: `detallesdocs_${this.$dateFns.format(
+                    new Date(formData.dateRange[0]),
+                    "yyyyMMdd"
+                  )}_detallesdocs_${this.$dateFns.format(
+                    new Date(formData.dateRange[1]),
+                    "yyyyMMdd"
+                  )}`,
+                },
                 pageSize: "LETTER",
                 pageOrientation: "landscape",
                 pageMargins: [20, 60, 20, 40],
@@ -800,12 +809,12 @@ export default {
                     d.date,
 
                     d.documentNumber,
-                    this.$options.filters.formatMoney(d.vGravada),
-                    this.$options.filters.formatMoney(d.vNSujeta),
-                    this.$options.filters.formatMoney(d.vExenta),
-                    this.$options.filters.formatMoney(d.iva),
-                    this.$options.filters.formatMoney(d.ivaRetenido),
-                    this.$options.filters.formatMoney(d.total),
+                    d.vGravada,
+                    d.vNSujeta,
+                    d.vExenta,
+                    d.iva,
+                    d.ivaRetenido,
+                    d.total,
                   ]);
                 }
                 data.push([""]);
@@ -814,12 +823,12 @@ export default {
 
                   "",
                   "",
-                  this.$options.filters.formatMoney(r.vGravadaTotal),
-                  this.$options.filters.formatMoney(r.vNSujetaTotal),
-                  this.$options.filters.formatMoney(r.vExentaTotal),
-                  this.$options.filters.formatMoney(r.ivaTotal),
-                  this.$options.filters.formatMoney(r.ivaRetenidoTotal),
-                  this.$options.filters.formatMoney(r.totalTotal),
+                  r.vGravadaTotal,
+                  r.vNSujetaTotal,
+                  r.vExentaTotal,
+                  r.ivaTotal,
+                  r.ivaRetenidoTotal,
+                  r.totalTotal,
                 ]);
               }
               const document = [
@@ -853,7 +862,13 @@ export default {
 
               const sheet = XLSX.utils.aoa_to_sheet(document);
               const workbook = XLSX.utils.book_new();
-              const fileName = "DETALLEDEFACTURACION";
+              const fileName = `detallesdocs_${this.$dateFns.format(
+                new Date(formData.dateRange[0]),
+                "yyyyMMdd"
+              )}_${this.$dateFns.format(
+                new Date(formData.dateRange[1]),
+                "yyyyMMdd"
+              )}`;
               XLSX.utils.book_append_sheet(workbook, sheet, fileName);
               XLSX.writeFile(workbook, `${fileName}.xlsx`);
               this.generating = false;
