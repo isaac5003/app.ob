@@ -410,6 +410,7 @@
                 type="number"
                 :min="1"
                 size="small"
+                :disabled="activeAccount.subAccounts"
               />
             </el-form-item>
             <el-form-item
@@ -712,6 +713,164 @@
           .catch(() => {})
       "
     >
+      <!--  tab generales -->
+      <el-tab-pane label="Generales" name="general">
+        <!-- <div class="grid grid-cols-12">
+          <div class="col-span-12">
+            <Notification
+              class="mb-4 w-full"
+              type="info"
+              title="Información"
+              
+            />
+          </div>
+        </div> -->
+        <el-form
+          :model="fiscalPeriodForm"
+          :rules="fiscalPeriodFormRules"
+          ref="fiscalPeriodForm"
+        >
+          <div class="grid grid-cols-12 gap-4">
+            <el-form-item
+              label="Ingrese el periodo fiscal de la empresa"
+              prop="startDate"
+              class="col-span-4"
+            >
+              <el-date-picker
+                v-model="fiscalPeriodForm.startDate"
+                size="small"
+                type="month"
+                format="MMM-yyyy"
+                placeholder="Fecha inicial"
+                style="width: 100%"
+                value-format="yyyy-MM-dd"
+              >
+              </el-date-picker>
+            </el-form-item>
+
+            <el-form-item label=" " prop="endDate" class="col-span-4">
+              <el-date-picker
+                v-model="fiscalPeriodForm.endDate"
+                size="small"
+                type="month"
+                format="MMM-yyyy"
+                placeholder="Fecha final"
+                style="width: 100%"
+              >
+              </el-date-picker>
+            </el-form-item>
+          </div>
+
+          <div class="flex justify-end mt-4">
+            <el-button
+              type="primary"
+              size="small"
+              @click.native="
+                saveSettingsGeneral('fiscalPeriodForm', fiscalPeriodForm)
+              "
+              :disabled="
+                !fiscalPeriodForm.startDate || !fiscalPeriodForm.endDate
+              "
+              >Guardar</el-button
+            >
+            <el-button size="small" @click="$router.push('/entries')">
+              Cancelar
+            </el-button>
+          </div>
+        </el-form>
+      </el-tab-pane>
+      <!-- Firmantes -->
+      <el-tab-pane label="Firmantes" name="signatures">
+        <!-- <div class="grid grid-cols-12">
+          <div class="col-span-12">
+            <Notification
+              class="mb-4 w-full"
+              type="info"
+              title="Información"
+              
+            />
+          </div>
+        </div> -->
+        <el-form
+          :model="firmantesForm"
+          :rules="firmantesFormRules"
+          ref="firmantesForm"
+        >
+          <div class="grid grid-cols-12 gap-4">
+            <el-form-item
+              label="Representante legal/Administrador único"
+              prop="legal"
+              class="col-span-4"
+            >
+              <el-input
+                v-model="firmantesForm.legal"
+                type="text"
+                autocomplete="off"
+                maxlength="100"
+                minlength="5"
+                size="small"
+                show-word-limit
+                clearable
+                placeholder=""
+              >
+              </el-input>
+            </el-form-item>
+            <el-form-item
+              label="Contador General"
+              prop="accountant"
+              class="col-span-4"
+            >
+              <el-input
+                v-model="firmantesForm.accountant"
+                size="small"
+                class="w-full"
+                autocomplete="off"
+                maxlength="100"
+                minlength="5"
+                show-word-limit
+                filterable
+                clearable
+                placeholder=""
+              >
+              </el-input>
+            </el-form-item>
+
+            <el-form-item label="Auditor" prop="auditor" class="col-span-4">
+              <el-input
+                v-model="firmantesForm.auditor"
+                size="small"
+                class="w-full"
+                autocomplete="off"
+                maxlength="100"
+                minlength="5"
+                show-word-limit
+                filterable
+                clearable
+                placeholder=""
+              >
+              </el-input>
+            </el-form-item>
+          </div>
+          <div class="flex justify-end mt-4">
+            <el-button
+              type="primary"
+              size="small"
+              @click.native="
+                saveSettingsSignature('firmantesForm', firmantesForm)
+              "
+              :disabled="
+                !firmantesForm.legal ||
+                !firmantesForm.accountant ||
+                !firmantesForm.auditor
+              "
+              >Guardar</el-button
+            >
+            <el-button size="small" @click="$router.push('/entries')"
+              >Cancelar</el-button
+            >
+          </div>
+        </el-form>
+      </el-tab-pane>
       <!-- tab catalogo -->
       <el-tab-pane label="Catálogo de cuentas" name="catalog" class="space-y-4">
         <!-- first row -->
@@ -1002,7 +1161,7 @@
       </el-tab-pane>
 
       <!-- tab estado resultados -->
-      <el-tab-pane label="Estado de resultados" name="estado resultados">
+      <el-tab-pane label="Estado de resultados" name="estado-resultados">
         <div class="grid grid-cols-12">
           <div class="col-span-12">
             <Notification
@@ -1132,6 +1291,8 @@
           <el-button size="small">Cancelar</el-button>
         </div>
       </el-tab-pane>
+
+      <!--  tab de firmante -->
       <!-- tab integraciones -->
       <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
         <Notification
@@ -1179,6 +1340,7 @@
 </template>
 
 <script>
+import { endOfMonth, format, startOfMonth } from "date-fns";
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
 import { getIcon, hasModule } from "../../tools";
@@ -1190,7 +1352,7 @@ import {
 } from "../../tools";
 
 export default {
-  name: "InvoicesSettings",
+  name: "EntriesSettings",
   components: { LayoutContent, Notification },
   fetch() {
     // Se ubica en el tab correcto
@@ -1213,6 +1375,7 @@ export default {
         this.accountsCount = accountCatalogs.data.count;
         this.catalogs = accounts.data.accountingCatalog;
         this.tableData = balance.data.balanceGeneral.report;
+
         this.specialAccounts = { ...balance.data.balanceGeneral.special };
         this.tablesData = results.data.estadoResultados.map((r) => {
           const obj = { ...r };
@@ -1235,11 +1398,86 @@ export default {
   },
   fetchOnServer: false,
   data() {
+    const newCargoValidateCompare = (rule, value, callback) => {
+      const abono =
+        this.newEntryDetailForm.abono > 0
+          ? this.newEntryDetailForm.abono.toFixed(2)
+          : "";
+      const val = value > 0 ? value.toFixed(2) : "";
+      if (!abono) {
+        if (!val) {
+          callback(new Error("Este campo es requerido."));
+        } else {
+          callback();
+        }
+      } else if (abono && val) {
+        return callback(
+          new Error("No puedes agregar cargo y abono al mismo tiempo")
+        );
+      } else {
+        callback();
+      }
+    };
+    const startDateValidateCompare = (rule, value, callback) => {
+      const startDate = this.fiscalPeriodForm.startDate
+        ? new Date(this.fiscalPeriodForm.startDate)
+        : "";
+      const val = value ? new Date(value) : "";
+      if (!startDate) {
+        if (!val) {
+          callback(new Error("Este campo es requerido."));
+        } else {
+          callback();
+        }
+      } else if (startDate > val) {
+        return callback(new Error("La fecha inicial no puede ser mayor"));
+      } else {
+        callback();
+      }
+    };
+    const endDateValidateCompare = (rule, value, callback) => {
+      const endDate = this.fiscalPeriodForm.endDate
+        ? new Date(this.fiscalPeriodForm.endDate)
+        : "";
+      const val = value ? new Date(value) : "";
+      if (!endDate) {
+        if (!val) {
+          callback(new Error("Este campo es requerido."));
+        } else {
+          callback();
+        }
+      } else if (endDate < val) {
+        return callback(new Error("La fecha final no puede ser menor"));
+      } else {
+        callback();
+      }
+    };
+
     return {
       pageloading: true,
       tableloading: false,
-      tab: "catalog",
+      tab: "general",
       utab: "invoicing",
+      date: new Date(2021, 2),
+      firmantesForm: {
+        legal: "",
+        accountant: "",
+        auditor: "",
+      },
+      firmantesFormRules: {
+        legal: inputValidation(true, 5, 100),
+        accountant: inputValidation(true, 5, 100),
+        auditor: inputValidation(true, 5, 100),
+      },
+      fiscalPeriodForm: {
+        startDate: "",
+        endDate: "",
+      },
+      fiscalPeriodFormRules: {
+        startDate: selectValidation(true),
+        endDate: selectValidation(true),
+      },
+
       integrations: [
         {
           name: "Facturación",
@@ -1742,11 +1980,16 @@ export default {
       this.fetchCatalog();
     },
     openEditAccount(account) {
-      this.activeAccount = { ...account };
       if (account.code.length == 1) {
         this.showEditMayorDialog = true;
+        this.activeAccount = { ...account };
       } else {
         this.showEditAccount = true;
+
+        this.activeAccount = {
+          ...account,
+          code: `0${account.code.slice(-1)}`,
+        };
       }
     },
     deleteAccount({ id }) {
@@ -1795,9 +2038,10 @@ export default {
         }
 
         // Genera el codigo real a guardar
-        const realCode = !activeAccount
-          ? `${accounts.code}`
-          : `${activeAccount.code}${accounts.code}`;
+        const realCode =
+          Object.keys(activeAccount).length > 0
+            ? `${activeAccount.code}${accounts.code}`
+            : `${accounts.code}`;
 
         // Verifica si los codigos nuevos y los guardados estan duplicados entre ellos.
         // const catalog = this.accounts.map((a) => a.code);
@@ -1828,6 +2072,7 @@ export default {
                 this.$axios
                   .put(`/entries/catalog/${accounts.id}`, {
                     ...accounts,
+                    code: realCode,
                   })
                   .then((res) => {
                     this.$notify.success({
@@ -2140,6 +2385,88 @@ export default {
       }).then(() => {
         this.$router.push("/entries");
       });
+    },
+    saveSettingsGeneral(formName, fiscalPeriodForm) {
+      const periodStart = fiscalPeriodForm.startDate;
+      let peridoEnd = endOfMonth(new Date(fiscalPeriodForm.endDate));
+      peridoEnd = this.$dateFns.format(new Date(peridoEnd), "yyyy-MM-dd");
+      this.$confirm(
+        "¿Estás seguro que deseas actualizar el periodo fiscal?",
+        "Confirmación",
+        {
+          confirmButtonText: "Si, guardar",
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+
+              this.$axios
+                .put(`/entries/setting/general`, {
+                  periodStart,
+                  peridoEnd,
+                })
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Exito",
+                    message: res.data.message,
+                  });
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = "Si, guardar";
+                  done();
+                })
+
+                .catch((err) => {
+                  this.errorMessage = err.response.data.messag;
+                });
+            } else {
+              instance.confirmButtonLoading = false;
+              instance.confirmButtonText = "Si, guardar";
+              done();
+            }
+          },
+        }
+      );
+    },
+    saveSettingsSignature(formName, firmantesForm) {
+      this.$confirm(
+        "¿Estás seguro que deseas actualizar datos de firmantes?",
+        "Confirmación",
+        {
+          confirmButtonText: "Si, guardar",
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+
+              this.$axios
+                .put(`/entries/setting/signatures`, {
+                  ...firmantesForm,
+                })
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Exito",
+                    message: res.data.message,
+                  });
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = "Si, guardar";
+                  done();
+                })
+
+                .catch((err) => {
+                  this.errorMessage = err.response.data.message;
+                });
+            } else {
+              instance.confirmButtonLoading = false;
+              instance.confirmButtonText = "Si, guardar";
+              done();
+            }
+          },
+        }
+      );
     },
   },
   computed: {
