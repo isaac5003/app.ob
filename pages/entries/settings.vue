@@ -768,9 +768,7 @@
                 settingsGeneral('fiscalPeriodForm', fiscalPeriodForm)
               "
               :disabled="
-                fiscalPeriodForm.startDate && fiscalPeriodForm.endDate
-                  ? false
-                  : true
+                !fiscalPeriodForm.startDate || !fiscalPeriodForm.endDate
               "
               >Guardar</el-button
             >
@@ -858,11 +856,9 @@
               size="small"
               @click.native="settingsSignature('firmantesForm', firmantesForm)"
               :disabled="
-                firmantesForm.legal &&
-                firmantesForm.accountant &&
-                firmantesForm.auditor
-                  ? false
-                  : true
+                !firmantesForm.legal ||
+                !firmantesForm.accountant ||
+                !firmantesForm.auditor
               "
               >Guardar</el-button
             >
