@@ -169,6 +169,7 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import XLSX from "xlsx";
 import { selectValidation, getHeader, getFooter } from "../../tools";
+import { endOfMonth, startOfMonth } from "date-fns";
 export default {
   name: "EntriesReports",
   components: {
@@ -209,7 +210,7 @@ export default {
       },
       catalogos: [],
       reports: [
-        { name: "Balance general", id: "balanceGeneral" },
+        { name: "Balance general mensual", id: "balanceGeneral" },
 
         { name: "Balance de comprobación", id: "balanceComprobacion" },
         { name: "Estado de resultados", id: "estadoResultados" },
@@ -743,10 +744,13 @@ export default {
       }
     },
     balanceGeneral(dateRange, fileType) {
+      const startDate = startOfMonth(new Date(dateRange));
+      const endDate = endOfMonth(new Date(dateRange));
       const general = () =>
         this.$axios.get("/entries/report/balance-general", {
           params: {
-            date: dateRange,
+            startDate,
+            endDate,
           },
         });
       const bussinesInfo = () => this.$axios.get("/business/info");
@@ -876,9 +880,9 @@ export default {
                 name,
                 nit,
                 nrc,
-                this.$dateFns.lastDayOfMonth(new Date(dateRange)),
-                "LIBRO DIARIO MAYOR",
-                "month"
+                [new Date(startDate), new Date(endDate)],
+                "BALANCE GENERAL",
+                "period"
               ),
               footer: getFooter(),
               content: [
@@ -1051,6 +1055,7 @@ export default {
           Promise.all([general(), bussinesInfo()]).then((res) => {
             const [general, bussinesInfo] = res;
             const [activo, pasivo, patrimonio] = general.data.balanceGeneral;
+            console.log(general.data.name);
             const { name, nit, nrc } = bussinesInfo.data.info;
             let activoValues = [];
             let pasivoValues = [];
@@ -1100,7 +1105,7 @@ export default {
 
             const document = [
               [name],
-              ["BALANCE GENERAL", `NIT: ${nit}`, `NRC: ${nrc}`],
+              [general.data.name, `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               ...activoValues,
               ...pasivoValues,
