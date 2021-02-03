@@ -289,23 +289,59 @@ export default {
             (res) => {
               const [bussinesInfo, estadoResultados, signatures] = res;
               const { name, nit, nrc } = bussinesInfo.data.info;
-              const estadoResultado = estadoResultados.data.estadoResultados;
+              const estadoResultado = estadoResultados.data.estadoResultados.map(
+                (er) => {
+                  return {
+                    ...er,
+                    section: true,
+                  };
+                }
+              );
               const signature = signatures.data.signatures;
               const values = [];
-              const emptyRow = [{}, {}, {}];
+              const emptyRow = [
+                {
+                  text: "",
+                  border: [false, false],
+                },
+                {
+                  text: "",
+                  border: [false, false],
+                },
+                {
+                  text: "",
+                  border: [false, false],
+                },
+              ];
 
               for (const er of estadoResultado) {
                 values.push(emptyRow);
                 values.push([
                   {
-                    bold: er.type == "total",
-                    text: er.name,
+                    bold: er.type == "total" || er.section,
+                    text:
+                      er.section || er.type == "total"
+                        ? er.name.toUpperCase()
+                        : er.name,
+                    border: [false, false],
                   },
-                  {},
+                  {
+                    text: "",
+                    border:
+                      er.type == "total" && er.children
+                        ? [false, true, false, false]
+                        : [false, false],
+                  },
                   {
                     bold: er.type == "total",
                     text: this.$options.filters.formatMoney(er.total),
                     alignment: "right",
+                    border:
+                      estadoResultado.indexOf(er) == estadoResultado.length - 1
+                        ? [false, true, false, true]
+                        : er.type == "total"
+                        ? [false, true, false, false]
+                        : [false, false],
                   },
                 ]);
                 if (er.children) {
@@ -315,17 +351,39 @@ export default {
                         bold: false,
                         text: ch.name,
                         margin: [5, 0, 0, 0],
+                        border: [false, false],
                       },
                       {
                         bold: false,
                         text: this.$options.filters.formatMoney(ch.total),
                         alignment: "right",
+                        border: [false, false],
                       },
-                      {},
+                      {
+                        text: "",
+                        border: [false, false],
+                      },
                     ]);
                   }
                 }
+                values.push([
+                  {
+                    text: "",
+                    border: [false, false],
+                  },
+                  {
+                    text: "",
+                    border: er.children
+                      ? [false, true, false, false]
+                      : [false, false],
+                  },
+                  {
+                    text: "",
+                    border: [false, false],
+                  },
+                ]);
               }
+
               const docDefinition = {
                 info: {
                   title: `estado_resultados_al_${this.$dateFns.format(
@@ -347,34 +405,25 @@ export default {
                 content: [
                   {
                     fontSize: 9,
-                    layout: "noBorders",
+
                     table: {
                       widths: ["*", "10%", "10%"],
                       body: [
-                        [
-                          {
-                            fontSize: 10,
-                            text: "CONCEPTOS",
-                            style: "tableHeader",
-                            margin: [0, 0, 0, 10],
-                          },
-                          {
-                            fontSize: 10,
-                            text: "SALDOS DEL PERIODO",
-                            style: "tableHeader",
-                            alignment: "right",
-                            colSpan: 2,
-                          },
-                          "",
-                        ],
                         ...values,
                         [
                           {
                             text: "",
                             margin: [0, 60, 0, 0],
+                            border: [false, false, false, false],
                           },
-                          {},
-                          {},
+                          {
+                            text: "",
+                            border: [false, false, false, false],
+                          },
+                          {
+                            text: "",
+                            border: [false, false, false, false],
+                          },
                         ],
                         [
                           {
@@ -427,9 +476,16 @@ export default {
                                 ],
                               ],
                             },
+                            border: [false, false, false, false],
                           },
-                          {},
-                          {},
+                          {
+                            text: "",
+                            border: [false, false, false, false],
+                          },
+                          {
+                            text: "",
+                            border: [false, false, false, false],
+                          },
                         ],
                       ],
                     },
@@ -452,13 +508,27 @@ export default {
             (res) => {
               const [bussinesInfo, estadoResultados, signatures] = res;
               const { name, nit, nrc } = bussinesInfo.data.info;
-              const estadoResultado = estadoResultados.data.estadoResultados;
+              const estadoResultado = estadoResultados.data.estadoResultados.map(
+                (er) => {
+                  return {
+                    ...er,
+                    section: true,
+                  };
+                }
+              );
               const signature = signatures.data.signatures;
               const data = [];
 
               for (const er of estadoResultado) {
                 data.push([""]);
-                data.push([er.name, "", er.total]);
+                data.push([
+                  er.section || er.type == "total"
+                    ? er.name.toUpperCase()
+                    : er.name,
+                  ,
+                  "",
+                  er.total,
+                ]);
                 if (er.children) {
                   for (const ch of er.children) {
                     data.push([ch.name, ch.total, ""]);
