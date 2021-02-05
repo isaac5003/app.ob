@@ -105,7 +105,7 @@
             size="small"
             autocomplete="off"
             @change="setStorage(reportForm)"
-            style="width: 100%"
+            style="width: 101%"
           />
           </el-form-item>
         </div>
@@ -120,7 +120,7 @@
             size="small"
             autocomplete="off"
             @change="setStorage(reportForm)"
-            style="width: 100%"
+            style="width: 101%"
           />
           </el-form-item>
         </div>
