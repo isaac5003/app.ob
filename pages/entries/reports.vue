@@ -314,6 +314,8 @@ export default {
                 }
               );
               const signature = signatures.data.signatures;
+              const postTitle =
+                "(Expresado en dólares de los Estados Unidos de América)";
               const values = [];
               const emptyRow = [
                 {
@@ -409,8 +411,17 @@ export default {
                 },
                 pageSize: "LETTER",
                 pageOrientation: "porttrait",
-                pageMargins: [20, 60, 20, 40],
-                header: getHeader(name, nit, nrc, null, reportTitleName),
+                pageMargins: [20, 80, 20, 40],
+                header: getHeader(
+                  name,
+                  nit,
+                  nrc,
+                  null,
+                  reportTitleName,
+                  null,
+                  null,
+                  postTitle
+                ),
                 footer: getFooter(),
                 content: [
                   {
@@ -523,8 +534,9 @@ export default {
                 }
               );
               const signature = signatures.data.signatures;
+              const postTitle =
+                "(Expresado en dólares de los Estados Unidos de América)";
               const data = [];
-
               for (const er of estadoResultado) {
                 data.push([""]);
                 data.push([
@@ -543,7 +555,8 @@ export default {
               }
               const document = [
                 [name],
-                [reportTitleName, `NIT: ${nit}`, `NRC: ${nrc}`],
+                [reportTitleName],
+                [postTitle, `NIT: ${nit}`, `NRC: ${nrc}`],
                 [""],
 
                 [""],
@@ -583,8 +596,9 @@ export default {
               const [bussinesInfo, signatures, settingsGeneral] = res;
               const { name, nit, nrc } = bussinesInfo.data.info;
               const generales = settingsGeneral.data.general;
-
               const signature = signatures.data.signatures;
+              const postTitle =
+                "(Expresado en dólares de los Estados Unidos de América)";
               this.$axios
                 .get("/entries/report/estado-resultados", {
                   params: {
@@ -699,8 +713,17 @@ export default {
                     },
                     pageSize: "LETTER",
                     pageOrientation: "porttrait",
-                    pageMargins: [20, 60, 20, 40],
-                    header: getHeader(name, nit, nrc, null, reportTitleName),
+                    pageMargins: [20, 80, 20, 40],
+                    header: getHeader(
+                      name,
+                      nit,
+                      nrc,
+                      null,
+                      reportTitleName,
+                      null,
+                      null,
+                      postTitle
+                    ),
                     footer: getFooter(),
                     content: [
                       {
@@ -810,8 +833,9 @@ export default {
               const [bussinesInfo, signatures, settingsGeneral] = res;
               const { name, nit, nrc } = bussinesInfo.data.info;
               const generales = settingsGeneral.data.general;
-
               const signature = signatures.data.signatures;
+              const postTitle =
+                "(Expresado en dólares de los Estados Unidos de América)";
               this.$axios
                 .get("/entries/report/estado-resultados", {
                   params: {
@@ -850,7 +874,8 @@ export default {
                   }
                   const document = [
                     [name],
-                    [reportTitleName, `NIT: ${nit}`, `NRC: ${nrc}`],
+                    [reportTitleName],
+                    [postTitle, `NIT: ${nit}`, `NRC: ${nrc}`],
                     [""],
 
                     [""],
@@ -1184,6 +1209,8 @@ export default {
             const reportTitleName = general.data.name;
             const { name, nit, nrc } = bussinesInfo.data.info;
             const { accountant, auditor, legal } = signatures.data.signatures;
+            const postTitle =
+              "(Expresado en dólares de los Estados Unidos de América)";
             let activoValues = [];
             let pasivoValues = [];
             let patrimonioValues = [];
@@ -1299,14 +1326,16 @@ export default {
               },
               pageSize: "LETTER",
               pageOrientation: "landscape",
-              pageMargins: [15, 55, 15, 40],
+              pageMargins: [20, 80, 20, 40],
               header: getHeader(
                 name,
                 nit,
                 nrc,
                 null,
                 reportTitleName,
-                "period"
+                "period",
+                null,
+                postTitle
               ),
               footer: getFooter(),
               content: [
@@ -1482,6 +1511,8 @@ export default {
             const { name, nit, nrc } = bussinesInfo.data.info;
             const { accountant, auditor, legal } = signatures.data.signatures;
             const reportTitleName = general.data.name;
+            const postTitle =
+              "(Expresado en dólares de los Estados Unidos de América)";
             let activoValues = [];
             let pasivoValues = [];
             let patrimonioValues = [];
@@ -1530,7 +1561,8 @@ export default {
 
             const document = [
               [name],
-              [reportTitleName, `NIT: ${nit}`, `NRC: ${nrc}`],
+              [reportTitleName],
+              [postTitle, `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               ...activoValues,
               ...pasivoValues,
@@ -1575,6 +1607,8 @@ export default {
               const { accountant, auditor, legal } = signatures.data.signatures;
               const startDate = periodStart;
               const endDate = peridoEnd;
+              const postTitle =
+                "(Expresado en dólares de los Estados Unidos de América)";
 
               this.$axios
                 .get("/entries/report/balance-general", {
@@ -1701,14 +1735,16 @@ export default {
                     },
                     pageSize: "LETTER",
                     pageOrientation: "landscape",
-                    pageMargins: [15, 55, 15, 40],
+                    pageMargins: [20, 80, 20, 40],
                     header: getHeader(
                       name,
                       nit,
                       nrc,
                       null,
                       reportTitleName,
-                      "period"
+                      "period",
+                      null,
+                      postTitle
                     ),
                     footer: getFooter(),
                     content: [
@@ -1887,6 +1923,8 @@ export default {
               const { accountant, auditor, legal } = signatures.data.signatures;
               const startDate = periodStart;
               const endDate = peridoEnd;
+              const postTitle =
+                "(Expresado en dólares de los Estados Unidos de América)";
 
               this.$axios
                 .get("/entries/report/balance-general", {
@@ -1946,7 +1984,8 @@ export default {
 
                   const document = [
                     [name],
-                    [reportTitleName, `NIT: ${nit}`, `NRC: ${nrc}`],
+                    [reportTitleName],
+                    [postTitle, `NIT: ${nit}`, `NRC: ${nrc}`],
                     [""],
                     ...activoValues,
                     ...pasivoValues,
