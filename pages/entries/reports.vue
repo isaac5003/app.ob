@@ -84,7 +84,7 @@
               v-model="reportForm.dateRange"
               type="month"
               format="MMMM yyyy"
-              value-format="yyyy-MM-dd"
+              value-format="yyyy-MM"
               placeholder="Selecciona un mes"
               size="small"
             />
@@ -253,7 +253,11 @@ export default {
             this.balanceGeneral(dateRange, radio);
             break;
           case "estadoResultados":
-            this.generateEstadoResultados(dateRange, radio);
+            this.generateEstadoResultados(
+              this.$dateFns.format(new Date(dateRange), "yyyy-MM-dd"),
+              radio
+            );
+
             break;
           case "balanceComprobacion":
             this.generateBalanceComprobacion(dateRange, radio);
@@ -289,6 +293,7 @@ export default {
             (res) => {
               const [bussinesInfo, estadoResultados, signatures] = res;
               const { name, nit, nrc } = bussinesInfo.data.info;
+              const reportTitleName = estadoResultados.data.name;
               const estadoResultado = estadoResultados.data.estadoResultados.map(
                 (er) => {
                   return {
@@ -394,13 +399,7 @@ export default {
                 pageSize: "LETTER",
                 pageOrientation: "porttrait",
                 pageMargins: [20, 60, 20, 40],
-                header: getHeader(
-                  name,
-                  nit,
-                  nrc,
-                  this.$dateFns.lastDayOfMonth(new Date(dateRange)),
-                  "ESTADO DE RESULTADOS"
-                ),
+                header: getHeader(name, nit, nrc, null, reportTitleName),
                 footer: getFooter(),
                 content: [
                   {
@@ -508,6 +507,7 @@ export default {
             (res) => {
               const [bussinesInfo, estadoResultados, signatures] = res;
               const { name, nit, nrc } = bussinesInfo.data.info;
+              const reportTitleName = estadoResultados.data.name;
               const estadoResultado = estadoResultados.data.estadoResultados.map(
                 (er) => {
                   return {
@@ -537,17 +537,9 @@ export default {
               }
               const document = [
                 [name],
-                [
-                  `ESTADO DE RESULTADOS AL ${this.$dateFns.format(
-                    new Date(dateRange),
-                    "dd/MM/yyyy"
-                  )}`,
-
-                  `NIT: ${nit}`,
-                  `NRC: ${nrc}`,
-                ],
+                [reportTitleName, `NIT: ${nit}`, `NRC: ${nrc}`],
                 [""],
-                ["CONCEPTOS", "SALDOS DEL PERÍODO"],
+
                 [""],
                 [""],
                 ...data,
@@ -588,7 +580,7 @@ export default {
             const { name, nit, nrc } = bussinesInfo.data.info;
             const comprobationBalance =
               balanceComprobacion.data.balanceComprobacion;
-
+            const reportTitleName = balanceComprobacion.data.name;
             const values = [];
             const emptyRow = [{}, {}, {}, {}, {}, {}, {}];
             const mayores = comprobationBalance.filter(
@@ -697,13 +689,7 @@ export default {
               pageSize: "LETTER",
               pageOrientation: "portrait",
               pageMargins: [15, 60, 15, 40],
-              header: getHeader(
-                name,
-                nit,
-                nrc,
-                this.$dateFns.lastDayOfMonth(new Date(dateRange)),
-                "BALANCE DE COMPROBACIÓN"
-              ),
+              header: getHeader(name, nit, nrc, null, reportTitleName),
               footer: getFooter(),
               content: [
                 {
@@ -790,7 +776,7 @@ export default {
             const { name, nit, nrc } = bussinesInfo.data.info;
             const comprobationBalance =
               balanceComprobacion.data.balanceComprobacion;
-
+            const reportTitleName = balanceComprobacion.data.name;
             const data = [];
 
             const mayores = comprobationBalance.filter(
@@ -835,17 +821,7 @@ export default {
             }
             const document = [
               [name],
-              [
-                `BALANCE DE COMPROBACIÓN AL ${this.$dateFns.format(
-                  new Date(dateRange),
-                  "dd/MM/yyyy"
-                )}`,
-                "",
-                "",
-                "",
-                `NIT: ${nit}`,
-                `NRC: ${nrc}`,
-              ],
+              [reportTitleName, "", "", "", `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               [
                 "CÓD. DE LA CUENTA",
@@ -891,6 +867,7 @@ export default {
           Promise.all([general(), bussinesInfo(), signatures()]).then((res) => {
             const [general, bussinesInfo, signatures] = res;
             const [activo, pasivo, patrimonio] = general.data.balanceGeneral;
+            const reportTitleName = general.data.name;
             const { name, nit, nrc } = bussinesInfo.data.info;
             const { accountant, auditor, legal } = signatures.data.signatures;
             let activoValues = [];
@@ -1013,8 +990,8 @@ export default {
                 name,
                 nit,
                 nrc,
-                [new Date(startDate), new Date(endDate)],
-                "BALANCE GENERAL",
+                null,
+                reportTitleName,
                 "period"
               ),
               footer: getFooter(),
@@ -1190,6 +1167,7 @@ export default {
             const [activo, pasivo, patrimonio] = general.data.balanceGeneral;
             const { name, nit, nrc } = bussinesInfo.data.info;
             const { accountant, auditor, legal } = signatures.data.signatures;
+            const reportTitleName = general.data.name;
             let activoValues = [];
             let pasivoValues = [];
             let patrimonioValues = [];
@@ -1238,7 +1216,7 @@ export default {
 
             const document = [
               [name],
-              [general.data.name, `NIT: ${nit}`, `NRC: ${nrc}`],
+              [reportTitleName, `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               ...activoValues,
               ...pasivoValues,
@@ -1293,6 +1271,7 @@ export default {
                 })
                 .then((res) => {
                   const [activo, pasivo, patrimonio] = res.data.balanceGeneral;
+                  const reportTitleName = res.data.name;
                   let activoValues = [];
                   let pasivoValues = [];
                   let patrimonioValues = [];
@@ -1413,8 +1392,8 @@ export default {
                       name,
                       nit,
                       nrc,
-                      [new Date(periodStart), new Date(peridoEnd)],
-                      "BALANCE GENERAL",
+                      null,
+                      reportTitleName,
                       "period"
                     ),
                     footer: getFooter(),
@@ -1604,6 +1583,7 @@ export default {
                 })
                 .then((res) => {
                   const [activo, pasivo, patrimonio] = res.data.balanceGeneral;
+                  const reportTitleName = res.data.name;
                   let activoValues = [];
                   let pasivoValues = [];
                   let patrimonioValues = [];
@@ -1652,7 +1632,7 @@ export default {
 
                   const document = [
                     [name],
-                    [res.data.name, `NIT: ${nit}`, `NRC: ${nrc}`],
+                    [reportTitleName, `NIT: ${nit}`, `NRC: ${nrc}`],
                     [""],
                     ...activoValues,
                     ...pasivoValues,
@@ -1691,8 +1671,9 @@ export default {
           Promise.all([catalog(), bussinesInfo()]).then((res) => {
             const [catalog, bussinesInfo] = res;
             const catalogReport = catalog.data.accountingCatalog;
+
             const { name, nit, nrc } = bussinesInfo.data.info;
-            const data = catalogReport.map((c) => {
+            const values = catalogReport.map((c) => {
               return [
                 { bold: c.isParent, text: c.code },
                 { bold: c.isParent, text: c.name },
@@ -1804,6 +1785,7 @@ export default {
             const [bussinesInfo, libroMayor] = res;
             const { name, nit, nrc } = bussinesInfo.data.info;
             const lib = libroMayor.data.accounts;
+            const reportTitleName = libroMayor.data.name;
             const values = [];
             const emptyRow = [{}, {}, {}, {}, {}, {}];
 
@@ -1894,14 +1876,7 @@ export default {
               pageSize: "LETTER",
               pageOrientation: "portrait",
               pageMargins: [20, 60, 20, 40],
-              header: getHeader(
-                name,
-                nit,
-                nrc,
-                this.$dateFns.lastDayOfMonth(new Date(dateRange)),
-                "LIBRO DIARIO MAYOR",
-                "month"
-              ),
+              header: getHeader(name, nit, nrc, null, reportTitleName, "month"),
               footer: getFooter(),
               content: [
                 {
@@ -1979,6 +1954,7 @@ export default {
           Promise.all([bussinesInfo(), libroMayor()]).then((res) => {
             const [bussinesInfo, libroMayor] = res;
             const { name, nit, nrc } = bussinesInfo.data.info;
+            const reportTitleName = libroMayor.data.name;
 
             const data = [];
             for (const account of libroMayor.data.accounts) {
@@ -2012,17 +1988,7 @@ export default {
             }
             const document = [
               [name],
-              [
-                `LIBRO DIARIO MAYOR PARA EL MES DE ${this.$dateFns.format(
-                  new Date(dateRange),
-                  "MMMM - yyyy"
-                )}`,
-                "",
-                "",
-                "",
-                `NIT: ${nit}`,
-                `NRC: ${nrc}`,
-              ],
+              [reportTitleName, "", "", "", `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               [
                 "CÓD. DE LA",
@@ -2065,6 +2031,7 @@ export default {
             const [bussinesInfo, auxiliares] = res;
             const { name, nit, nrc } = bussinesInfo.data.info;
             const reporteAuxiliares = auxiliares.data.accounts;
+            const reportTitleName = auxiliares.data.name;
             const values = [];
             const emptyRow = [{}, {}, {}, {}, {}, {}];
 
@@ -2158,14 +2125,7 @@ export default {
               pageSize: "LETTER",
               pageOrientation: "portrait",
               pageMargins: [20, 60, 20, 40],
-              header: getHeader(
-                name,
-                nit,
-                nrc,
-                this.$dateFns.lastDayOfMonth(new Date(dateRange)),
-                "LIBROS DE AUXILIARES",
-                "month"
-              ),
+              header: getHeader(name, nit, nrc, null, reportTitleName, "month"),
               footer: getFooter(),
               content: [
                 {
@@ -2243,7 +2203,7 @@ export default {
           Promise.all([bussinesInfo(), auxiliares()]).then((res) => {
             const [bussinesInfo, auxiliares] = res;
             const { name, nit, nrc } = bussinesInfo.data.info;
-
+            const reportTitleName = auxiliares.data.name;
             const data = [];
             for (const account of auxiliares.data.accounts) {
               data.push([
@@ -2276,17 +2236,7 @@ export default {
             }
             const document = [
               [name],
-              [
-                `LIBROS DE AUXILIARES PARA EL MES DE ${this.$dateFns.format(
-                  new Date(dateRange),
-                  "MMMM - yyyy"
-                )}`,
-                "",
-                "",
-                "",
-                `NIT: ${nit}`,
-                `NRC: ${nrc}`,
-              ],
+              [reportTitleName, "", "", "", `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               [
                 "CÓD. DE LA CUENTA",
