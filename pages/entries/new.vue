@@ -555,6 +555,7 @@ export default {
           },
         ],
       },
+      count:0,
     };
   },
   methods: {
@@ -585,7 +586,9 @@ export default {
           catalogCode: this.accountingCatalog.find(
             (c) => c.id == data.accountingCatalog
           ).code,
+          order:this.count,
         });
+        this.count++;
         this.showNewEntryDetail = false;
         this.checkEntry();
       });

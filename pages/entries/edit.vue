@@ -439,9 +439,14 @@ export default {
               ...d,
               accountingCatalog: d.accountingCatalog.id,
               code: d.accountingCatalog.code,
+              order: !d.order ? entry.data.entry.accountingEntryDetails.indexOF(d)
+              : d.order,
             };
           }
         );
+
+        this.count = 
+        this.accountingEntryDetails[this.accountingEntryDetails.length - 1].order + 1;
         this.checkEntry();
       })
       .catch((err) => {
@@ -535,6 +540,7 @@ export default {
       }
     };
     return {
+      count:0,
       showEditEntryDetail: false,
       showAddEntryDetail: false,
       loading: false,
@@ -702,7 +708,9 @@ export default {
           code: this.accountingCatalog.find(
             (c) => c.id == this.newEntryDetailForm.accountingCatalog
           ).code,
+          order:this.count,
         });
+        this.count++;
         this.showAddEntryDetail = false;
         this.checkEntry();
       });
