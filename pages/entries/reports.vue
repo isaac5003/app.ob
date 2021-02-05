@@ -293,7 +293,7 @@ export default {
             (res) => {
               const [bussinesInfo, estadoResultados, signatures] = res;
               const { name, nit, nrc } = bussinesInfo.data.info;
-              const titleName = estadoResultados.data.name;
+              const reportTitleName = estadoResultados.data.name;
               const estadoResultado = estadoResultados.data.estadoResultados.map(
                 (er) => {
                   return {
@@ -399,13 +399,7 @@ export default {
                 pageSize: "LETTER",
                 pageOrientation: "porttrait",
                 pageMargins: [20, 60, 20, 40],
-                header: getHeader(
-                  name,
-                  nit,
-                  nrc,
-                  this.$dateFns.lastDayOfMonth(new Date(dateRange)),
-                  titleName
-                ),
+                header: getHeader(name, nit, nrc, null, reportTitleName),
                 footer: getFooter(),
                 content: [
                   {
@@ -513,7 +507,7 @@ export default {
             (res) => {
               const [bussinesInfo, estadoResultados, signatures] = res;
               const { name, nit, nrc } = bussinesInfo.data.info;
-              const titleName = estadoResultados.data.name;
+              const reportTitleName = estadoResultados.data.name;
               const estadoResultado = estadoResultados.data.estadoResultados.map(
                 (er) => {
                   return {
@@ -543,7 +537,7 @@ export default {
               }
               const document = [
                 [name],
-                [titleName, `NIT: ${nit}`, `NRC: ${nrc}`],
+                [reportTitleName, `NIT: ${nit}`, `NRC: ${nrc}`],
                 [""],
 
                 [""],
@@ -586,7 +580,7 @@ export default {
             const { name, nit, nrc } = bussinesInfo.data.info;
             const comprobationBalance =
               balanceComprobacion.data.balanceComprobacion;
-            const titleName = balanceComprobacion.data.name;
+            const reportTitleName = balanceComprobacion.data.name;
             const values = [];
             const emptyRow = [{}, {}, {}, {}, {}, {}, {}];
             const mayores = comprobationBalance.filter(
@@ -695,7 +689,7 @@ export default {
               pageSize: "LETTER",
               pageOrientation: "portrait",
               pageMargins: [15, 60, 15, 40],
-              header: getHeader(name, nit, nrc, null, titleName),
+              header: getHeader(name, nit, nrc, null, reportTitleName),
               footer: getFooter(),
               content: [
                 {
@@ -782,7 +776,7 @@ export default {
             const { name, nit, nrc } = bussinesInfo.data.info;
             const comprobationBalance =
               balanceComprobacion.data.balanceComprobacion;
-            const titleName = balanceComprobacion.data.name;
+            const reportTitleName = balanceComprobacion.data.name;
             const data = [];
 
             const mayores = comprobationBalance.filter(
@@ -827,7 +821,7 @@ export default {
             }
             const document = [
               [name],
-              [titleName, "", "", "", `NIT: ${nit}`, `NRC: ${nrc}`],
+              [reportTitleName, "", "", "", `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               [
                 "CÓD. DE LA CUENTA",
@@ -873,7 +867,7 @@ export default {
           Promise.all([general(), bussinesInfo(), signatures()]).then((res) => {
             const [general, bussinesInfo, signatures] = res;
             const [activo, pasivo, patrimonio] = general.data.balanceGeneral;
-            const titleName = general.data.name;
+            const reportTitleName = general.data.name;
             const { name, nit, nrc } = bussinesInfo.data.info;
             const { accountant, auditor, legal } = signatures.data.signatures;
             let activoValues = [];
@@ -992,7 +986,14 @@ export default {
               pageSize: "LETTER",
               pageOrientation: "landscape",
               pageMargins: [15, 55, 15, 40],
-              header: getHeader(name, nit, nrc, null, titleName, "period"),
+              header: getHeader(
+                name,
+                nit,
+                nrc,
+                null,
+                reportTitleName,
+                "period"
+              ),
               footer: getFooter(),
               content: [
                 {
@@ -1166,7 +1167,7 @@ export default {
             const [activo, pasivo, patrimonio] = general.data.balanceGeneral;
             const { name, nit, nrc } = bussinesInfo.data.info;
             const { accountant, auditor, legal } = signatures.data.signatures;
-            const titleName = general.data.name;
+            const reportTitleName = general.data.name;
             let activoValues = [];
             let pasivoValues = [];
             let patrimonioValues = [];
@@ -1215,7 +1216,7 @@ export default {
 
             const document = [
               [name],
-              [titleName, `NIT: ${nit}`, `NRC: ${nrc}`],
+              [reportTitleName, `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               ...activoValues,
               ...pasivoValues,
@@ -1270,7 +1271,7 @@ export default {
                 })
                 .then((res) => {
                   const [activo, pasivo, patrimonio] = res.data.balanceGeneral;
-                  const titleName = res.data.name;
+                  const reportTitleName = res.data.name;
                   let activoValues = [];
                   let pasivoValues = [];
                   let patrimonioValues = [];
@@ -1392,7 +1393,7 @@ export default {
                       nit,
                       nrc,
                       null,
-                      titleName,
+                      reportTitleName,
                       "period"
                     ),
                     footer: getFooter(),
@@ -1582,7 +1583,7 @@ export default {
                 })
                 .then((res) => {
                   const [activo, pasivo, patrimonio] = res.data.balanceGeneral;
-                  const titleName = res.data.name;
+                  const reportTitleName = res.data.name;
                   let activoValues = [];
                   let pasivoValues = [];
                   let patrimonioValues = [];
@@ -1631,7 +1632,7 @@ export default {
 
                   const document = [
                     [name],
-                    [titleName, `NIT: ${nit}`, `NRC: ${nrc}`],
+                    [reportTitleName, `NIT: ${nit}`, `NRC: ${nrc}`],
                     [""],
                     ...activoValues,
                     ...pasivoValues,
@@ -1784,7 +1785,7 @@ export default {
             const [bussinesInfo, libroMayor] = res;
             const { name, nit, nrc } = bussinesInfo.data.info;
             const lib = libroMayor.data.accounts;
-            const titleName = libroMayor.data.name;
+            const reportTitleName = libroMayor.data.name;
             const values = [];
             const emptyRow = [{}, {}, {}, {}, {}, {}];
 
@@ -1875,7 +1876,7 @@ export default {
               pageSize: "LETTER",
               pageOrientation: "portrait",
               pageMargins: [20, 60, 20, 40],
-              header: getHeader(name, nit, nrc, null, titleName, "month"),
+              header: getHeader(name, nit, nrc, null, reportTitleName, "month"),
               footer: getFooter(),
               content: [
                 {
@@ -1953,7 +1954,7 @@ export default {
           Promise.all([bussinesInfo(), libroMayor()]).then((res) => {
             const [bussinesInfo, libroMayor] = res;
             const { name, nit, nrc } = bussinesInfo.data.info;
-            const titleName = libroMayor.data.name;
+            const reportTitleName = libroMayor.data.name;
 
             const data = [];
             for (const account of libroMayor.data.accounts) {
@@ -1987,7 +1988,7 @@ export default {
             }
             const document = [
               [name],
-              [titleName, "", "", "", `NIT: ${nit}`, `NRC: ${nrc}`],
+              [reportTitleName, "", "", "", `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               [
                 "CÓD. DE LA",
@@ -2030,7 +2031,7 @@ export default {
             const [bussinesInfo, auxiliares] = res;
             const { name, nit, nrc } = bussinesInfo.data.info;
             const reporteAuxiliares = auxiliares.data.accounts;
-            const titleName = auxiliares.data.name;
+            const reportTitleName = auxiliares.data.name;
             const values = [];
             const emptyRow = [{}, {}, {}, {}, {}, {}];
 
@@ -2124,7 +2125,7 @@ export default {
               pageSize: "LETTER",
               pageOrientation: "portrait",
               pageMargins: [20, 60, 20, 40],
-              header: getHeader(name, nit, nrc, null, titleName, "month"),
+              header: getHeader(name, nit, nrc, null, reportTitleName, "month"),
               footer: getFooter(),
               content: [
                 {
@@ -2202,7 +2203,7 @@ export default {
           Promise.all([bussinesInfo(), auxiliares()]).then((res) => {
             const [bussinesInfo, auxiliares] = res;
             const { name, nit, nrc } = bussinesInfo.data.info;
-            const titleName = auxiliares.data.name;
+            const reportTitleName = auxiliares.data.name;
             const data = [];
             for (const account of auxiliares.data.accounts) {
               data.push([
@@ -2235,7 +2236,7 @@ export default {
             }
             const document = [
               [name],
-              [titleName, "", "", "", `NIT: ${nit}`, `NRC: ${nrc}`],
+              [reportTitleName, "", "", "", `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               [
                 "CÓD. DE LA CUENTA",
