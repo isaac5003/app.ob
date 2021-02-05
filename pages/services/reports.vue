@@ -48,7 +48,7 @@
           </el-form-item>
         </div>
       </div>
-      <div class=" grid grid-cols-12 gap-4" v-if="requirementForm =='venta'">
+      <div class=" grid grid-cols-12 gap-4" v-if="requirementForm =='seller'">
          <div class="col-span-3">
           <el-form-item label="Seleccione el tipo de venta">
             <el-select
@@ -70,7 +70,7 @@
           </el-form-item>
         </div>
       </div>
-          <div class=" grid grid-cols-12 gap-4" v-if="requirementForm =='estado'">
+          <div class=" grid grid-cols-12 gap-4" v-if="requirementForm =='status'">
          <div class="col-span-3">
           <el-form-item label="Seleccione el reporte de estado">
             <el-select
@@ -93,9 +93,9 @@
         </div>
           </div>
       
-      <div class=" grid grid-cols-12 gap-4" v-if="requirementForm == 'precio'">
+      <div class=" grid grid-cols-12 gap-4" v-if="requirementForm == 'price'">
         <div class="col-span-4">
-          <el-form-item label="Desde">
+          <el-form-item label="Desde" prop="initialCost">
             <el-input-number
             ref="cost"
             type="number"
@@ -104,13 +104,13 @@
             v-model="reportForm.initialCost"
             size="small"
             autocomplete="off"
-            @change="setStorage(servicesNewForm)"
+            @change="setStorage(reportForm)"
             style="width: 100%"
           />
           </el-form-item>
         </div>
           <div class="col-span-4">
-          <el-form-item label="hasta">
+          <el-form-item label="hasta" prop="finalCost">
             <el-input-number
             ref="cost"
             type="number"
@@ -119,7 +119,7 @@
             v-model="reportForm.finalCost"
             size="small"
             autocomplete="off"
-            @change="setStorage(servicesNewForm)"
+            @change="setStorage(reportForm)"
             style="width: 100%"
           />
           </el-form-item>
@@ -140,7 +140,7 @@
           >
         </div>
         <div class="col-start-11 col-span-2">
-          <el-button class="w-full" size="small">Cancelar</el-button>
+          <el-button class="w-full" size="small" @click="$router.push('/services')">Cancelar</el-button>
         </div>
       </div>
     </el-form>
@@ -153,20 +153,26 @@ import Notification from "../../components/Notification";
 import {
   getIcon,
   hasModule,
+  checkBeforeLeave,
   selectValidation,
   getHeader,
   getFooter,
+  inputValidation,
 } from "../../tools";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import XLSX from "xlsx";
 
+const storagekey = "report";
 export default {
   name: "CustomerSettings",
   components: { LayoutContent, Notification },
   fetch() {},
   fetchOnServer: false,
+   beforeRouteLeave(to, from, next) {
+    checkBeforeLeave(this, storagekey, next);
+   },
   data() {
     return {
       generating: false,
@@ -178,19 +184,19 @@ export default {
         },{ id:2, name:"Inactivo"}],
       reports: [
         {
-          id: "servicios",
+          id: "services",
           name: "Reporte servicios",
         },
             {
-          id: "venta",
+          id: "seller",
           name: "Reporte por tipo de venta",
         },
             {
-          id: "estado",
+          id: "status",
           name: "Reporte por tipo de estados",
         },
         {
-          id: "precio",
+          id: "price",
           name: "Reporte por precios",
         },
       ],
@@ -198,36 +204,40 @@ export default {
         reportType: "",
         status:"",
         initialCost:"",
-        finalCost: "",
+        finalCost:"",
         sellingType:"",
         radio: "pdf",
       
       },
       reportFormRules: {
         reportType: selectValidation("change", true),
+        initialCost:inputValidation(true, 0, null, "number"),
+        finalCost: inputValidation(true, 0, null, "number"),
       },
     };
   },
   methods: {
+     setStorage(reportForm) {
+      localStorage.setItem(storagekey, JSON.stringify(reportForm)); 
+     },
     showRequeriments(id){
      if(!id){
        this.requirementForm=null;
      }else {
         switch(id){
-          case"venta":
-          this.requirementForm = "venta";
+          case"seller":
+          this.requirementForm = "seller";
          this.$axios.get("/services/selling-types")
          .then((res)=> {
             this.sellingTypes = res.data.types
             
          }) 
           break;
-          case"estado":
-          this.requirementForm = "estado"
-           
-          break;
-          case"precio":
-          this.requirementForm = "precio"
+          case"status":
+          this.requirementForm = "status"
+           break;
+          case"price":
+          this.requirementForm = "price"
           break;
           default: 
           this.requirementForm = ""
@@ -241,8 +251,7 @@ export default {
         }
         this.generating = true;
         let params = {}
-       if(reportForm.sellingType){
-       
+       if(reportForm.sellingType){ 
          params = {type: reportForm.sellingType}
        }else if(reportForm.status){
          switch(reportForm.status){
@@ -252,17 +261,21 @@ export default {
            case 2:
            params = {active: false }
                        break;
-
+           
          }
-       }
-       
+
+       }else if(reportForm.initialCost && reportForm.finalCost){
+          params ={fromAmount: reportForm.initialCost,
+                   toAmount: reportForm.finalCost}
+         } 
+
        switch (reportForm.reportType) {
-          case "servicios":
+          case "services":
             this.generateServiceReport(reportForm.radio);
             break;
-          case "venta":
-          case "estado": 
-          case "precio":
+          case "seller":
+          case "status": 
+          case "price":
             this.generateEspecialService(params, reportForm.radio)
             break;
         }
@@ -280,9 +293,11 @@ export default {
         const service = services.data.services;
         this.reportForm.sellingType = ""
         this.reportForm.status = ""
+        this.reportForm.initialCost =""
+        this.reportForm.finalCost = ""
+
      // const name = this.reports.find((r)=> this.reportForm.reportType == r.id).name
-     
-            const values = service.map((s) => {
+         const values = service.map((s) => {
               return [
                 { bold: false, text: s.index },
                 { bold: false, text: s.name },
@@ -361,12 +376,11 @@ export default {
         const [bussinesInfo, services] = res;
         const bussines = bussinesInfo.data.company;
         const service = services.data.services;
-        this.reportForm.sellingType = ""
-         this.reportForm.status = ""
-        
-      
-      const name = this.reports.find((r)=> this.reportForm.reportType == r.id).name
-
+       this.reportForm.sellingType = ""
+       this.reportForm.status = ""
+       this.reportForm.initialCost =""
+       this.reportForm.finalCost = "" 
+    //  const name = this.reports.find((r)=> this.reportForm.reportType == r.id).name
             const data = service.map((s) => {
               return [
                 s.index,
