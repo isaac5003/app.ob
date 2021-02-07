@@ -439,14 +439,11 @@ export default {
               ...d,
               accountingCatalog: d.accountingCatalog.id,
               code: d.accountingCatalog.code,
-              order: !d.order ? entry.data.entry.accountingEntryDetails.indexOF(d)
-              : d.order,
+              order: !d.order ? entry.data.entry.accountingEntryDetails.indexOf(d) + 1 : d.order,
+            
             };
           }
         );
-
-        this.count = 
-        this.accountingEntryDetails[this.accountingEntryDetails.length - 1].order + 1;
         this.checkEntry();
       })
       .catch((err) => {
@@ -454,9 +451,7 @@ export default {
         this.errorMessage = err.response.data.message;
       });
   },
-
   // checkBeforeEnter(this, storagekey, "salesNewForm");
-
   fetchOnServer: false,
   data() {
     const newCargoValidateCompare = (rule, value, callback) => {
@@ -540,7 +535,7 @@ export default {
       }
     };
     return {
-      count:0,
+    
       showEditEntryDetail: false,
       showAddEntryDetail: false,
       loading: false,
@@ -708,9 +703,8 @@ export default {
           code: this.accountingCatalog.find(
             (c) => c.id == this.newEntryDetailForm.accountingCatalog
           ).code,
-          order:this.count,
+         
         });
-        this.count++;
         this.showAddEntryDetail = false;
         this.checkEntry();
       });
@@ -720,7 +714,6 @@ export default {
         if (!valid) {
           return false;
         }
-
         this.accountingEntryDetails.splice(index, 1, { ...form });
         this.showEditEntryDetail = false;
         this.checkEntry();
@@ -744,7 +737,6 @@ export default {
         if (!valid) {
           return false;
         }
-
         const save = () => {
           this.$confirm(
             "¿Estás seguro que deseas actualizar esta partida?",
@@ -762,7 +754,6 @@ export default {
                       header: {
                         title: formData.title,
                         date: formData.rawDate,
-
                         squared: formData.squared,
                         accounted: formData.accounted,
                         accountingEntryType: formData.accountingEntryType,
@@ -771,6 +762,7 @@ export default {
                         return {
                           ...d,
                           accountingCatalog: d.accountingCatalog,
+                         order: !d.order ? details.indexOf(d) + 1 : d.order,
                         };
                       }),
                     })
