@@ -8,7 +8,7 @@ export default {
         hid: "description",
         name: "description",
         content:
-          "Sistema de soporte para la gestión empresarial, que permite tener acceso a herramientas de soporte operativo y administrativo.",
+          "Sistema de soporte para la gesti�n empresarial, que permite tener acceso a herramientas de soporte operativo y administrativo.",
       },
     ],
     link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
