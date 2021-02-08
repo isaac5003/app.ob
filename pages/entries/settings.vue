@@ -1810,13 +1810,14 @@ const general = () => this.$axios.get("/entries/setting/general")
     //general
     fetchGeneral(){
       this.$axios.get('/entries/setting/general')
-      .then((res) => this.fiscalPeriodForm.startDate = res.general.data.general.periodStart,
-                     this.fiscalPeriodForm.startDate = res.general.data.general.peridoEnd );
+      .then((res) => {this.fiscalPeriodForm.startDate = res.data.general.periodStart,
+                     this.fiscalPeriodForm.startDate = res.data.general.peridoEnd} );
     },
+    
     //asignatura
-    signatures(){
+    fetchAsignatures(){
       this.$axios.get('/entries/setting/signatures')
-      .then((res) => this.firmantesForm = res.signatures.data.signatures) 
+      .then((res) => this.firmantesForm = res.signatures.data.signatures);
     },
     //  CatalogAccount
     openMayorAccountDialog() {
@@ -2469,7 +2470,7 @@ const general = () => this.$axios.get("/entries/setting/general")
                     title: "Exito",
                     message: res.data.message,
                   });
-                  this.signature();
+                  this.fetchAsignatures();
                   instance.confirmButtonLoading = false;
                   instance.confirmButtonText = "Si, guardar";
                   done();
