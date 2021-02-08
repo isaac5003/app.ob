@@ -69,8 +69,18 @@
               :disabled="reportForm.reportType ? false : true"
               class="w-full"
             >
-              <el-radio border size="small" label="pdf">PDF</el-radio>
-              <el-radio border size="small" label="excel">Excel</el-radio>
+              <el-row :gutter="15">
+                <el-col :span="8">
+                  <el-radio border label="pdf" size="small" class="w-full"
+                    >PDF</el-radio
+                  >
+                </el-col>
+                <el-col :span="8">
+                  <el-radio border label="excel" size="small" class="w-full"
+                    >EXCEL</el-radio
+                  >
+                </el-col>
+              </el-row>
             </el-radio-group>
           </el-form-item>
         </div>
@@ -87,6 +97,7 @@
               value-format="yyyy-MM"
               placeholder="Selecciona un mes"
               size="small"
+              style="width: 100%"
             />
           </el-form-item>
         </div>
@@ -110,7 +121,7 @@
             />
           </el-form-item>
         </div>
-        <div class="col-span-4">
+        <div class="col-span-8">
           <el-form-item label="Cuentas:">
             <el-select
               v-model="catalogos"
@@ -120,6 +131,7 @@
               filterable
               multiple
               default-first-option
+              class="w-full"
             >
               <el-option
                 v-for="catalog in accountingCatalog"
@@ -139,24 +151,16 @@
       </div>
 
       <!-- Guardar y Cancelar -->
-      <div class="grid grid-cols-12 gap-4">
-        <div class="col-start-9 col-span-2">
-          <el-button
-            :disabled="reportForm.reportType ? false : true"
-            type="primary"
-            class="w-full"
-            size="small"
-            icon="el-icon-download"
-            native-type="submit"
-            :loading="generating"
-            >Descargar</el-button
-          >
-        </div>
-        <div class="col-start-11 col-span-2">
-          <el-button class="w-full" size="small" @click="cancel()"
-            >Cancelar</el-button
-          >
-        </div>
+      <div class="flex flex-row justify-end">
+        <el-button
+          :disabled="reportForm.reportType ? false : true"
+          type="primary"
+          size="small"
+          icon="el-icon-download"
+          native-type="submit"
+          :loading="generating"
+          >Descargar</el-button
+        ><el-button size="small" @click="cancel()">Cancelar</el-button>
       </div>
     </el-form>
   </layout-content>
@@ -1036,7 +1040,15 @@ export default {
                   layout: "noBorders",
                   table: {
                     headerRows: 2,
-                    widths: ["12%", "auto", "10%", "9%", "9%", "9%", "10%"],
+                    widths: [
+                      "12%",
+                      "auto",
+                      "10%",
+                      "9.5%",
+                      "9.5%",
+                      "9.5%",
+                      "10%",
+                    ],
                     heights: -5,
                     body: [
                       [
@@ -1237,13 +1249,17 @@ export default {
                 "",
                 {
                   text: this.$options.filters.formatMoney(a.total),
+                  alignment: "right",
                   style: "tableHeader",
                 },
               ]);
               for (const ch of a.accounts) {
                 activoValues.push([
                   { text: ch.name, margin: [10, 0, 0, 0] },
-                  this.$options.filters.formatMoney(ch.total),
+                  {
+                    text: this.$options.filters.formatMoney(ch.total),
+                    alignment: "right",
+                  },
                   "",
                 ]);
               }
@@ -1272,12 +1288,16 @@ export default {
                 {
                   text: this.$options.filters.formatMoney(a.total),
                   style: "tableHeader",
+                  alignment: "right",
                 },
               ]);
               for (const ch of a.accounts) {
                 pasivoValues.push([
                   { text: ch.name, margin: [10, 0, 0, 0] },
-                  this.$options.filters.formatMoney(ch.total),
+                  {
+                    text: this.$options.filters.formatMoney(ch.total),
+                    alignment: "right",
+                  },
                   "",
                 ]);
               }
@@ -1306,12 +1326,16 @@ export default {
                 {
                   text: this.$options.filters.formatMoney(a.total),
                   style: "tableHeader",
+                  alignment: "right",
                 },
               ]);
               for (const ch of a.accounts) {
                 patrimonioValues.push([
                   { text: ch.name, margin: [10, 0, 0, 0] },
-                  this.$options.filters.formatMoney(ch.total),
+                  {
+                    text: this.$options.filters.formatMoney(ch.total),
+                    alignment: "right",
+                  },
                   "",
                 ]);
               }
@@ -1502,7 +1526,6 @@ export default {
             this.generating = false;
             pdfMake.createPdf(docDefinition).open();
           });
-
           break;
         case "excel":
           Promise.all([general(), bussinesInfo(), signatures()]).then((res) => {
@@ -1587,9 +1610,6 @@ export default {
             this.generating = false;
           });
 
-          break;
-
-        default:
           break;
       }
     },
@@ -2075,7 +2095,7 @@ export default {
                           style: "tableHeader",
                         },
                       ],
-                      ...values,
+                      ...data,
                     ],
                   },
                 },

@@ -13,7 +13,7 @@
       width="900px"
       :append-to-body="true"
     >
-      <div class="flex flex-col space-y-2">
+      <div class="flex flex-col space-y-2 text-xs">
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-6 flex flex-col">
             <span class="font-semibold">Nombre o razón social</span>
@@ -37,7 +37,7 @@
               <el-tag size="small" type="warning" v-else>Inactivo</el-tag>
             </div>
           </div>
-          <div class="col-span-2 flex flex-col">
+          <div class="col-span-2 flex flex-col" v-if="hasModule()">
             <span class="font-semibold">Es proveedor</span>
             <div>
               <el-tag size="small" type="warning" class="w-auto">{{
@@ -133,7 +133,6 @@
             placeholder="Seleccionar"
             size="small"
             class="w-full"
-            filterable
             clearable
             default-first-option
             @change="fetchCustomers"
@@ -157,46 +156,44 @@
         </el-form-item>
       </el-form>
       <el-table
-      @sort-change="sortBy"
+        @sort-change="sortBy"
         :data="customers.customers"
         stripe
         size="mini"
         v-loading="tableloading"
       >
         <el-table-column prop="index" width="40" />
-        <el-table-column 
-        label="Nombre"
-        prop="name" 
-        width="360"
-         sortable="custom" />
+        <el-table-column label="Nombre" min-width="360" sortable="custom">
+          <template slot-scope="scope">
+            <div class="flex flex-col">
+              <span class="font-semibold text-xs">
+                {{ scope.row.shortName }}
+              </span>
+              <span>
+                {{ scope.row.name }}
+              </span>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column
           label="Tipo"
           prop="customerType.id"
           width="130"
           sortable="custom"
-        ><template slot-scope="scope">
-              <span>
-                {{ scope.row.customerType.name }}
-              </span>
-              </template>
+        >
+          <template slot-scope="scope">
+            <span>
+              {{ scope.row.customerType.name }}
+            </span>
+          </template>
         </el-table-column>
-        <el-table-column 
-        label="NIT" 
-        prop="nit" 
-        width="150" 
-        sortable="custom"
-        />
-        <el-table-column 
-        label="NRC" 
-        prop="nrc" 
-        width="90"
-        sortable="custom" 
-        />
-        <el-table-column 
-        label="Estado" 
-        width="110"
-        prop="isActiveCustomer"
-        sortable="custom"
+        <el-table-column label="NIT" prop="nit" width="150" sortable="custom" />
+        <el-table-column label="NRC" prop="nrc" width="90" sortable="custom" />
+        <el-table-column
+          label="Estado"
+          width="110"
+          prop="isActiveCustomer"
+          sortable="custom"
         >
           <template slot-scope="scope">
             <el-tag
@@ -213,7 +210,7 @@
             >
           </template>
         </el-table-column>
-        <el-table-column label width="80" align="center">
+        <el-table-column label width="70" align="center">
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />
@@ -274,6 +271,7 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
+import { hasModule } from "../../tools/index.js";
 export default {
   name: "CustomersIndex",
   head: {
@@ -308,10 +306,10 @@ export default {
         customers: [],
         count: 0,
       },
-       filter:{
-         prop:"",
-         order:null
-       },
+      filter: {
+        prop: "",
+        order: null,
+      },
       page: {
         limit: 10,
         page: 1,
@@ -330,11 +328,11 @@ export default {
       if (this.searchValue !== "") {
         params = { ...params, search: this.searchValue.toLowerCase() };
       }
-      if(this.filter.order){
-        params ={
+      if (this.filter.order) {
+        params = {
           ...params,
-          prop:this.filter.prop,
-          order:this.filter.order,
+          prop: this.filter.prop,
+          order: this.filter.order,
         };
       }
 
@@ -432,15 +430,17 @@ export default {
 
     async openCustomerPreview({ id }) {
       const { data } = await this.$axios.get(`/customers/${id}`);
-      this.selectedCustomer = data.customer;
-      this.showCustomerPreview = true;
+      (this.selectedCustomer = data.customer),
+        (this.showCustomerPreview = true);
     },
-     
-     sortBy({column, prop, order }){
-       this.filter.prop = prop;
-       this.filter.order = order;
-       this.fetchCustomers();
-     }
+    hasModule() {
+      return hasModule("f6000cbb-1e6d-4f7d-a7cc-cadd78d23076", this.$auth.user);
+    },
+    sortBy({ column, prop, order }) {
+      this.filter.prop = prop;
+      this.filter.order = order;
+      this.fetchCustomers();
+    },
   },
 };
 </script>

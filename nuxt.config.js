@@ -29,6 +29,9 @@ export default {
   router: {
     middleware: ["auth"],
   },
+  dateFns: {
+    defaultLocale: "es",
+  },
   axios: {
     baseURL: "https://devapi.openbox.cloud/",
     //baseURL: "http://localhost:5001",

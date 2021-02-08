@@ -59,8 +59,18 @@
                 :disabled="filterForm.report ? false : true"
                 class="w-full"
               >
-                <el-radio border size="small" label="pdf">PDF</el-radio>
-                <el-radio border size="small" label="excel">Excel</el-radio>
+                <el-row :gutter="15">
+                  <el-col :span="8">
+                    <el-radio border label="pdf" size="small" class="w-full"
+                      >PDF</el-radio
+                    >
+                  </el-col>
+                  <el-col :span="8">
+                    <el-radio border label="excel" size="small" class="w-full"
+                      >EXCEL</el-radio
+                    >
+                  </el-col>
+                </el-row>
               </el-radio-group>
             </el-form-item>
           </div>
@@ -259,27 +269,25 @@
             </div>
           </div>
         </div>
-        <div class="flex justify-end gap-4">
-          <el-form-item>
-            <el-button
-              type="primary"
-              size="small"
-              icon="el-icon-download"
-              :disabled="filterForm.report ? false : true"
-              :loading="generating"
-              native-type="submit"
-              >Descargar
-            </el-button>
-          </el-form-item>
-
-          <el-form-item>
-            <el-button @click="cancel" size="small"> Cancelar </el-button>
-          </el-form-item>
+        <div class="flex flex-row justify-end">
+          <el-button
+            type="primary"
+            size="small"
+            icon="el-icon-download"
+            :disabled="filterForm.report ? false : true"
+            :loading="generating"
+            native-type="submit"
+            >Descargar
+          </el-button>
+          <el-button size="small" @click="$router.push('/invoices')"
+            >Cancelar</el-button
+          >
         </div>
       </el-form>
     </div>
   </layout-content>
 </template>
+
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";

@@ -464,7 +464,7 @@ export default {
         address2: "",
         phone: "",
         email: "",
-        country: "",
+        country:1,
         state: "",
         city: "",
       },
