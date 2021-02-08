@@ -8,7 +8,7 @@ export default {
         hid: "description",
         name: "description",
         content:
-          "Sistema de soporte para la gestión empresarial, que permite tener acceso a herramientas de soporte operativo y administrativo.",
+          "Sistema de soporte para la gestiï¿½n empresarial, que permite tener acceso a herramientas de soporte operativo y administrativo.",
       },
     ],
     link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
@@ -33,7 +33,7 @@ export default {
     defaultLocale: "es",
   },
   axios: {
-    baseURL: "https://api2.openbox.cloud/",
+    baseURL: "https://devapi.openbox.cloud/",
     //baseURL: "http://localhost:5001",
   },
   googleFonts: {

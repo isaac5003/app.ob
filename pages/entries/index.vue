@@ -602,7 +602,6 @@ export default {
                       nrc,
                       null,
                       accountingEntry.title,
-                      null,
                       preTitle
                     ),
                     footer: getFooter(),
