@@ -402,7 +402,7 @@ export default {
         );
       } else {
         callback();
-      }
+      } 
     };
     const newAbonoValidateCompare = (rule, value, callback) => {
       const cargo =
@@ -585,6 +585,7 @@ export default {
           catalogCode: this.accountingCatalog.find(
             (c) => c.id == data.accountingCatalog
           ).code,
+     
         });
         this.showNewEntryDetail = false;
         this.checkEntry();
@@ -674,7 +675,7 @@ export default {
         if (!valid) {
           return false;
         }
-        console.log(formData);
+      
 
         const save = () => {
           this.$confirm(
@@ -705,6 +706,7 @@ export default {
                           concept: d.concept,
                           cargo: d.cargo,
                           abono: d.abono,
+                          order:details.indexOf(d)+1,
                         };
                       }),
                     })
