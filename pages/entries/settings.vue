@@ -1362,24 +1362,38 @@ export default {
     if (this.$route.query.utab) {
       this.utab = this.$route.query.utab;
     }
-   const accountCatalogs = () =>
+    const accountCatalogs = () =>
       this.$axios.get("/entries/catalog", { params: this.page });
     const accounts = () => this.$axios.get("/entries/catalog");
     const balance = () => this.$axios.get("/entries/setting/balance-general");
     const results = () => this.$axios.get("/entries/setting/estado-resultados");
     const signatures = () => this.$axios.get("/entries/setting/signatures");
-const general = () => this.$axios.get("/entries/setting/general")
-  
-    Promise.all([accountCatalogs(), accounts(), balance(), results(), signatures(), general()])
+    const general = () => this.$axios.get("/entries/setting/general");
+
+    Promise.all([
+      accountCatalogs(),
+      accounts(),
+      balance(),
+      results(),
+      signatures(),
+      general(),
+    ])
       .then((res) => {
-        const [accountCatalogs, accounts, balance, results, signatures, general] = res;
+        const [
+          accountCatalogs,
+          accounts,
+          balance,
+          results,
+          signatures,
+          general,
+        ] = res;
         this.accounts = accountCatalogs.data.accountingCatalog;
         this.accountsCount = accountCatalogs.data.count;
         this.catalogs = accounts.data.accountingCatalog;
         this.tableData = balance.data.balanceGeneral.report;
-       this.firmantesForm = signatures.data.signatures;
-       this.fiscalPeriodForm.startDate = general.data.general.periodStart
-       this.fiscalPeriodForm.endDate = general.data.general.peridoEnd
+        this.firmantesForm = signatures.data.signatures;
+        this.fiscalPeriodForm.startDate = general.data.general.periodStart;
+        this.fiscalPeriodForm.endDate = general.data.general.peridoEnd;
         this.specialAccounts = { ...balance.data.balanceGeneral.special };
         this.tablesData = results.data.estadoResultados.map((r) => {
           const obj = { ...r };
@@ -1458,7 +1472,6 @@ const general = () => this.$axios.get("/entries/setting/general")
     };
 
     return {
-
       pageloading: true,
       tableloading: false,
       tab: "general",
@@ -1808,16 +1821,18 @@ const general = () => this.$axios.get("/entries/setting/general")
   },
   methods: {
     //general
-    fetchGeneral(){
-      this.$axios.get('/entries/setting/general')
-      .then((res) => {this.fiscalPeriodForm.startDate = res.data.general.periodStart,
-                     this.fiscalPeriodForm.startDate = res.data.general.peridoEnd} );
+    fetchGeneral() {
+      this.$axios.get("/entries/setting/general").then((res) => {
+        (this.fiscalPeriodForm.startDate = res.data.general.periodStart),
+          (this.fiscalPeriodForm.endDate = res.data.general.peridoEnd);
+      });
     },
-    
+
     //asignatura
-    fetchAsignatures(){
-      this.$axios.get('/entries/setting/signatures')
-      .then((res) => this.firmantesForm = res.signatures.data.signatures);
+    fetchAsignatures() {
+      this.$axios
+        .get("/entries/setting/signatures")
+        .then((res) => (this.firmantesForm = res.signatures.data.signatures));
     },
     //  CatalogAccount
     openMayorAccountDialog() {
@@ -2428,7 +2443,6 @@ const general = () => this.$axios.get("/entries/setting/general")
                   this.$notify.success({
                     title: "Exito",
                     message: res.data.message,
-                     
                   });
                   this.fetchGeneral();
                   instance.confirmButtonLoading = false;
