@@ -168,7 +168,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 1 &&
-                  selectedInvoice.documentType.id != 3
+                    selectedInvoice.documentType.id != 3
                 "
                 >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
               >
@@ -184,7 +184,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 2 &&
-                  selectedInvoice.documentType.id != 3
+                    selectedInvoice.documentType.id != 3
                 "
                 >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
               >
@@ -200,7 +200,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 3 ||
-                  selectedInvoice.documentType.id == 3
+                    selectedInvoice.documentType.id == 3
                 "
                 >{{
                   (selectedInvoice.documentType.id == 1
@@ -595,6 +595,9 @@
                   >
                     <i class="el-icon-edit-outline"></i> Editar documento
                   </el-dropdown-item>
+                  <el-dropdown-item>
+                    <i class="el-icon-check"></i> Marcar como pagado
+                  </el-dropdown-item>
                   <el-dropdown-item
                     v-if="scope.row.status.id == 1"
                     @click.native="
@@ -604,9 +607,12 @@
                     <i class="el-icon-printer"></i>
                     Imprimir documento
                   </el-dropdown-item>
-                  <el-dropdown-item v-if="scope.row.status.id == 2"  @click.native="
+                  <el-dropdown-item
+                    v-if="scope.row.status.id == 2"
+                    @click.native="
                       printInvoice(scope.row.id, scope.row.documentType)
-                    ">
+                    "
+                  >
                     <i class="el-icon-printer"></i> Re imprimir documento
                   </el-dropdown-item>
                   <el-dropdown-item
@@ -623,11 +629,11 @@
                     class="font-semibold"
                     v-if="
                       scope.row.status.id == '1' &&
-                      !isLastInvoice(
-                        scope.row.sequence,
-                        scope.row.documentType.id,
-                        scope.row.authorization
-                      )
+                        !isLastInvoice(
+                          scope.row.sequence,
+                          scope.row.documentType.id,
+                          scope.row.authorization
+                        )
                     "
                     @click.native="deleteInvoice(scope.row)"
                   >
@@ -639,12 +645,12 @@
                     @click.native="voidDocument(scope.row)"
                     v-if="
                       scope.row.status.id === '2' ||
-                      (isLastInvoice(
-                        scope.row.sequence,
-                        scope.row.documentType.id,
-                        scope.row.authorization
-                      ) &&
-                        scope.row.status.id != '3')
+                        (isLastInvoice(
+                          scope.row.sequence,
+                          scope.row.documentType.id,
+                          scope.row.authorization
+                        ) &&
+                          scope.row.status.id != '3')
                     "
                   >
                     <i class="el-icon-circle-close"></i>
