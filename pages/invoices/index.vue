@@ -168,7 +168,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 1 &&
-                  selectedInvoice.documentType.id != 3
+                    selectedInvoice.documentType.id != 3
                 "
                 >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
               >
@@ -184,7 +184,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 2 &&
-                  selectedInvoice.documentType.id != 3
+                    selectedInvoice.documentType.id != 3
                 "
                 >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
               >
@@ -200,7 +200,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 3 ||
-                  selectedInvoice.documentType.id == 3
+                    selectedInvoice.documentType.id == 3
                 "
                 >{{
                   (selectedInvoice.documentType.id == 1
@@ -604,9 +604,12 @@
                     <i class="el-icon-printer"></i>
                     Imprimir documento
                   </el-dropdown-item>
-                  <el-dropdown-item v-if="scope.row.status.id == 2"  @click.native="
+                  <el-dropdown-item
+                    v-if="scope.row.status.id == 2"
+                    @click.native="
                       printInvoice(scope.row.id, scope.row.documentType)
-                    ">
+                    "
+                  >
                     <i class="el-icon-printer"></i> Re imprimir documento
                   </el-dropdown-item>
                   <el-dropdown-item
@@ -623,11 +626,11 @@
                     class="font-semibold"
                     v-if="
                       scope.row.status.id == '1' &&
-                      !isLastInvoice(
-                        scope.row.sequence,
-                        scope.row.documentType.id,
-                        scope.row.authorization
-                      )
+                        !isLastInvoice(
+                          scope.row.sequence,
+                          scope.row.documentType.id,
+                          scope.row.authorization
+                        )
                     "
                     @click.native="deleteInvoice(scope.row)"
                   >
@@ -639,12 +642,12 @@
                     @click.native="voidDocument(scope.row)"
                     v-if="
                       scope.row.status.id === '2' ||
-                      (isLastInvoice(
-                        scope.row.sequence,
-                        scope.row.documentType.id,
-                        scope.row.authorization
-                      ) &&
-                        scope.row.status.id != '3')
+                        (isLastInvoice(
+                          scope.row.sequence,
+                          scope.row.documentType.id,
+                          scope.row.authorization
+                        ) &&
+                          scope.row.status.id != '3')
                     "
                   >
                     <i class="el-icon-circle-close"></i>
@@ -1186,7 +1189,7 @@ export default {
                       const documentType = invoice.data.invoice.documentType;
                       // Ventas no sujetas
                       pdfDocument.text(
-                        sellingType.id == 1
+                        sellingType.id == 1 && documentType.id != 3
                           ? this.$options.filters.formatMoney(ventaPrice)
                           : "",
                         conf.details.sujeto.position[0] + position_x,
@@ -1194,7 +1197,7 @@ export default {
                       );
                       // Ventas exentas
                       pdfDocument.text(
-                        sellingType.id == 2
+                        sellingType.id == 2 && documentType.id != 3
                           ? this.$options.filters.formatMoney(ventaPrice)
                           : "",
                         conf.details.exento.position[0] + position_x,
@@ -1202,8 +1205,18 @@ export default {
                       );
                       // Ventas afectas
                       pdfDocument.text(
-                        sellingType.id == 3
-                          ? this.$options.filters.formatMoney(ventaPrice)
+                        sellingType.id == 3 || documentType.id == 3
+                          ? documentType.id == 1
+                            ? this.$options.filters.formatMoney(
+                                parseFloat(ventaPrice) * (incTax ? 1 : 1.13)
+                              )
+                            : documentType.id == 2
+                            ? this.$options.filters.formatMoney(
+                                parseFloat(ventaPrice) / (incTax ? 1.13 : 1)
+                              )
+                            : this.$options.filters.formatMoney(
+                                parseFloat(ventaPrice)
+                              )
                           : "",
                         conf.details.afecto.position[0] + position_x,
                         position_y
