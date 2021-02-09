@@ -94,7 +94,7 @@
           </div>
       
       <div class=" grid grid-cols-12 gap-4" v-if="requirementForm == 'price'">
-        <div class="col-span-4">
+        <div class="col-span-2">
           <el-form-item label="Desde" prop="initialCost">
             <el-input-number
             ref="cost"
@@ -109,7 +109,7 @@
           />
           </el-form-item>
         </div>
-          <div class="col-span-4">
+          <div class="col-span-2">
           <el-form-item label="hasta" prop="finalCost">
             <el-input-number
             ref="cost"
@@ -302,6 +302,7 @@ export default {
                 { bold: false, text: s.index },
                 { bold: false, text: s.name },
                 { bold: false, text: s.description },
+                 { bold: false, text: s.active ? "Activo" :"Inactivo"},
                 {
                   bold: false,
                   text: this.$options.filters.formatMoney(s.cost),
@@ -328,7 +329,7 @@ export default {
                   layout: "noBorders",
                   table: {
                     headerRows: 1,
-                    widths: ["3%", "40%", "40%", "8.5%", "8.5%"],
+                    widths: ["3%", "36%", "36%","8.5%","8.5%", "8.5%"],
                     heights: -5,
                     body: [
                       [
@@ -342,6 +343,10 @@ export default {
                         },
                         {
                           text: "Descripción",
+                          style: "tableHeader",
+                        },
+                          {
+                          text: "Estado",
                           style: "tableHeader",
                         },
                         {
@@ -386,6 +391,7 @@ export default {
                 s.index,
                 s.name,
                 s.description,
+                s.active ? "Activo" :"Inactivo",
                 this.$options.filters.formatMoney(s.cost),
                 s.sellingType.name,
               ];
@@ -401,7 +407,7 @@ export default {
                 `NRC: ${bussines.nrc}`,
               ],
               [""],
-              ["#", "Nombre", "Descripción", "Costo", "Tipo de venta"],
+              ["#", "Nombre", "Descripción", "Estado","Costo", "Tipo de venta"],
               [""],
               ...data,
             ];
