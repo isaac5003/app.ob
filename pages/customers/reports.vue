@@ -166,7 +166,7 @@ export default {
         switch (id) {
           case "clientes":
             this.$axios
-              .get("/customers", { params: { active: true } })
+              .get("/customers")
               .then((res) => {
                 this.customers.push(...res.data.customers);
                 this.requirementForm = "clientes";
