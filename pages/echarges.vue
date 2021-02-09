@@ -2,7 +2,7 @@
   <div class="flex">
     <layout-submenu
       page-name="Cobros electrónicos"
-      :menu="hasModule() ? menu2 : menu"
+      :menu="hasModule() ? menu : ''"
       icon="collection"
     />
     <nuxt-child />
@@ -23,52 +23,62 @@ export default {
 
   data() {
     return {
-      menu: [
-        {
-          name: "Nuevo cobro",
-          icon: getIcon("plus"),
-          path: "/echarges/new",
-        },
-        {
-          name: "Listado de cobros",
-          icon: getIcon("menu"),
-          path: "/echarges",
-          epath: ["/echarges/edit"],
-        },
-        {
-          name: "Reportes",
-          icon: getIcon("document-text"),
-          path: "/echarges/reports",
-        },
-        {
-          name: "Configuraciones",
-          icon: getIcon("cog"),
-          path: "/echarges/reports",
-        },
-      ],
-      menu2: [
-        {
-          name: "Listado de cobros",
-          icon: getIcon("menu"),
-          path: "/echarges",
-          epath: ["/echarges/edit"],
-        },
-        {
-          name: "Reportes",
-          icon: getIcon("document-text"),
-          path: "/echarges/reports",
-        },
-        {
-          name: "Configuraciones",
-          icon: getIcon("cog"),
-          path: "/echarges/reports",
-        },
-      ],
+      modules: false,
+      menu: [],
     };
   },
   methods: {
-    hasModule() {
-      return hasModule("cfb8addb-541b-482f-8fa1-dfe5db03fdf4", this.$auth.user);
+    async hasModule() {
+      this.modules = hasModule(
+        "cfb8addb-541b-482f-8fa1-dfe5db03fdf4",
+        this.$auth.user
+      );
+      let menu = null;
+      if (this.modules) {
+        menu = [
+          {
+            name: "Listado de cobros",
+            icon: getIcon("menu"),
+            path: "/echarges",
+            epath: ["/echarges/edit"],
+          },
+          {
+            name: "Reportes",
+            icon: getIcon("document-text"),
+            path: "/echarges/reports",
+          },
+          {
+            name: "Configuraciones",
+            icon: getIcon("cog"),
+            path: "/echarges/reports",
+          },
+        ];
+      } else {
+        menu = [
+          {
+            name: "Nuevo cobro",
+            icon: getIcon("plus"),
+            path: "/echarges/new",
+          },
+          {
+            name: "Listado de cobros",
+            icon: getIcon("menu"),
+            path: "/echarges",
+            epath: ["/echarges/edit"],
+          },
+          {
+            name: "Reportes",
+            icon: getIcon("document-text"),
+            path: "/echarges/reports",
+          },
+          {
+            name: "Configuraciones",
+            icon: getIcon("cog"),
+            path: "/echarges/reports",
+          },
+        ];
+      }
+      this.menu = menu;
     },
   },
 };

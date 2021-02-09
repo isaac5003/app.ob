@@ -46,6 +46,7 @@ import { getIcon } from "../../tools";
 
 export default {
   name: "Submenu",
+
   props: ["pageName", "menu", "icon"],
   fetchOnServer: false,
   methods: {
