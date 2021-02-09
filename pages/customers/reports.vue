@@ -329,11 +329,7 @@ export default {
             const branches = branch.data.branches;
             const values = [];
             const valuesTable = [];
-            const emptyRow = [
-              {
-                text: "  ",
-              },
-            ];
+
             values.push([
               {
                 text: "  ",
@@ -346,6 +342,7 @@ export default {
                   {
                     text: customerData.name,
                   },
+                  { text: ` (${customerData.shortName})` },
                 ],
               },
             ]);
@@ -363,6 +360,7 @@ export default {
             ]);
             values.push([
               {
+                style: "generalInfo",
                 text: [
                   {
                     bold: true,
@@ -392,30 +390,31 @@ export default {
               {
                 bold: true,
                 text: "Información Tributaria",
-                border: [true, false, false, false],
+                style: "generalInfo",
               },
             ]);
             values.push([
               {
+                style: "generalInfo",
                 text: [
                   {
                     bold: true,
                     text: "NRC: ",
                   },
                   {
-                    text: customerData.nrc,
+                    text: customerData.nrc ? customerData.nrc : "-------",
                   },
                   {
                     bold: true,
                     text: "     NIT: ",
                   },
-                  { text: customerData.nit },
+                  { text: customerData.nit ? customerData.nit : "-------" },
                   {
                     bold: true,
-                    text: "     Giro: ",
+                    text: "     GIRO: ",
                   },
                   {
-                    text: customerData.giro,
+                    text: customerData.giro ? customerData.giro : " -------",
                   },
                 ],
               },
@@ -430,7 +429,8 @@ export default {
             values.push([
               {
                 bold: true,
-                text: "Sucursales",
+                text: "SUCURSALES",
+                style: "generalInfo",
               },
             ]);
             for (const br of branches) {
@@ -456,15 +456,24 @@ export default {
             }
 
             const docDefinition = {
+              info: {
+                title: `reporte_perfil_cliente_${customerData.name}`,
+              },
               pageSize: "LETTER",
               pageOrientation: "portrait",
               pageMargins: [20, 60, 20, 40],
-              header: getHeader(name, nit, nrc, null, "REPORTE CLIENTES"),
+              header: getHeader(
+                name,
+                nit,
+                nrc,
+                null,
+                `REPORTE DEL PERFIL DE ${customerData.name}`
+              ),
               footer: getFooter(),
               content: [
                 ...values,
                 {
-                  fontSize: 9,
+                  fontSize: 10,
                   layout: "noBorders",
                   table: {
                     headerRows: 1,
@@ -507,10 +516,10 @@ export default {
               styles: {
                 tableHeader: {
                   bold: true,
-                  fontSize: 9,
+                  fontSize: 10,
                 },
-                defaultStyle: {
-                  fontSize: 9,
+                generalInfo: {
+                  fontSize: 10,
                 },
               },
             };
@@ -519,31 +528,79 @@ export default {
           });
           break;
         case "excel":
-          Promise.all([customers(), bussinesInfo()]).then((res) => {
-            const [customers, bussinesInfo] = res;
+          Promise.all([bussinesInfo(), customer(), branches()]).then((res) => {
+            const [bussinesInfo, customer, branch] = res;
+
             const { name, nit, nrc } = bussinesInfo.data.info;
-            const customersData = customers.data.customers;
+            const customerData = customer.data.customer;
+            const branches = branch.data.branches;
             const values = [];
-            for (const c of customersData) {
-              values.push([
-                c.name,
-                c.customerType.name,
-                c.nit,
-                c.nrc,
-                c.isActiveCustomer ? "Activo" : "Inactivo",
+            const valuesTable = [];
+            values.push(["  "]);
+            values.push([
+              "Nombre:",
+              customerData.name,
+              `(${customerData.shortName})`,
+            ]);
+            values.push(["  "]);
+            values.push(["Información General"]);
+            values.push([
+              "Estado: ",
+              customerData.isActiveCustomer
+                ? "Activo        "
+                : "Inactivo      ",
+              "Tipo de cliente: ",
+              customerData.customerType.name,
+            ]);
+            values.push(["  "]);
+            values.push(["Información Tributaria"]);
+            values.push([
+              "NRC: ",
+              customerData.nrc ? customerData.nrc : "-------",
+              "     NIT: ",
+              customerData.nit ? customerData.nit : "-------",
+              "     GIRO: ",
+              customerData.giro ? customerData.giro : " -------",
+            ]);
+
+            values.push(["  "]);
+
+            values.push(["SUCURSALES"]);
+            for (const br of branches) {
+              valuesTable.push([
+                br.name,
+                br.address1,
+                br.address2,
+                br.city.name,
+                br.state.name,
+                br.country.name,
               ]);
             }
+
             const document = [
               [name],
-              ["REPORTE CLIENTES", `NIT: ${nit}`, `NRC: ${nrc}`],
+              [
+                `REPORTE DEL PERFIL DE ${customerData.name}`,
+                `NIT: ${nit}`,
+                `NRC: ${nrc}`,
+              ],
               [""],
-              ["NOMBRE", "TIPO", "NIT", "NRC", "ESTADO"],
               ...values,
+
+              [
+                "NOMBRE",
+                "DIRECCIÓN 1",
+                "DIRECCIÓN 2",
+                "CIUDAD",
+                "DEPARTAMENTO",
+                "PAIS",
+              ],
+              ...valuesTable,
             ];
 
             const sheet = XLSX.utils.aoa_to_sheet(document);
             const workbook = XLSX.utils.book_new();
-            const fileName = "report";
+            const fileName = `reporte_cliente_${customerData.shortName}`;
             XLSX.utils.book_append_sheet(workbook, sheet, fileName);
             XLSX.writeFile(workbook, `${fileName}.xlsx`);
             this.generating = false;
