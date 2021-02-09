@@ -261,7 +261,7 @@ export default {
       reports: [
         {
           id: 1,
-          name: "Detalle de reportes",
+          name: "Listado genaral",
         },
       ],
       page: {
