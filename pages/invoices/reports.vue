@@ -93,7 +93,8 @@
                 </el-date-picker>
               </el-form-item>
             </div>
-            <div class="col-span-4">
+            <template>
+                <div class="col-span-4">
               <el-form-item label="Cliente:">
                 <el-select
                   v-model="filterForm.customer"
@@ -112,6 +113,8 @@
                       :label="item.name"
                       :value="item.id"
                     >
+                       <span style="float: right; color: #8492a6;">{{`${item.name}` }}</span>
+                      <span style="float: left;">{{ `${item.name }` }}</span>
                     </el-option>
                   </el-option-group>
                   <el-option-group key="INACTIVOS" label="INACTIVOS">
@@ -121,11 +124,15 @@
                       :label="item.name"
                       :value="item.id"
                     >
+                        <span style="float: right; color: #8492a6;">{{`${item.name}` }}</span>
+                      <span style="float: left;">{{ `${item.name }` }}</span>
                     </el-option>
                   </el-option-group>
                 </el-select>
               </el-form-item>
             </div>
+            </template>
+          <template>
             <div class="col-span-2">
               <el-form-item label="Tipo fact:">
                 <el-select
@@ -137,16 +144,21 @@
                 >
                   <el-option label="Todos los tipos" value="" />
                   <el-option
+                  style="width:103%"
                     v-for="item in documentTypes"
                     :key="item.id"
                     :label="`${item.code} - ${item.name}`"
                     :value="item.id"
                   >
+                  <span style="float: right; color: #8492a6;">{{`${item.name}` }}</span>
+                      <span style="float: left;">{{ `${item.name }` }}</span>
                   </el-option>
                 </el-select>
               </el-form-item>
             </div>
-            <div class="col-span-2">
+          </template>
+            <template>
+               <div class="col-span-2">
               <el-form-item label="Estado:">
                 <el-select
                   v-model="filterForm.status"
@@ -157,19 +169,25 @@
                 >
                   <el-option label="Todos los estados" value="" />
                   <el-option
+                   style="width:103%"
                     v-for="item in statuses"
                     :key="item.id"
                     :label="item.name"
                     :value="item.id"
                   >
+                        <span style="float: right; color: #8492a6;">{{`${item.name}` }}</span>
+                      <span style="float: left;">{{ `${item.name }` }}</span>
                   </el-option>
                 </el-select>
               </el-form-item>
             </div>
+            </template>
+           
           </div>
           <!-- div vendedor, zona servicio-->
           <div class="grid grid-cols-12 gap-4">
-            <div class="col-span-3">
+          <template>
+              <div class="col-span-3">
               <el-form-item label="Vendedor:">
                 <el-select
                   v-model="filterForm.seller"
@@ -188,6 +206,8 @@
                       :label="item.name"
                       :value="item.id"
                     >
+                       <span style="float: right; color: #8492a6;">{{`${item.name}` }}</span>
+                      <span style="float: left;">{{ `${item.name }` }}</span>
                     </el-option>
                   </el-option-group>
                   <el-option-group key="INACTIVOS" label="INACTIVOS">
@@ -197,12 +217,16 @@
                       :label="item.name"
                       :value="item.id"
                     >
+                       <span style="float: right; color: #8492a6;">{{`${item.name}` }}</span>
+                      <span style="float: left;">{{ `${item.name }` }}</span>
                     </el-option>
                   </el-option-group>
                 </el-select>
               </el-form-item>
             </div>
-            <div class="col-span-3">
+          </template>
+           <template>
+               <div class="col-span-3">
               <el-form-item label="Zona:">
                 <el-select
                   v-model="filterForm.zone"
@@ -221,6 +245,8 @@
                       :label="item.name"
                       :value="item.id"
                     >
+                      <span style="float: right; color: #8492a6;">{{`${item.name}` }}</span>
+                      <span style="float: left;">{{ `${item.name }` }}</span>
                     </el-option>
                   </el-option-group>
                   <el-option-group key="INACTIVOS" label="INACTIVOS">
@@ -230,12 +256,16 @@
                       :label="item.name"
                       :value="item.id"
                     >
+                      <span style="float: right; color: #8492a6;">{{`${item.name}` }}</span>
+                      <span style="float: left;">{{ `${item.name }` }}</span>
                     </el-option>
                   </el-option-group>
                 </el-select>
               </el-form-item>
             </div>
-            <div class="col-span-3">
+           </template>
+          <template>
+              <div class="col-span-3">
               <el-form-item label="Servicios:">
                 <el-select
                   v-model="filterForm.service"
@@ -253,6 +283,8 @@
                       :label="item.name"
                       :value="item.id"
                     >
+                      <span style="float: right; color: #8492a6;">{{`${item.name}` }}</span>
+                      <span style="float: left;">{{ `${item.name }` }}</span>
                     </el-option>
                   </el-option-group>
                   <el-option-group key="INACTIVOS" label="INACTIVOS">
@@ -267,6 +299,8 @@
                 </el-select>
               </el-form-item>
             </div>
+          </template>
+          
           </div>
         </div>
         <div class="flex flex-row justify-end">

@@ -291,7 +291,8 @@
           <!-- first row -->
           <div class="grid grid-cols-12 gap-4">
             <!-- tipo de documento -->
-            <div class="col-span-3">
+            <template>
+               <div class="col-span-3">
               <el-form-item label="Tipo de documento" prop="documentType">
                 <el-select
                   v-model="salesNewForm.documentType"
@@ -313,6 +314,8 @@
                 </el-select>
               </el-form-item>
             </div>
+            </template>
+           
             <!-- n° autorizacion -->
             <div class="col-span-2 col-start-7">
               <el-form-item label="N° de autorización">
@@ -359,7 +362,8 @@
           <!-- second row -->
           <div class="grid grid-cols-12 gap-4">
             <!-- cliente -->
-            <div class="col-span-4">
+            <template>
+              <div class="col-span-4">
               <el-form-item label="Cliente" prop="customer">
                 <el-select
                   v-model="salesNewForm.customer"
@@ -378,12 +382,17 @@
                     :value="c.id"
                     @change="setStorage(salesNewForm)"
                   >
+                     <span style="float: right; color: #8492a6;">{{`${c.name}` }}</span>
+                      <span style="float: left;">{{ `${c.name }` }}</span>
                   </el-option>
                 </el-select>
               </el-form-item>
             </div>
+            </template>
+            
             <!-- sucursal -->
-            <div class="col-span-2">
+            <template>
+                <div class="col-span-2">
               <el-form-item label="Sucursal" prop="customerBranch">
                 <el-select
                   v-model="salesNewForm.customerBranch"
@@ -401,12 +410,17 @@
                     :label="br.name"
                     :value="br.id"
                   >
+                     <!-- <span style="float: right; color: #8492a6;">{{`${br.name}` }}</span>
+                      <span style="float: left;">{{ `${br.name }` }}</span> -->
                   </el-option>
                 </el-select>
               </el-form-item>
             </div>
+            </template>
+          
             <!-- condiciones de pago -->
-            <div class="col-span-3">
+            <template>
+                <div class="col-span-3">
               <el-form-item
                 label="Condiciones de pago"
                 prop="invoicesPaymentsCondition"
@@ -426,13 +440,16 @@
                     :label="p.name"
                     :value="p.id"
                   >
+                  <span style="float: right; color: #8492a6;">{{`${p.name}` }}</span>
+                      <span style="float: left;">{{ `${p.name }` }}</span>
                   </el-option>
                 </el-select>
               </el-form-item>
             </div>
-
+            </template>
             <!-- Venta a cuenta de -->
-            <div class="col-span-3">
+            <template>
+              <div class="col-span-3">
               <el-form-item label="Venta a cuenta de" prop="invoicesSellers">
                 <el-select
                   v-model="salesNewForm.invoicesSellers"
@@ -449,10 +466,14 @@
                     :label="s.name"
                     :value="s.id"
                   >
+                   <span style="float: right; color: #8492a6;">{{`${s.name}` }}</span>
+                      <span style="float: left;">{{ `${s.name }` }}</span>
                   </el-option>
                 </el-select>
               </el-form-item>
             </div>
+            </template>
+            
           </div>
           <!-- third row -->
           <div class="grid grid-cols-12 gap-4 text-xs">

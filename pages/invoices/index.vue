@@ -320,7 +320,8 @@
               @change="fetchInvoices"
             />
           </el-form-item>
-          <el-form-item label="Cliente:" class="col-span-4">
+          <template>
+             <el-form-item label="Cliente:" class="col-span-4">
             <el-select
               v-model="filter.customer"
               size="small"
@@ -338,7 +339,10 @@
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"
-                />
+                >
+                  <span style="float: right; color: #8492a6;">{{`${item.name}` }}</span>
+                      <span style="float: left;">{{ `${item.name }` }}</span>
+                </el-option>
               </el-option-group>
               <el-option-group key="INACTIVOS" label="INACTIVOS">
                 <el-option
@@ -346,11 +350,16 @@
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"
-                />
+                >
+                 <span style="float: right; color: #8492a6; font-size: 13px">{{`${item.name}` }}</span>
+                      <span style="float: left; font-size: 13px">{{ `${item.name }` }}</span>
+                </el-option>
               </el-option-group>
             </el-select>
           </el-form-item>
-          <el-form-item label="Tipo de documento:" class="col-span-2">
+          </template>
+         <template>
+              <el-form-item label="Tipo de documento:" class="col-span-2">
             <el-select
               v-model="filter.documentType"
               size="small"
@@ -361,14 +370,23 @@
             >
               <el-option label="Todos los tipos" value="" />
               <el-option
+                style="width:103%"
                 v-for="item in documentTypes"
                 :key="item.id"
                 :label="`${item.code} - ${item.name}`"
                 :value="item.id"
-              />
+              >
+                  <span style="float: right; color: #8492a6;">{{`${item.name}`}}</span>
+                   <span style="float: right; color: #8492a6;">{{`${item.code}`}}-</span>
+                  <span style="float: left;">{{ `${item.code }` }}-</span>
+                 <span style="float: left; ">{{ `${item.name }`}}</span>
+              </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="Estado:" class="col-span-2">
+         </template>
+       
+       <template>
+           <el-form-item label="Estado:" class="col-span-2">
             <el-select
               v-model="filter.status"
               size="small"
@@ -379,14 +397,22 @@
             >
               <el-option label="Todos los estados" value="" />
               <el-option
+               style="width:105%; text-align:center;"
+               class="text:center"
                 v-for="status in statuses"
                 :key="status.id"
                 :label="status.name"
                 :value="status.id"
-              />
+              >
+                <span style="float: right; color: #8492a6; text-align:right;">{{`${status.name}` }}</span>
+                      <span style="float: left; ">{{ `${status.name }` }}</span>
+              </el-option>
             </el-select>
           </el-form-item>
+       </template>
+        
         </div>
+        <template></template>
         <div class="grid grid-cols-12 gap-4">
           <el-form-item label="Vendedor:" class="col-span-3">
             <el-select
@@ -406,7 +432,10 @@
                   :key="seller.id"
                   :label="seller.name"
                   :value="seller.id"
-                />
+                >
+                  <span style="float: right; color: #8492a6;">{{`${seller.name}` }}</span>
+                      <span style="float: left; ">{{ `${seller.name }` }}</span>
+                </el-option>
               </el-option-group>
               <el-option-group key="INACTIVOS" label="INACTIVOS">
                 <el-option
@@ -414,11 +443,15 @@
                   :key="seller.id"
                   :label="seller.name"
                   :value="seller.id"
-                />
+                >
+                  <span style="float: right; color: #8492a6;">{{`${seller.name}` }}</span>
+                      <span style="float: left; ">{{ `${seller.name }` }}</span>
+                </el-option>
               </el-option-group>
             </el-select>
           </el-form-item>
-          <el-form-item label="Zona:" class="col-span-3">
+          <template>
+            <el-form-item label="Zona:" class="col-span-3">
             <el-select
               v-model="filter.zone"
               size="small"
@@ -436,7 +469,11 @@
                   :key="zone.id"
                   :label="zone.name"
                   :value="zone.id"
-                />
+                >
+                    <span style="float: right; color: #8492a6;">{{`${zone.name}` }}</span>
+                      <span style="float: left; ">{{ `${zone.name }` }}</span>
+                 </el-option>
+              
               </el-option-group>
               <el-option-group key="INACTIVOS" label="INACTIVOS">
                 <el-option
@@ -444,11 +481,15 @@
                   :key="zone.id"
                   :label="zone.name"
                   :value="zone.id"
-                />
+                >
+                <span style="float: right; color: #8492a6;">{{`${zone.name}` }}</span>
+                      <span style="float: left; ">{{ `${zone.name }` }}</span>
+                </el-option>
               </el-option-group>
             </el-select>
-          </el-form-item>
-          <el-form-item label="Servicios:" class="col-span-3">
+          </el-form-item></template>
+          <template>
+             <el-form-item label="Servicios:" class="col-span-3">
             <el-select
               v-model="filter.service"
               size="small"
@@ -466,7 +507,11 @@
                   :key="service.id"
                   :label="service.name"
                   :value="service.id"
-                />
+                >
+                
+                    <span style="float: right; color: #8492a6;">{{`${service.name}` }}</span>
+                      <span style="float: left;">{{ `${service.name }` }}</span>
+                </el-option>
               </el-option-group>
               <el-option-group key="INACTIVOS" label="INACTIVOS">
                 <el-option
@@ -474,10 +519,15 @@
                   :key="service.id"
                   :label="service.name"
                   :value="service.id"
-                />
+                >
+                 <span style="float: right; color: #8492a6;">{{`${service.name}` }}</span>
+                      <span style="float: left;">{{ `${service.name }` }}</span>
+                </el-option>
               </el-option-group>
             </el-select>
           </el-form-item>
+          </template>
+         
         </div>
       </el-form>
       <div class="flex flex-col space-y-2">
