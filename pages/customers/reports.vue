@@ -172,6 +172,8 @@ export default {
               .catch((err) => err.data.errorMessage);
 
             break;
+          default:
+            this.requirementForm = "";
         }
       }
     },
@@ -398,13 +400,6 @@ export default {
                       ? "Activo        "
                       : "Inactivo      ",
                   },
-                  {
-                    bold: true,
-                    text: "Tipo de cliente: ",
-                  },
-                  {
-                    text: customerData.customerType.name,
-                  },
                 ],
               },
             ]);
@@ -423,13 +418,15 @@ export default {
             ]);
             values.push([
               {
-                text: "  ",
-              },
-            ]);
-
-            values.push([
-              {
-                text: "  ",
+                text: [
+                  {
+                    bold: true,
+                    text: "Tipo de cliente: ",
+                  },
+                  {
+                    text: customerData.customerType.name,
+                  },
+                ],
               },
             ]);
 
@@ -444,17 +441,45 @@ export default {
                   {
                     text: customerData.nrc ? customerData.nrc : "-------",
                   },
+                ],
+              },
+            ]);
+            values.push([
+              {
+                text: [
                   {
                     bold: true,
-                    text: "     NIT: ",
+                    text: "NIT: ",
                   },
                   { text: customerData.nit ? customerData.nit : "-------" },
+                ],
+              },
+            ]);
+            values.push([
+              {
+                text: [
                   {
                     bold: true,
-                    text: "     GIRO: ",
+                    text: "GIRO: ",
                   },
                   {
                     text: customerData.giro ? customerData.giro : " -------",
+                  },
+                ],
+              },
+            ]);
+            values.push([
+              {
+                text: [
+                  {
+                    bold: true,
+                    text: "Tipo de persona natural: ",
+                  },
+                  {
+                    text:
+                      customerData.customerType.id == 2
+                        ? customerData.customerTypeNatural.name
+                        : "",
                   },
                 ],
               },
