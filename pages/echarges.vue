@@ -41,7 +41,7 @@ export default {
         {
           name: "Configuraciones",
           icon: getIcon("cog"),
-          path: "/echarges/reports",
+          path: "/echarges/settings",
         },
       ],
     };
