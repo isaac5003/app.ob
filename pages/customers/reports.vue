@@ -139,22 +139,20 @@ export default {
       reportForm: {
         reportType: "",
         radio: "pdf",
-        customers: 1,
+        customers: "",
       },
       reportFormRules: {
         reportType: selectValidation("change", true),
         dateRange: selectValidation("change", true),
         customers: selectValidation(true),
       },
-      reports: [{ name: "Clientes", id: "clientes" }],
+      reports: [
+        { name: "Listado de clientes", id: "clientes" },
+        { name: "Perfil de cliente", id: "perfil" },
+      ],
       requirementForm: null,
       accountingCatalog: [],
-      customers: [
-        {
-          id: 1,
-          name: "Todos los clientes",
-        },
-      ],
+      customers: null,
     };
   },
 
@@ -164,11 +162,11 @@ export default {
         this.requirementForm = null;
       } else {
         switch (id) {
-          case "clientes":
+          case "perfil":
             this.$axios
               .get("/customers")
               .then((res) => {
-                this.customers.push(...res.data.customers);
+                this.customers = res.data.customers;
                 this.requirementForm = "clientes";
               })
               .catch((err) => err.data.errorMessage);
@@ -186,11 +184,10 @@ export default {
         this.generating = true;
         switch (reportType) {
           case "clientes":
-            if (customers == 1) {
-              this.reportCustomers(radio);
-            } else {
-              this.reportCustomer(customers, radio);
-            }
+            this.reportCustomers(radio);
+            break;
+          case "perfil":
+            this.reportCustomer(customers, radio);
             break;
         }
       });
@@ -329,33 +326,63 @@ export default {
             const branches = branch.data.branches;
             const values = [];
             const valuesTable = [];
-
             values.push([
               {
-                text: "  ",
+                bold: true,
+                text: "INFORMACIÓN GENERAL",
+                style: "generalInfo",
               },
             ]);
             values.push([
               {
                 text: [
-                  { bold: true, text: "Nombre: " },
+                  { bold: true, style: "generalInfo", text: "Nombre: " },
                   {
                     text: customerData.name,
                   },
-                  { text: ` (${customerData.shortName})` },
                 ],
               },
             ]);
             values.push([
               {
-                text: "  ",
+                text: [
+                  { bold: true, style: "generalInfo", text: "Identificador: " },
+                  {
+                    text: customerData.shortName,
+                  },
+                ],
               },
             ]);
             values.push([
               {
-                bold: true,
-                text: "Información General",
-                border: [true, false, false, false],
+                text: [
+                  { bold: true, style: "generalInfo", text: "Contacto: " },
+                  {
+                    text: customerData.customerBranches.contacName
+                      ? customerData.customerBranches.contacName
+                      : "----------------",
+                  },
+                ],
+              },
+            ]);
+            values.push([
+              {
+                text: [
+                  { bold: true, style: "generalInfo", text: "Telefono: " },
+                  {
+                    text: customerData.customerBranches.contactInfo,
+                  },
+                ],
+              },
+            ]);
+            values.push([
+              {
+                text: [
+                  { bold: true, style: "generalInfo", text: "Correo: " },
+                  {
+                    text: customerData.customerBranches.contactInfo,
+                  },
+                ],
               },
             ]);
             values.push([
@@ -381,6 +408,7 @@ export default {
                 ],
               },
             ]);
+
             values.push([
               {
                 text: "  ",
@@ -389,10 +417,22 @@ export default {
             values.push([
               {
                 bold: true,
-                text: "Información Tributaria",
+                text: "INFORMACIÓN TRIBUTARIA",
                 style: "generalInfo",
               },
             ]);
+            values.push([
+              {
+                text: "  ",
+              },
+            ]);
+
+            values.push([
+              {
+                text: "  ",
+              },
+            ]);
+
             values.push([
               {
                 style: "generalInfo",
@@ -462,13 +502,7 @@ export default {
               pageSize: "LETTER",
               pageOrientation: "portrait",
               pageMargins: [20, 60, 20, 40],
-              header: getHeader(
-                name,
-                nit,
-                nrc,
-                null,
-                `REPORTE DEL PERFIL DE ${customerData.name}`
-              ),
+              header: getHeader(name, nit, nrc, null, `PERFIL DE CLIENTE`),
               footer: getFooter(),
               content: [
                 ...values,
@@ -516,11 +550,14 @@ export default {
               styles: {
                 tableHeader: {
                   bold: true,
-                  fontSize: 10,
+                  fontSize: 9,
                 },
                 generalInfo: {
-                  fontSize: 10,
+                  fontSize: 9,
                 },
+              },
+              defaultStyle: {
+                fontSize: 9,
               },
             };
             this.generating = false;
