@@ -2,7 +2,7 @@
   <div class="flex">
     <layout-submenu
       page-name="Cobros electrónicos"
-      :menu="menu"
+      :menu="hasModule() ? menu2 : menu"
       icon="collection"
     />
     <nuxt-child />
@@ -12,6 +12,7 @@
 <script>
 import LayoutSubmenu from "../components/layout/Submenu";
 import { getIcon } from "../tools";
+import { hasModule } from "../tools/index.js";
 export default {
   name: "Echarges",
   middleware: "access",
@@ -19,6 +20,7 @@ export default {
     id: "09a5c668-ab54-441e-9fb2-d24b36ae202e",
   },
   components: { LayoutSubmenu },
+
   data() {
     return {
       menu: [
@@ -44,7 +46,30 @@ export default {
           path: "/echarges/reports",
         },
       ],
+      menu2: [
+        {
+          name: "Listado de cobros",
+          icon: getIcon("menu"),
+          path: "/echarges",
+          epath: ["/echarges/edit"],
+        },
+        {
+          name: "Reportes",
+          icon: getIcon("document-text"),
+          path: "/echarges/reports",
+        },
+        {
+          name: "Configuraciones",
+          icon: getIcon("cog"),
+          path: "/echarges/reports",
+        },
+      ],
     };
+  },
+  methods: {
+    hasModule() {
+      return hasModule("cfb8addb-541b-482f-8fa1-dfe5db03fdf4", this.$auth.user);
+    },
   },
 };
 </script>
