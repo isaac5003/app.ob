@@ -168,7 +168,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 1 &&
-                  selectedInvoice.documentType.id != 3
+                    selectedInvoice.documentType.id != 3
                 "
                 >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
               >
@@ -184,7 +184,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 2 &&
-                  selectedInvoice.documentType.id != 3
+                    selectedInvoice.documentType.id != 3
                 "
                 >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
               >
@@ -200,7 +200,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 3 ||
-                  selectedInvoice.documentType.id == 3
+                    selectedInvoice.documentType.id == 3
                 "
                 >{{
                   (selectedInvoice.documentType.id == 1
@@ -626,11 +626,11 @@
                     class="font-semibold"
                     v-if="
                       scope.row.status.id == '1' &&
-                      !isLastInvoice(
-                        scope.row.sequence,
-                        scope.row.documentType.id,
-                        scope.row.authorization
-                      )
+                        !isLastInvoice(
+                          scope.row.sequence,
+                          scope.row.documentType.id,
+                          scope.row.authorization
+                        )
                     "
                     @click.native="deleteInvoice(scope.row)"
                   >
@@ -642,12 +642,12 @@
                     @click.native="voidDocument(scope.row)"
                     v-if="
                       scope.row.status.id === '2' ||
-                      (isLastInvoice(
-                        scope.row.sequence,
-                        scope.row.documentType.id,
-                        scope.row.authorization
-                      ) &&
-                        scope.row.status.id != '3')
+                        (isLastInvoice(
+                          scope.row.sequence,
+                          scope.row.documentType.id,
+                          scope.row.authorization
+                        ) &&
+                          scope.row.status.id != '3')
                     "
                   >
                     <i class="el-icon-circle-close"></i>
@@ -1076,7 +1076,6 @@ export default {
               Promise.all([invoice(), document()])
                 .then((res) => {
                   const [invoice, document] = res;
-                  console.log(invoice, document);
                   try {
                     const vadd = 1;
                     const hadd = 3;
@@ -1339,7 +1338,6 @@ export default {
 
                     window.open(pdfDocument.output("bloburl"), "_blank");
                   } catch (error) {
-                    console.log(error);
                     this.$message.error(
                       "Error al generar el PDF, contacta con tu administrador."
                     );
