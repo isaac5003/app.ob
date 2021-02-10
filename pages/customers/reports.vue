@@ -133,6 +133,7 @@ export default {
 
   data() {
     return {
+      errorMessage: "",
       generating: false,
       loading: false,
       errorMessage: "",
@@ -320,274 +321,286 @@ export default {
       const bussinesInfo = () => this.$axios.get("/business/info");
       switch (fileType) {
         case "pdf":
-          Promise.all([bussinesInfo(), customer(), branches()]).then((res) => {
-            const [bussinesInfo, customer, branch] = res;
+          Promise.all([bussinesInfo(), customer(), branches()])
+            .then((res) => {
+              const [bussinesInfo, customer, branch] = res;
 
-            const { name, nit, nrc } = bussinesInfo.data.info;
-            const customerData = customer.data.customer;
-            const branches = branch.data.branches;
-            const values = [];
-            const valuesTable = [];
-            values.push([
-              {
-                bold: true,
-                text: "INFORMACIÓN GENERAL",
-                style: "generalInfo",
-              },
-            ]);
-            values.push([
-              {
-                text: [
-                  { bold: true, style: "generalInfo", text: "Nombre: " },
-                  {
-                    text: customerData.name,
-                  },
-                ],
-              },
-            ]);
-            values.push([
-              {
-                text: [
-                  { bold: true, style: "generalInfo", text: "Identificador: " },
-                  {
-                    text: customerData.shortName,
-                  },
-                ],
-              },
-            ]);
-            values.push([
-              {
-                text: [
-                  { bold: true, style: "generalInfo", text: "Contacto: " },
-                  {
-                    text: customerData.customerBranches.contacName
-                      ? customerData.customerBranches.contacName
-                      : "----------------",
-                  },
-                ],
-              },
-            ]);
-            values.push([
-              {
-                text: [
-                  { bold: true, style: "generalInfo", text: "Telefono: " },
-                  {
-                    text: customerData.customerBranches.contactInfo,
-                  },
-                ],
-              },
-            ]);
-            values.push([
-              {
-                text: [
-                  { bold: true, style: "generalInfo", text: "Correo: " },
-                  {
-                    text: customerData.customerBranches.contactInfo,
-                  },
-                ],
-              },
-            ]);
-            values.push([
-              {
-                style: "generalInfo",
-                text: [
-                  {
-                    bold: true,
-                    text: "Estado: ",
-                  },
-                  {
-                    text: customerData.isActiveCustomer
-                      ? "Activo        "
-                      : "Inactivo      ",
-                  },
-                ],
-              },
-            ]);
-
-            values.push([
-              {
-                text: "  ",
-              },
-            ]);
-            values.push([
-              {
-                bold: true,
-                text: "INFORMACIÓN TRIBUTARIA",
-                style: "generalInfo",
-              },
-            ]);
-            values.push([
-              {
-                text: [
-                  {
-                    bold: true,
-                    text: "Tipo de cliente: ",
-                  },
-                  {
-                    text: customerData.customerType.name,
-                  },
-                ],
-              },
-            ]);
-
-            values.push([
-              {
-                style: "generalInfo",
-                text: [
-                  {
-                    bold: true,
-                    text: "NRC: ",
-                  },
-                  {
-                    text: customerData.nrc ? customerData.nrc : "-------",
-                  },
-                ],
-              },
-            ]);
-            values.push([
-              {
-                text: [
-                  {
-                    bold: true,
-                    text: "NIT: ",
-                  },
-                  { text: customerData.nit ? customerData.nit : "-------" },
-                ],
-              },
-            ]);
-            values.push([
-              {
-                text: [
-                  {
-                    bold: true,
-                    text: "GIRO: ",
-                  },
-                  {
-                    text: customerData.giro ? customerData.giro : " -------",
-                  },
-                ],
-              },
-            ]);
-            values.push([
-              {
-                text: [
-                  {
-                    bold: true,
-                    text: "Tipo de persona natural: ",
-                  },
-                  {
-                    text:
-                      customerData.customerType.id == 2
-                        ? customerData.customerTypeNatural.name
-                        : "",
-                  },
-                ],
-              },
-            ]);
-
-            values.push([
-              {
-                text: "  ",
-              },
-            ]);
-
-            values.push([
-              {
-                bold: true,
-                text: "SUCURSALES",
-                style: "generalInfo",
-              },
-            ]);
-            for (const br of branches) {
-              valuesTable.push([
+              const { name, nit, nrc } = bussinesInfo.data.info;
+              const customerData = customer.data.customer;
+              const branches = branch.data.branches;
+              const values = [];
+              const valuesTable = [];
+              values.push([
                 {
-                  text: br.name,
-                },
-                {
-                  text: br.address1,
-                },
-                {
-                  text: br.address2,
-                },
-                { text: br.city.name },
-                {
-                  text: br.state.name,
-                },
-
-                {
-                  text: br.country.name,
+                  bold: true,
+                  text: "INFORMACIÓN GENERAL",
+                  style: "generalInfo",
                 },
               ]);
-            }
-
-            const docDefinition = {
-              info: {
-                title: `reporte_perfil_cliente_${customerData.name}`,
-              },
-              pageSize: "LETTER",
-              pageOrientation: "portrait",
-              pageMargins: [20, 60, 20, 40],
-              header: getHeader(name, nit, nrc, null, `PERFIL DE CLIENTE`),
-              footer: getFooter(),
-              content: [
-                ...values,
+              values.push([
                 {
-                  fontSize: 10,
-                  layout: "noBorders",
-                  table: {
-                    headerRows: 1,
+                  text: [
+                    { bold: true, style: "generalInfo", text: "Nombre: " },
+                    {
+                      text: customerData.name,
+                    },
+                  ],
+                },
+              ]);
+              values.push([
+                {
+                  text: [
+                    {
+                      bold: true,
+                      style: "generalInfo",
+                      text: "Identificador: ",
+                    },
+                    {
+                      text: customerData.shortName,
+                    },
+                  ],
+                },
+              ]);
+              values.push([
+                {
+                  text: [
+                    { bold: true, style: "generalInfo", text: "Contacto: " },
+                    {
+                      text: customerData.customerBranches.contacName
+                        ? customerData.customerBranches.contacName
+                        : "----------------",
+                    },
+                  ],
+                },
+              ]);
+              values.push([
+                {
+                  text: [
+                    { bold: true, style: "generalInfo", text: "Telefono: " },
+                    {
+                      text: customerData.customerBranches.contactInfo,
+                    },
+                  ],
+                },
+              ]);
+              values.push([
+                {
+                  text: [
+                    { bold: true, style: "generalInfo", text: "Correo: " },
+                    {
+                      text: customerData.customerBranches.contactInfo,
+                    },
+                  ],
+                },
+              ]);
+              values.push([
+                {
+                  style: "generalInfo",
+                  text: [
+                    {
+                      bold: true,
+                      text: "Estado: ",
+                    },
+                    {
+                      text: customerData.isActiveCustomer
+                        ? "Activo        "
+                        : "Inactivo      ",
+                    },
+                  ],
+                },
+              ]);
 
-                    widths: ["30%", "20%", "15%", "10%", "15%", "10%"],
-                    heights: -5,
-                    body: [
-                      [
-                        {
-                          text: "NOMBRE",
-                          style: "tableHeader",
-                        },
-                        {
-                          text: "DIRECCION 1",
-                          style: "tableHeader",
-                        },
-                        {
-                          text: "DIRECCIÓN 2",
-                          style: "tableHeader",
-                        },
+              values.push([
+                {
+                  text: "  ",
+                },
+              ]);
+              values.push([
+                {
+                  bold: true,
+                  text: "INFORMACIÓN TRIBUTARIA",
+                  style: "generalInfo",
+                },
+              ]);
+              values.push([
+                {
+                  text: [
+                    {
+                      bold: true,
+                      text: "Tipo de cliente: ",
+                    },
+                    {
+                      text: customerData.customerType.name,
+                    },
+                  ],
+                },
+              ]);
 
-                        {
-                          text: "MUNICIPIO",
-                          style: "tableHeader",
-                        },
-                        {
-                          text: "DEPARTAMENTO",
-                          style: "tableHeader",
-                        },
-                        {
-                          text: "PAIS",
-                          style: "tableHeader",
-                        },
+              values.push([
+                {
+                  style: "generalInfo",
+                  text: [
+                    {
+                      bold: true,
+                      text: "NRC: ",
+                    },
+                    {
+                      text: customerData.nrc ? customerData.nrc : "-------",
+                    },
+                  ],
+                },
+              ]);
+              values.push([
+                {
+                  text: [
+                    {
+                      bold: true,
+                      text: "NIT: ",
+                    },
+                    { text: customerData.nit ? customerData.nit : "-------" },
+                  ],
+                },
+              ]);
+              values.push([
+                {
+                  text: [
+                    {
+                      bold: true,
+                      text: "GIRO: ",
+                    },
+                    {
+                      text: customerData.giro ? customerData.giro : " -------",
+                    },
+                  ],
+                },
+              ]);
+              values.push([
+                {
+                  text: [
+                    {
+                      bold: true,
+                      text:
+                        customerData.customerType.id == 2
+                          ? "Tipo de persona natural: "
+                          : "",
+                    },
+                    {
+                      text:
+                        customerData.customerType.id == 2
+                          ? customerData.customerTypeNatural.name
+                          : "",
+                    },
+                  ],
+                },
+              ]);
+
+              values.push([
+                {
+                  text: "  ",
+                },
+              ]);
+
+              values.push([
+                {
+                  bold: true,
+                  text: "SUCURSALES",
+                  style: "generalInfo",
+                },
+              ]);
+              for (const br of branches) {
+                valuesTable.push([
+                  {
+                    text: br.name,
+                  },
+                  {
+                    text: br.address1,
+                  },
+                  {
+                    text: br.address2,
+                  },
+                  { text: br.city.name },
+                  {
+                    text: br.state.name,
+                  },
+
+                  {
+                    text: br.country.name,
+                  },
+                ]);
+              }
+
+              const docDefinition = {
+                info: {
+                  title: `reporte_perfil_cliente_${customerData.name}`,
+                },
+                pageSize: "LETTER",
+                pageOrientation: "portrait",
+                pageMargins: [20, 60, 20, 40],
+                header: getHeader(name, nit, nrc, null, `PERFIL DE CLIENTE`),
+                footer: getFooter(),
+                content: [
+                  ...values,
+                  {
+                    fontSize: 10,
+                    layout: "noBorders",
+                    table: {
+                      headerRows: 1,
+
+                      widths: ["auto", "25%", "25%", "10%", "15%", "10%"],
+                      heights: -5,
+                      body: [
+                        [
+                          {
+                            text: "NOMBRE",
+                            style: "tableHeader",
+                          },
+                          {
+                            text: "DIRECCION 1",
+                            style: "tableHeader",
+                          },
+                          {
+                            text: "DIRECCIÓN 2",
+                            style: "tableHeader",
+                          },
+
+                          {
+                            text: "MUNICIPIO",
+                            style: "tableHeader",
+                          },
+                          {
+                            text: "DEPARTAMENTO",
+                            style: "tableHeader",
+                          },
+                          {
+                            text: "PAIS",
+                            style: "tableHeader",
+                          },
+                        ],
+                        ...valuesTable,
                       ],
-                      ...valuesTable,
-                    ],
+                    },
+                  },
+                ],
+                styles: {
+                  tableHeader: {
+                    bold: true,
+                    fontSize: 9,
+                  },
+                  generalInfo: {
+                    fontSize: 9,
                   },
                 },
-              ],
-              styles: {
-                tableHeader: {
-                  bold: true,
+                defaultStyle: {
                   fontSize: 9,
                 },
-                generalInfo: {
-                  fontSize: 9,
-                },
-              },
-              defaultStyle: {
-                fontSize: 9,
-              },
-            };
-            this.generating = false;
-            pdfMake.createPdf(docDefinition).open();
-          });
+              };
+              this.generating = false;
+              pdfMake.createPdf(docDefinition).open();
+            })
+            .catch((err) => {
+              this.errorMessage =
+                "Error al generar el PDF, contacta con tu administrador";
+            });
           break;
         case "excel":
           Promise.all([bussinesInfo(), customer(), branches()]).then((res) => {
@@ -598,35 +611,58 @@ export default {
             const branches = branch.data.branches;
             const values = [];
             const valuesTable = [];
-            values.push(["  "]);
+            values.push(["INFORMACIÓN GENERAL"]);
+            values.push(["Nombre: ", customerData.name]);
+            values.push(["Identificador: ", customerData.shortName]);
             values.push([
-              "Nombre:",
-              customerData.name,
-              `(${customerData.shortName})`,
+              "Contacto: ",
+              customerData.customerBranches.contacName
+                ? customerData.customerBranches.contacName
+                : "----------------",
             ]);
-            values.push(["  "]);
-            values.push(["Información General"]);
+            values.push([
+              "Telefono: ",
+              customerData.customerBranches.contactInfo,
+            ]);
+            values.push([
+              "Correo: ",
+              customerData.customerBranches.contactInfo,
+            ]);
             values.push([
               "Estado: ",
               customerData.isActiveCustomer
                 ? "Activo        "
                 : "Inactivo      ",
-              "Tipo de cliente: ",
-              customerData.customerType.name,
             ]);
-            values.push(["  "]);
-            values.push(["Información Tributaria"]);
+            values.push([
+              {
+                text: "  ",
+              },
+            ]);
+            values.push(["INFORMACIÓN TRIBUTARIA"]);
+            values.push(["Tipo de cliente: ", customerData.customerType.name]);
+
             values.push([
               "NRC: ",
               customerData.nrc ? customerData.nrc : "-------",
-              "     NIT: ",
+            ]);
+            values.push([
+              "NIT: ",
               customerData.nit ? customerData.nit : "-------",
-              "     GIRO: ",
+            ]);
+            values.push([
+              "GIRO: ",
               customerData.giro ? customerData.giro : " -------",
             ]);
-
+            values.push([
+              customerData.customerType.id == 2
+                ? "Tipo de persona natural: "
+                : "",
+              customerData.customerType.id == 2
+                ? customerData.customerTypeNatural.name
+                : "",
+            ]);
             values.push(["  "]);
-
             values.push(["SUCURSALES"]);
             for (const br of branches) {
               valuesTable.push([
@@ -641,11 +677,7 @@ export default {
 
             const document = [
               [name],
-              [
-                `REPORTE DEL PERFIL DE ${customerData.name}`,
-                `NIT: ${nit}`,
-                `NRC: ${nrc}`,
-              ],
+              [`PERFIL DE CLIENTE`, `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               ...values,
 
