@@ -1027,7 +1027,13 @@ export default {
         }
         const types = this.details[index].types;
         const sellingType = this.details[index].sellingType;
-        this.details.splice(index, 1, { ...form, sellingType, types });
+        this.details.splice(index, 1, {
+          ...form,
+          sellingType,
+          types,
+          ventaPrice: form.unitPrice * form.quantity,
+        });
+
         this.showEditService = false;
       });
     },
