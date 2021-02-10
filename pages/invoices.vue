@@ -34,6 +34,11 @@ export default {
           icon: getIcon("document-text"),
           path: "/invoices/reports",
         },
+          {
+          name: "Reservar documento",
+          icon: getIcon("document-text"),
+          path: "/invoices/reserveDocument",
+        },
         {
           name: "Configuraciones",
           icon: getIcon("cog"),
