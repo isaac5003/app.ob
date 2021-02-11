@@ -3,7 +3,7 @@
     v-loading="loading"
     page-title="Reportes"
     :breadcrumb="[
-      { name: 'Ventas', to: '/invoices' },
+      { name: 'Cobros', to: '/echarges' },
       { name: 'Reportes', to: null },
     ]"
   >
@@ -127,24 +127,24 @@
               </el-form-item>
             </div>
             <div class="col-span-2">
-            <el-form-item label="Tipo de documento:" class="col-span-2">
-            <el-select
-              v-model="filterForm.documentType"
-              size="small"
-              clearable
-              placeholder="Todos los tipos:"
-              class="w-full"
-              @change="fetchInvoices"
-            >
-              <el-option label="Todos los tipos" value="" />
-              <el-option
-                v-for="item in documentTypes"
-                :key="item.id"
-                :label="`${item.code} - ${item.name}`"
-                :value="item.id"
-              />
-            </el-select>
-          </el-form-item>
+              <el-form-item label="Tipo de documento:" class="col-span-2">
+                <el-select
+                  v-model="filterForm.documentType"
+                  size="small"
+                  clearable
+                  placeholder="Todos los tipos:"
+                  class="w-full"
+                  @change="fetchInvoices"
+                >
+                  <el-option label="Todos los tipos" value="" />
+                  <el-option
+                    v-for="item in documentTypes"
+                    :key="item.id"
+                    :label="`${item.code} - ${item.name}`"
+                    :value="item.id"
+                  />
+                </el-select>
+              </el-form-item>
             </div>
             <div class="col-span-2">
               <el-form-item label="Estado venta:">
@@ -177,26 +177,25 @@
                   placeholder="Todos los clientes:"
                   class="w-full"
                 >
-                  
-                    <el-option
-                      v-for="item in activePayment"
-                      :key="item.id"
-                      :label="item.name"
-                      :value="item.id"
-                    >
-                    </el-option>
+                  <el-option
+                    v-for="item in activePayment"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                  </el-option>
 
-                    <el-option
-                      v-for="item in inactivePayment"
-                      :key="item.id"
-                      :label="item.name"
-                      :value="item.id"
-                    >
-                    </el-option>
+                  <el-option
+                    v-for="item in inactivePayment"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                  </el-option>
                 </el-select>
               </el-form-item>
+            </div>
           </div>
-        </div>
         </div>
         <div class="flex flex-row justify-end">
           <el-button
@@ -245,14 +244,11 @@ export default {
       generating: false,
       filterForm: {
         report: "",
-        reportType: "",
         dateRange: "",
         customer: "",
-        invoiceType: "",
         status: "",
         payment: "",
-    
-         documentType: "",
+        documentType: "",
         radioType: "pdf",
       },
       rulesInputData: {
@@ -264,15 +260,7 @@ export default {
           name: "Listado genaral",
         },
       ],
-      page: {
-        limit: 10,
-        page: 1,
-      },
     };
   },
-  methods: {
-    
-  },
-  computed: {},
 };
 </script>
