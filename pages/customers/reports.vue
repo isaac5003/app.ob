@@ -633,102 +633,110 @@ export default {
             });
           break;
         case "excel":
-          Promise.all([bussinesInfo(), customer(), branches()]).then((res) => {
-            const [bussinesInfo, customer, branch] = res;
+          Promise.all([bussinesInfo(), customer(), branches()])
+            .then((res) => {
+              const [bussinesInfo, customer, branch] = res;
 
-            const { name, nit, nrc } = bussinesInfo.data.info;
-            const customerData = customer.data.customer;
-            const branches = branch.data.branches;
-            const values = [];
-            const valuesTable = [];
-            values.push(["INFORMACIÓN GENERAL"]);
-            values.push(["Nombre: ", customerData.name]);
-            values.push(["Identificador: ", customerData.shortName]);
-            values.push([
-              "Contacto: ",
-              customerData.customerBranches.contacName
-                ? customerData.customerBranches.contacName
-                : "----------------",
-            ]);
-            values.push([
-              "Telefono: ",
-              customerData.customerBranches.contactInfo,
-            ]);
-            values.push([
-              "Correo: ",
-              customerData.customerBranches.contactInfo,
-            ]);
-            values.push([
-              "Estado: ",
-              customerData.isActiveCustomer
-                ? "Activo        "
-                : "Inactivo      ",
-            ]);
-            values.push([
-              {
-                text: "  ",
-              },
-            ]);
-            values.push(["INFORMACIÓN TRIBUTARIA"]);
-            values.push(["Tipo de cliente: ", customerData.customerType.name]);
+              const { name, nit, nrc } = bussinesInfo.data.info;
+              const customerData = customer.data.customer;
+              const branches = branch.data.branches;
+              const values = [];
+              const valuesTable = [];
+              const valuesGeneral = [];
+              const valuesTributary = [];
 
-            values.push([
-              "NRC: ",
-              customerData.nrc ? customerData.nrc : "-------",
-            ]);
-            values.push([
-              "NIT: ",
-              customerData.nit ? customerData.nit : "-------",
-            ]);
-            values.push([
-              "GIRO: ",
-              customerData.giro ? customerData.giro : " -------",
-            ]);
-            values.push([
-              customerData.customerType.id == 2
-                ? "Tipo de persona natural: "
-                : "",
-              customerData.customerType.id == 2
-                ? customerData.customerTypeNatural.name
-                : "",
-            ]);
-            values.push(["  "]);
-            values.push(["SUCURSALES"]);
-            for (const br of branches) {
-              valuesTable.push([
-                br.name,
-                br.address1,
-                br.address2,
-                br.city.name,
-                br.state.name,
-                br.country.name,
+              valuesGeneral.push([
+                `Nombre:`,
+                customerData.name,
+                `Identificador:`,
+                customerData.shortName,
+                `Estado:`,
+                customerData.isActiveCustomer ? "Activo" : "Inactivo",
               ]);
-            }
+              valuesGeneral.push([
+                "Contacto:",
+                customerData.customerBranches.contacName
+                  ? customerData.customerBranches.contacName
+                  : "----------------",
+                "Telefono: ",
+                customerData.customerBranches.contactInfo
+                  ? customerData.customerBranches.contactInfo
+                  : "--------",
+                "Correo: ",
+                customerData.customerBranches.contactInfo
+                  ? customerData.customerBranches.contactInfo
+                  : "-------",
+              ]);
 
-            const document = [
-              [name],
-              [`PERFIL DE CLIENTE`, `NIT: ${nit}`, `NRC: ${nrc}`],
-              [""],
-              ...values,
+              valuesTributary.push([
+                "DUI: ",
+                customerData.dui ? customerData.dui : "-------",
+                "NRC: ",
+                customerData.nrc ? customerData.nrc : "-------",
+                "NIT: ",
+                customerData.nit ? customerData.nit : "-------",
+                "GIRO: ",
+                customerData.giro ? customerData.giro : " -------",
+              ]);
+              valuesTributary.push([
+                "Tipo de cliente:",
+                customerData.customerType.name,
+                customerData.customerType.id == 2
+                  ? "Tipo de persona natural: "
+                  : "",
+                customerData.customerType.id == 2
+                  ? customerData.customerTypeNatural.name
+                  : "",
+                "Tipo de contribuyente: ",
+                customerData.customerTaxerType
+                  ? customerData.customerTaxerType.name
+                  : "---------------",
+              ]);
 
-              [
-                "NOMBRE",
-                "DIRECCIÓN 1",
-                "DIRECCIÓN 2",
-                "CIUDAD",
-                "DEPARTAMENTO",
-                "PAIS",
-              ],
-              ...valuesTable,
-            ];
+              for (const br of branches) {
+                valuesTable.push([
+                  br.name,
+                  br.address1,
+                  br.address2,
+                  br.city.name,
+                  br.state.name,
+                  br.country.name,
+                ]);
+              }
 
-            const sheet = XLSX.utils.aoa_to_sheet(document);
-            const workbook = XLSX.utils.book_new();
-            const fileName = `reporte_cliente_${customerData.shortName}`;
-            XLSX.utils.book_append_sheet(workbook, sheet, fileName);
-            XLSX.writeFile(workbook, `${fileName}.xlsx`);
-            this.generating = false;
-          });
+              const document = [
+                [name],
+                [`PERFIL DE CLIENTE`, `NIT: ${nit}`, `NRC: ${nrc}`],
+                [""],
+                ["INFORMACIÓN GENERAL"],
+                ...valuesGeneral,
+                [""],
+                ["INFORMACIÓN TRIBUTARIA"],
+                ...valuesTributary,
+                [""],
+                ["SUCURSALES"],
+                [
+                  "NOMBRE",
+                  "DIRECCIÓN 1",
+                  "DIRECCIÓN 2",
+                  "CIUDAD",
+                  "DEPARTAMENTO",
+                  "PAIS",
+                ],
+                ...valuesTable,
+              ];
+
+              const sheet = XLSX.utils.aoa_to_sheet(document);
+              const workbook = XLSX.utils.book_new();
+              const fileName = `reporte_cliente_${customerData.shortName}`;
+              XLSX.utils.book_append_sheet(workbook, sheet, fileName);
+              XLSX.writeFile(workbook, `${fileName}.xlsx`);
+              this.generating = false;
+            })
+            .catch((err) => {
+              this.errorMessage =
+                "Error al generar el EXCEL, contacta con tu administrador";
+            });
           break;
       }
     },
