@@ -48,7 +48,7 @@ export default {
   name: "Submenu",
 
   props: ["pageName", "menu", "icon"],
-  fetchOnServer: false,
+
   methods: {
     activePath(path, item) {
       const paths = [item.path];

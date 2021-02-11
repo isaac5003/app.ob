@@ -132,7 +132,6 @@ export default {
         this.loading = false;
       })
       .catch((err) => {
-        console.log(err);
         this.errorMessage = err.response.data.message;
       });
   },
@@ -147,7 +146,7 @@ export default {
         description: "",
         total: "",
       },
-      customers: null,
+      customers: [],
       eChargesNewFormRules: {
         customer: selectValidation(true),
         date: selectValidation(true),

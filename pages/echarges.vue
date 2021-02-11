@@ -2,7 +2,7 @@
   <div class="flex">
     <layout-submenu
       page-name="Cobros electrónicos"
-      :menu="hasModule() ? menu : ''"
+      :menu="menu"
       icon="collection"
     />
     <nuxt-child />
@@ -20,65 +20,42 @@ export default {
     id: "09a5c668-ab54-441e-9fb2-d24b36ae202e",
   },
   components: { LayoutSubmenu },
-
+  fetch() {
+    if (!hasModule) {
+      this.menu.unshift({
+        name: "Nuevo cobro",
+        icon: getIcon("plus"),
+        path: "/echarges/new",
+      });
+    } else {
+      this.menu = this.menu;
+    }
+  },
   data() {
     return {
-      modules: false,
-      menu: [],
+      menu: [
+        {
+          name: "Listado de cobros",
+          icon: getIcon("menu"),
+          path: "/echarges",
+          epath: ["/echarges/edit"],
+        },
+        {
+          name: "Reportes",
+          icon: getIcon("document-text"),
+          path: "/echarges/reports",
+        },
+        {
+          name: "Configuraciones",
+          icon: getIcon("cog"),
+          path: "/echarges/reports",
+        },
+      ],
     };
   },
   methods: {
     async hasModule() {
-      this.modules = hasModule(
-        "cfb8addb-541b-482f-8fa1-dfe5db03fdf4",
-        this.$auth.user
-      );
-      let menu = null;
-      if (this.modules) {
-        menu = [
-          {
-            name: "Listado de cobros",
-            icon: getIcon("menu"),
-            path: "/echarges",
-            epath: ["/echarges/edit"],
-          },
-          {
-            name: "Reportes",
-            icon: getIcon("document-text"),
-            path: "/echarges/reports",
-          },
-          {
-            name: "Configuraciones",
-            icon: getIcon("cog"),
-            path: "/echarges/reports",
-          },
-        ];
-      } else {
-        menu = [
-          {
-            name: "Nuevo cobro",
-            icon: getIcon("plus"),
-            path: "/echarges/new",
-          },
-          {
-            name: "Listado de cobros",
-            icon: getIcon("menu"),
-            path: "/echarges",
-            epath: ["/echarges/edit"],
-          },
-          {
-            name: "Reportes",
-            icon: getIcon("document-text"),
-            path: "/echarges/reports",
-          },
-          {
-            name: "Configuraciones",
-            icon: getIcon("cog"),
-            path: "/echarges/reports",
-          },
-        ];
-      }
-      this.menu = menu;
+      return hasModule("cfb8addb-541b-482f-8fa1-dfe5db03fdf4", this.$auth.user);
     },
   },
 };
