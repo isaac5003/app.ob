@@ -376,7 +376,6 @@
               >
                 <el-option label="Todos los tipos" value="" />
                 <el-option
-                  style="width: 103%"
                   v-for="item in documentTypes"
                   :key="item.id"
                   :label="`${item.code} - ${item.name}`"
@@ -399,7 +398,6 @@
               >
                 <el-option label="Todos los estados" value="" />
                 <el-option
-                  style="width: 105%; text-align: center"
                   class="text:center"
                   v-for="status in statuses"
                   :key="status.id"
