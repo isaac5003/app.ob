@@ -1,7 +1,7 @@
 <template>
   <layout-content
     v-loading="pageloading"
-    page-title="Listado de documentos"
+    page-title="Configuraciones"
     :breadcrumb="[
       { name: 'Cobros electrónicos', to: '/echarges' },
       { name: 'Configuraciones', to: null },
@@ -127,6 +127,13 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
+import {
+  inputValidation,
+  selectValidation,
+  checkBeforeLeave,
+  checkBeforeEnter,
+} from "../../tools";
+
 export default {
   name: "Configuraciones",
   components: { LayoutContent, Notification },
@@ -148,9 +155,17 @@ export default {
         body: "",
         farewell: "",
       },
+      documentFormRules: {
+        body: inputValidation(true, 5, 100),
+        farewell: inputValidation(true, 5, 100),
+      },
       paymentForm: {
         clientId: "",
         clientSecret: "",
+      },
+      paymentFormmRules: {
+        clientId: inputValidation(true, 5, 100),
+        clientSecret: inputValidation(true, 5, 100),
       },
     };
   },
