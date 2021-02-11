@@ -382,7 +382,8 @@
                     :value="c.id"
                     @change="setStorage(salesNewForm)"
                   >
-                     <span style="float: right; color: #8492a6;">{{`${c.name}` }}</span>
+          <span style="float: right; color: #8492a6;">{{ `${c.shortName }`}}-{{`${c.nrc}`}}</span>
+
                       <span style="float: left;">{{ `${c.name }` }}</span>
                   </el-option>
                 </el-select>
@@ -440,8 +441,7 @@
                     :label="p.name"
                     :value="p.id"
                   >
-                  <span style="float: right; color: #8492a6;">{{`${p.name}` }}</span>
-                      <span style="float: left;">{{ `${p.name }` }}</span>
+                
                   </el-option>
                 </el-select>
               </el-form-item>
@@ -465,9 +465,7 @@
                     :key="s.value"
                     :label="s.name"
                     :value="s.id"
-                  >
-                   <span style="float: right; color: #8492a6;">{{`${s.name}` }}</span>
-                      <span style="float: left;">{{ `${s.name }` }}</span>
+               >
                   </el-option>
                 </el-select>
               </el-form-item>

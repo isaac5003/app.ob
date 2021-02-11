@@ -321,96 +321,95 @@
             />
           </el-form-item>
           <template>
-             <el-form-item label="Cliente:" class="col-span-4">
-            <el-select
-              v-model="filter.customer"
-              size="small"
-              class="w-full"
-              clearable
-              filterable
-              default-first-option
-              placeholder="Todos los clientes:"
-              @change="fetchInvoices"
-            >
-              <el-option label="Todos los clientes" value="" />
-              <el-option-group key="ACTIVOS" label="ACTIVOS">
-                <el-option
-                  v-for="item in activeCustomers"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                >
-                  <span style="float: right; color: #8492a6;">{{`${item.name}` }}</span>
-                      <span style="float: left;">{{ `${item.name }` }}</span>
-                </el-option>
-              </el-option-group>
-              <el-option-group key="INACTIVOS" label="INACTIVOS">
-                <el-option
-                  v-for="item in inactiveCustomers"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                >
-                 <span style="float: right; color: #8492a6; font-size: 13px">{{`${item.name}` }}</span>
-                      <span style="float: left; font-size: 13px">{{ `${item.name }` }}</span>
-                </el-option>
-              </el-option-group>
-            </el-select>
-          </el-form-item>
+            <el-form-item label="Cliente:" class="col-span-4">
+              <el-select
+                v-model="filter.customer"
+                size="small"
+                class="w-full"
+                clearable
+                filterable
+                default-first-option
+                placeholder="Todos los clientes:"
+                @change="fetchInvoices"
+              >
+                <el-option label="Todos los clientes" value="" />
+                <el-option-group key="ACTIVOS" label="ACTIVOS">
+                  <el-option
+                    v-for="item in activeCustomers"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                    <span style="float: right; color: #8492a6"
+                      >{{ `${item.shortName}` }}-{{ `${item.nrc}` }}</span
+                    >
+                    <span style="float: left">{{ `${item.name}` }}</span>
+                  </el-option>
+                </el-option-group>
+                <el-option-group key="INACTIVOS" label="INACTIVOS">
+                  <el-option
+                    v-for="item in activeCustomers"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                    <span style="float: right; color: #8492a6"
+                      >{{ `${item.shortName}` }}-{{ `${item.nrc}` }}</span
+                    >
+                    <span style="float: left; font-size: 13px">{{
+                      `${item.name}`
+                    }}</span>
+                  </el-option>
+                </el-option-group>
+              </el-select>
+            </el-form-item>
           </template>
-         <template>
-              <el-form-item label="Tipo de documento:" class="col-span-2">
-            <el-select
-              v-model="filter.documentType"
-              size="small"
-              clearable
-              placeholder="Todos los tipos:"
-              class="w-full"
-              @change="fetchInvoices"
-            >
-              <el-option label="Todos los tipos" value="" />
-              <el-option
-                style="width:103%"
-                v-for="item in documentTypes"
-                :key="item.id"
-                :label="`${item.code} - ${item.name}`"
-                :value="item.id"
+          <template>
+            <el-form-item label="Tipo de documento:" class="col-span-2">
+              <el-select
+                v-model="filter.documentType"
+                size="small"
+                clearable
+                placeholder="Todos los tipos:"
+                class="w-full"
+                @change="fetchInvoices"
               >
-                  <span style="float: right; color: #8492a6;">{{`${item.name}`}}</span>
-                   <span style="float: right; color: #8492a6;">{{`${item.code}`}}-</span>
-                  <span style="float: left;">{{ `${item.code }` }}-</span>
-                 <span style="float: left; ">{{ `${item.name }`}}</span>
-              </el-option>
-            </el-select>
-          </el-form-item>
-         </template>
-       
-       <template>
-           <el-form-item label="Estado:" class="col-span-2">
-            <el-select
-              v-model="filter.status"
-              size="small"
-              clearable
-              placeholder="Todos los estados:"
-              class="w-full"
-              @change="fetchInvoices"
-            >
-              <el-option label="Todos los estados" value="" />
-              <el-option
-               style="width:105%; text-align:center;"
-               class="text:center"
-                v-for="status in statuses"
-                :key="status.id"
-                :label="status.name"
-                :value="status.id"
+                <el-option label="Todos los tipos" value="" />
+                <el-option
+                  style="width: 103%"
+                  v-for="item in documentTypes"
+                  :key="item.id"
+                  :label="`${item.code} - ${item.name}`"
+                  :value="item.id"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </template>
+
+          <template>
+            <el-form-item label="Estado:" class="col-span-2">
+              <el-select
+                v-model="filter.status"
+                size="small"
+                clearable
+                placeholder="Todos los estados:"
+                class="w-full"
+                @change="fetchInvoices"
               >
-                <span style="float: right; color: #8492a6; text-align:right;">{{`${status.name}` }}</span>
-                      <span style="float: left; ">{{ `${status.name }` }}</span>
-              </el-option>
-            </el-select>
-          </el-form-item>
-       </template>
-        
+                <el-option label="Todos los estados" value="" />
+                <el-option
+                  style="width: 105%; text-align: center"
+                  class="text:center"
+                  v-for="status in statuses"
+                  :key="status.id"
+                  :label="status.name"
+                  :value="status.id"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </template>
         </div>
         <template></template>
         <div class="grid grid-cols-12 gap-4">
@@ -433,8 +432,6 @@
                   :label="seller.name"
                   :value="seller.id"
                 >
-                  <span style="float: right; color: #8492a6;">{{`${seller.name}` }}</span>
-                      <span style="float: left; ">{{ `${seller.name }` }}</span>
                 </el-option>
               </el-option-group>
               <el-option-group key="INACTIVOS" label="INACTIVOS">
@@ -444,90 +441,77 @@
                   :label="seller.name"
                   :value="seller.id"
                 >
-                  <span style="float: right; color: #8492a6;">{{`${seller.name}` }}</span>
-                      <span style="float: left; ">{{ `${seller.name }` }}</span>
                 </el-option>
               </el-option-group>
             </el-select>
           </el-form-item>
           <template>
             <el-form-item label="Zona:" class="col-span-3">
-            <el-select
-              v-model="filter.zone"
-              size="small"
-              clearable
-              filterable
-              default-first-option
-              placeholder="Todos las Zonas"
-              class="w-full"
-              @change="fetchInvoices"
-            >
-              <el-option label="Tados las zonas" value="" />
-              <el-option-group key="ACTIVOS" label="ACTIVOS">
-                <el-option
-                  v-for="zone in activeZones"
-                  :key="zone.id"
-                  :label="zone.name"
-                  :value="zone.id"
-                >
-                    <span style="float: right; color: #8492a6;">{{`${zone.name}` }}</span>
-                      <span style="float: left; ">{{ `${zone.name }` }}</span>
-                 </el-option>
-              
-              </el-option-group>
-              <el-option-group key="INACTIVOS" label="INACTIVOS">
-                <el-option
-                  v-for="zone in inactiveZones"
-                  :key="zone.id"
-                  :label="zone.name"
-                  :value="zone.id"
-                >
-                <span style="float: right; color: #8492a6;">{{`${zone.name}` }}</span>
-                      <span style="float: left; ">{{ `${zone.name }` }}</span>
-                </el-option>
-              </el-option-group>
-            </el-select>
-          </el-form-item></template>
+              <el-select
+                v-model="filter.zone"
+                size="small"
+                clearable
+                filterable
+                default-first-option
+                placeholder="Todos las Zonas"
+                class="w-full"
+                @change="fetchInvoices"
+              >
+                <el-option label="Tados las zonas" value="" />
+                <el-option-group key="ACTIVOS" label="ACTIVOS">
+                  <el-option
+                    v-for="zone in activeZones"
+                    :key="zone.id"
+                    :label="zone.name"
+                    :value="zone.id"
+                  >
+                  </el-option>
+                </el-option-group>
+                <el-option-group key="INACTIVOS" label="INACTIVOS">
+                  <el-option
+                    v-for="zone in inactiveZones"
+                    :key="zone.id"
+                    :label="zone.name"
+                    :value="zone.id"
+                  >
+                  </el-option>
+                </el-option-group>
+              </el-select> </el-form-item
+          ></template>
           <template>
-             <el-form-item label="Servicios:" class="col-span-3">
-            <el-select
-              v-model="filter.service"
-              size="small"
-              clearable
-              default-first-option
-              placeholder="Todos los servicios"
-              class="w-full"
-              filterable
-              @change="fetchInvoices"
-            >
-              <el-option label="Todos los servicios" value="" />
-              <el-option-group key="ACTIVOS" label="ACTIVOS">
-                <el-option
-                  v-for="service in activeServices"
-                  :key="service.id"
-                  :label="service.name"
-                  :value="service.id"
-                >
-                
-                    <span style="float: right; color: #8492a6;">{{`${service.name}` }}</span>
-                      <span style="float: left;">{{ `${service.name }` }}</span>
-                </el-option>
-              </el-option-group>
-              <el-option-group key="INACTIVOS" label="INACTIVOS">
-                <el-option
-                  v-for="service in inactiveServices"
-                  :key="service.id"
-                  :label="service.name"
-                  :value="service.id"
-                >
-                 <span style="float: right; color: #8492a6;">{{`${service.name}` }}</span>
-                      <span style="float: left;">{{ `${service.name }` }}</span>
-                </el-option>
-              </el-option-group>
-            </el-select>
-          </el-form-item>
+            <el-form-item label="Servicios:" class="col-span-3">
+              <el-select
+                v-model="filter.service"
+                size="small"
+                clearable
+                default-first-option
+                placeholder="Todos los servicios"
+                class="w-full"
+                filterable
+                @change="fetchInvoices"
+              >
+                <el-option label="Todos los servicios" value="" />
+                <el-option-group key="ACTIVOS" label="ACTIVOS">
+                  <el-option
+                    v-for="service in activeServices"
+                    :key="service.id"
+                    :label="service.name"
+                    :value="service.id"
+                  >
+                  </el-option>
+                </el-option-group>
+                <el-option-group key="INACTIVOS" label="INACTIVOS">
+                  <el-option
+                    v-for="service in inactiveServices"
+                    :key="service.id"
+                    :label="service.name"
+                    :value="service.id"
+                  >
+                  </el-option>
+                </el-option-group>
+              </el-select>
+            </el-form-item>
           </template>
-         
         </div>
       </el-form>
       <div class="flex flex-col space-y-2">
