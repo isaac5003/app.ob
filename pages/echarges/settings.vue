@@ -25,43 +25,48 @@
           ref="documentForm"
         >
           <div class="grid grid-cols-12 gap-4">
-            <el-form-item
-              label="Cuerpo de documento"
-              prop="body"
-              class="col-span-4"
-            >
-              <el-input
-                v-model="documentForm.body"
-                type="text"
-                autocomplete="off"
-                maxlength="500"
-                minlength="5"
-                size="small"
-                show-word-limit
-                clearable
-                placeholder=""
+            <div class="col-span-6">
+              <el-form-item
+                label="Cuerpo de documento"
+                prop="body"
+                class="col-span-4"
               >
-              </el-input>
-            </el-form-item>
-            <el-form-item
-              label="Despedida de documento"
-              prop="farewell"
-              class="col-span-4"
-            >
-              <el-input
-                v-model="documentForm.farewell"
-                size="small"
-                class="w-full"
-                autocomplete="off"
-                maxlength="500"
-                minlength="5"
-                show-word-limit
-                filterable
-                clearable
-                placeholder=""
+                <el-input
+                  v-model="documentForm.body"
+                  type="textarea"
+                  autocomplete="off"
+                  maxlength="500"
+                  minlength="5"
+                  size="small"
+                  show-word-limit
+                  clearable
+                  placeholder=""
+                >
+                </el-input>
+              </el-form-item>
+            </div>
+            <div class="col-span-6">
+              <el-form-item
+                label="Despedida de documento"
+                prop="farewell"
+                class="col-span-4"
               >
-              </el-input>
-            </el-form-item>
+                <el-input
+                  v-model="documentForm.farewell"
+                  type="textarea"
+                  size="small"
+                  class="w-full"
+                  autocomplete="off"
+                  maxlength="500"
+                  minlength="5"
+                  show-word-limit
+                  filterable
+                  clearable
+                  placeholder=""
+                >
+                </el-input>
+              </el-form-item>
+            </div>
           </div>
           <div class="flex justify-end mt-4">
             <el-button type="primary" size="small">Guardar</el-button>
@@ -79,39 +84,48 @@
           ref="paymentForm"
         >
           <div class="grid grid-cols-12 gap-4">
-            <el-form-item label="Cliente ID" prop="clientId" class="col-span-4">
-              <el-input
-                v-model="paymentForm.clientId"
-                type="text"
-                autocomplete="off"
-                maxlength="500"
-                minlength="5"
-                size="small"
-                show-word-limit
-                clearable
-                placeholder=""
+            <div class="col-span-6">
+              <el-form-item
+                label="Cliente ID"
+                prop="clientId"
+                class="col-span-4"
               >
-              </el-input>
-            </el-form-item>
-            <el-form-item
-              label="Codigo de cliente"
-              prop="clientSecret"
-              class="col-span-4"
-            >
-              <el-input
-                v-model="paymentForm.clientSecret"
-                size="small"
-                class="w-full"
-                autocomplete="off"
-                maxlength="500"
-                minlength="5"
-                show-word-limit
-                filterable
-                clearable
-                placeholder=""
+                <el-input
+                  v-model="paymentForm.clientId"
+                  type="textarea"
+                  autocomplete="off"
+                  maxlength="500"
+                  minlength="5"
+                  size="small"
+                  show-word-limit
+                  clearable
+                  placeholder=""
+                >
+                </el-input>
+              </el-form-item>
+            </div>
+            <div class="col-span-6">
+              <el-form-item
+                label="Codigo de cliente"
+                prop="clientSecret"
+                class="col-span-4"
               >
-              </el-input>
-            </el-form-item>
+                <el-input
+                  v-model="paymentForm.clientSecret"
+                  type="textarea"
+                  size="small"
+                  class="w-full"
+                  autocomplete="off"
+                  maxlength="500"
+                  minlength="5"
+                  show-word-limit
+                  filterable
+                  clearable
+                  placeholder=""
+                >
+                </el-input>
+              </el-form-item>
+            </div>
           </div>
           <div class="flex justify-end mt-4">
             <el-button type="primary" size="small">Guardar</el-button>
