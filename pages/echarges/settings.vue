@@ -34,7 +34,7 @@
                 v-model="documentForm.body"
                 type="text"
                 autocomplete="off"
-                maxlength="100"
+                maxlength="500"
                 minlength="5"
                 size="small"
                 show-word-limit
@@ -53,7 +53,7 @@
                 size="small"
                 class="w-full"
                 autocomplete="off"
-                maxlength="100"
+                maxlength="500"
                 minlength="5"
                 show-word-limit
                 filterable
@@ -84,7 +84,7 @@
                 v-model="paymentForm.clientId"
                 type="text"
                 autocomplete="off"
-                maxlength="100"
+                maxlength="500"
                 minlength="5"
                 size="small"
                 show-word-limit
@@ -103,7 +103,7 @@
                 size="small"
                 class="w-full"
                 autocomplete="off"
-                maxlength="100"
+                maxlength="500"
                 minlength="5"
                 show-word-limit
                 filterable
@@ -156,16 +156,16 @@ export default {
         farewell: "",
       },
       documentFormRules: {
-        body: inputValidation(true, 5, 100),
-        farewell: inputValidation(true, 5, 100),
+        body: inputValidation(true, 5, 500),
+        farewell: inputValidation(true, 5, 500),
       },
       paymentForm: {
         clientId: "",
         clientSecret: "",
       },
       paymentFormmRules: {
-        clientId: inputValidation(true, 5, 100),
-        clientSecret: inputValidation(true, 5, 100),
+        clientId: inputValidation(true, 5, 500),
+        clientSecret: inputValidation(true, 5, 500),
       },
     };
   },
