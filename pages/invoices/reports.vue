@@ -108,15 +108,26 @@
                     <el-option label="Todos los clientes" value="" />
                     <el-option-group key="ACTIVOS" label="ACTIVOS">
                       <el-option
+                       
                         v-for="item in activeCustomers"
                         :key="item.id"
                         :label="item.name"
                         :value="item.id"
                       >
-                        <span style="float: right; color: #8492a6"
-                          >{{ `${item.shortName}` }}-{{ `${item.nrc}` }}</span
+                        <span
+                          class="text-xs"
+                          style="float: right; color: #8492a6"
+                          >{{ `${item.nrc}` }}</span
                         >
-                        <span style="float: left">{{ `${item.name}` }}</span>
+                        <div class="flex flex-col h-3 text-xs">
+                          <span style="float: right; color: #8492a6">{{
+                            `${item.shortName}`
+                          }}</span>
+                        </div>
+                        <div class="flex flex-col text-sm">
+                          <span>{{ `${item.name}` }}</span>
+                          >
+                        </div>
                       </el-option>
                     </el-option-group>
                     <el-option-group key="INACTIVOS" label="INACTIVOS">
@@ -126,12 +137,20 @@
                         :label="item.name"
                         :value="item.id"
                       >
-                        <span style="float: right; color: #8492a6"
-                          >{{ `${item.shortName}` }}-{{ `${item.nrc}` }}</span
+                         <span
+                          class="text-xs"
+                          style="float: right; color: #8492a6"
+                          >{{ `${item.nrc}` }}</span
                         >
-                        <span style="float: left; font-size: 13px">{{
-                          `${item.name}`
-                        }}</span>
+                        <div class="flex flex-col h-3 text-xs">
+                          <span style="float: right; color: #8492a6">{{
+                            `${item.shortName}`
+                          }}</span>
+                        </div>
+                        <div class="flex flex-col text-sm">
+                          <span>{{ `${item.name}` }}</span>
+                          >
+                        </div>
                       </el-option>
                     </el-option-group>
                   </el-select>
