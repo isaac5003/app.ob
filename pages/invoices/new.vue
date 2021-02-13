@@ -382,19 +382,16 @@
                       :value="c.id"
                       @change="setStorage(salesNewForm)"
                     >
-                      <span
-                        class="text-xs"
-                        style="float: right; color: #8492a6"
-                        >{{ `${c.nrc}` }}</span
+                      <div
+                        class="flex flex-row justify-between items-end py-1 leading-normal"
                       >
-                      <div class="flex flex-col h-3 text-xs">
-                        <span style="float: right; color: #8492a6">{{
-                          `${c.shortName}`
-                        }}</span>
-                      </div>
-                      <div class="flex flex-col text-sm">
-                        <span>{{ `${c.name}` }}</span>
-                        >
+                        <div class="flex flex-col">
+                          <span class="text-xs text-gray-500">{{
+                            c.shortName
+                          }}</span>
+                          <span>{{ c.name }}</span>
+                        </div>
+                        <span class="text-xs text-gray-500">{{ c.nrc }}</span>
                       </div>
                     </el-option>
                   </el-select>
