@@ -114,20 +114,17 @@
                         :label="item.name"
                         :value="item.id"
                       >
-                        <span
-                          class="text-xs"
-                          style="float: right; color: #8492a6"
-                          >{{ `${item.nrc}` }}</span
-                        >
-                        <div class="flex flex-col h-3 text-xs">
-                          <span style="float: right; color: #8492a6">{{
-                            `${item.shortName}`
+                  <div
+                        class="flex flex-row justify-between items-end py-1 leading-normal"
+                      >
+                        <div class="flex flex-col">
+                          <span class="text-xs text-gray-500">{{
+                            item.shortName
                           }}</span>
+                          <span>{{ item.name }}</span>
                         </div>
-                        <div class="flex flex-col text-sm">
-                          <span>{{ `${item.name}` }}</span>
-                          >
-                        </div>
+                        <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                      </div>
                       </el-option>
                     </el-option-group>
                     <el-option-group key="INACTIVOS" label="INACTIVOS">
@@ -137,20 +134,17 @@
                         :label="item.name"
                         :value="item.id"
                       >
-                         <span
-                          class="text-xs"
-                          style="float: right; color: #8492a6"
-                          >{{ `${item.nrc}` }}</span
-                        >
-                        <div class="flex flex-col h-3 text-xs">
-                          <span style="float: right; color: #8492a6">{{
-                            `${item.shortName}`
+                         <div
+                        class="flex flex-row justify-between items-end py-1 leading-normal"
+                      >
+                        <div class="flex flex-col">
+                          <span class="text-xs text-gray-500">{{
+                            item.shortName
                           }}</span>
+                          <span>{{ item.name }}</span>
                         </div>
-                        <div class="flex flex-col text-sm">
-                          <span>{{ `${item.name}` }}</span>
-                          >
-                        </div>
+                        <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                      </div>
                       </el-option>
                     </el-option-group>
                   </el-select>
