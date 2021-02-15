@@ -33,7 +33,7 @@ export default {
     defaultLocale: "es",
   },
   axios: {
-    baseURL: "https://demoapi.openbox.cloud/",
+    baseURL: "https://dapi.openbox.cloud/",
     //baseURL: "http://localhost:5001",
   },
   googleFonts: {
