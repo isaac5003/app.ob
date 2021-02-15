@@ -94,7 +94,7 @@
               v-model="reportForm.dateRange"
               type="month"
               format="MMMM yyyy"
-              value-format="yyyy-MM"
+              value-format="yyyy-MM-dd"
               placeholder="Selecciona un mes"
               size="small"
               style="width: 100%"
@@ -2095,7 +2095,7 @@ export default {
                           style: "tableHeader",
                         },
                       ],
-                      ...data,
+                      ...values,
                     ],
                   },
                 },
