@@ -94,7 +94,7 @@
               v-model="reportForm.dateRange"
               type="month"
               format="MMMM yyyy"
-              value-format="yyyy-MM"
+              value-format="yyyy-MM-dd"
               placeholder="Selecciona un mes"
               size="small"
               style="width: 100%"
@@ -910,6 +910,7 @@ export default {
       }
     },
     generateBalanceComprobacion(dateRange, fileType) {
+      console.log(dateRange);
       const bussinesInfo = () => this.$axios.get("/business/info");
       const balanceComprobacion = () =>
         this.$axios.get("/entries/report/balance-comprobacion", {
@@ -2041,75 +2042,79 @@ export default {
       const bussinesInfo = () => this.$axios.get("/business/info");
       switch (fileType) {
         case "pdf":
-          Promise.all([catalog(), bussinesInfo()]).then((res) => {
-            const [catalog, bussinesInfo] = res;
-            const catalogReport = catalog.data.accountingCatalog;
+          Promise.all([catalog(), bussinesInfo()])
+            .then((res) => {
+              const [catalog, bussinesInfo] = res;
+              const catalogReport = catalog.data.accountingCatalog;
 
-            const { name, nit, nrc } = bussinesInfo.data.info;
-            const values = catalogReport.map((c) => {
-              return [
-                { bold: c.isParent, text: c.code },
-                { bold: c.isParent, text: c.name },
+              const { name, nit, nrc } = bussinesInfo.data.info;
+              const values = catalogReport.map((c) => {
+                return [
+                  { bold: c.isParent, text: c.code },
+                  { bold: c.isParent, text: c.name },
 
-                {
-                  bold: c.isParent,
-                  text: c.isParent ? "N" : "S",
-                  alignment: "center",
+                  {
+                    bold: c.isParent,
+                    text: c.isParent ? "N" : "S",
+                    alignment: "center",
+                  },
+                ];
+              });
+
+              const docDefinition = {
+                info: {
+                  title: `catalogo_cuentas_al_${this.$dateFns.format(
+                    new Date(),
+                    "yyyyMMdd"
+                  )}`,
                 },
-              ];
-            });
-
-            const docDefinition = {
-              info: {
-                title: `catalogo_cuentas_al_${this.$dateFns.format(
-                  new Date(),
-                  "yyyyMMdd"
-                )}`,
-              },
-              pageSize: "LETTER",
-              pageOrientation: "portrait",
-              pageMargins: [20, 60, 20, 40],
-              header: getHeader(name, nit, nrc, null, "CATALOGO DE CUENTAS"),
-              footer: getFooter(),
-              content: [
-                {
-                  fontSize: 9,
-                  layout: "noBorders",
-                  table: {
-                    headerRows: 1,
-                    widths: ["20%", "70%", "10%"],
-                    heights: -5,
-                    body: [
-                      [
-                        {
-                          text: "CUENTA",
-                          style: "tableHeader",
-                        },
-                        {
-                          text: "DESCRIPCIÓN LA CUENTA",
-                          style: "tableHeader",
-                        },
-                        {
-                          alignment: "center",
-                          text: "ASIGNABLE",
-                          style: "tableHeader",
-                        },
+                pageSize: "LETTER",
+                pageOrientation: "portrait",
+                pageMargins: [20, 60, 20, 40],
+                header: getHeader(name, nit, nrc, null, "CATALOGO DE CUENTAS"),
+                footer: getFooter(),
+                content: [
+                  {
+                    fontSize: 9,
+                    layout: "noBorders",
+                    table: {
+                      headerRows: 1,
+                      widths: ["20%", "70%", "10%"],
+                      heights: -5,
+                      body: [
+                        [
+                          {
+                            text: "CUENTA",
+                            style: "tableHeader",
+                          },
+                          {
+                            text: "DESCRIPCIÓN LA CUENTA",
+                            style: "tableHeader",
+                          },
+                          {
+                            alignment: "center",
+                            text: "ASIGNABLE",
+                            style: "tableHeader",
+                          },
+                        ],
+                        ...values,
                       ],
-                      ...data,
-                    ],
+                    },
+                  },
+                ],
+                styles: {
+                  tableHeader: {
+                    bold: true,
+                    fontSize: 9,
                   },
                 },
-              ],
-              styles: {
-                tableHeader: {
-                  bold: true,
-                  fontSize: 9,
-                },
-              },
-            };
-            this.generating = false;
-            pdfMake.createPdf(docDefinition).open();
-          });
+              };
+              this.generating = false;
+              pdfMake.createPdf(docDefinition).open();
+            })
+            .catch((err) => {
+              console.log(err);
+            });
           break;
         case "excel":
           Promise.all([catalog(), bussinesInfo()]).then((res) => {
