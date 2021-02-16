@@ -177,7 +177,7 @@
                 size="small"
                 autocomplete="off"
                 style="width: 100%"
-                :disabled="editEntryDetailForm.entryAccounting === ''"
+                :disabled="editEntryDetailForm.accountingCatalog === ''"
               />
             </el-form-item>
           </div>
@@ -395,10 +395,7 @@
             >
           </div>
           <div class="col-start-11 col-span-2">
-            <el-button
-              @click="cancel()"
-              class="w-full"
-              size="small"
+            <el-button @click="cancel()" class="w-full" size="small"
               >Cancelar</el-button
             >
           </div>
@@ -439,8 +436,9 @@ export default {
               ...d,
               accountingCatalog: d.accountingCatalog.id,
               code: d.accountingCatalog.code,
-              order: !d.order ? entry.data.entry.accountingEntryDetails.indexOf(d) + 1 : d.order,
-            
+              order: !d.order
+                ? entry.data.entry.accountingEntryDetails.indexOf(d) + 1
+                : d.order,
             };
           }
         );
@@ -535,7 +533,6 @@ export default {
       }
     };
     return {
-    
       showEditEntryDetail: false,
       showAddEntryDetail: false,
       loading: false,
@@ -634,7 +631,9 @@ export default {
       console.log({ accountingEntryType, rawDate });
       if (accountingEntryType && rawDate) {
         this.$axios
-          .get(`entries/serie`, { params:{ accountingEntryType: accountingEntryType, date:rawDate }})
+          .get(`entries/serie`, {
+            params: { accountingEntryType: accountingEntryType, date: rawDate },
+          })
           .then((res) => {
             this.editEntryForm.serie = res.data.nextSerie;
             this.checkEntry();
@@ -703,7 +702,6 @@ export default {
           code: this.accountingCatalog.find(
             (c) => c.id == this.newEntryDetailForm.accountingCatalog
           ).code,
-         
         });
         this.showAddEntryDetail = false;
         this.checkEntry();
@@ -750,7 +748,7 @@ export default {
                   instance.confirmButtonLoading = true;
                   instance.confirmButtonText = "Procesando...";
                   this.$axios
-                    .put(`/entries/${this.$route.query.ref}` , {
+                    .put(`/entries/${this.$route.query.ref}`, {
                       header: {
                         title: formData.title,
                         date: formData.rawDate,
@@ -762,7 +760,7 @@ export default {
                         return {
                           ...d,
                           accountingCatalog: d.accountingCatalog,
-                         order: !d.order ? details.indexOf(d) + 1 : d.order,
+                          order: !d.order ? details.indexOf(d) + 1 : d.order,
                         };
                       }),
                     })
