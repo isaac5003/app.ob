@@ -496,8 +496,8 @@ export default {
       const abono =
         this.newEntryDetailForm.abono > 0
           ? this.newEntryDetailForm.abono.toFixed(2)
-          : "";
-      const val = value > 0 ? value.toFixed(2) : "";
+          : 0;
+      const val = value >= 0 ? value.toFixed(2) : 0;
       if (!abono) {
         if (!val) {
           callback(new Error("Este campo es requerido."));
@@ -516,8 +516,8 @@ export default {
       const cargo =
         this.newEntryDetailForm.cargo > 0
           ? this.newEntryDetailForm.cargo.toFixed(2)
-          : "";
-      const val = value > 0 ? value.toFixed(2) : "";
+          : 0;
+      const val = value >= 0 ? value.toFixed(2) : 0;
       if (!cargo) {
         if (!val) {
           callback(new Error("Este campo es requerido."));
