@@ -697,11 +697,13 @@ export default {
       });
     },
     updateDetail(index, formName, form) {
+      console.log(index, formName, form);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
         }
         this.accountingEntryDetails.splice(index, 1, { ...form });
+        console.log(this.accountingEntryDetails);
         this.showEditEntryDetail = false;
         this.checkEntry();
       });
