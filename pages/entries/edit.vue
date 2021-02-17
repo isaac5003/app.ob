@@ -385,21 +385,11 @@
           </el-table>
         </div>
         <!-- Guardar y Cancelar -->
-        <div class="grid grid-cols-12 gap-4 relative mt-4">
-          <div class="col-start-9 col-span-2">
-            <el-button
-              type="primary"
-              class="w-full"
-              size="small"
-              native-type="submit"
-              >Guardar</el-button
-            >
-          </div>
-          <div class="col-start-11 col-span-2">
-            <el-button @click="cancel()" class="w-full" size="small"
-              >Cancelar</el-button
-            >
-          </div>
+        <div class="flex flex-row justify-end space-x-4">
+          <el-button type="primary" size="small" native-type="submit"
+            >Guardar</el-button
+          >
+          <el-button size="small" @click="cancel()">Cancelar</el-button>
         </div>
       </el-form>
     </div>
