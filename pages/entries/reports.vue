@@ -174,7 +174,7 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import XLSX from "xlsx";
 import { selectValidation, getHeader, getFooter } from "../../tools";
-import { endOfMonth, startOfMonth } from "date-fns";
+import { startOfMonth, endOfMonth } from "date-fns";
 export default {
   name: "EntriesReports",
   components: {
@@ -255,7 +255,7 @@ export default {
             this.balanceAnual(radio);
             break;
           case "balanceGeneral":
-            this.balanceGeneral(dateRange, radio);
+            this.balanceGeneral(this.$dateFns.format(new Date(dateRange), "yyyy-MM-dd"), radio);
             break;
           case "estadoResultados":
             this.generateEstadoResultados(
@@ -297,8 +297,8 @@ export default {
       const estadoResultados = () =>
         this.$axios.get("/entries/report/estado-resultados", {
           params: {
-            startDate: startOfMonth(new Date(dateRange)),
-            endDate: endOfMonth(new Date(dateRange)),
+            // startDate: startOfMonth(new Date(dateRange)),
+            endDate: this.$dateFns.format(new Date( endOfMonth(new Date(dateRange)),), "yyyy-MM-dd"),
           },
         });
       const signatures = () => this.$axios.get("/entries/setting/signatures");
@@ -600,13 +600,14 @@ export default {
               const [bussinesInfo, signatures, settingsGeneral] = res;
               const { name, nit, nrc } = bussinesInfo.data.info;
               const generales = settingsGeneral.data.general;
+              console.log(generales);
               const signature = signatures.data.signatures;
               const postTitle =
                 "(Expresado en dólares de los Estados Unidos de América)";
               this.$axios
                 .get("/entries/report/estado-resultados", {
                   params: {
-                    startDate: generales.periodStart,
+                    //  startDate: generales.periodStart,
                     endDate: generales.peridoEnd,
                   },
                 })
@@ -837,13 +838,14 @@ export default {
               const [bussinesInfo, signatures, settingsGeneral] = res;
               const { name, nit, nrc } = bussinesInfo.data.info;
               const generales = settingsGeneral.data.general;
+              console.log(generales)
               const signature = signatures.data.signatures;
               const postTitle =
                 "(Expresado en dólares de los Estados Unidos de América)";
               this.$axios
                 .get("/entries/report/estado-resultados", {
                   params: {
-                    startDate: generales.periodStart,
+                    // startDate: generales.periodStart,
                     endDate: generales.peridoEnd,
                   },
                 })
@@ -1202,13 +1204,15 @@ export default {
       }
     },
     balanceGeneral(dateRange, fileType) {
-      const startDate = startOfMonth(new Date(dateRange));
-      const endDate = endOfMonth(new Date(dateRange));
+      // const startDate = startOfMonth(new Date(dateRange));
+      const endDate = 
+      this.$dateFns.format(new Date( endOfMonth(new Date(dateRange))), "yyyy-MM-dd")
+
       const general = () =>
         this.$axios.get("/entries/report/balance-general", {
           params: {
-            startDate,
-            endDate,
+            //  startDate,
+             endDate
           },
         });
       const bussinesInfo = () => this.$axios.get("/business/info");
