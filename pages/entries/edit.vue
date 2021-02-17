@@ -702,7 +702,13 @@ export default {
         if (!valid) {
           return false;
         }
-        this.accountingEntryDetails.splice(index, 1, { ...form });
+
+        this.accountingEntryDetails.splice(index, 1, {
+          ...form,
+          code: this.accountingCatalog.find(
+            (c) => c.id == form.accountingCatalog
+          ).code,
+        });
         console.log(this.accountingEntryDetails);
         this.showEditEntryDetail = false;
         this.checkEntry();
