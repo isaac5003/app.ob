@@ -144,6 +144,7 @@
                   :key="aC.id"
                   :label="`${aC.code} - ${aC.name}`"
                   :value="aC.id"
+                  :disabled="aC.isParent == true"
                 />
               </el-select>
             </el-form-item>
