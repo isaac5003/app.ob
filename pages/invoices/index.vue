@@ -1083,7 +1083,7 @@ export default {
 
                     // Crea el documento base
                     const pdfDocument = new jsPDF({
-                      orientation: "portrait",
+                      orientation: conf.orientation ? conf.orientation : "portrait",
                       unit: "mm",
                       format: conf.resolution,
                     });
