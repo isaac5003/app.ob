@@ -434,7 +434,6 @@ export default {
         this.checkEntry();
       })
       .catch((err) => {
-        console.log(err);
         this.errorMessage = err.response.data.message;
       });
   },
@@ -445,8 +444,8 @@ export default {
       const abono =
         this.newEntryDetailForm.abono > 0
           ? this.newEntryDetailForm.abono.toFixed(2)
-          : "";
-      const val = value > 0 ? value.toFixed(2) : "";
+          : 0;
+      const val = value > 0 ? value.toFixed(2) : 0;
       if (!abono) {
         if (!val) {
           callback(new Error("Este campo es requerido."));
@@ -465,8 +464,8 @@ export default {
       const cargo =
         this.newEntryDetailForm.cargo > 0
           ? this.newEntryDetailForm.cargo.toFixed(2)
-          : "";
-      const val = value > 0 ? value.toFixed(2) : "";
+          : 0;
+      const val = value > 0 ? value.toFixed(2) : 0;
       if (!cargo) {
         if (!val) {
           callback(new Error("Este campo es requerido."));
@@ -617,7 +616,6 @@ export default {
   },
   methods: {
     getEntrySerie({ accountingEntryType, rawDate }) {
-      console.log({ accountingEntryType, rawDate });
       if (accountingEntryType && rawDate) {
         this.$axios
           .get(`entries/serie`, {
@@ -628,7 +626,6 @@ export default {
             this.checkEntry();
           })
           .catch((err) => {
-            console.log(err);
             this.errorMessage = err.response.data.message;
           });
       }
