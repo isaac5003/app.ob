@@ -155,7 +155,15 @@
           />
           <el-table-column label="Precio Unit." min-width="75" align="right">
             <template slot-scope="scope">
-              <span>{{ parseFloat(scope.row.unitPrice) | formatMoney }}</span>
+              <span>{{
+                (selectedInvoice.documentType.id == 1
+                  ? parseFloat(scope.row.unitPrice) *
+                    (scope.row.incTax ? 1 : 1.13)
+                  : selectedInvoice.documentType.id == 2
+                  ? parseFloat(scope.row.unitPrice) /
+                    (scope.row.incTax ? 1.13 : 1)
+                  : parseFloat(scope.row.unitPrice)) | formatMoney
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column
@@ -1181,12 +1189,25 @@ export default {
                         position_y
                       );
                       // Price
+                      const documentType = invoice.data.invoice.documentType;
                       pdfDocument.text(
-                        this.$options.filters.formatMoney(unitPrice),
+                        sellingType.id == 3 || documentType.id == 3
+                          ? documentType.id == 1
+                            ? this.$options.filters.formatMoney(
+                                parseFloat(unitPrice) * (incTax ? 1 : 1.13)
+                              )
+                            : documentType.id == 2
+                            ? this.$options.filters.formatMoney(
+                                parseFloat(unitPrice) / (incTax ? 1.13 : 1)
+                              )
+                            : this.$options.filters.formatMoney(
+                                parseFloat(unitPrice)
+                              )
+                          : "",
                         conf.details.price.position[0] + position_x,
                         position_y
                       );
-                      const documentType = invoice.data.invoice.documentType;
+
                       // Ventas no sujetas
                       pdfDocument.text(
                         sellingType.id == 1 && documentType.id != 3
@@ -1338,6 +1359,7 @@ export default {
 
                     window.open(pdfDocument.output("bloburl"), "_blank");
                   } catch (error) {
+                    console.log(error);
                     this.$message.error(
                       "Error al generar el PDF, contacta con tu administrador."
                     );
