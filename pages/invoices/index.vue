@@ -1182,7 +1182,7 @@ export default {
                       );
                       // Price
                       pdfDocument.text(
-                        this.$options.filters.formatMoney(ventaPrice),
+                        this.$options.filters.formatMoney(unitPrice),
                         conf.details.price.position[0] + position_x,
                         position_y
                       );
