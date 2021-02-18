@@ -304,8 +304,8 @@
           :data="accountingEntryDetails"
           stripe
           size="mini"
-          :summary-method="getSummaries"
           show-summary
+          :summary-method="getSummaries"
         >
           <el-table-column type="index" label="#" min-width="70" />
           <el-table-column
@@ -651,7 +651,12 @@ export default {
         if (!valid) {
           return false;
         }
-        this.accountingEntryDetails.splice(index, 1, { ...form });
+        this.accountingEntryDetails.splice(index, 1, {
+          ...form,
+          code: this.accountingCatalog.find(
+            (c) => c.id == form.accountingCatalog
+          ).code,
+        });
         this.showEditEntryDetail = false;
         this.checkEntry();
       });

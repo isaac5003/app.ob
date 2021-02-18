@@ -697,7 +697,6 @@ export default {
       });
     },
     updateDetail(index, formName, form) {
-      console.log(index, formName, form);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -709,7 +708,6 @@ export default {
             (c) => c.id == form.accountingCatalog
           ).code,
         });
-        console.log(this.accountingEntryDetails);
         this.showEditEntryDetail = false;
         this.checkEntry();
       });
