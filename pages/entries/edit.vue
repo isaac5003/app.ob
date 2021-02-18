@@ -482,10 +482,10 @@ export default {
     };
     const editCargoValidateCompare = (rule, value, callback) => {
       const abono =
-        this.newEntryDetailForm.abono > 0
-          ? this.newEntryDetailForm.abono.toFixed(2)
+        this.editEntryDetailForm.abono > 0
+          ? this.editEntryDetailForm.abono.toFixed(2)
           : 0;
-      const val = value >= 0 ? value.toFixed(2) : 0;
+      const val = value > 0 ? value.toFixed(2) : 0;
       if (!abono) {
         if (!val) {
           callback(new Error("Este campo es requerido."));
@@ -502,10 +502,10 @@ export default {
     };
     const editAbonoValidateCompare = (rule, value, callback) => {
       const cargo =
-        this.newEntryDetailForm.cargo > 0
-          ? this.newEntryDetailForm.cargo.toFixed(2)
+        this.editEntryDetailForm.cargo > 0
+          ? this.editEntryDetailForm.cargo.toFixed(2)
           : 0;
-      const val = value >= 0 ? value.toFixed(2) : 0;
+      const val = value > 0 ? value.toFixed(2) : 0;
       if (!cargo) {
         if (!val) {
           callback(new Error("Este campo es requerido."));
