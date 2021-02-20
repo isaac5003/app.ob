@@ -58,6 +58,84 @@
           </el-form-item>
         </div>
       </div>
+      <div class="grid grid-cols-12 gap-4" v-if="requirementForm == 'seller'">
+        <div class="col-span-3">
+          <el-form-item label="Seleccione el tipo de venta">
+            <el-select
+              v-model="reportForm.sellingType"
+              placeholder="Selecione reporte"
+              size="small"
+              class="w-full"
+              default-first-option
+              clearable
+              filterable
+            >
+              <el-option
+                v-for="sellingType in sellingTypes"
+                :key="sellingType.id"
+                :label="sellingType.name"
+                :value="sellingType.id"
+              />
+            </el-select>
+          </el-form-item>
+        </div>
+      </div>
+      <div class="grid grid-cols-12 gap-4" v-if="requirementForm == 'status'">
+        <div class="col-span-3">
+          <el-form-item label="Seleccione el reporte de estado">
+            <el-select
+              v-model="reportForm.status"
+              placeholder="Selecione reporte"
+              size="small"
+              class="w-full"
+              default-first-option
+              clearable
+              filterable
+            >
+              <el-option
+                v-for="active in status"
+                :key="active.id"
+                :label="active.name"
+                :value="active.id"
+              />
+            </el-select>
+          </el-form-item>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-12 gap-4" v-if="requirementForm == 'price'">
+        <div class="col-span-2">
+          <el-form-item label="Desde" prop="initialCost">
+            <el-input-number
+              ref="cost"
+              type="number"
+              :min="0.01"
+              :step="0.01"
+              v-model="reportForm.initialCost"
+              size="small"
+              autocomplete="off"
+              @change="setStorage(reportForm)"
+              style="width: 101%"
+            />
+          </el-form-item>
+        </div>
+        <div class="col-span-2">
+          <el-form-item label="hasta" prop="finalCost">
+            <el-input-number
+              ref="cost"
+              type="number"
+              :min="0.01"
+              :step="0.01"
+              v-model="reportForm.finalCost"
+              size="small"
+              autocomplete="off"
+              @change="setStorage(reportForm)"
+              style="width: 101%"
+            />
+          </el-form-item>
+        </div>
+      </div>
+
       <div class="flex flex-row justify-end">
         <el-button
           :disabled="reportForm.reportType ? false : true"
@@ -71,6 +149,7 @@
         <el-button size="small" @click="$router.push('/services')"
           >Cancelar</el-button
         >
+        </div>
       </div>
     </el-form>
   </layout-content>
