@@ -24,6 +24,11 @@ export default {
           path: "/invoices/new",
         },
         {
+          name: "Reservar documento",
+          icon: getIcon("document-add"),
+          path: "/invoices/reserve",
+        },
+        {
           name: "Listado de documentos",
           icon: getIcon("menu"),
           path: "/invoices",
@@ -33,11 +38,6 @@ export default {
           name: "Reportes",
           icon: getIcon("document-text"),
           path: "/invoices/reports",
-        },
-          {
-          name: "Reservar documento",
-          icon: getIcon("document-text"),
-          path: "/invoices/reserveDocument",
         },
         {
           name: "Configuraciones",
