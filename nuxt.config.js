@@ -33,8 +33,9 @@ export default {
     defaultLocale: "es",
   },
   axios: {
-    baseURL: "https://devapi.openbox.cloud/",
-    //baseURL: "http://localhost:5001",
+    // baseURL: "https://v3.openbox.cloud/",
+    // baseURL: "http://localhost:5001",
+    baseURL: "https://devapi.openbox.cloud/"
   },
   googleFonts: {
     families: {
