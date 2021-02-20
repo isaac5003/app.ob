@@ -20,7 +20,7 @@
         <el-form-item
           label="Nombre del servicio"
           prop="name"
-          class="col-span-6"
+          class="col-span-5"
         >
           <el-input
             ref="name"
@@ -48,7 +48,7 @@
         <el-form-item
           label="Tipo de venta"
           prop="sellingType"
-          class="col-span-4"
+          class="col-span-5"
         >
           <el-radio-group
             ref="sellingType"

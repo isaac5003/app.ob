@@ -173,6 +173,7 @@
 
 <script>
 import { getIcon, selectValidation } from "../../tools";
+
 export default {
   name: "Menu",
   data() {
@@ -253,20 +254,19 @@ export default {
                   background: "rgba(255, 255, 255, 0.8)",
                   customClass: "text-3xl",
                 });
+
                 setTimeout(() => {
                   this.$axios
                     .put("/auth/update-workspace", { cid, bid })
                     .then((res) => {
-                      this.$auth
-                        .setUserToken(res.data.access_token)
-                        .then((res) => {
-                          this.$notify.success({
-                            title: "Éxito",
-                            message:
-                              "Se ha cambiado de espacio de trabajo correctamente.",
-                          });
-                          this.$router.push("/");
-                        });
+                      this.$router.push("/");
+                      this.$auth.setUserToken(res.data.access_token);
+
+                      this.$notify.success({
+                        title: "Éxito",
+                        message:
+                          "Se ha cambiado de espacio de trabajo correctamente.",
+                      });
                     })
                     .catch((err) => {
                       this.$notify.error({
@@ -274,11 +274,14 @@ export default {
                         message: err.response.data.message,
                       });
                     })
+
                     .then((alw) => {
                       instance.confirmButtonLoading = false;
                       instance.confirmButtonText = "Si, cambiar";
+
                       done();
                     });
+
                   loading.close();
                 }, 2000);
               }
@@ -309,7 +312,7 @@ export default {
       }
     },
     initials() {
-      return this.$auth.user.workspace.company.name.slice(0, 2);
+      return this.$store.state.auth.user.workspace.company.name.slice(0, 2);
     },
     modules() {
       const company = this.$auth.user.profile.access.find(

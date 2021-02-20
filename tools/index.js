@@ -407,7 +407,7 @@ function hasModule(module, user) {
   return branch.modules.map((m) => m.id).includes(module);
 }
 
-const getHeader = (name, nit, nrc, lastDay, docName, dateType = 'date', preTitle = null) => {
+const getHeader = (name, nit, nrc, lastDay, docName, dateType = 'date', preTitle = null, postTitle = null) => {
   let title = docName
   if (lastDay) {
     let date = null
@@ -435,14 +435,13 @@ const getHeader = (name, nit, nrc, lastDay, docName, dateType = 'date', preTitle
             text: name.toUpperCase(),
             fontSize: 12,
             bold: true,
-
           }
         ],
         margin: [20, 15, 20, 0],
       },
     ]
 
-    if (!preTitle === null) {
+    if (preTitle) {
       header.push(
         {
           columns: [
@@ -456,44 +455,102 @@ const getHeader = (name, nit, nrc, lastDay, docName, dateType = 'date', preTitle
         },
       )
     }
-    header.push(
-      {
-        columns: [
-          {
-            text: title.toUpperCase(),
-            fontSize: 10,
-            margin: [0, 5, 0, 0],
-            width: '70%'
-          },
-          {
-            text: [
-              {
-                text: 'NIT: ',
-                bold: true
-              },
-              {
-                text: nit
-              },
-              {
-                text: '  NRC: ',
-                bold: true
-              },
-              {
-                text: nrc
-              }
-            ],
-            fontSize: 9,
-            alignment: 'right',
-            margin: [0, 5, 0, 0],
-            width: '30%'
-          }
-        ],
-        margin: [20, 0, 20, 0],
-      },
-      {
-        canvas: [{ type: 'line', x1: 20, y1: 5, x2: pageSize.width - 20, y2: 5, lineWidth: 1 }]
-      }
-    )
+
+    if (postTitle) {
+      header.push(
+        {
+          columns: [
+            {
+              text: title.toUpperCase(),
+              fontSize: 10,
+              margin: [0, 5, 0, 0],
+              width: '70%'
+            },
+          ],
+          margin: [20, 0, 20, 0],
+        },
+        {
+          columns: [
+            {
+              text: postTitle,
+              fontSize: 10,
+              margin: [0, 5, 0, 0],
+              width: '70%'
+            },
+            {
+              text: [
+                {
+                  text: 'NIT: ',
+                  bold: true
+                },
+                {
+                  text: nit
+                },
+                {
+                  text: '  NRC: ',
+                  bold: true
+                },
+                {
+                  text: nrc
+                }
+              ],
+              fontSize: 9,
+              alignment: 'right',
+              margin: [0, 5, 0, 0],
+              width: '30%'
+            },
+          ],
+          margin: [20, 0, 20, 0],
+        },
+        {
+          canvas: [{ type: 'line', x1: 20, y1: 5, x2: pageSize.width - 20, y2: 5, lineWidth: 1 }]
+        }
+      )
+    }
+
+    else {
+      header.push(
+        {
+          columns: [
+            {
+              text: title.toUpperCase(),
+              fontSize: 10,
+              margin: [0, 5, 0, 0],
+              width: '70%'
+            },
+            {
+              text: [
+                {
+                  text: 'NIT: ',
+                  bold: true
+                },
+                {
+                  text: nit
+                },
+                {
+                  text: '  NRC: ',
+                  bold: true
+                },
+                {
+                  text: nrc
+                }
+              ],
+              fontSize: 9,
+              alignment: 'right',
+              margin: [0, 5, 0, 0],
+              width: '30%'
+            },
+          ],
+          margin: [20, 0, 20, 0],
+        },
+        {
+          canvas: [{ type: 'line', x1: 20, y1: 5, x2: pageSize.width - 20, y2: 5, lineWidth: 1 }]
+        }
+      )
+
+    }
+
+
     return header
   }
 }

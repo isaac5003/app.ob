@@ -388,7 +388,6 @@
           <div class="col-start-9 col-span-2">
             <el-button
               type="primary"
-              icon="el-icon-check"
               class="w-full"
               size="small"
               native-type="submit"
@@ -397,7 +396,6 @@
           </div>
           <div class="col-start-11 col-span-2">
             <el-button
-              icon="el-icon-close"
               @click="cancel()"
               class="w-full"
               size="small"
@@ -441,6 +439,8 @@ export default {
               ...d,
               accountingCatalog: d.accountingCatalog.id,
               code: d.accountingCatalog.code,
+              order: !d.order ? entry.data.entry.accountingEntryDetails.indexOf(d) + 1 : d.order,
+            
             };
           }
         );
@@ -451,9 +451,7 @@ export default {
         this.errorMessage = err.response.data.message;
       });
   },
-
   // checkBeforeEnter(this, storagekey, "salesNewForm");
-
   fetchOnServer: false,
   data() {
     const newCargoValidateCompare = (rule, value, callback) => {
@@ -537,6 +535,7 @@ export default {
       }
     };
     return {
+    
       showEditEntryDetail: false,
       showAddEntryDetail: false,
       loading: false,
@@ -704,6 +703,7 @@ export default {
           code: this.accountingCatalog.find(
             (c) => c.id == this.newEntryDetailForm.accountingCatalog
           ).code,
+         
         });
         this.showAddEntryDetail = false;
         this.checkEntry();
@@ -714,7 +714,6 @@ export default {
         if (!valid) {
           return false;
         }
-
         this.accountingEntryDetails.splice(index, 1, { ...form });
         this.showEditEntryDetail = false;
         this.checkEntry();
@@ -738,7 +737,6 @@ export default {
         if (!valid) {
           return false;
         }
-
         const save = () => {
           this.$confirm(
             "¿Estás seguro que deseas actualizar esta partida?",
@@ -756,7 +754,6 @@ export default {
                       header: {
                         title: formData.title,
                         date: formData.rawDate,
-
                         squared: formData.squared,
                         accounted: formData.accounted,
                         accountingEntryType: formData.accountingEntryType,
@@ -765,6 +762,7 @@ export default {
                         return {
                           ...d,
                           accountingCatalog: d.accountingCatalog,
+                         order: !d.order ? details.indexOf(d) + 1 : d.order,
                         };
                       }),
                     })
