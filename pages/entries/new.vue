@@ -592,7 +592,7 @@ export default {
       });
     },
     changeEntryType({ entryType, date }) {
-      // console.log(`ENTRY TYPE :::${entryType} FECHA ::: ${date}`);
+   
       if (entryType && date) {
         this.$axios
           .get("/entries/serie", {
@@ -602,7 +602,6 @@ export default {
             },
           })
           .then(({ data }) => {
-            console.log(data);
             this.newEntryForm.serie = data.nextSerie;
           })
           .catch((err) => {
@@ -660,7 +659,6 @@ export default {
     checkEntry() {
        const totalAbono = this.accountingEntryDetails.reduce((a, b) => a + (b.abono ? b.abono : 0), 0);
       const totalCargo = this.accountingEntryDetails.reduce((a, b) => a + (b.cargo ? b.cargo : 0), 0);
-      console.log(totalAbono, totalCargo, totalAbono.toFixed(3) == totalCargo.toFixed(3));
     this.newEntryForm.squared =  totalAbono.toFixed(3) == totalCargo.toFixed(3);
       this.newEntryForm.accounted = false;
     },
