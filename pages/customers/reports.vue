@@ -24,9 +24,7 @@
       :model="reportForm"
       :rules="reportFormRules"
       ref="reportForm"
-      @submit.native.prevent="
-        generateReport('reportForm', reportForm)
-      "
+      @submit.native.prevent="generateReport('reportForm', reportForm)"
       status-icon
     >
       <!-- first row -->
@@ -63,10 +61,14 @@
             >
               <el-row :gutter="15">
                 <el-col :span="8">
-                <el-radio border size="small" label="pdf" class="w-full">PDF</el-radio>  
+                  <el-radio border size="small" label="pdf" class="w-full"
+                    >PDF</el-radio
+                  >
                 </el-col>
                 <el-col :span="8">
-                <el-radio border size="small" label="excel" class="w-full">EXCEL</el-radio>  
+                  <el-radio border size="small" label="excel" class="w-full"
+                    >EXCEL</el-radio
+                  >
                 </el-col>
               </el-row>
             </el-radio-group>
@@ -74,21 +76,41 @@
         </div>
       </div>
 
+      <div class="grid grid-cols-12 gap-4" v-if="requirementForm == 'clientes'">
+        <div class="col-span-5">
+          <el-form-item label="Clientes" prop="customers">
+            <el-select
+              v-model="reportForm.customers"
+              placeholder="Seleccione el cliente"
+              size="small"
+              class="w-full"
+              default-first-option
+              filterable
+              clearable
+            >
+              <el-option
+                v-for="c in customers"
+                :key="c.id"
+                :label="c.name"
+                :value="c.id"
+              />
+            </el-select>
+          </el-form-item>
+        </div>
+      </div>
 
       <!-- Guardar y Cancelar -->
       <div class="flex flex-row justify-end">
-          <el-button
-            :disabled="reportForm.reportType ? false : true"
-            type="primary"
-            size="small"
-            icon="el-icon-download"
-            native-type="submit"
-            :loading="generating"
-            >Descargar</el-button
-          >
-          <el-button  size="small" @click="cancel()"
-            >Cancelar</el-button
-          >
+        <el-button
+          :disabled="reportForm.reportType ? false : true"
+          type="primary"
+          size="small"
+          icon="el-icon-download"
+          native-type="submit"
+          :loading="generating"
+          >Descargar</el-button
+        >
+        <el-button size="small" @click="cancel()">Cancelar</el-button>
       </div>
     </el-form>
   </layout-content>
@@ -101,47 +123,37 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import XLSX from "xlsx";
 import { selectValidation, getHeader, getFooter } from "../../tools";
+import { eachMonthOfInterval } from "date-fns";
 export default {
-  name: "EntriesReports",
+  name: "customerReports",
   components: {
     LayoutContent,
     Notification,
   },
-  // fetch() {
-  //   const catalog = () => {
-  //     return this.$axios.get("/entries/catalog" );
-  //   };
-
-  //   Promise.all([catalog()])
-  //     .then((res) => {
-  //       const [catalog] = res;
-  //       this.catalog = catalog.data.catalog;
-  //       this.loading = false;
-  //     })
-  //     .catch((err) => {
-  //       this.errorMessage = err.response.data.message;
-  //     });
-  // },
-  // fetchOnServer: false,
 
   data() {
     return {
+      errorMessage: "",
       generating: false,
       loading: false,
       errorMessage: "",
       reportForm: {
         reportType: "",
         radio: "pdf",
+        customers: "",
       },
       reportFormRules: {
         reportType: selectValidation("change", true),
         dateRange: selectValidation("change", true),
+        customers: selectValidation(true),
       },
       reports: [
-        { name: "Clientes", id: "clientes" },
+        { name: "Listado de clientes", id: "clientes" },
+        { name: "Perfil de cliente", id: "perfil" },
       ],
       requirementForm: null,
       accountingCatalog: [],
+      customers: null,
     };
   },
 
@@ -151,11 +163,22 @@ export default {
         this.requirementForm = null;
       } else {
         switch (id) {
-          case "clientes":
+          case "perfil":
+            this.$axios
+              .get("/customers")
+              .then((res) => {
+                this.customers = res.data.customers;
+                this.requirementForm = "clientes";
+              })
+              .catch((err) => err.data.errorMessage);
+
+            break;
+          default:
+            this.requirementForm = "";
         }
       }
     },
-    generateReport(formName, { reportType, radio }) {
+    generateReport(formName, { reportType, radio, customers }) {
       this.$refs[formName].validate((valid) => {
         if (!valid) {
           return false;
@@ -166,6 +189,9 @@ export default {
           case "clientes":
             this.reportCustomers(radio);
             break;
+          case "perfil":
+            this.reportCustomer(customers, radio);
+            break;
         }
       });
     },
@@ -175,33 +201,33 @@ export default {
       switch (fileType) {
         case "pdf":
           Promise.all([customers(), bussinesInfo()]).then((res) => {
-            const [ customers, bussinesInfo] = res;
+            const [customers, bussinesInfo] = res;
             const customersData = customers.data.customers;
             const { name, nit, nrc } = bussinesInfo.data.info;
             const values = [];
             const emptyRow = [{}, {}, {}, {}, {}];
             console.log(customersData);
 
-            for(const c of customersData){
+            for (const c of customersData) {
               values.push(emptyRow);
               values.push([
                 {
-                  text: c.name
+                  text: c.name,
                 },
                 {
-                  text: c.customerType.name
+                  text: c.customerType.name,
                 },
                 {
-                  text: c.nit
+                  text: c.nit,
                 },
                 {
-                  text: c.nrc
+                  text: c.nrc,
                 },
                 {
-                  text: c.isActiveCustomer ? "Activo" : "Inactivo"
-                }
+                  text: c.isActiveCustomer ? "Activo" : "Inactivo",
+                },
               ]);
-            };
+            }
             const docDefinition = {
               pageSize: "LETTER",
               pageOrientation: "portrait",
@@ -257,17 +283,17 @@ export default {
           break;
         case "excel":
           Promise.all([customers(), bussinesInfo()]).then((res) => {
-            const [ customers, bussinesInfo] = res;
+            const [customers, bussinesInfo] = res;
             const { name, nit, nrc } = bussinesInfo.data.info;
             const customersData = customers.data.customers;
             const values = [];
             for (const c of customersData) {
               values.push([
-                  c.name,
-                  c.customerType.name,
-                  c.nit,
-                  c.nrc,
-                  c.isActiveCustomer ? "Activo" : "Inactivo"
+                c.name,
+                c.customerType.name,
+                c.nit,
+                c.nrc,
+                c.isActiveCustomer ? "Activo" : "Inactivo",
               ]);
             }
             const document = [
@@ -288,6 +314,433 @@ export default {
           break;
       }
     },
+    reportCustomer(customerId, fileType) {
+      const customer = () => this.$axios.get(`/customers/${customerId}`);
+      const branches = () =>
+        this.$axios.get(`/customers/${customerId}/branches`);
+      const bussinesInfo = () => this.$axios.get("/business/info");
+      switch (fileType) {
+        case "pdf":
+          Promise.all([bussinesInfo(), customer(), branches()])
+            .then((res) => {
+              const [bussinesInfo, customer, branch] = res;
+
+              const { name, nit, nrc } = bussinesInfo.data.info;
+              const customerData = customer.data.customer;
+              const branches = branch.data.branches;
+              const values = [];
+              const valuesTable = [];
+              const valuesGeneral = [];
+              const valuesTributary = [];
+
+              valuesGeneral.push([
+                {
+                  bold: true,
+
+                  text: "Nombre:",
+                },
+                {
+                  text: customerData.name,
+                },
+                {
+                  bold: true,
+
+                  text: "Identificador:",
+                },
+                {
+                  text: customerData.shortName,
+                },
+                {
+                  bold: true,
+
+                  text: "Estado:",
+                },
+                {
+                  text: customerData.isActiveCustomer ? "Activo" : "Inactivo",
+                },
+              ]);
+              valuesGeneral.push([
+                { bold: true, text: "Contacto: " },
+                {
+                  text: customerData.customerBranches.contacName
+                    ? customerData.customerBranches.contacName
+                    : "----------------",
+                },
+                {
+                  bold: true,
+
+                  text: "Telefono: ",
+                },
+                {
+                  text: customerData.customerBranches.contactInfo
+                    ? customerData.customerBranches.contactInfo
+                    : "--------",
+                },
+                {
+                  bold: true,
+
+                  text: "Correo: ",
+                },
+                {
+                  text: customerData.customerBranches.contactInfo
+                    ? customerData.customerBranches.contactInfo
+                    : "-------",
+                },
+              ]);
+              values.push([
+                {
+                  text: "  ",
+                },
+              ]);
+              values.push([
+                {
+                  bold: true,
+                  text: "INFORMACIÓN TRIBUTARIA",
+                  style: "generalInfo",
+                },
+              ]);
+              valuesTributary.push([
+                {
+                  bold: true,
+                  text: "DUI: ",
+                },
+                {
+                  text: customerData.dui ? customerData.dui : "-------",
+                },
+                {
+                  bold: true,
+                  text: "NRC: ",
+                },
+                {
+                  text: customerData.nrc ? customerData.nrc : "-------",
+                },
+                {
+                  bold: true,
+                  text: "NIT: ",
+                },
+                { text: customerData.nit ? customerData.nit : "-------" },
+                {
+                  bold: true,
+                  text: "GIRO: ",
+                },
+                {
+                  text: customerData.giro ? customerData.giro : " -------",
+                },
+              ]);
+              valuesTributary.push([
+                {
+                  bold: true,
+                  text: "Tipo de cliente: ",
+                },
+                {
+                  text: customerData.customerType.name,
+                },
+                {
+                  bold: true,
+                  text:
+                    customerData.customerType.id == 2
+                      ? "Tipo de persona natural: "
+                      : "",
+                  colSpan: 2,
+                },
+                {},
+                {
+                  text:
+                    customerData.customerType.id == 2
+                      ? customerData.customerTypeNatural.name
+                      : "",
+                },
+                {
+                  bold: true,
+                  text: "Tipo de contribuyente: ",
+                  colSpan: 2,
+                },
+                {},
+                {
+                  text: customerData.customerTaxerType
+                    ? customerData.customerTaxerType.name
+                    : "---------------",
+                },
+              ]);
+
+              values.push([
+                {
+                  bold: true,
+                  text: "SUCURSALES",
+                  style: "generalInfo",
+                },
+              ]);
+              values.push([
+                {
+                  text: "  ",
+                },
+              ]);
+              for (const br of branches) {
+                valuesTable.push([
+                  {
+                    text: br.name,
+                  },
+                  {
+                    text: br.address1,
+                  },
+                  {
+                    text: br.address2,
+                  },
+                  { text: br.city.name },
+                  {
+                    text: br.state.name,
+                  },
+
+                  {
+                    text: br.country.name,
+                  },
+                ]);
+              }
+
+              const docDefinition = {
+                info: {
+                  title: `reporte_perfil_cliente_${customerData.name}`,
+                },
+                pageSize: "LETTER",
+                pageOrientation: "portrait",
+                pageMargins: [20, 60, 20, 40],
+                header: getHeader(name, nit, nrc, null, `PERFIL DE CLIENTE`),
+                footer: getFooter(),
+                content: [
+                  {
+                    fontSize: 9,
+                    layout: "noBorders",
+                    table: {
+                      headerRows: 1,
+                      widths: ["10%", "45%", "11%", "14%", "10%", "10%"],
+                      heights: -5,
+                      body: [
+                        [
+                          {
+                            text: "INFORMACIÓN GENERAL",
+                            style: "tableHeader",
+                            colSpan: 2,
+                          },
+                          {},
+                          {},
+                          {},
+                          {},
+                          {},
+                        ],
+                        ...valuesGeneral,
+                      ],
+                    },
+                  },
+                  values[0],
+
+                  {
+                    fontSize: 9,
+                    layout: "noBorders",
+                    table: {
+                      headerRows: 1,
+                      widths: [
+                        "15%",
+                        "15%",
+                        "10%",
+                        "9%",
+                        "15%",
+                        "16%",
+                        "10%",
+                        "10%",
+                      ],
+                      heights: -5,
+                      body: [
+                        [
+                          {
+                            text: "INFORMACIÓN TRIBUTARIA",
+                            style: "tableHeader",
+                            colSpan: 2,
+                          },
+                          {},
+                          {},
+                          {},
+                          {},
+                          {},
+                          {},
+                          {},
+                        ],
+                        ...valuesTributary,
+                      ],
+                    },
+                  },
+                  values[3],
+                  values[2],
+                  {
+                    fontSize: 9,
+                    layout: "noBorders",
+                    table: {
+                      headerRows: 1,
+
+                      widths: ["auto", "25%", "25%", "10%", "15%", "10%"],
+                      heights: -5,
+                      body: [
+                        [
+                          {
+                            text: "NOMBRE",
+                            style: "tableHeader",
+                          },
+                          {
+                            text: "DIRECCION 1",
+                            style: "tableHeader",
+                          },
+                          {
+                            text: "DIRECCIÓN 2",
+                            style: "tableHeader",
+                          },
+
+                          {
+                            text: "MUNICIPIO",
+                            style: "tableHeader",
+                          },
+                          {
+                            text: "DEPARTAMENTO",
+                            style: "tableHeader",
+                          },
+                          {
+                            text: "PAIS",
+                            style: "tableHeader",
+                          },
+                        ],
+                        ...valuesTable,
+                      ],
+                    },
+                  },
+                ],
+                styles: {
+                  tableHeader: {
+                    bold: true,
+                    fontSize: 9,
+                  },
+                  generalInfo: {
+                    fontSize: 9,
+                  },
+                },
+                defaultStyle: {
+                  fontSize: 9,
+                },
+              };
+              this.generating = false;
+              pdfMake.createPdf(docDefinition).open();
+            })
+            .catch((err) => {
+              this.errorMessage =
+                "Error al generar el PDF, contacta con tu administrador";
+            });
+          break;
+        case "excel":
+          Promise.all([bussinesInfo(), customer(), branches()])
+            .then((res) => {
+              const [bussinesInfo, customer, branch] = res;
+
+              const { name, nit, nrc } = bussinesInfo.data.info;
+              const customerData = customer.data.customer;
+              const branches = branch.data.branches;
+              const values = [];
+              const valuesTable = [];
+              const valuesGeneral = [];
+              const valuesTributary = [];
+
+              valuesGeneral.push([
+                `Nombre:`,
+                customerData.name,
+                `Identificador:`,
+                customerData.shortName,
+                `Estado:`,
+                customerData.isActiveCustomer ? "Activo" : "Inactivo",
+              ]);
+              valuesGeneral.push([
+                "Contacto:",
+                customerData.customerBranches.contacName
+                  ? customerData.customerBranches.contacName
+                  : "----------------",
+                "Telefono: ",
+                customerData.customerBranches.contactInfo
+                  ? customerData.customerBranches.contactInfo
+                  : "--------",
+                "Correo: ",
+                customerData.customerBranches.contactInfo
+                  ? customerData.customerBranches.contactInfo
+                  : "-------",
+              ]);
+
+              valuesTributary.push([
+                "DUI: ",
+                customerData.dui ? customerData.dui : "-------",
+                "NRC: ",
+                customerData.nrc ? customerData.nrc : "-------",
+                "NIT: ",
+                customerData.nit ? customerData.nit : "-------",
+                "GIRO: ",
+                customerData.giro ? customerData.giro : " -------",
+              ]);
+              valuesTributary.push([
+                "Tipo de cliente:",
+                customerData.customerType.name,
+                customerData.customerType.id == 2
+                  ? "Tipo de persona natural: "
+                  : "",
+                customerData.customerType.id == 2
+                  ? customerData.customerTypeNatural.name
+                  : "",
+                "Tipo de contribuyente: ",
+                customerData.customerTaxerType
+                  ? customerData.customerTaxerType.name
+                  : "---------------",
+              ]);
+
+              for (const br of branches) {
+                valuesTable.push([
+                  br.name,
+                  br.address1,
+                  br.address2,
+                  br.city.name,
+                  br.state.name,
+                  br.country.name,
+                ]);
+              }
+
+              const document = [
+                [name],
+                [`PERFIL DE CLIENTE`, `NIT: ${nit}`, `NRC: ${nrc}`],
+                [""],
+                ["INFORMACIÓN GENERAL"],
+                ...valuesGeneral,
+                [""],
+                ["INFORMACIÓN TRIBUTARIA"],
+                ...valuesTributary,
+                [""],
+                ["SUCURSALES"],
+                [
+                  "NOMBRE",
+                  "DIRECCIÓN 1",
+                  "DIRECCIÓN 2",
+                  "CIUDAD",
+                  "DEPARTAMENTO",
+                  "PAIS",
+                ],
+                ...valuesTable,
+              ];
+
+              const sheet = XLSX.utils.aoa_to_sheet(document);
+              const workbook = XLSX.utils.book_new();
+              const fileName = `reporte_cliente_${customerData.shortName}`;
+              XLSX.utils.book_append_sheet(workbook, sheet, fileName);
+              XLSX.writeFile(workbook, `${fileName}.xlsx`);
+              this.generating = false;
+            })
+            .catch((err) => {
+              this.errorMessage =
+                "Error al generar el EXCEL, contacta con tu administrador";
+            });
+          break;
+      }
+    },
+
     cancel() {
       this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
         confirmButtonText: "Si, salir",

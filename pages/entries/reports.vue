@@ -174,7 +174,7 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import XLSX from "xlsx";
 import { selectValidation, getHeader, getFooter } from "../../tools";
-import { endOfMonth, startOfMonth } from "date-fns";
+
 export default {
   name: "EntriesReports",
   components: {
@@ -255,7 +255,10 @@ export default {
             this.balanceAnual(radio);
             break;
           case "balanceGeneral":
-            this.balanceGeneral(dateRange, radio);
+            this.balanceGeneral(
+              this.$dateFns.format(new Date(dateRange), "yyyy-MM-dd"),
+              radio
+            );
             break;
           case "estadoResultados":
             this.generateEstadoResultados(
@@ -297,8 +300,10 @@ export default {
       const estadoResultados = () =>
         this.$axios.get("/entries/report/estado-resultados", {
           params: {
-            startDate: startOfMonth(new Date(dateRange)),
-            endDate: endOfMonth(new Date(dateRange)),
+            endDate: this.$dateFns.format(
+              this.$dateFns.endOfMonth(new Date(dateRange)),
+              "yyyy-MM-dd"
+            ),
           },
         });
       const signatures = () => this.$axios.get("/entries/setting/signatures");
@@ -606,7 +611,6 @@ export default {
               this.$axios
                 .get("/entries/report/estado-resultados", {
                   params: {
-                    startDate: generales.periodStart,
                     endDate: generales.peridoEnd,
                   },
                 })
@@ -843,7 +847,6 @@ export default {
               this.$axios
                 .get("/entries/report/estado-resultados", {
                   params: {
-                    startDate: generales.periodStart,
                     endDate: generales.peridoEnd,
                   },
                 })
@@ -1202,12 +1205,14 @@ export default {
       }
     },
     balanceGeneral(dateRange, fileType) {
-      const startDate = startOfMonth(new Date(dateRange));
-      const endDate = endOfMonth(new Date(dateRange));
+      const endDate = this.$dateFns.format(
+        this.$dateFns.endOfMonth(new Date(dateRange)),
+        "yyyy-MM-dd"
+      );
+
       const general = () =>
         this.$axios.get("/entries/report/balance-general", {
           params: {
-            startDate,
             endDate,
           },
         });
