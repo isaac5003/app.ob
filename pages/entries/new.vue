@@ -89,7 +89,7 @@
             "
             >Guardar</el-button
           >
-          <el-button @click="showEditEntryDetail = false" size="small"
+          <el-button @click="showNewEntryDetail= false" size="small"
             >Cancelar</el-button
           >
         </div>
