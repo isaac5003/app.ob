@@ -36,7 +36,7 @@ export default {
     // baseURL: "https://api2.openbox.cloud/",
     baseURL: "https://dapi.openbox.cloud/",
     // baseURL: "https://devapi.openbox.cloud/",
-    //baseURL: "http://localhost:5001",
+    // baseURL: "http://localhost:5001",
   },
   googleFonts: {
     families: {
