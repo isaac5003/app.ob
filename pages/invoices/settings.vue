@@ -244,7 +244,7 @@
             </div>
             <el-table :data="zones" stripe size="mini">
               <el-table-column prop="index" width="40" />
-              <el-table-column label="Zona" prop="name" width="180" />
+              <el-table-column label="Zona" prop="name" min-width="180" />
               <el-table-column label="Estado" width="100">
                 <template slot-scope="scope">
                   <el-tag size="small" type="success" v-if="scope.row.active"
@@ -255,7 +255,7 @@
                   >
                 </template>
               </el-table-column>
-              <el-table-column label width="70" align="center">
+              <el-table-column label min-width="70" align="center">
                 <template slot-scope="scope">
                   <el-dropdown trigger="click" szie="mini">
                     <el-button icon="el-icon-more" size="mini" />
@@ -304,7 +304,7 @@
             <el-table :data="sellers" stripe size="mini">
               <el-table-column label="ID" prop="index" width="40" />
               <el-table-column label="Vendedor" prop="name" min-width="240" />
-              <el-table-column label="Zona" width="100">
+              <el-table-column label="Zona" min-width="100">
                 <template slot-scope="scope">
                   <span
                     >{{
@@ -463,9 +463,9 @@
               <el-table-column
                 label="Condicion de pago"
                 prop="name"
-                width="260"
+                min-width="260"
               />
-              <el-table-column label="Estado" width="100">
+              <el-table-column label="Estado" min-width="100">
                 <template slot-scope="scope">
                   <el-tag size="small" type="success" v-if="scope.row.active"
                     ><i class="el-icon-success"></i>Activo</el-tag
