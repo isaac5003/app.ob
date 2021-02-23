@@ -2645,6 +2645,7 @@ export default {
       }
     },
     generateDetalleCuentas(dateRange, catalogos, fileType) {
+      console.log(dateRange);
       const bussinesInfo = () => this.$axios.get("/business/info");
       const movements = () =>
         this.$axios.get("/entries/report/account-movements", {
@@ -2758,7 +2759,10 @@ export default {
                 name,
                 nit,
                 nrc,
-                [new Date(dateRange[0]), new Date(dateRange[1])],
+                [
+                  new Date(this.$dateFns.format(dateRange[0], "MM-dd-yyyy")),
+                  new Date(this.$dateFns.format(dateRange[1], "MM-dd-yyyy")),
+                ],
                 "DETALLE DE MOVIMIENTO DE CUENTAS",
                 "period"
               ),
@@ -2875,12 +2879,9 @@ export default {
               [name],
               [
                 `DETALLE DE MOVIMIENTO DE CUENTAS EN EL PERÍODO DEL ${this.$dateFns.format(
-                  new Date(dateRange[0]),
+                  dateRange[0],
                   "dd/MM/yyyy"
-                )} AL ${this.$dateFns.format(
-                  new Date(dateRange[1]),
-                  "dd/MM/yyyy"
-                )}`,
+                )} AL ${this.$dateFns.format(dateRange[1], "dd/MM/yyyy")}`,
                 "",
                 "",
                 "",
