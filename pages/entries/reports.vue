@@ -94,7 +94,6 @@
               v-model="reportForm.dateRange"
               type="month"
               format="MMMM yyyy"
-              value-format="yyyy-MM-dd"
               placeholder="Selecciona un mes"
               size="small"
               style="width: 100%"
@@ -173,8 +172,8 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import XLSX from "xlsx";
-import { selectValidation, getHeader, getFooter } from "../../tools";
-import { endOfMonth, startOfMonth } from "date-fns";
+import { selectValidation, getHeader, getFooter, fixDate } from "../../tools";
+
 export default {
   name: "EntriesReports",
   components: {
@@ -255,7 +254,10 @@ export default {
             this.balanceAnual(radio);
             break;
           case "balanceGeneral":
-            this.balanceGeneral(dateRange, radio);
+            this.balanceGeneral(
+              this.$dateFns.format(new Date(dateRange), "yyyy-MM-dd"),
+              radio
+            );
             break;
           case "estadoResultados":
             this.generateEstadoResultados(
@@ -297,8 +299,7 @@ export default {
       const estadoResultados = () =>
         this.$axios.get("/entries/report/estado-resultados", {
           params: {
-            startDate: startOfMonth(new Date(dateRange)),
-            endDate: endOfMonth(new Date(dateRange)),
+            endDate: fixDate(dateRange),
           },
         });
       const signatures = () => this.$axios.get("/entries/setting/signatures");
@@ -843,7 +844,6 @@ export default {
               this.$axios
                 .get("/entries/report/estado-resultados", {
                   params: {
-                    startDate: generales.periodStart,
                     endDate: generales.peridoEnd,
                   },
                 })
@@ -1203,13 +1203,10 @@ export default {
       }
     },
     balanceGeneral(dateRange, fileType) {
-      const startDate = startOfMonth(new Date(dateRange));
-      const endDate = endOfMonth(new Date(dateRange));
       const general = () =>
         this.$axios.get("/entries/report/balance-general", {
           params: {
-            startDate,
-            endDate,
+            endDate: fixDate(dateRange),
           },
         });
       const bussinesInfo = () => this.$axios.get("/business/info");
@@ -1666,14 +1663,21 @@ export default {
                       ],
                       "",
                       {
+                        alignment: "right",
                         text: this.$options.filters.formatMoney(a.total),
                         style: "tableHeader",
                       },
                     ]);
                     for (const ch of a.accounts) {
                       activoValues.push([
-                        { text: ch.name, margin: [10, 0, 0, 0] },
-                        this.$options.filters.formatMoney(ch.total),
+                        {
+                          text: ch.name,
+                          margin: [10, 0, 0, 0],
+                        },
+                        {
+                          alignment: "right",
+                          text: this.$options.filters.formatMoney(ch.total),
+                        },
                         "",
                       ]);
                     }
@@ -1700,6 +1704,7 @@ export default {
                       ],
                       "",
                       {
+                        alignment: "right",
                         text: this.$options.filters.formatMoney(a.total),
                         style: "tableHeader",
                       },
@@ -1707,7 +1712,11 @@ export default {
                     for (const ch of a.accounts) {
                       pasivoValues.push([
                         { text: ch.name, margin: [10, 0, 0, 0] },
-                        this.$options.filters.formatMoney(ch.total),
+                        {
+                          alignment: "right",
+                          text: this.$options.filters.formatMoney(ch.total),
+                        },
+
                         "",
                       ]);
                     }
@@ -1734,6 +1743,7 @@ export default {
                       ],
                       "",
                       {
+                        alignment: "right",
                         text: this.$options.filters.formatMoney(a.total),
                         style: "tableHeader",
                       },
@@ -1741,7 +1751,11 @@ export default {
                     for (const ch of a.accounts) {
                       patrimonioValues.push([
                         { text: ch.name, margin: [10, 0, 0, 0] },
-                        this.$options.filters.formatMoney(ch.total),
+                        {
+                          alignment: "right",
+                          text: this.$options.filters.formatMoney(ch.total),
+                        },
+
                         "",
                       ]);
                     }
@@ -2763,7 +2777,10 @@ export default {
                 name,
                 nit,
                 nrc,
-                [new Date(dateRange[0]), new Date(dateRange[1])],
+                [
+                  new Date(this.$dateFns.format(dateRange[0], "MM-dd-yyyy")),
+                  new Date(this.$dateFns.format(dateRange[1], "MM-dd-yyyy")),
+                ],
                 "DETALLE DE MOVIMIENTO DE CUENTAS",
                 "period"
               ),
@@ -2880,12 +2897,9 @@ export default {
               [name],
               [
                 `DETALLE DE MOVIMIENTO DE CUENTAS EN EL PERÍODO DEL ${this.$dateFns.format(
-                  new Date(dateRange[0]),
+                  dateRange[0],
                   "dd/MM/yyyy"
-                )} AL ${this.$dateFns.format(
-                  new Date(dateRange[1]),
-                  "dd/MM/yyyy"
-                )}`,
+                )} AL ${this.$dateFns.format(dateRange[1], "dd/MM/yyyy")}`,
                 "",
                 "",
                 "",

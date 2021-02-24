@@ -87,7 +87,7 @@
                 <el-checkbox
                   v-if="
                     newServiceForm.sellingType == 3 &&
-                      salesNewForm.documentType != 3
+                    salesNewForm.documentType != 3
                   "
                   border
                   v-model="newServiceForm.incTax"
@@ -218,7 +218,7 @@
                   border
                   v-if="
                     editServiceForm.sellingType == 3 &&
-                      salesNewForm.documentType != 3
+                    salesNewForm.documentType != 3
                   "
                   v-model="editServiceForm.incTax"
                   size="small"
@@ -291,28 +291,31 @@
           <!-- first row -->
           <div class="grid grid-cols-12 gap-4">
             <!-- tipo de documento -->
-            <div class="col-span-3">
-              <el-form-item label="Tipo de documento" prop="documentType">
-                <el-select
-                  v-model="salesNewForm.documentType"
-                  class="w-full"
-                  size="small"
-                  clearable
-                  placeholder="Seleccionar"
-                  @change="
-                    validateDocumentType(salesNewForm.documentType, tributary)
-                  "
-                >
-                  <el-option
-                    v-for="d in documentTypes"
-                    :key="d.id"
-                    :label="`${d.code} - ${d.name}`"
-                    :value="d.id"
+            <template>
+              <div class="col-span-3">
+                <el-form-item label="Tipo de documento" prop="documentType">
+                  <el-select
+                    v-model="salesNewForm.documentType"
+                    class="w-full"
+                    size="small"
+                    clearable
+                    placeholder="Seleccionar"
+                    @change="
+                      validateDocumentType(salesNewForm.documentType, tributary)
+                    "
                   >
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </div>
+                    <el-option
+                      v-for="d in documentTypes"
+                      :key="d.id"
+                      :label="`${d.code} - ${d.name}`"
+                      :value="d.id"
+                    >
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </div>
+            </template>
+
             <!-- n° autorizacion -->
             <div class="col-span-2 col-start-7">
               <el-form-item label="N° de autorización">
@@ -359,100 +362,124 @@
           <!-- second row -->
           <div class="grid grid-cols-12 gap-4">
             <!-- cliente -->
-            <div class="col-span-4">
-              <el-form-item label="Cliente" prop="customer">
-                <el-select
-                  v-model="salesNewForm.customer"
-                  size="small"
-                  class="w-full"
-                  clearable
-                  filterable
-                  default-first-option
-                  placeholder="Seleccionar"
-                  @change="getCustomerDetails(salesNewForm.customer)"
-                >
-                  <el-option
-                    v-for="c in customers"
-                    :key="c.id"
-                    :label="c.name"
-                    :value="c.id"
-                    @change="setStorage(salesNewForm)"
+            <template>
+              <div class="col-span-4">
+                <el-form-item label="Cliente" prop="customer">
+                  <el-select
+                    v-model="salesNewForm.customer"
+                    size="small"
+                    class="w-full"
+                    clearable
+                    filterable
+                    default-first-option
+                    placeholder="Seleccionar"
+                    @change="getCustomerDetails(salesNewForm.customer)"
                   >
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </div>
-            <!-- sucursal -->
-            <div class="col-span-2">
-              <el-form-item label="Sucursal" prop="customerBranch">
-                <el-select
-                  v-model="salesNewForm.customerBranch"
-                  class="w-full"
-                  clearable
-                  filterable
-                  default-first-option
-                  size="small"
-                  placeholder="Seleccionar"
-                  @change="selectBranch(salesNewForm.customerBranch, branches)"
-                >
-                  <el-option
-                    v-for="br in branches"
-                    :key="br.id"
-                    :label="br.name"
-                    :value="br.id"
-                  >
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </div>
-            <!-- condiciones de pago -->
-            <div class="col-span-3">
-              <el-form-item
-                label="Condiciones de pago"
-                prop="invoicesPaymentsCondition"
-              >
-                <el-select
-                  v-model="salesNewForm.invoicesPaymentsCondition"
-                  size="small"
-                  class="w-full"
-                  clearable
-                  filterable
-                  default-first-option
-                  placeholder="Seleccionar"
-                >
-                  <el-option
-                    v-for="p in paymentConditions"
-                    :key="p.value"
-                    :label="p.name"
-                    :value="p.id"
-                  >
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </div>
+                    <el-option
+                      v-for="c in customers"
+                      :key="c.id"
+                      :label="c.name"
+                      :value="c.id"
+                      @change="setStorage(salesNewForm)"
+                    >
+                      <div
+                        class="flex flex-row justify-between items-end py-1 leading-normal"
+                      >
+                        <div class="flex flex-col">
+                          <span class="text-xs text-gray-500">{{
+                            c.shortName
+                          }}</span>
+                          <span>{{ c.name }}</span>
+                        </div>
+                        <span class="text-xs text-gray-500">{{ c.nrc }}</span>
+                      </div>
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </div>
+            </template>
 
-            <!-- Venta a cuenta de -->
-            <div class="col-span-3">
-              <el-form-item label="Venta a cuenta de" prop="invoicesSellers">
-                <el-select
-                  v-model="salesNewForm.invoicesSellers"
-                  class="w-full"
-                  size="small"
-                  clearable
-                  filterable
-                  default-first-option
-                  placeholder="Seleccionar"
-                >
-                  <el-option
-                    v-for="s in sellers"
-                    :key="s.value"
-                    :label="s.name"
-                    :value="s.id"
+            <!-- sucursal -->
+            <template>
+              <div class="col-span-2">
+                <el-form-item label="Sucursal" prop="customerBranch">
+                  <el-select
+                    v-model="salesNewForm.customerBranch"
+                    class="w-full"
+                    clearable
+                    filterable
+                    default-first-option
+                    size="small"
+                    placeholder="Seleccionar"
+                    @change="
+                      selectBranch(salesNewForm.customerBranch, branches)
+                    "
                   >
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </div>
+                    <el-option
+                      v-for="br in branches"
+                      :key="br.id"
+                      :label="br.name"
+                      :value="br.id"
+                    >
+                      <!-- <span style="float: right; color: #8492a6;">{{`${br.name}` }}</span>
+                      <span style="float: left;">{{ `${br.name }` }}</span> -->
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </div>
+            </template>
+
+            <!-- condiciones de pago -->
+            <template>
+              <div class="col-span-3">
+                <el-form-item
+                  label="Condiciones de pago"
+                  prop="invoicesPaymentsCondition"
+                >
+                  <el-select
+                    v-model="salesNewForm.invoicesPaymentsCondition"
+                    size="small"
+                    class="w-full"
+                    clearable
+                    filterable
+                    default-first-option
+                    placeholder="Seleccionar"
+                  >
+                    <el-option
+                      v-for="p in paymentConditions"
+                      :key="p.value"
+                      :label="p.name"
+                      :value="p.id"
+                    >
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </div>
+            </template>
+            <!-- Venta a cuenta de -->
+            <template>
+              <div class="col-span-3">
+                <el-form-item label="Venta a cuenta de" prop="invoicesSellers">
+                  <el-select
+                    v-model="salesNewForm.invoicesSellers"
+                    class="w-full"
+                    size="small"
+                    clearable
+                    filterable
+                    default-first-option
+                    placeholder="Seleccionar"
+                  >
+                    <el-option
+                      v-for="s in sellers"
+                      :key="s.value"
+                      :label="s.name"
+                      :value="s.id"
+                    >
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </div>
+            </template>
           </div>
           <!-- third row -->
           <div class="grid grid-cols-12 gap-4 text-xs">
@@ -559,7 +586,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 1 &&
-                        salesNewForm.documentType != 3
+                      salesNewForm.documentType != 3
                     "
                     >{{
                       calcSujeta(salesNewForm.documentType, scope.row)
@@ -578,7 +605,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 2 &&
-                        salesNewForm.documentType != 3
+                      salesNewForm.documentType != 3
                     "
                     >{{
                       calcExenta(salesNewForm.documentType, scope.row)
@@ -597,7 +624,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 3 ||
-                        salesNewForm.documentType == 3
+                      salesNewForm.documentType == 3
                     "
                     >{{
                       calcGravada(salesNewForm.documentType, scope.row)

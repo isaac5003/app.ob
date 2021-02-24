@@ -1,4 +1,4 @@
-const { format } = require('date-fns')
+const { format, endOfMonth } = require('date-fns')
 const { es } = require('date-fns/locale')
 const { zonedTimeToUtc } = require('date-fns-tz')
 
@@ -584,6 +584,10 @@ const getFooter = () => {
   }
 }
 
+const fixDate = (date) => {
+  return format(endOfMonth(zonedTimeToUtc(date)), 'yyyy-MM-dd')
+}
+
 module.exports = {
   getIcon,
   inputValidation,
@@ -595,5 +599,6 @@ module.exports = {
   numeroALetras,
   calculatedAmount,
   getHeader,
-  getFooter
+  getFooter,
+  fixDate
 };
