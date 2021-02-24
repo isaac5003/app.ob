@@ -26,3 +26,7 @@ html {
   display: flex;
   justify-content: center;
 }
+
+.el-select-dropdown__item {
+  height: auto !important;
+}

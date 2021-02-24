@@ -155,7 +155,17 @@
           />
           <el-table-column label="Precio Unit." min-width="75" align="right">
             <template slot-scope="scope">
-              <span>{{ parseFloat(scope.row.unitPrice) | formatMoney }}</span>
+              <span>
+                {{
+                  (selectedInvoice.documentType.id == 1
+                    ? parseFloat(scope.row.unitPrice) *
+                      (scope.row.incTax ? 1 : 1.13)
+                    : selectedInvoice.documentType.id == 2
+                    ? parseFloat(scope.row.unitPrice) /
+                      (scope.row.incTax ? 1.13 : 1)
+                    : parseFloat(scope.row.unitPrice)) | formatMoney
+                }}</span
+              >
             </template>
           </el-table-column>
           <el-table-column
@@ -320,73 +330,110 @@
               @change="fetchInvoices"
             />
           </el-form-item>
-          <el-form-item label="Cliente:" class="col-span-4">
-            <el-select
-              v-model="filter.customer"
-              size="small"
-              class="w-full"
-              clearable
-              filterable
-              default-first-option
-              placeholder="Todos los clientes:"
-              @change="fetchInvoices"
-            >
-              <el-option label="Todos los clientes" value="" />
-              <el-option-group key="ACTIVOS" label="ACTIVOS">
+          <template>
+            <el-form-item label="Cliente:" class="col-span-4">
+              <el-select
+                v-model="filter.customer"
+                size="small"
+                class="w-full"
+                clearable
+                filterable
+                default-first-option
+                placeholder="Todos los clientes:"
+                @change="fetchInvoices"
+              >
+                <el-option label="Todos los clientes" value="" />
+                <el-option-group key="ACTIVOS" label="ACTIVOS">
+                  <el-option
+                    style="height: 60px"
+                    v-for="item in activeCustomers"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                   <div
+                        class="flex flex-row justify-between items-end py-1 leading-normal"
+                      >
+                        <div class="flex flex-col">
+                          <span class="text-xs text-gray-500">{{
+                            item.shortName
+                          }}</span>
+                          <span>{{ item.name }}</span>
+                        </div>
+                        <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                      </div>
+                  </el-option>
+                </el-option-group>
+                <el-option-group key="INACTIVOS" label="INACTIVOS">
+                  <el-option
+                   style="height:50px;"
+                    v-for="item in activeCustomers"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+               <div
+                        class="flex flex-row justify-between items-end py-1 leading-normal"
+                      >
+                        <div class="flex flex-col">
+                          <span class="text-xs text-gray-500">{{
+                            item.shortName
+                          }}</span>
+                          <span>{{ item.name }}</span>
+                        </div>
+                        <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                      </div>
+                  </el-option>
+                </el-option-group>
+              </el-select>
+            </el-form-item>
+          </template>
+          <template>
+            <el-form-item label="Tipo de documento:" class="col-span-2">
+              <el-select
+                v-model="filter.documentType"
+                size="small"
+                clearable
+                placeholder="Todos los tipos:"
+                class="w-full"
+                @change="fetchInvoices"
+              >
+                <el-option label="Todos los tipos" value="" />
                 <el-option
-                  v-for="item in activeCustomers"
+                  v-for="item in documentTypes"
                   :key="item.id"
-                  :label="item.name"
+                  :label="`${item.code} - ${item.name}`"
                   :value="item.id"
-                />
-              </el-option-group>
-              <el-option-group key="INACTIVOS" label="INACTIVOS">
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </template>
+
+          <template>
+            <el-form-item label="Estado:" class="col-span-2">
+              <el-select
+                v-model="filter.status"
+                size="small"
+                clearable
+                placeholder="Todos los estados:"
+                class="w-full"
+                @change="fetchInvoices"
+              >
+                <el-option label="Todos los estados" value="" />
                 <el-option
-                  v-for="item in inactiveCustomers"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-option-group>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="Tipo de documento:" class="col-span-2">
-            <el-select
-              v-model="filter.documentType"
-              size="small"
-              clearable
-              placeholder="Todos los tipos:"
-              class="w-full"
-              @change="fetchInvoices"
-            >
-              <el-option label="Todos los tipos" value="" />
-              <el-option
-                v-for="item in documentTypes"
-                :key="item.id"
-                :label="`${item.code} - ${item.name}`"
-                :value="item.id"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="Estado:" class="col-span-2">
-            <el-select
-              v-model="filter.status"
-              size="small"
-              clearable
-              placeholder="Todos los estados:"
-              class="w-full"
-              @change="fetchInvoices"
-            >
-              <el-option label="Todos los estados" value="" />
-              <el-option
-                v-for="status in statuses"
-                :key="status.id"
-                :label="status.name"
-                :value="status.id"
-              />
-            </el-select>
-          </el-form-item>
+                  class="text:center"
+                  v-for="status in statuses"
+                  :key="status.id"
+                  :label="status.name"
+                  :value="status.id"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </template>
         </div>
+        <template></template>
         <div class="grid grid-cols-12 gap-4">
           <el-form-item label="Vendedor:" class="col-span-3">
             <el-select
@@ -406,7 +453,8 @@
                   :key="seller.id"
                   :label="seller.name"
                   :value="seller.id"
-                />
+                >
+                </el-option>
               </el-option-group>
               <el-option-group key="INACTIVOS" label="INACTIVOS">
                 <el-option
@@ -414,70 +462,78 @@
                   :key="seller.id"
                   :label="seller.name"
                   :value="seller.id"
-                />
+                >
+                </el-option>
               </el-option-group>
             </el-select>
           </el-form-item>
-          <el-form-item label="Zona:" class="col-span-3">
-            <el-select
-              v-model="filter.zone"
-              size="small"
-              clearable
-              filterable
-              default-first-option
-              placeholder="Todos las Zonas"
-              class="w-full"
-              @change="fetchInvoices"
-            >
-              <el-option label="Tados las zonas" value="" />
-              <el-option-group key="ACTIVOS" label="ACTIVOS">
-                <el-option
-                  v-for="zone in activeZones"
-                  :key="zone.id"
-                  :label="zone.name"
-                  :value="zone.id"
-                />
-              </el-option-group>
-              <el-option-group key="INACTIVOS" label="INACTIVOS">
-                <el-option
-                  v-for="zone in inactiveZones"
-                  :key="zone.id"
-                  :label="zone.name"
-                  :value="zone.id"
-                />
-              </el-option-group>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="Servicios:" class="col-span-3">
-            <el-select
-              v-model="filter.service"
-              size="small"
-              clearable
-              default-first-option
-              placeholder="Todos los servicios"
-              class="w-full"
-              filterable
-              @change="fetchInvoices"
-            >
-              <el-option label="Todos los servicios" value="" />
-              <el-option-group key="ACTIVOS" label="ACTIVOS">
-                <el-option
-                  v-for="service in activeServices"
-                  :key="service.id"
-                  :label="service.name"
-                  :value="service.id"
-                />
-              </el-option-group>
-              <el-option-group key="INACTIVOS" label="INACTIVOS">
-                <el-option
-                  v-for="service in inactiveServices"
-                  :key="service.id"
-                  :label="service.name"
-                  :value="service.id"
-                />
-              </el-option-group>
-            </el-select>
-          </el-form-item>
+          <template>
+            <el-form-item label="Zona:" class="col-span-3">
+              <el-select
+                v-model="filter.zone"
+                size="small"
+                clearable
+                filterable
+                default-first-option
+                placeholder="Todos las Zonas"
+                class="w-full"
+                @change="fetchInvoices"
+              >
+                <el-option label="Tados las zonas" value="" />
+                <el-option-group key="ACTIVOS" label="ACTIVOS">
+                  <el-option
+                    v-for="zone in activeZones"
+                    :key="zone.id"
+                    :label="zone.name"
+                    :value="zone.id"
+                  >
+                  </el-option>
+                </el-option-group>
+                <el-option-group key="INACTIVOS" label="INACTIVOS">
+                  <el-option
+                    v-for="zone in inactiveZones"
+                    :key="zone.id"
+                    :label="zone.name"
+                    :value="zone.id"
+                  >
+                  </el-option>
+                </el-option-group>
+              </el-select> </el-form-item
+          ></template>
+          <template>
+            <el-form-item label="Servicios:" class="col-span-3">
+              <el-select
+                v-model="filter.service"
+                size="small"
+                clearable
+                default-first-option
+                placeholder="Todos los servicios"
+                class="w-full"
+                filterable
+                @change="fetchInvoices"
+              >
+                <el-option label="Todos los servicios" value="" />
+                <el-option-group key="ACTIVOS" label="ACTIVOS">
+                  <el-option
+                    v-for="service in activeServices"
+                    :key="service.id"
+                    :label="service.name"
+                    :value="service.id"
+                  >
+                  </el-option>
+                </el-option-group>
+                <el-option-group key="INACTIVOS" label="INACTIVOS">
+                  <el-option
+                    v-for="service in inactiveServices"
+                    :key="service.id"
+                    :label="service.name"
+                    :value="service.id"
+                  >
+                  </el-option>
+                </el-option-group>
+              </el-select>
+            </el-form-item>
+          </template>
         </div>
       </el-form>
       <div class="flex flex-col space-y-2">
@@ -1086,7 +1142,9 @@ export default {
 
                     // Crea el documento base
                     const pdfDocument = new jsPDF({
-                      orientation: "portrait",
+                      orientation: conf.orientation
+                        ? conf.orientation
+                        : "portrait",
                       unit: "mm",
                       format: conf.resolution,
                     });
@@ -1183,16 +1241,29 @@ export default {
                         conf.details.description.position[0] + position_x,
                         position_y
                       );
+                      const documentType = invoice.data.invoice.documentType;
                       // Price
                       pdfDocument.text(
-                        this.$options.filters.formatMoney(unitPrice),
+                        sellingType.id == 3 || documentType.id == 3
+                          ? documentType.id == 1
+                            ? this.$options.filters.formatMoney(
+                                parseFloat(unitPrice) * (incTax ? 1 : 1.13)
+                              )
+                            : documentType.id == 2
+                            ? this.$options.filters.formatMoney(
+                                parseFloat(unitPrice) / (incTax ? 1.13 : 1)
+                              )
+                            : this.$options.filters.formatMoney(
+                                parseFloat(unitPrice)
+                              )
+                          : "",
                         conf.details.price.position[0] + position_x,
                         position_y
                       );
-                      const documentType = invoice.data.invoice.documentType;
+
                       // Ventas no sujetas
                       pdfDocument.text(
-                        sellingType.id == 1
+                        sellingType.id == 1 && documentType.id != 3
                           ? this.$options.filters.formatMoney(ventaPrice)
                           : "",
                         conf.details.sujeto.position[0] + position_x,
@@ -1200,7 +1271,7 @@ export default {
                       );
                       // Ventas exentas
                       pdfDocument.text(
-                        sellingType.id == 2
+                        sellingType.id == 2 && documentType.id != 3
                           ? this.$options.filters.formatMoney(ventaPrice)
                           : "",
                         conf.details.exento.position[0] + position_x,
@@ -1208,8 +1279,18 @@ export default {
                       );
                       // Ventas afectas
                       pdfDocument.text(
-                        sellingType.id == 3
-                          ? this.$options.filters.formatMoney(ventaPrice)
+                        sellingType.id == 3 || documentType.id == 3
+                          ? documentType.id == 1
+                            ? this.$options.filters.formatMoney(
+                                parseFloat(ventaPrice) * (incTax ? 1 : 1.13)
+                              )
+                            : documentType.id == 2
+                            ? this.$options.filters.formatMoney(
+                                parseFloat(ventaPrice) / (incTax ? 1.13 : 1)
+                              )
+                            : this.$options.filters.formatMoney(
+                                parseFloat(ventaPrice)
+                              )
                           : "",
                         conf.details.afecto.position[0] + position_x,
                         position_y
@@ -1221,9 +1302,12 @@ export default {
                       let value = "";
                       switch (total.value) {
                         case "sum":
-                          value = this.$options.filters.formatMoney(
-                            invoice.data.invoice.sum
-                          );
+                          let sum =
+                            parseFloat(invoice.data.invoice.sum) +
+                            (invoice.data.invoice.documentType.id == 1
+                              ? parseFloat(invoice.data.invoice.iva)
+                              : 0);
+                          value = this.$options.filters.formatMoney(sum);
                           break;
                         case "iva":
                           value = this.$options.filters.formatMoney(
