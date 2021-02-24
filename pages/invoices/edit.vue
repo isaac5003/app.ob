@@ -346,6 +346,7 @@
           <!-- second row -->
           <div class="grid grid-cols-12 gap-4">
             <!-- cliente -->
+            <template></template>
             <div class="col-span-4">
               <el-form-item label="Cliente" prop="customer">
                 <el-select
@@ -364,6 +365,17 @@
                     :label="c.name"
                     :value="c.id"
                   >
+                    <div
+                        class="flex flex-row justify-between items-end py-1 leading-normal"
+                      >
+                        <div class="flex flex-col">
+                          <span class="text-xs text-gray-500">{{
+                            c.shortName
+                          }}</span>
+                          <span>{{ c.name }}</span>
+                        </div>
+                        <span class="text-xs text-gray-500">{{ c.nrc }}</span>
+                      </div>
                   </el-option>
                 </el-select>
               </el-form-item>
@@ -1027,7 +1039,13 @@ export default {
         }
         const types = this.details[index].types;
         const sellingType = this.details[index].sellingType;
-        this.details.splice(index, 1, { ...form, sellingType, types });
+        this.details.splice(index, 1, {
+          ...form,
+          sellingType,
+          types,
+          ventaPrice: form.unitPrice * form.quantity,
+        });
+
         this.showEditService = false;
       });
     },

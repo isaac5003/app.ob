@@ -127,6 +127,12 @@
             </template>
           </el-table-column>
         </el-table>
+
+        <span slot="footer" class="dialog-footer">
+          <el-button size="small" @click="showInvoicePreview = false"
+            >Cerrar</el-button
+          >
+        </span> 
       </el-dialog>
 
       <!--Cierre de dialogo-->
