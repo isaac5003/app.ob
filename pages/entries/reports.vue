@@ -1662,14 +1662,21 @@ export default {
                       ],
                       "",
                       {
+                        alignment: "right",
                         text: this.$options.filters.formatMoney(a.total),
                         style: "tableHeader",
                       },
                     ]);
                     for (const ch of a.accounts) {
                       activoValues.push([
-                        { text: ch.name, margin: [10, 0, 0, 0] },
-                        this.$options.filters.formatMoney(ch.total),
+                        {
+                          text: ch.name,
+                          margin: [10, 0, 0, 0],
+                        },
+                        {
+                          alignment: "right",
+                          text: this.$options.filters.formatMoney(ch.total),
+                        },
                         "",
                       ]);
                     }
@@ -1696,6 +1703,7 @@ export default {
                       ],
                       "",
                       {
+                        alignment: "right",
                         text: this.$options.filters.formatMoney(a.total),
                         style: "tableHeader",
                       },
@@ -1703,7 +1711,11 @@ export default {
                     for (const ch of a.accounts) {
                       pasivoValues.push([
                         { text: ch.name, margin: [10, 0, 0, 0] },
-                        this.$options.filters.formatMoney(ch.total),
+                        {
+                          alignment: "right",
+                          text: this.$options.filters.formatMoney(ch.total),
+                        },
+
                         "",
                       ]);
                     }
@@ -1730,6 +1742,7 @@ export default {
                       ],
                       "",
                       {
+                        alignment: "right",
                         text: this.$options.filters.formatMoney(a.total),
                         style: "tableHeader",
                       },
@@ -1737,7 +1750,11 @@ export default {
                     for (const ch of a.accounts) {
                       patrimonioValues.push([
                         { text: ch.name, margin: [10, 0, 0, 0] },
-                        this.$options.filters.formatMoney(ch.total),
+                        {
+                          alignment: "right",
+                          text: this.$options.filters.formatMoney(ch.total),
+                        },
+
                         "",
                       ]);
                     }
