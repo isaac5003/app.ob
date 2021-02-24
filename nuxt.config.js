@@ -34,7 +34,6 @@ export default {
   },
   axios: {
     baseURL: process.env.API_URL || "https://devapi.openbox.cloud/",
-    // baseURL: "http://localhost:5001",
   },
   googleFonts: {
     families: {
