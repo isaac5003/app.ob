@@ -89,7 +89,9 @@
             "
             >Guardar</el-button
           >
-          <el-button @click="cancel()" size="small">Cancelar</el-button>
+          <el-button @click="showNewEntryDetail = false" size="small"
+            >Cancelar</el-button
+          >
         </div>
       </el-form>
     </el-dialog>
