@@ -20,7 +20,7 @@
         <el-form-item
           label="Nombre del servicio"
           prop="name"
-          class="col-span-5"
+          class="col-span-8"
         >
           <el-input
             ref="name"
@@ -47,6 +47,17 @@
             style="width: 100%"
           />
         </el-form-item>
+        <el-form-item class="col-span-2 pt-4" prop="incRenta">
+          <el-checkbox
+            v-model="servicesNewForm.incRenta"
+            size="small"
+            class="w-full"
+            label="Desc. 10% Renta"
+            border
+          />
+        </el-form-item>
+      </div>
+      <div class="grid grid-cols-12 gap-4">
         <el-form-item
           label="Tipo de venta"
           prop="sellingType"
@@ -66,6 +77,16 @@
               </el-col>
             </el-row>
           </el-radio-group>
+        </el-form-item>
+        <el-form-item class="col-span-2 pt-4" prop="incIva">
+          <el-checkbox
+            size="small"
+            class="w-full"
+            label="Inc. IVA"
+            border
+            v-model="servicesNewForm.incIva"
+            :disabled="servicesNewForm.sellingType !== 3"
+          />
         </el-form-item>
       </div>
       <el-form-item label="Descripción del servicio" prop="description">
@@ -138,6 +159,8 @@ export default {
         cost: "",
         sellingType: 3,
         description: "",
+        incIva: false,
+        incRenta: false,
       },
       servicesNewFormRules: {
         name: inputValidation(true, 5, 60),
@@ -151,7 +174,11 @@ export default {
     setStorage(servicesNewForm) {
       localStorage.setItem(storagekey, JSON.stringify(servicesNewForm));
     },
-    submitNewService(formName, { name, cost, sellingType, description }) {
+    submitNewService(
+      formName,
+      { name, cost, sellingType, description, incIva, incRenta }
+    ) {
+      console.log(sellingType);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -174,6 +201,8 @@ export default {
                     cost,
                     sellingType,
                     description,
+                    incIva,
+                    incRenta,
                   })
                   .then((res) => {
                     this.$notify.success({
