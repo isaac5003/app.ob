@@ -89,7 +89,7 @@
             "
             >Guardar</el-button
           >
-          <el-button @click="showNewEntryDetail= false" size="small"
+          <el-button @click="showNewEntryDetail = false" size="small"
             >Cancelar</el-button
           >
         </div>
@@ -304,13 +304,13 @@
           :data="accountingEntryDetails"
           stripe
           size="mini"
-          :summary-method="getSummaries"
           show-summary
+          :summary-method="getSummaries"
         >
           <el-table-column type="index" label="#" min-width="70" />
           <el-table-column
             label="Cuenta contable"
-            prop="catalogCode"
+            prop="code"
             min-width="150"
           />
           <el-table-column label="Concepto" prop="concept" min-width="425" />
@@ -402,7 +402,7 @@ export default {
         );
       } else {
         callback();
-      } 
+      }
     };
     const newAbonoValidateCompare = (rule, value, callback) => {
       const cargo =
@@ -428,8 +428,8 @@ export default {
       const abono =
         this.editEntryDetailForm.abono > 0
           ? this.editEntryDetailForm.abono.toFixed(2)
-          : "";
-      const val = value > 0 ? value.toFixed(2) : "";
+          : 0;
+      const val = value > 0 ? value.toFixed(2) : 0;
       if (!abono) {
         if (!val) {
           callback(new Error("Este campo es requerido."));
@@ -448,8 +448,8 @@ export default {
       const cargo =
         this.editEntryDetailForm.cargo > 0
           ? this.editEntryDetailForm.cargo.toFixed(2)
-          : "";
-      const val = value > 0 ? value.toFixed(2) : "";
+          : 0;
+      const val = value > 0 ? value.toFixed(2) : 0;
       if (!cargo) {
         if (!val) {
           callback(new Error("Este campo es requerido."));
@@ -585,14 +585,12 @@ export default {
           catalogCode: this.accountingCatalog.find(
             (c) => c.id == data.accountingCatalog
           ).code,
-     
         });
         this.showNewEntryDetail = false;
         this.checkEntry();
       });
     },
     changeEntryType({ entryType, date }) {
-      // console.log(`ENTRY TYPE :::${entryType} FECHA ::: ${date}`);
       if (entryType && date) {
         this.$axios
           .get("/entries/serie", {
@@ -602,7 +600,6 @@ export default {
             },
           })
           .then(({ data }) => {
-            console.log(data);
             this.newEntryForm.serie = data.nextSerie;
           })
           .catch((err) => {
@@ -638,6 +635,7 @@ export default {
         this.$refs["newEntryDetailForm"].resetFields();
       }
     },
+
     openEditEntryDetail(index, details) {
       this.getAccountingCatalog();
       this.editingEntryDetail = index;
@@ -652,7 +650,14 @@ export default {
         if (!valid) {
           return false;
         }
-        this.accountingEntryDetails.splice(index, 1, { ...form });
+        this.accountingEntryDetails.splice(index, 1, {
+          ...form,
+          code: this.accountingCatalog.find(
+            (c) => c.id == form.accountingCatalog
+          ).code,
+        });
+        console.log(this.accountingEntryDetails);
+
         this.showEditEntryDetail = false;
         this.checkEntry();
       });
@@ -675,7 +680,6 @@ export default {
         if (!valid) {
           return false;
         }
-      
 
         const save = () => {
           this.$confirm(
@@ -706,7 +710,7 @@ export default {
                           concept: d.concept,
                           cargo: d.cargo,
                           abono: d.abono,
-                          order:details.indexOf(d)+1,
+                          order: details.indexOf(d) + 1,
                         };
                       }),
                     })
