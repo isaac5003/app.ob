@@ -108,23 +108,24 @@
                     <el-option label="Todos los clientes" value="" />
                     <el-option-group key="ACTIVOS" label="ACTIVOS">
                       <el-option
-                       
                         v-for="item in activeCustomers"
                         :key="item.id"
                         :label="item.name"
                         :value="item.id"
                       >
-                  <div
-                        class="flex flex-row justify-between items-end py-1 leading-normal"
-                      >
-                        <div class="flex flex-col">
+                        <div
+                          class="flex flex-row justify-between items-end py-1 leading-normal"
+                        >
+                          <div class="flex flex-col">
+                            <span class="text-xs text-gray-500">{{
+                              item.shortName
+                            }}</span>
+                            <span>{{ item.name }}</span>
+                          </div>
                           <span class="text-xs text-gray-500">{{
-                            item.shortName
+                            item.nrc
                           }}</span>
-                          <span>{{ item.name }}</span>
                         </div>
-                        <span class="text-xs text-gray-500">{{ item.nrc }}</span>
-                      </div>
                       </el-option>
                     </el-option-group>
                     <el-option-group key="INACTIVOS" label="INACTIVOS">
@@ -134,17 +135,19 @@
                         :label="item.name"
                         :value="item.id"
                       >
-                         <div
-                        class="flex flex-row justify-between items-end py-1 leading-normal"
-                      >
-                        <div class="flex flex-col">
+                        <div
+                          class="flex flex-row justify-between items-end py-1 leading-normal"
+                        >
+                          <div class="flex flex-col">
+                            <span class="text-xs text-gray-500">{{
+                              item.shortName
+                            }}</span>
+                            <span>{{ item.name }}</span>
+                          </div>
                           <span class="text-xs text-gray-500">{{
-                            item.shortName
+                            item.nrc
                           }}</span>
-                          <span>{{ item.name }}</span>
                         </div>
-                        <span class="text-xs text-gray-500">{{ item.nrc }}</span>
-                      </div>
                       </el-option>
                     </el-option-group>
                   </el-select>
@@ -432,7 +435,7 @@ export default {
       reports: [
         {
           id: 1,
-          name: "Detalle de reportes",
+          name: "Detalle de ventas",
         },
       ],
       page: {
