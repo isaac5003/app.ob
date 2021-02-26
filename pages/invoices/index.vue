@@ -155,7 +155,17 @@
           />
           <el-table-column label="Precio Unit." min-width="75" align="right">
             <template slot-scope="scope">
-              <span>{{ parseFloat(scope.row.unitPrice) | formatMoney }}</span>
+              <span>
+                {{
+                  (selectedInvoice.documentType.id == 1
+                    ? parseFloat(scope.row.unitPrice) *
+                      (scope.row.incTax ? 1 : 1.13)
+                    : selectedInvoice.documentType.id == 2
+                    ? parseFloat(scope.row.unitPrice) /
+                      (scope.row.incTax ? 1.13 : 1)
+                    : parseFloat(scope.row.unitPrice)) | formatMoney
+                }}</span
+              >
             </template>
           </el-table-column>
           <el-table-column
@@ -168,7 +178,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 1 &&
-                  selectedInvoice.documentType.id != 3
+                    selectedInvoice.documentType.id != 3
                 "
                 >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
               >
@@ -184,7 +194,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 2 &&
-                  selectedInvoice.documentType.id != 3
+                    selectedInvoice.documentType.id != 3
                 "
                 >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
               >
@@ -200,7 +210,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 3 ||
-                  selectedInvoice.documentType.id == 3
+                    selectedInvoice.documentType.id == 3
                 "
                 >{{
                   (selectedInvoice.documentType.id == 1
@@ -672,11 +682,11 @@
                     class="font-semibold"
                     v-if="
                       scope.row.status.id == '1' &&
-                      !isLastInvoice(
-                        scope.row.sequence,
-                        scope.row.documentType.id,
-                        scope.row.authorization
-                      )
+                        !isLastInvoice(
+                          scope.row.sequence,
+                          scope.row.documentType.id,
+                          scope.row.authorization
+                        )
                     "
                     @click.native="deleteInvoice(scope.row)"
                   >
@@ -688,12 +698,12 @@
                     @click.native="voidDocument(scope.row)"
                     v-if="
                       scope.row.status.id === '2' ||
-                      (isLastInvoice(
-                        scope.row.sequence,
-                        scope.row.documentType.id,
-                        scope.row.authorization
-                      ) &&
-                        scope.row.status.id != '3')
+                        (isLastInvoice(
+                          scope.row.sequence,
+                          scope.row.documentType.id,
+                          scope.row.authorization
+                        ) &&
+                          scope.row.status.id != '3')
                     "
                   >
                     <i class="el-icon-circle-close"></i>
@@ -1122,7 +1132,6 @@ export default {
               Promise.all([invoice(), document()])
                 .then((res) => {
                   const [invoice, document] = res;
-                  console.log(invoice, document);
                   try {
                     const vadd = 1;
                     const hadd = 3;
@@ -1130,7 +1139,9 @@ export default {
 
                     // Crea el documento base
                     const pdfDocument = new jsPDF({
-                      orientation: "portrait",
+                      orientation: conf.orientation
+                        ? conf.orientation
+                        : "portrait",
                       unit: "mm",
                       format: conf.resolution,
                     });
@@ -1227,13 +1238,26 @@ export default {
                         conf.details.description.position[0] + position_x,
                         position_y
                       );
+                      const documentType = invoice.data.invoice.documentType;
                       // Price
                       pdfDocument.text(
-                        this.$options.filters.formatMoney(unitPrice),
+                        sellingType.id == 3 || documentType.id == 3
+                          ? documentType.id == 1
+                            ? this.$options.filters.formatMoney(
+                                parseFloat(unitPrice) * (incTax ? 1 : 1.13)
+                              )
+                            : documentType.id == 2
+                            ? this.$options.filters.formatMoney(
+                                parseFloat(unitPrice) / (incTax ? 1.13 : 1)
+                              )
+                            : this.$options.filters.formatMoney(
+                                parseFloat(unitPrice)
+                              )
+                          : "",
                         conf.details.price.position[0] + position_x,
                         position_y
                       );
-                      const documentType = invoice.data.invoice.documentType;
+
                       // Ventas no sujetas
                       pdfDocument.text(
                         sellingType.id == 1 && documentType.id != 3
@@ -1385,7 +1409,6 @@ export default {
 
                     window.open(pdfDocument.output("bloburl"), "_blank");
                   } catch (error) {
-                    console.log(error);
                     this.$message.error(
                       "Error al generar el PDF, contacta con tu administrador."
                     );

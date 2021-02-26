@@ -89,9 +89,7 @@
             "
             >Guardar</el-button
           >
-          <el-button @click="showEditEntryDetail = false" size="small"
-            >Cancelar</el-button
-          >
+          <el-button @click="cancel()" size="small">Cancelar</el-button>
         </div>
       </el-form>
     </el-dialog>
@@ -304,13 +302,13 @@
           :data="accountingEntryDetails"
           stripe
           size="mini"
-          :summary-method="getSummaries"
           show-summary
+          :summary-method="getSummaries"
         >
           <el-table-column type="index" label="#" min-width="70" />
           <el-table-column
             label="Cuenta contable"
-            prop="catalogCode"
+            prop="code"
             min-width="150"
           />
           <el-table-column label="Concepto" prop="concept" min-width="425" />
@@ -402,7 +400,7 @@ export default {
         );
       } else {
         callback();
-      } 
+      }
     };
     const newAbonoValidateCompare = (rule, value, callback) => {
       const cargo =
@@ -428,8 +426,8 @@ export default {
       const abono =
         this.editEntryDetailForm.abono > 0
           ? this.editEntryDetailForm.abono.toFixed(2)
-          : "";
-      const val = value > 0 ? value.toFixed(2) : "";
+          : 0;
+      const val = value > 0 ? value.toFixed(2) : 0;
       if (!abono) {
         if (!val) {
           callback(new Error("Este campo es requerido."));
@@ -448,8 +446,8 @@ export default {
       const cargo =
         this.editEntryDetailForm.cargo > 0
           ? this.editEntryDetailForm.cargo.toFixed(2)
-          : "";
-      const val = value > 0 ? value.toFixed(2) : "";
+          : 0;
+      const val = value > 0 ? value.toFixed(2) : 0;
       if (!cargo) {
         if (!val) {
           callback(new Error("Este campo es requerido."));
@@ -585,14 +583,12 @@ export default {
           catalogCode: this.accountingCatalog.find(
             (c) => c.id == data.accountingCatalog
           ).code,
-     
         });
         this.showNewEntryDetail = false;
         this.checkEntry();
       });
     },
     changeEntryType({ entryType, date }) {
-   
       if (entryType && date) {
         this.$axios
           .get("/entries/serie", {
@@ -637,6 +633,7 @@ export default {
         this.$refs["newEntryDetailForm"].resetFields();
       }
     },
+
     openEditEntryDetail(index, details) {
       this.getAccountingCatalog();
       this.editingEntryDetail = index;
@@ -651,15 +648,29 @@ export default {
         if (!valid) {
           return false;
         }
-        this.accountingEntryDetails.splice(index, 1, { ...form });
+        this.accountingEntryDetails.splice(index, 1, {
+          ...form,
+          code: this.accountingCatalog.find(
+            (c) => c.id == form.accountingCatalog
+          ).code,
+        });
+        console.log(this.accountingEntryDetails);
+
         this.showEditEntryDetail = false;
         this.checkEntry();
       });
     },
     checkEntry() {
-       const totalAbono = this.accountingEntryDetails.reduce((a, b) => a + (b.abono ? b.abono : 0), 0);
-      const totalCargo = this.accountingEntryDetails.reduce((a, b) => a + (b.cargo ? b.cargo : 0), 0);
-    this.newEntryForm.squared =  totalAbono.toFixed(3) == totalCargo.toFixed(3);
+      const totalAbono = this.accountingEntryDetails.reduce(
+        (a, b) => a + (b.abono ? b.abono : 0),
+        0
+      );
+      const totalCargo = this.accountingEntryDetails.reduce(
+        (a, b) => a + (b.cargo ? b.cargo : 0),
+        0
+      );
+      this.newEntryForm.squared =
+        totalAbono.toFixed(3) == totalCargo.toFixed(3);
       this.newEntryForm.accounted = false;
     },
     saveEntry(formName, formData, details) {
@@ -696,7 +707,7 @@ export default {
                           concept: d.concept,
                           cargo: d.cargo,
                           abono: d.abono,
-                          order:details.indexOf(d)+1,
+                          order: details.indexOf(d) + 1,
                         };
                       }),
                     })
