@@ -263,9 +263,9 @@
               </el-form-item>
             </div>
             <div class="col-span-2">
-              <el-form-item label="Opciones de partida" prop="scuared">
+              <el-form-item label="Opciones de partida" prop="squared">
                 <el-checkbox
-                  v-model="newEntryForm.scuared"
+                  v-model="newEntryForm.squared"
                   disabled
                   border
                   size="small"
@@ -472,7 +472,7 @@ export default {
         entryType: "",
         date: this.$dateFns.format(new Date(), "yyyy-MM-dd"),
         serie: "",
-        scuared: "",
+        squared: "",
         accounted: "",
         title: "",
       },
@@ -663,16 +663,16 @@ export default {
       });
     },
     checkEntry() {
-      let totalCargo = this.accountingEntryDetails.reduce(
-        (a, b) => a + (b.cargo ? b.cargo : 0),
-        0
-      );
-      let totalAbono = this.accountingEntryDetails.reduce(
+      const totalAbono = this.accountingEntryDetails.reduce(
         (a, b) => a + (b.abono ? b.abono : 0),
         0
       );
-      this.newEntryForm.scuared =
-        totalAbono.toFixed(3) === totalCargo.toFixed(3);
+      const totalCargo = this.accountingEntryDetails.reduce(
+        (a, b) => a + (b.cargo ? b.cargo : 0),
+        0
+      );
+      this.newEntryForm.squared =
+        totalAbono.toFixed(3) == totalCargo.toFixed(3);
       this.newEntryForm.accounted = false;
     },
     saveEntry(formName, formData, details) {
@@ -680,7 +680,6 @@ export default {
         if (!valid) {
           return false;
         }
-
         const save = () => {
           this.$confirm(
             "¿Estás seguro que deseas guardar esta partida?",
@@ -699,7 +698,7 @@ export default {
                         title: formData.title,
                         serie: formData.serie,
                         date: formData.date,
-                        squared: formData.scuared,
+                        squared: formData.squared,
                         accounted: formData.accounted,
                         accountingEntryType: formData.entryType,
                       },
@@ -789,6 +788,7 @@ export default {
         }
       });
     },
+
     cancel() {
       this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
         confirmButtonText: "Si, salir",
