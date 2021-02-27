@@ -366,10 +366,13 @@
           :append-to-body="true"
           title="Nueva condición de pago"
           :visible.sync="showNewPayment"
-          width="30%"
+          width="400px"
+          class="pt-28"
+        
           @close="closeDialog('newPaymentForm')"
         >
-          <el-form
+        <div>
+            <el-form
             :model="newPaymentForm"
             :rules="newzoneRules"
             status-icon
@@ -390,8 +393,24 @@
                 ></el-input>
               </el-form-item>
             </div>
+            <div class="flex flex-row space-x-6">
+              <el-form-item label="Tipo de pago">
+                <template>
+                  <el-radio v-model="radio1" border size="small"
+                    >Contado</el-radio
+                  >
+                </template>
+              </el-form-item>
+              <el-form-item label=" " class="mt-4">
+                <template>
+                  <el-radio v-model="radio2" size="small" border
+                    >Credito</el-radio
+                  >
+                </template>
+              </el-form-item>
+            </div>
           </el-form>
-          <span slot="footer" class="dialog-footer">
+          <span slot="footer" class=" ml-40">
             <el-button
               type="primary"
               size="small"
@@ -402,6 +421,8 @@
               >Cancelar</el-button
             >
           </span>
+        </div>
+        
         </el-dialog>
 
         <!-- Dialogo para editar condicion de pago -->
@@ -662,6 +683,8 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+        radio1: '1',
+        radio2:'2',
       tab: "zones-sellers",
       utab: "invoicing",
       integrations: [
