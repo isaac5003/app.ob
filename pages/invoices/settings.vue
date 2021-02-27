@@ -17,6 +17,2007 @@
           .catch(() => {})
       "
     >
+      <el-dialog
+        title="Crear modelo de factura"
+        width="1040px"
+        :close-on-click-modal="false"
+        :append-to-body="true"
+        :visible.sync="closeDialog"
+      >
+        <Notification
+          class="w-full"
+          type="info"
+          title="Información"
+          message="
+         <strong class='text-black'>Medida de X:</strong> mida la distancia que hay desde  el borde izquierdo de la factura hasta el inicio de la palabra y escribala en el campo correspondiente<br>
+        <strong class='text-black'>Medida de Y:</strong> mida la distancia que hay desde el borde superior  de la factura de la palabra y escriba en el campo correspondiente<br>
+        <strong class='text-black'>Medida de L:</strong> Es el largo de Linea que se encuentra al lado de cada titulo, donde la persona podra rellenar con los datos segun corresponda<br>
+       <strong class='text-black'> Medida de A:</strong> se refiere al ancho del campo de una columnnan a campo 
+        "
+        />
+        <!-- firts grid -->
+        <div class="flex flex-col">
+          <el-form label-position="top">
+            <div class="grid grid-cols-12">
+              <el-form-item class="grid col-span-4">
+                <span class="font-semibold">Encabezado</span>
+              </el-form-item>
+              <!-- <span class="col-start-9 col-span-2 mt-6 ml-20 text-xs"
+                >Tamaño de texto</span -->
+
+              <el-form-item
+                label="Tamaño de texto "
+                class="grid mt-3 ml-10 col-span-4 col-start-11"
+              >
+                <template>
+                  <el-input-number
+                    v-model="num"
+                    @change="handleChange"
+                    :min="1"
+                    :max="10"
+                    placeholder="pts"
+                    class="w-full"
+                    size="small"
+                  >
+                  </el-input-number>
+                </template>
+              </el-form-item>
+            </div>
+            <!-- senores fecha Direccion  -->
+            <div class="grid grid-cols-12">
+              <div class="mt-4 col-span-4">
+                <el-checkbox v-model="checked">Señor (es)</el-checkbox>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de L">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 col-span-4">
+                <el-checkbox v-model="checked">Fecha</el-checkbox>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 col-span-4">
+                <el-checkbox v-model="checked">Dirección</el-checkbox>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de L">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!--nrc retencion giro  -->
+            <div class="grid grid-cols-12">
+              <div class="mt-4 col-span-4">
+                <el-checkbox v-model="checked">NRC</el-checkbox>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          placeholder="pts"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de L">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 col-span-4">
+                <el-checkbox v-model="checked">Nota de remision</el-checkbox>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          placeholder="pts"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 col-span-4">
+                <el-checkbox v-model="checked">Giro</el-checkbox>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          controls-position="right"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de L">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Condiones de la opracion  ventas a cuenta -->
+            <div class="grid grid-cols-12 border-b-2">
+              <div class="mt-4 col-span-4">
+                <el-checkbox v-model="checked"
+                  >Condiciones de la operacion</el-checkbox
+                >
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          placeholder="pts"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de L">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 col-span-4">
+                <el-checkbox v-model="checked">Ventas a cuenta de</el-checkbox>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          placeholder="pts"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- DETALLES-->
+            <div class="grid grid-cols-12 mt-3">
+              <div class="w-full col-span-4 flex flex-col">
+                <span class="font-semibold text-black">Detalles</span>
+                <span>Campos para el encabezado para la tabla</span>
+              </div>
+              <!-- <span class="col-span-3 mt-6  text-xs col-start-9 bg-red-300"
+                >Tamaño de texto</span
+
+              > -->
+              <el-form-item
+                label="Altura de la descripcion de los items "
+                class="col-span-4 col-start-7 ml-12"
+              >
+                <template>
+                  <el-input-number
+                    v-model="num"
+                    @change="handleChange"
+                    :min="1"
+                    :max="10"
+                    placeholder="pts"
+                    class="w-full"
+                    size="small"
+                  >
+                  </el-input-number>
+                </template>
+              </el-form-item>
+              <el-form-item
+                label="Tamaño de texto "
+                class="col-span-4 col-start-11 ml-12"
+              >
+                <template>
+                  <el-input-number
+                    v-model="num"
+                    @change="handleChange"
+                    :min="1"
+                    :max="10"
+                    placeholder="pts"
+                    class="w-full"
+                    size="small"
+                  >
+                  </el-input-number>
+                </template>
+              </el-form-item>
+            </div>
+            <!-- cant  descripcion  preciounitatio -->
+            <div class="grid grid-cols-12">
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Medida Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Medida L">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de L">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-12 borde-b-2">
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Medida Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Medida L">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de L">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- TOTALES-->
+            <div class="grid grid-cols-12">
+              <div class="col-span-4">
+                <span class="font-semibold">Totales</span>
+              </div>
+              <div class="col-span-4 col-start-11 ml-10">
+                <el-form-item label="Tamaño de texto">
+                  <template>
+                    <el-input-number
+                      v-model="num"
+                      @change="handleChange"
+                      :min="1"
+                      :max="10"
+                      placeholder="pts"
+                      class="w-full"
+                      size="small"
+                    >
+                    </el-input-number>
+                  </template>
+                </el-form-item>
+              </div>
+            </div>
+            <!-- Son, Operacion superiora {a evaluar }, entregado por -->
+            <div class="grid grid-cols-12">
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Medida Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Medida L">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de L">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- NOMBRE DUI Y FIRMA -->
+            <div class="grid grid-cols-12">
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Medida Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Medida L">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de L">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- RECIVIDO POR, NPMBRE Y DUI -->
+            <div class="grid grid-cols-12">
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Medida Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Medida L">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de L">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- FIRMA, SUMAS, 13% DE IVA -->
+            <div class="grid grid-cols-12">
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Medida Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Medida L">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de L">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- subtotal, iva retenido, ventas extenta -->
+            <div class="grid grid-cols-12">
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Medida Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Medida L">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de L">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- VENTA NO SUJETAS VENTA TOTAL  (RECUADRO) -->
+            <div class="grid grid-cols-12">
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Medida Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Medida L">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 col-span-4 space-x-2">
+                <el-checkbox v-model="checked"></el-checkbox>
+                <el-input
+                  placeholder="Please input"
+                  style="width: 68%"
+                  size="small"
+                  v-model="input"
+                ></el-input>
+                <div class="grid grid-cols-6 mt-3">
+                  <div class="col-span-2">
+                    <el-form-item label="Media de X">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de Y">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-2">
+                    <el-form-item label="Media de L">
+                      <template>
+                        <el-input-number
+                          v-model="num"
+                          controls-position="right"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          style="width: 90%"
+                          size="small"
+                        >
+                        </el-input-number>
+                      </template>
+                    </el-form-item>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-row justify-end">
+              <el-button type="primary" size="small">Guardar </el-button>
+              <el-button size="small" @click="closeDialog = false"
+                >Cerrar</el-button
+              >
+            </div>
+          </el-form>
+        </div>
+      </el-dialog>
+      <!-- Panel -->
       <el-tab-pane label="Zonas y vendedores" name="zones-sellers">
         <!-- dialogo zonas -->
         <el-dialog
@@ -230,7 +2231,7 @@
           </span>
         </el-dialog>
         <!-- Inicio de tablas zonas y vendedores -->
-        <div class="grid grid-cols-12 gap-4">
+        <div class="grid grid-cols-12">
           <!-- tabla de zonas -->
           <div class="col-span-5 flex flex-col space-y-4">
             <div class="flex justify-between items-center">
@@ -592,6 +2593,13 @@
                       ></el-input>
                     </el-form-item>
                   </div>
+                  <el-link
+                    @click="closeDialog = true"
+                    class="w-56"
+                    icon="el-icon-setting"
+                  >
+                    Creacion de Factura
+                  </el-link>
                 </div>
               </div>
             </div>
@@ -612,6 +2620,7 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
+
 import {
   getIcon,
   hasModule,
@@ -662,6 +2671,10 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+      checked: true,
+      input: "",
+      num: 1,
+      closeDialog: false,
       tab: "zones-sellers",
       utab: "invoicing",
       integrations: [
@@ -715,6 +2728,9 @@ export default {
     };
   },
   methods: {
+    handleChange(value) {
+      console.log(value);
+    },
     closeDialog(name) {
       this.$refs[name].resetFields();
     },
