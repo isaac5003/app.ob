@@ -858,7 +858,7 @@ export default {
       },
       newServiceForm: {
         service: "",
-        quantity: null,
+        quantity: 1,
         chargeDescription: null,
         incTax: false,
         sellingType: null,
@@ -911,7 +911,7 @@ export default {
           this.errorMessage = err.response.data.message;
         });
     },
-   selectService(id, type, services) {
+    selectService(id, type, services) {
       const service = services.find((s) => s.id == id);
 
       switch (type) {
