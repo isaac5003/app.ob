@@ -356,23 +356,56 @@
             </el-form-item>
           </div>
         </el-tab-pane>
-        <!-- <el-tab-pane label="Integraciones" name="integrations">
+        
+        <el-tab-pane label="Integraciones" name="integrations">
           <Notification
             class="w-full"
             type="info"
             title="Integraciones"
             message="En esta sección se muestran las configuraciones necesarias para poder integrar otros modulos del sistema cuando estos están disponibles."
           />
-        </el-tab-pane> -->
-      </el-tabs>
-      <div class="flex justify-end" v-if="activeTab != 'integrations'">
-        <el-button type="primary" size="small" native-type="submit"
-          >Actualizar</el-button
+          <div class="flex flex-col space-y-3">
+                <el-form
+                position-label="top"
+                >
+               <div class="grid grid-cols-12 mt-4">
+            
+        <div class="col-span-3">
+          <el-form-item label="Selecciona la cuenta" prop="customers">
+            <el-select
+              v-model="customers1"
+              placeholder="Seleccione el cliente"
+              size="small"
+              class="w-full"
+              default-first-option
+              filterable
+              clearable
+            >
+              <el-option
+                v-for="c in options"
+                :key="c.id"
+                :label="c.name"
+                :value="c.id"
+              />
+            </el-select>
+          </el-form-item>
+        </div>
+      </div>
+          </el-form>
+          <div class="flex justify-end">
+        <el-button type="primary" size="small" 
+          >Guardar</el-button
         >
         <el-button size="small" @click="$router.push('/customers')"
           >Cancelar</el-button
         >
       </div>
+          </div>
+      
+        
+        </el-tab-pane>
+      </el-tabs>
+      
     </el-form>
   </layout-content>
 </template>
@@ -493,6 +526,13 @@ export default {
   },
   data() {
     return {
+      customers1:{
+
+      },
+      options:[
+        {
+          name:'jorge'
+        }],
       pageloading: true,
       activeTab: "general-information",
       countries: [],
