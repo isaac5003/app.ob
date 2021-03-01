@@ -16,15 +16,73 @@
           })
           .catch(() => {})
       "
-    >
-      <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
-        <Notification
+     >
+      <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
+        <div class="grid grid-cols-12">
+          <div class=" col-span-12">
+            <Notification
           class="w-full"
           type="info"
           title="Integraciones"
           message="En esta sección se realizan las configuraciones de integración con otros modulos de manera general. Estas configuraciones se aplicarán a todos los clientes que no tengan una configuración individual."
+          
         />
-        <el-tabs
+        </div>
+          </div>
+      
+      <div class=" flex flex-col space-y-2">
+          <div class="grid grid-cols-12 gap-4  ">
+            <el-form
+             label-position="top"
+             >
+             <div class="w-56 ">
+               <template>
+                    <el-form-item
+               label="Seleccione una cuenta"
+               >
+               <el-select
+               v-model="cogInfo"
+               placeholder=" seleccione una cuenta"
+               clearable
+               filterable
+               class="w-full"
+               default-first-option
+               size="small"
+               >
+               <el-option
+               v-for="c in cogSettings"
+               :key="c.id"
+               :label="c.name"
+               :value="c.id"
+
+               >
+
+               </el-option>
+               </el-select>
+               </el-form-item>
+               </template>
+            
+             </div>
+
+             <div class=" flex-row justify-items-end mx-33">
+               <div class=" flex flex-row justify-items-end mx-160">
+               <el-button
+               type="primary"
+               size="small"
+               > Guardar</el-button>
+               <el-button
+               size="small"
+               
+               >Cancelar</el-button>
+             </div>
+             </div>
+             
+            </el-form>
+          </div>
+        </div>
+     
+
+        <!-- <el-tabs
           tab-position="left"
           v-model="utab"
           @tab-click="
@@ -56,9 +114,11 @@
             >
             {{ integration.name }}
           </el-tab-pane>
-        </el-tabs>
-      </el-tab-pane> -->
-    </el-tabs>
+        </el-tabs> -->
+      </el-tab-pane>
+      
+    </el-tabs> 
+    
   </layout-content>
 </template>
 
@@ -81,6 +141,10 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+      cogInfo:"",
+      cogSettings:[
+        {name:'cogSettings'},
+      ],
       tab: "integrations",
       utab: "invoicing",
       integrations: [
