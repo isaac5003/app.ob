@@ -36,7 +36,49 @@
               .catch(() => {})
           "
         >
-          <el-tab-pane
+          <div class="flex flex-col space-y-2">
+            <div class="grid grid-cols-12 gap-4">
+              <div class="col-span-3">
+                <el-form label-position="top">
+                  <el-form-item label="Seleccione una cuenta">
+                    <template>
+                      <el-select
+                        v-model="cogIfo"
+                        placeholder="Seleccione una cuenta"
+                        size="small"
+                        clearable
+                        filterable
+                        class="w-full"
+                      >
+                        <el-option
+                          v-for="c in cogSetting"
+                          :key="c.id"
+                          :label="c.name"
+                          :value="c.id"
+                        >
+                        </el-option>
+                      </el-select>
+                    </template>
+                  </el-form-item>
+                </el-form>
+              </div>
+            </div>
+           
+      <div class="flex flex-row justify-end">
+        <el-button
+          type="primary"
+          size="small"
+          native-type="submit"
+          :loading="generating"
+          >Guardar</el-button
+        >
+        <el-button size="small" @click="$router.push('/services')"
+          >Cancelar</el-button
+        >
+        </div>
+          </div>
+
+          <!-- <el-tab-pane
             v-for="(integration, k) of filteredIntegrations"
             :key="k"
             :name="integration.id"
@@ -55,7 +97,7 @@
               {{ integration.name }}</span
             >
             {{ integration.name }}
-          </el-tab-pane>
+          </el-tab-pane> -->
         </el-tabs>
       </el-tab-pane>
     </el-tabs>
@@ -81,6 +123,25 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+      cogIfo: "",
+      cogSetting: [
+        {
+          id: 1,
+          name: "Gerson, Project management",
+        },
+        {
+          id: 2,
+          name: "Bryan, devJunior",
+        },
+        {
+          id: 3,
+          name: "Issac, DevJunior",
+        },
+        {
+          id: 4,
+          name: "Jorge, designer",
+        },
+      ],
       tab: "integrations",
       utab: "invoicing",
       integrations: [
