@@ -356,54 +356,64 @@
             </el-form-item>
           </div>
         </el-tab-pane>
-        
-        <el-tab-pane label="Integraciones" name="integrations">
-          <Notification
-            class="w-full"
-            type="info"
-            title="Integraciones"
-            message="En esta sección se muestran las configuraciones necesarias para poder integrar otros modulos del sistema cuando estos están disponibles."
-          />
-          <div class="flex flex-col space-y-3">
-                <el-form
-                position-label="top"
-                >
-               <div class="grid grid-cols-12 mt-4">
-            
-        <div class="col-span-3">
-          <el-form-item label="Selecciona la cuenta" prop="customers">
-            <el-select
-              v-model="customers1"
-              placeholder="Seleccione el cliente"
-              size="small"
-              class="w-full"
-              default-first-option
-              filterable
-              clearable
-            >
-              <el-option
-                v-for="c in options"
-                :key="c.id"
-                :label="c.name"
-                :value="c.id"
-              />
-            </el-select>
-          </el-form-item>
-        </div>
-      </div>
+          <el-tab-pane label="Integraciones" name="integrations" class="space-y-2">
+        <Notification
+          class="w-full"
+          type="info"
+          title="Integraciones"
+          message="En esta sección se realizan las configuraciones de integración con otros modulos de manera general. Estas configuraciones se aplicarán a todos los servicios que no tengan una configuración individual."
+        />
+        <el-tabs
+          tab-position="left"
+          v-model="utab"
+          @tab-click="
+            $router
+              .replace({
+                path: `/customers/settings`,
+                query: { tab, utab },
+              })
+              .catch(() => {})
+          "
+        >
+          <el-form label-position="top">
+            <div class="grid grid-cols-12 gap-4">
+              <el-form-item label="Seleccione una cuenta" class="col-span-4">
+                <template>
+                  <el-select
+                    v-model="cogInfo"
+                    placeholder="Seleccione una cuenta"
+                    size="small"
+                    clearable
+                    filterable
+                    class="w-full"
+                  >
+                    <el-option
+                      v-for="c in cogSetting"
+                      :key="c.id"
+                      :label="c.name"
+                      :value="c.id"
+                    >
+                    </el-option>
+                  </el-select>
+                </template>
+              </el-form-item>
+            </div>
+            <div class="flex justify-end">
+              <el-button
+                type="primary"
+                size="small"
+                native-type="submit"
+                :loading="generating"
+                >Guardar</el-button
+              >
+              <el-button size="small" @click="$router.push('/customers')"
+                >Cancelar</el-button
+              >
+            </div>
           </el-form>
-          <div class="flex justify-end">
-        <el-button type="primary" size="small" 
-          >Guardar</el-button
-        >
-        <el-button size="small" @click="$router.push('/customers')"
-          >Cancelar</el-button
-        >
-      </div>
-          </div>
-      
-        
-        </el-tab-pane>
+        </el-tabs>
+      </el-tab-pane>
+       
       </el-tabs>
       
     </el-form>
@@ -526,10 +536,8 @@ export default {
   },
   data() {
     return {
-      customers1:{
-
-      },
-      options:[
+      cogInfo:"",
+      cogSetting:[
         {
           name:'jorge'
         }],
