@@ -459,11 +459,6 @@ export default {
       cities(),
     ])
       .then((res) => {
-        // Se ubica en el tab seleccionado
-        if (this.$route.query.tab) {
-          this.activeTab = this.$route.query.tab;
-        }
-
         const [
           customerTypes,
           customerTypeNaturals,
