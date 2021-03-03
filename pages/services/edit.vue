@@ -18,7 +18,7 @@
           .catch(() => {})
       "
   >
-  <el-tab-pane label="Informacion de general">
+  <el-tab-pane label="Información general">
     <div class=" flex flex-col space-y-2 ">
     <el-form
       :model="servicesEditForm"
