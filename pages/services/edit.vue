@@ -65,6 +65,7 @@
             ref="sellingType"
             v-model="servicesEditForm.sellingType"
             class="w-full"
+            @change="changeIva(servicesEditForm.sellingType)"
           >
             <el-row :gutter="15">
               <el-col :span="8" v-for="(s, k) in sellingTypes" :key="k">
@@ -227,6 +228,13 @@ export default {
           }
         );
       });
+    },
+    changeIva(sellingTypeValue) {
+      if (sellingTypeValue !== 3) {
+        this.servicesEditForm.incIva = false;
+      } else {
+        this.servicesEditForm.incIva = true;
+      }
     },
   },
 };

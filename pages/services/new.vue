@@ -67,7 +67,10 @@
             ref="sellingType"
             v-model="servicesNewForm.sellingType"
             class="w-full"
-            @change="setStorage(servicesNewForm)"
+            @change="
+              setStorage(servicesNewForm),
+                changeIva(servicesNewForm.sellingType)
+            "
           >
             <el-row :gutter="15">
               <el-col :span="8" v-for="(s, k) in sellingTypes" :key="k">
@@ -178,6 +181,7 @@ export default {
       formName,
       { name, cost, sellingType, description, incIva, incRenta }
     ) {
+      console.log(incIva);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -247,6 +251,13 @@ export default {
           }
         );
       });
+    },
+    changeIva(sellingTypeValue) {
+      if (sellingTypeValue !== 3) {
+        this.servicesNewForm.incIva = false;
+      } else {
+        this.servicesNewForm.incIva = true;
+      }
     },
   },
   watch: {
