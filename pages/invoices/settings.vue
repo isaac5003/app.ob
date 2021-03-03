@@ -399,7 +399,7 @@
                   <el-radio-group v-model="radio1" class="w-full">
                     <el-row :gutter="15">
                       <el-col :span="8">
-                        <el-radio border label="pdf" size="small" class="w-full"
+                        <el-radio border size="small" class="w-full"
                           >Contado</el-radio
                         >
                       </el-col>
@@ -453,18 +453,16 @@
               submitPayment('editPaymentForm', editPaymentForm)
             "
           >
-            <div>
-              <el-form-item label="Nombre la condición de pago" prop="name">
-                <el-input
-                  v-model="editPaymentForm.name"
-                  clearable
-                  type="text"
-                  maxlength="100"
-                  minlength="5"
-                  show-word-limit
-                ></el-input>
-              </el-form-item>
-            </div>
+            <el-form-item label="Nombre la condición de pago" prop="name">
+              <el-input
+                v-model="editPaymentForm.name"
+                clearable
+                type="text"
+                maxlength="100"
+                minlength="5"
+                show-word-limit
+              ></el-input>
+            </el-form-item>
             <div class="col-span-5">
               <el-form-item prop="" label="Tipo de pago">
                 <el-radio-group v-model="radio1" class="w-full">
@@ -680,12 +678,12 @@ export default {
   components: { LayoutContent, Notification },
   fetch() {
     // Se ubica en el tab correcto
-    if (this.$route.query.tab) {
-      this.tab = this.$route.query.tab;
-    }
-    if (this.$route.query.utab) {
-      this.utab = this.$route.query.utab;
-    }
+    // if (this.$route.query.tab) {
+    //   this.tab = this.$route.query.tab;
+    // }
+    // if (this.$route.query.utab) {
+    //   this.utab = this.$route.query.utab;
+    // }
 
     const zones = () => {
       return this.$axios.get("/invoices/zones");
@@ -1261,9 +1259,9 @@ export default {
     },
   },
   computed: {
-    filteredIntegrations() {
-      return this.integrations.filter((i) => hasModule(i.ref, this.$auth.user));
-    },
+    // filteredIntegrations() {
+    //   return this.integrations.filter((i) => hasModule(i.ref, this.$auth.user));
+    // },
     activeZones() {
       return this.zones.filter((zone) => zone.active);
     },
