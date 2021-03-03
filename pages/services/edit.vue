@@ -7,6 +7,19 @@
       { name: 'Editar servicio', to: null },
     ]"
   >
+
+  <el-tabs
+   @click="
+   $router
+          .replace({
+            path: `/services/edit`,
+            query: { tab },
+          })
+          .catch(() => {})
+      "
+  >
+  <el-tab-pane label="Informacion de general">
+    <div class=" flex flex-col space-y-2 ">
     <el-form
       :model="servicesEditForm"
       :rules="servicesEditFormRules"
@@ -86,6 +99,53 @@
         >
       </div>
     </el-form>
+  </div>
+  </el-tab-pane>
+
+  
+  <el-tab-pane label="Integraciones ">
+    <div class=" flex flex-col space-y-2">
+      <div class=" grid grid-cols-12 gap-4">
+      <el-form label-position="top">
+        <div class="w-64">
+       <el-form-item 
+        label="Seleccione la cuenta"
+        >
+        <el-select
+        v-model="acountGeneral"
+        placeholder="Seleccione una cuenta"
+        class="w-full"
+        size="small"
+        clearable
+        filterable
+        
+        >
+          <el-option
+          v-for="c in acountInfo"
+          :key="c.id"
+          :label="c.name"
+          :value="c.id"
+          >
+
+          </el-option>
+        </el-select>
+        </el-form-item>
+        </div>
+      </el-form>
+      
+      </div>
+        
+       <div class="flex justify-end">
+        <el-button type="primary" size="small"
+          >Guardar</el-button
+        >
+        <el-button size="small" @click="$router.push('/services')"
+          >Cancelar</el-button
+        >
+      </div>
+    </div>
+  </el-tab-pane>
+  </el-tabs>
   </layout-content>
 </template>
 
@@ -107,6 +167,11 @@ export default {
   },
   components: { LayoutContent },
   fetch() {
+    // Aqui llamaremos el tag correctamente
+    // if(this.$router.query.tab){
+    //  this.tab = this.$router.query.tab;
+    // }
+
     const sellingTypes = () => this.$axios.get("/services/selling-types");
     const service = () => this.$axios.get(`/services/${this.$route.query.ref}`);
 
@@ -132,6 +197,12 @@ export default {
   },
   data() {
     return {
+      tab: "infoGeneral",
+       acountGeneral:"",
+       acountInfo:[{
+         id:1,
+         name:'Jorge_vladimir@hotmail.com'
+       }],
       pageloading: true,
       sellingTypes: [],
       servicesEditForm: {
