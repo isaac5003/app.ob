@@ -1,7 +1,7 @@
 <template>
   <layout-content
     v-loading="pageloading"
-    page-title="Nuevo clientesssss"
+    page-title="Nuevo clientes"
     :breadcrumb="[
       { name: 'Clientes', to: '/customers' },
       { name: 'Listado de clientes', to: '/customers' },
