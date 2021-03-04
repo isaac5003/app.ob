@@ -75,7 +75,7 @@
             </el-form-item>
           </div>
         </div>
-        <div class="flex flex-col" v-if="filterForm.report != ''">
+        <div class="flex flex-col" v-if="filterForm.report == 1">
           <div class="grid grid-cols-12 gap-4">
             <div class="col-span-4">
               <el-form-item label="Rango de fechas:" prop="dateRange">
@@ -108,23 +108,24 @@
                     <el-option label="Todos los clientes" value="" />
                     <el-option-group key="ACTIVOS" label="ACTIVOS">
                       <el-option
-                       
                         v-for="item in activeCustomers"
                         :key="item.id"
                         :label="item.name"
                         :value="item.id"
                       >
-                  <div
-                        class="flex flex-row justify-between items-end py-1 leading-normal"
-                      >
-                        <div class="flex flex-col">
+                        <div
+                          class="flex flex-row justify-between items-end py-1 leading-normal"
+                        >
+                          <div class="flex flex-col">
+                            <span class="text-xs text-gray-500">{{
+                              item.shortName
+                            }}</span>
+                            <span>{{ item.name }}</span>
+                          </div>
                           <span class="text-xs text-gray-500">{{
-                            item.shortName
+                            item.nrc
                           }}</span>
-                          <span>{{ item.name }}</span>
                         </div>
-                        <span class="text-xs text-gray-500">{{ item.nrc }}</span>
-                      </div>
                       </el-option>
                     </el-option-group>
                     <el-option-group key="INACTIVOS" label="INACTIVOS">
@@ -134,17 +135,19 @@
                         :label="item.name"
                         :value="item.id"
                       >
-                         <div
-                        class="flex flex-row justify-between items-end py-1 leading-normal"
-                      >
-                        <div class="flex flex-col">
+                        <div
+                          class="flex flex-row justify-between items-end py-1 leading-normal"
+                        >
+                          <div class="flex flex-col">
+                            <span class="text-xs text-gray-500">{{
+                              item.shortName
+                            }}</span>
+                            <span>{{ item.name }}</span>
+                          </div>
                           <span class="text-xs text-gray-500">{{
-                            item.shortName
+                            item.nrc
                           }}</span>
-                          <span>{{ item.name }}</span>
                         </div>
-                        <span class="text-xs text-gray-500">{{ item.nrc }}</span>
-                      </div>
                       </el-option>
                     </el-option-group>
                   </el-select>
@@ -305,6 +308,109 @@
             </template>
           </div>
         </div>
+        <div class="flex flex-col" v-if="filterForm.report == 2">
+          <div class="grid grid-cols-12 gap-4">
+            <div class="col-span-4">
+              <el-form-item label="Rango de fechas:" prop="dateRange">
+                <el-date-picker
+                  v-model="listSellings.dateRange"
+                  style="width: 100%"
+                  size="small"
+                  type="daterange"
+                  range-separator="-"
+                  start-placeholder="Fecha inicial"
+                  end-placeholder="Fecha final"
+                  format="dd/MM/yyyy"
+                  value-format="yyyy-MM-dd"
+                >
+                </el-date-picker>
+              </el-form-item>
+            </div>
+            <template>
+              <div class="col-span-4">
+                <el-form-item label="Cliente:">
+                  <el-select
+                    v-model="listSellings.customer"
+                    size="small"
+                    class="w-full"
+                    clearable
+                    filterable
+                    default-first-option
+                    placeholder="Todos los clientes:"
+                  >
+                    <el-option label="Todos los clientes" value="" />
+                    <el-option-group key="ACTIVOS" label="ACTIVOS">
+                      <el-option
+                        v-for="item in activeCustomers"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id"
+                      >
+                        <div
+                          class="flex flex-row justify-between items-end py-1 leading-normal"
+                        >
+                          <div class="flex flex-col">
+                            <span class="text-xs text-gray-500">{{
+                              item.shortName
+                            }}</span>
+                            <span>{{ item.name }}</span>
+                          </div>
+                          <span class="text-xs text-gray-500">{{
+                            item.nrc
+                          }}</span>
+                        </div>
+                      </el-option>
+                    </el-option-group>
+                    <el-option-group key="INACTIVOS" label="INACTIVOS">
+                      <el-option
+                        v-for="item in activeCustomers"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id"
+                      >
+                        <div
+                          class="flex flex-row justify-between items-end py-1 leading-normal"
+                        >
+                          <div class="flex flex-col">
+                            <span class="text-xs text-gray-500">{{
+                              item.shortName
+                            }}</span>
+                            <span>{{ item.name }}</span>
+                          </div>
+                          <span class="text-xs text-gray-500">{{
+                            item.nrc
+                          }}</span>
+                        </div>
+                      </el-option>
+                    </el-option-group>
+                  </el-select>
+                </el-form-item>
+              </div>
+            </template>
+            <template>
+              <div class="col-span-2">
+                <el-form-item label="Tipo fact:">
+                  <el-select
+                    v-model="listSellings.documentType"
+                    size="small"
+                    clearable
+                    placeholder="Todos los tipos:"
+                    class="w-full"
+                  >
+                    <el-option label="Todos los tipos" value="" />
+                    <el-option
+                      v-for="item in documentTypes"
+                      :key="item.id"
+                      :label="`${item.code} - ${item.name}`"
+                      :value="item.id"
+                    >
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </div>
+            </template>
+          </div>
+        </div>
         <div class="flex flex-row justify-end">
           <el-button
             type="primary"
@@ -426,6 +532,13 @@ export default {
         service: "",
         radioType: "pdf",
       },
+      listSellings: {
+        report: "",
+        reportType: "",
+        dateRange: "",
+        customer: "",
+        documentType: "",
+      },
       rulesInputData: {
         dateRange: selectValidation("blur", true),
       },
@@ -433,6 +546,10 @@ export default {
         {
           id: 1,
           name: "Detalle de reportes",
+        },
+        {
+          id: 2,
+          name: "Listado de ventas",
         },
       ],
       page: {
