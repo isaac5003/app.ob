@@ -1340,7 +1340,7 @@
 </template>
 
 <script>
-import { endOfMonth, format, startOfMonth } from "date-fns";
+import { endOfMonth, format, startOfMonth, differenceInMonths } from "date-fns";
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
 import { getIcon, hasModule } from "../../tools";
@@ -2422,45 +2422,59 @@ export default {
       const periodStart = fiscalPeriodForm.startDate;
       let peridoEnd = endOfMonth(new Date(fiscalPeriodForm.endDate));
       peridoEnd = this.$dateFns.format(new Date(peridoEnd), "yyyy-MM-dd");
-      this.$confirm(
-        "¿Estás seguro que deseas actualizar el periodo fiscal?",
-        "Confirmación",
-        {
-          confirmButtonText: "Si, guardar",
-          cancelButtonText: "Cancelar",
-          type: "warning",
-          beforeClose: (action, instance, done) => {
-            if (action === "confirm") {
-              instance.confirmButtonLoading = true;
-              instance.confirmButtonText = "Procesando...";
+      const totalOfMonth =
+        differenceInMonths(new Date(peridoEnd), new Date(periodStart)) + 1;
+      if (new Date(peridoEnd) < new Date(periodStart)) {
+        this.$notify.error({
+          title: "Error",
+          message: "El mes final tiene que ser mayor al mes inicial",
+        });
+      } else if (totalOfMonth != 12) {
+        this.$notify.error({
+          title: "Error",
+          message: "El periodo fiscal debe tener 12 meses exactos",
+        });
+      } else {
+        this.$confirm(
+          "¿Estás seguro que deseas actualizar el periodo fiscal?",
+          "Confirmación",
+          {
+            confirmButtonText: "Si, guardar",
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
 
-              this.$axios
-                .put(`/entries/setting/general`, {
-                  periodStart,
-                  peridoEnd,
-                })
-                .then((res) => {
-                  this.$notify.success({
-                    title: "Exito",
-                    message: res.data.message,
+                this.$axios
+                  .put(`/entries/setting/general`, {
+                    periodStart,
+                    peridoEnd,
+                  })
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Exito",
+                      message: res.data.message,
+                    });
+                    this.fetchGeneral();
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = "Si, guardar";
+                    done();
+                  })
+
+                  .catch((err) => {
+                    this.errorMessage = err.response.data.messag;
                   });
-                  this.fetchGeneral();
-                  instance.confirmButtonLoading = false;
-                  instance.confirmButtonText = "Si, guardar";
-                  done();
-                })
-
-                .catch((err) => {
-                  this.errorMessage = err.response.data.messag;
-                });
-            } else {
-              instance.confirmButtonLoading = false;
-              instance.confirmButtonText = "Si, guardar";
-              done();
-            }
-          },
-        }
-      );
+              } else {
+                instance.confirmButtonLoading = false;
+                instance.confirmButtonText = "Si, guardar";
+                done();
+              }
+            },
+          }
+        );
+      }
     },
     saveSettingsSignature(formName, firmantesForm) {
       this.$confirm(
