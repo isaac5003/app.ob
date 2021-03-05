@@ -23,6 +23,7 @@
         :close-on-click-modal="false"
         :append-to-body="true"
         :visible.sync="closeDialog"
+      
       >
         <Notification
           class="w-full"
@@ -36,31 +37,27 @@
         "
         />
         <!-- firts grid -->
-        <div class="flex flex-col">
+        <div class="flex flex-col bg-gradient-to-r from-gray-200 to-gray-400">
           <el-form label-position="top">
-            <div class="grid grid-cols-12">
-              <el-form-item class="grid col-span-4">
+            <div class="grid grid-cols-12 ">
+              <el-form-item class="col-span-3">
                 <span class="font-semibold">Encabezado</span>
               </el-form-item>
-              <!-- <span class="col-start-9 col-span-2 mt-6 ml-20 text-xs"
-                >Tamaño de texto</span -->
-
-              <el-form-item
-                label="Tamaño de texto "
-                class="grid mt-3 ml-10 col-span-4 col-start-11"
-              >
-                <template>
-                  <el-input-number
-                    v-model="num"
-                    @change="handleChange"
-                    :min="1"
-                    :max="10"
-                    placeholder="pts"
-                    class="w-full"
-                    size="small"
-                  >
-                  </el-input-number>
-                </template>
+              <el-form-item class="w-screen col-start-9 ml-15">
+                <div class="inline-flex space-x-2 col-span-4 mt-3">
+                  <div class="flex-1 text-xs">Tamaño de texto</div>
+                  <div class="flex-1">
+                    <el-input-number
+                      v-model="num"
+                      @change="handleChange"
+                      :min="1"
+                      :max="10"
+                      placeholder="pts"
+                      class="w-full"
+                      size="small"
+                    ></el-input-number>
+                  </div>
+                </div>
               </el-form-item>
             </div>
             <!-- senores fecha Direccion  -->
@@ -506,34 +503,29 @@
             <div class="grid grid-cols-12 mt-3">
               <div class="w-full col-span-4 flex flex-col">
                 <span class="font-semibold text-black">Detalles</span>
-                <span>Campos para el encabezado para la tabla</span>
+                <span class="text-xs">Campos para el encabezado para la tabla</span>
               </div>
-              <!-- <span class="col-span-3 mt-6  text-xs col-start-9 bg-red-300"
-                >Tamaño de texto</span
-
-              > -->
-              <el-form-item
-                label="Altura de la descripcion de los items "
-                class="col-span-4 col-start-7 ml-12"
-              >
-                <template>
+                <el-form-item class="w-96 col-start-5  ">
+                <div class="inline-flex space-x-2 col-span-4 col-span-4 ">
+              <span class="flex-1 text-xs ">Altura para la descripción de items</span>
+               <!-- <div class="flex-1"> -->
                   <el-input-number
                     v-model="num"
                     @change="handleChange"
                     :min="1"
                     :max="10"
-                    placeholder="pts"
+                
                     class="w-full"
                     size="small"
-                  >
-                  </el-input-number>
-                </template>
+                  ></el-input-number>
+                <!-- </div> -->
+                  </div>
               </el-form-item>
-              <el-form-item
-                label="Tamaño de texto "
-                class="col-span-4 col-start-11 ml-12"
-              >
-                <template>
+
+                <el-form-item class="w-screen col-start-9 ml-15">
+                   <div class="inline-flex space-x-2 col-span-4">
+                <span class="flex-1 text-xs ">Tamaño de texto</span>
+                <!-- <div class="flex-1"> -->
                   <el-input-number
                     v-model="num"
                     @change="handleChange"
@@ -542,9 +534,9 @@
                     placeholder="pts"
                     class="w-full"
                     size="small"
-                  >
-                  </el-input-number>
-                </template>
+                  ></el-input-number>
+                </div>
+              <!-- </div> -->
               </el-form-item>
             </div>
             <!-- cant  descripcion  preciounitatio -->
@@ -727,7 +719,7 @@
                 </div>
               </div>
             </div>
-            <div class="grid grid-cols-12 borde-b-2">
+            <div class="grid grid-cols-12 border-b-2">
               <div class="mt-4 col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
@@ -907,13 +899,15 @@
               </div>
             </div>
             <!-- TOTALES-->
-            <div class="grid grid-cols-12">
+            <div class="grid grid-cols-12 mt-3">
               <div class="col-span-4">
                 <span class="font-semibold">Totales</span>
               </div>
-              <div class="col-span-4 col-start-11 ml-10">
-                <el-form-item label="Tamaño de texto">
-                  <template>
+          
+                <el-form-item class="w-screen col-start-9 ml-15">
+                <div class="inline-flex space-x-2 col-span-4 mt-3">
+                  <div class="flex-1 text-xs ">Tamaño de texto</div>
+                  <div class="flex-1">
                     <el-input-number
                       v-model="num"
                       @change="handleChange"
@@ -922,11 +916,11 @@
                       placeholder="pts"
                       class="w-full"
                       size="small"
-                    >
-                    </el-input-number>
-                  </template>
-                </el-form-item>
-              </div>
+                    ></el-input-number>
+                  </div>
+                </div>
+              </el-form-item>
+    
             </div>
             <!-- Son, Operacion superiora {a evaluar }, entregado por -->
             <div class="grid grid-cols-12">
@@ -2595,8 +2589,7 @@
                   </div>
                   <el-link
                     @click="closeDialog = true"
-                    class="w-56"
-                    icon="el-icon-setting"
+                    class="w-56 el-icon-setting el-icon-righ"
                   >
                     Creacion de Factura
                   </el-link>
@@ -3229,3 +3222,5 @@ export default {
   },
 };
 </script>
+  
+
