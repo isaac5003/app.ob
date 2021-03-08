@@ -17,13 +17,13 @@
           .catch(() => {})
       "
     >
+    <!-- Creacion de factura -->
       <el-dialog
         title="Crear modelo de factura"
         width="1040px"
         :close-on-click-modal="false"
         :append-to-body="true"
         :visible.sync="closeDialog"
-      
       >
         <Notification
           class="w-full"
@@ -37,14 +37,14 @@
         "
         />
         <!-- firts grid -->
-        <div class="flex flex-col bg-gradient-to-r from-gray-200 to-gray-400">
+        <div class="flex flex-col">
           <el-form label-position="top">
-            <div class="grid grid-cols-12 ">
+            <div class="grid grid-cols-12">
               <el-form-item class="col-span-3">
                 <span class="font-semibold">Encabezado</span>
               </el-form-item>
-              <el-form-item class="w-screen col-start-9 ml-15">
-                <div class="inline-flex space-x-2 col-span-4 mt-3">
+              <el-form-item class="col-span-3 col-start-10">
+                <div class="inline-flex space-x-2">
                   <div class="flex-1 text-xs">Tamaño de texto</div>
                   <div class="flex-1">
                     <el-input-number
@@ -52,7 +52,6 @@
                       @change="handleChange"
                       :min="1"
                       :max="10"
-                      placeholder="pts"
                       class="w-full"
                       size="small"
                     ></el-input-number>
@@ -60,11 +59,11 @@
                 </div>
               </el-form-item>
             </div>
-            <!-- senores fecha Direccion  -->
+            <!-- senores, fecha y Direccion  -->
             <div class="grid grid-cols-12">
-              <div class="mt-4 col-span-4">
+              <div class="col-span-4">
                 <el-checkbox v-model="checked">Señor (es)</el-checkbox>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -115,9 +114,9 @@
                   </div>
                 </div>
               </div>
-              <div class="mt-4 col-span-4">
+              <div class="col-span-4">
                 <el-checkbox v-model="checked">Fecha</el-checkbox>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -168,9 +167,9 @@
                   </div>
                 </div>
               </div>
-              <div class="mt-4 col-span-4">
+              <div class="col-span-4">
                 <el-checkbox v-model="checked">Dirección</el-checkbox>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -224,9 +223,9 @@
             </div>
             <!--nrc retencion giro  -->
             <div class="grid grid-cols-12">
-              <div class="mt-4 col-span-4">
+              <div class="col-span-4">
                 <el-checkbox v-model="checked">NRC</el-checkbox>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -236,7 +235,6 @@
                           @change="handleChange"
                           :min="1"
                           :max="10"
-                          placeholder="pts"
                           style="width: 90%"
                           size="small"
                         >
@@ -278,9 +276,9 @@
                   </div>
                 </div>
               </div>
-              <div class="mt-4 col-span-4">
+              <div class="col-span-4">
                 <el-checkbox v-model="checked">Nota de remision</el-checkbox>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -290,7 +288,6 @@
                           @change="handleChange"
                           :min="1"
                           :max="10"
-                          placeholder="pts"
                           style="width: 90%"
                           size="small"
                         >
@@ -332,9 +329,9 @@
                   </div>
                 </div>
               </div>
-              <div class="mt-4 col-span-4">
+              <div class="col-span-4">
                 <el-checkbox v-model="checked">Giro</el-checkbox>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -388,11 +385,11 @@
             </div>
             <!-- Condiones de la opracion  ventas a cuenta -->
             <div class="grid grid-cols-12 border-b-2">
-              <div class="mt-4 col-span-4">
+              <div class="col-span-4">
                 <el-checkbox v-model="checked"
                   >Condiciones de la operacion</el-checkbox
                 >
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -402,7 +399,6 @@
                           @change="handleChange"
                           :min="1"
                           :max="10"
-                          placeholder="pts"
                           style="width: 90%"
                           size="small"
                         >
@@ -444,9 +440,9 @@
                   </div>
                 </div>
               </div>
-              <div class="mt-4 col-span-4">
+              <div class="col-span-4">
                 <el-checkbox v-model="checked">Ventas a cuenta de</el-checkbox>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -456,7 +452,6 @@
                           @change="handleChange"
                           :min="1"
                           :max="10"
-                          placeholder="pts"
                           style="width: 90%"
                           size="small"
                         >
@@ -501,47 +496,44 @@
             </div>
             <!-- DETALLES-->
             <div class="grid grid-cols-12 mt-3">
-              <div class="w-full col-span-4 flex flex-col">
+              <div class="col-span-3 flex flex-col">
                 <span class="font-semibold text-black">Detalles</span>
-                <span class="text-xs">Campos para el encabezado para la tabla</span>
+                <span class="text-xs"
+                  >Campos para el encabezado de la tabla</span
+                >
               </div>
-                <el-form-item class="w-96 col-start-5  ">
-                <div class="inline-flex space-x-2 col-span-4 col-span-4 ">
-              <span class="flex-1 text-xs ">Altura para la descripción de items</span>
-               <!-- <div class="flex-1"> -->
+              <el-form-item class="col-span-5 col-start-5 ml-12">
+                <div class="inline-flex space-x-2">
+                  <span class="flex-1 text-xs"
+                    >Altura para la descripción de items</span
+                  >
                   <el-input-number
                     v-model="num"
                     @change="handleChange"
                     :min="1"
                     :max="10"
-                
-                    class="w-full"
-                    size="small"
-                  ></el-input-number>
-                <!-- </div> -->
-                  </div>
-              </el-form-item>
-
-                <el-form-item class="w-screen col-start-9 ml-15">
-                   <div class="inline-flex space-x-2 col-span-4">
-                <span class="flex-1 text-xs ">Tamaño de texto</span>
-                <!-- <div class="flex-1"> -->
-                  <el-input-number
-                    v-model="num"
-                    @change="handleChange"
-                    :min="1"
-                    :max="10"
-                    placeholder="pts"
                     class="w-full"
                     size="small"
                   ></el-input-number>
                 </div>
-              <!-- </div> -->
+              </el-form-item>
+              <el-form-item class="col-span-3 col-start-10">
+                <div class="inline-flex space-x-2">
+                  <span class="flex-1 text-xs">Tamaño de texto</span>
+                  <el-input-number
+                    v-model="num"
+                    @change="handleChange"
+                    :min="1"
+                    :max="10"
+                    class="w-full"
+                    size="small"
+                  ></el-input-number>
+                </div>
               </el-form-item>
             </div>
             <!-- cant  descripcion  preciounitatio -->
             <div class="grid grid-cols-12">
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -549,7 +541,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -600,7 +592,7 @@
                   </div>
                 </div>
               </div>
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -608,7 +600,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -659,7 +651,7 @@
                   </div>
                 </div>
               </div>
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -667,7 +659,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -720,7 +712,7 @@
               </div>
             </div>
             <div class="grid grid-cols-12 border-b-2">
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -728,7 +720,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -779,7 +771,7 @@
                   </div>
                 </div>
               </div>
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -787,7 +779,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -838,7 +830,7 @@
                   </div>
                 </div>
               </div>
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -846,7 +838,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -903,28 +895,26 @@
               <div class="col-span-4">
                 <span class="font-semibold">Totales</span>
               </div>
-          
-                <el-form-item class="w-screen col-start-9 ml-15">
-                <div class="inline-flex space-x-2 col-span-4 mt-3">
-                  <div class="flex-1 text-xs ">Tamaño de texto</div>
+
+              <el-form-item class="col-span-3 col-start-10">
+                <div class="inline-flex space-x-2">
+                  <div class="flex-1 text-xs">Tamaño de texto</div>
                   <div class="flex-1">
                     <el-input-number
                       v-model="num"
                       @change="handleChange"
                       :min="1"
                       :max="10"
-                      placeholder="pts"
                       class="w-full"
                       size="small"
                     ></el-input-number>
                   </div>
                 </div>
               </el-form-item>
-    
             </div>
             <!-- Son, Operacion superiora {a evaluar }, entregado por -->
             <div class="grid grid-cols-12">
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -932,7 +922,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -983,7 +973,7 @@
                   </div>
                 </div>
               </div>
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -991,7 +981,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -1042,7 +1032,7 @@
                   </div>
                 </div>
               </div>
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -1050,7 +1040,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -1104,7 +1094,7 @@
             </div>
             <!-- NOMBRE DUI Y FIRMA -->
             <div class="grid grid-cols-12">
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -1112,7 +1102,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -1163,7 +1153,7 @@
                   </div>
                 </div>
               </div>
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -1171,7 +1161,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -1222,7 +1212,7 @@
                   </div>
                 </div>
               </div>
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -1230,7 +1220,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -1284,7 +1274,7 @@
             </div>
             <!-- RECIVIDO POR, NPMBRE Y DUI -->
             <div class="grid grid-cols-12">
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -1292,7 +1282,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -1343,7 +1333,7 @@
                   </div>
                 </div>
               </div>
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -1351,7 +1341,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -1402,7 +1392,7 @@
                   </div>
                 </div>
               </div>
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -1410,7 +1400,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -1464,7 +1454,7 @@
             </div>
             <!-- FIRMA, SUMAS, 13% DE IVA -->
             <div class="grid grid-cols-12">
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -1472,7 +1462,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -1523,7 +1513,7 @@
                   </div>
                 </div>
               </div>
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -1531,7 +1521,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -1582,7 +1572,7 @@
                   </div>
                 </div>
               </div>
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -1590,7 +1580,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -1644,7 +1634,7 @@
             </div>
             <!-- subtotal, iva retenido, ventas extenta -->
             <div class="grid grid-cols-12">
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -1652,7 +1642,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -1703,7 +1693,7 @@
                   </div>
                 </div>
               </div>
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -1711,7 +1701,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -1762,7 +1752,7 @@
                   </div>
                 </div>
               </div>
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -1770,7 +1760,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -1824,7 +1814,7 @@
             </div>
             <!-- VENTA NO SUJETAS VENTA TOTAL  (RECUADRO) -->
             <div class="grid grid-cols-12">
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -1832,7 +1822,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -1883,7 +1873,7 @@
                   </div>
                 </div>
               </div>
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -1891,7 +1881,7 @@
                   size="small"
                   v-model="input"
                 ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -1942,7 +1932,7 @@
                   </div>
                 </div>
               </div>
-              <div class="mt-4 col-span-4 space-x-2">
+              <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked"></el-checkbox>
                 <el-input
                   placeholder="Please input"
@@ -2586,13 +2576,13 @@
                         v-model="d.current"
                       ></el-input>
                     </el-form-item>
+                    <div class="col-span-3 justify-items-center">
+                      <el-link @click="closeDialog = true">
+                        Creacion de Factura
+                        <i class="el-icon-setting el-icon--right"></i>
+                      </el-link>
+                    </div>
                   </div>
-                  <el-link
-                    @click="closeDialog = true"
-                    class="w-56 el-icon-setting el-icon-righ"
-                  >
-                    Creacion de Factura
-                  </el-link>
                 </div>
               </div>
             </div>
