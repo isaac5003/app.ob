@@ -227,7 +227,6 @@ export default {
           case "libroAuxiliares":
             this.requirementForm = "compact";
             break;
-
           case "movimientoCuentas":
             this.requirementForm = "extended";
             this.getCalogs();
