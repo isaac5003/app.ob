@@ -366,7 +366,7 @@
           :append-to-body="true"
           title="Nueva condición de pago"
           :visible.sync="showNewPayment"
-          width="30%"
+          width="400px"
           @close="closeDialog('newPaymentForm')"
         >
           <el-form
@@ -378,30 +378,49 @@
               submitPayment('newPaymentForm', newPaymentForm)
             "
           >
-            <div>
-              <el-form-item label="Nombre de la condición de pago" prop="name">
-                <el-input
-                  v-model="newPaymentForm.name"
-                  clearable
-                  type="text"
-                  maxlength="100"
-                  minlength="5"
-                  show-word-limit
-                ></el-input>
-              </el-form-item>
+            <el-form-item label="Nombre de la condición de pago" prop="name">
+              <el-input
+                v-model="newPaymentForm.name"
+                clearable
+                type="text"
+                maxlength="100"
+                minlength="5"
+                show-word-limit
+              ></el-input>
+            </el-form-item>
+            <el-form-item prop="" label="Tipo de pago">
+              <el-radio-group v-model="radio1" class="w-full">
+                <el-row :gutter="15">
+                  <el-col :span="8">
+                    <el-radio border size="small" class="w-full"
+                      >Contado</el-radio
+                    >
+                  </el-col>
+                  <el-col :span="8">
+                    <el-radio border label="excel" size="small" class="w-full"
+                      >Credito</el-radio
+                    >
+                  </el-col>
+                </el-row>
+              </el-radio-group>
+            </el-form-item>
+
+            <div class="flex flex-row justify-end">
+              <span slot="foot">
+                <el-button
+                  type="primary"
+                  size="small"
+                  @click.native="
+                    submitPayment('newPaymentForm', newPaymentForm)
+                  "
+                  >Guardar</el-button
+                >
+                <el-button @click="showNewPayment = false" size="small"
+                  >Cancelar</el-button
+                >
+              </span>
             </div>
           </el-form>
-          <span slot="footer" class="dialog-footer">
-            <el-button
-              type="primary"
-              size="small"
-              @click.native="submitPayment('newPaymentForm', newPaymentForm)"
-              >Guardar</el-button
-            >
-            <el-button @click="showNewPayment = false" size="small"
-              >Cancelar</el-button
-            >
-          </span>
         </el-dialog>
 
         <!-- Dialogo para editar condicion de pago -->
@@ -409,7 +428,7 @@
           :append-to-body="true"
           title="Editar condición de pago"
           :visible.sync="showEditPayment"
-          width="30%"
+          width="400px"
           @close="closeDialog('editPaymentForm')"
         >
           <el-form
@@ -431,18 +450,38 @@
                 show-word-limit
               ></el-input>
             </el-form-item>
+            <el-form-item prop="" label="Tipo de pago">
+              <el-radio-group v-model="radio1" class="w-full">
+                <el-row :gutter="15">
+                  <el-col :span="8">
+                    <el-radio border size="small" class="w-full"
+                      >Contado</el-radio
+                    >
+                  </el-col>
+                  <el-col :span="8">
+                    <el-radio border size="small" class="w-full"
+                      >Credito</el-radio
+                    >
+                  </el-col>
+                </el-row>
+              </el-radio-group>
+            </el-form-item>
+            <div class="flex justify-end">
+              <span slot="footer" class="dialog-footer">
+                <el-button
+                  type="primary"
+                  size="small"
+                  @click.native="
+                    submitPayment('editPaymentForm', editPaymentForm)
+                  "
+                  >Guardar</el-button
+                >
+                <el-button @click="showEditPayment = false" size="small"
+                  >Cancelar</el-button
+                >
+              </span>
+            </div>
           </el-form>
-          <span slot="footer" class="dialog-footer">
-            <el-button
-              type="primary"
-              size="small"
-              @click.native="submitPayment('editPaymentForm', editPaymentForm)"
-              >Guardar</el-button
-            >
-            <el-button @click="showEditPayment = false" size="small"
-              >Cancelar</el-button
-            >
-          </span>
         </el-dialog>
 
         <div class="grid grid-cols-12 gap-4">
@@ -627,9 +666,6 @@ export default {
     if (this.$route.query.tab) {
       this.tab = this.$route.query.tab;
     }
-    if (this.$route.query.utab) {
-      this.utab = this.$route.query.utab;
-    }
 
     const zones = () => {
       return this.$axios.get("/invoices/zones");
@@ -662,6 +698,7 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+      radio1: "",
       tab: "zones-sellers",
       utab: "invoicing",
       integrations: [
@@ -1204,9 +1241,6 @@ export default {
     },
   },
   computed: {
-    filteredIntegrations() {
-      return this.integrations.filter((i) => hasModule(i.ref, this.$auth.user));
-    },
     activeZones() {
       return this.zones.filter((zone) => zone.active);
     },
