@@ -815,10 +815,10 @@ export default {
             const docDefinition = {
               info: {
                 title: `detallesdocs_${this.$dateFns.format(
-                  new Date(formData.dateRange[0]),
+                  new Date(startDate),
                   "yyyyMMdd"
                 )}_detallesdocs_${this.$dateFns.format(
-                  new Date(formData.dateRange[1]),
+                  new Date(endDate),
                   "yyyyMMdd"
                 )}`,
               },
@@ -829,10 +829,7 @@ export default {
                 name,
                 nit,
                 nrc,
-                [
-                  new Date(formData.dateRange[0]),
-                  new Date(formData.dateRange[1]),
-                ],
+                [new Date(startDate), new Date(endDate)],
                 "DETALLE DE FACTURACIÓN ",
                 "period"
               ),
@@ -962,7 +959,7 @@ export default {
             const document = [
               [name],
               [
-                `DETALLE DE FACTURACIÓN EN EL PERÍODO DEL ${formData.dateRange[0]} AL ${formData.dateRange[1]}`,
+                `DETALLE DE FACTURACIÓN EN EL PERÍODO DEL ${startDate} AL ${endDate}`,
                 "",
                 "",
                 "",
@@ -991,12 +988,9 @@ export default {
             const sheet = XLSX.utils.aoa_to_sheet(document);
             const workbook = XLSX.utils.book_new();
             const fileName = `detallesdocs_${this.$dateFns.format(
-              new Date(formData.dateRange[0]),
+              new Date(startDate),
               "yyyyMMdd"
-            )}_${this.$dateFns.format(
-              new Date(formData.dateRange[1]),
-              "yyyyMMdd"
-            )}`;
+            )}_${this.$dateFns.format(new Date(endDate), "yyyyMMdd")}`;
             XLSX.utils.book_append_sheet(workbook, sheet, fileName);
             XLSX.writeFile(workbook, `${fileName}.xlsx`);
             this.generating = false;
