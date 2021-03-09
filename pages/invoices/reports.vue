@@ -630,7 +630,6 @@ export default {
         zone,
       }
     ) {
-      console.log(radioType, reportType);
       this.$refs[formName].validate((valid) => {
         if (!valid) {
           return false;
@@ -670,15 +669,6 @@ export default {
       status,
       zone
     ) {
-      console.log(
-        dateRange,
-        customer,
-        invoiceType,
-        status,
-        seller,
-        zone,
-        service
-      );
       const startDate = dateRange[0];
       const endDate = dateRange[1];
 
