@@ -37,7 +37,7 @@
         "
         />
         <!-- firts grid-cols-span -->
-        <div class="flex flex-col">
+        <div class="flex flex-col ">
           <el-form label-position="top">
             <div class="grid grid-cols-12">
               <el-form-item class="col-span-3">
@@ -60,7 +60,7 @@
               </el-form-item>
             </div>
             <!-- senores, fecha y Direccion  -->
-            <div class="grid grid-cols-12">
+            <div class="grid grid-cols-12 gap-8 ">
               <div class="col-span-4">
                 <el-checkbox v-model="checked">Señor (es)</el-checkbox>
                 <div class="grid grid-cols-6">
@@ -222,7 +222,7 @@
               </div>
             </div>
             <!--nrc retencion giro  -->
-            <div class="grid grid-cols-12">
+            <div class="grid grid-cols-12 gap-8">
               <div class="col-span-4">
                 <el-checkbox v-model="checked">NRC</el-checkbox>
                 <div class="grid grid-cols-6">
@@ -277,7 +277,7 @@
                 </div>
               </div>
               <div class="col-span-4">
-                <el-checkbox v-model="checked">Nota de remision</el-checkbox>
+                <el-checkbox v-model="checked">Nota de remisión</el-checkbox>
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -384,7 +384,7 @@
               </div>
             </div>
             <!-- Condiones de la opracion  ventas a cuenta -->
-            <div class="grid grid-cols-12 border-b-2">
+            <div class="grid grid-cols-12 border-b-2 gap-8">
               <div class="col-span-4">
                 <el-checkbox v-model="checked"
                   >Condiciones de la operacion</el-checkbox
@@ -531,16 +531,10 @@
                 </div>
               </el-form-item>
             </div>
-            <!-- cant  descripcion  preciounitatio -->
-            <div class="grid grid-cols-12">
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+            <!-- cant  descripcion  preciounitario -->
+            <div class="grid grid-cols-12 gap-8">
+              <div class="col-span-4 ">
+                <el-checkbox v-model="checked">Cantidad</el-checkbox>
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -592,14 +586,9 @@
                   </div>
                 </div>
               </div>
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+              <div class="col-span-4">
+                <el-checkbox v-model="checked">Descripción</el-checkbox>
+                
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -651,14 +640,9 @@
                   </div>
                 </div>
               </div>
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+              <div class="col-span-4">
+                <el-checkbox v-model="checked">Precio unitario</el-checkbox>
+                
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -711,15 +695,10 @@
                 </div>
               </div>
             </div>
-            <div class="grid grid-cols-12 border-b-2">
+            <div class="grid grid-cols-12 border-b-2 gap-8">
               <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+                <el-checkbox v-model="checked">Venta No sujetas</el-checkbox>
+               
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -771,14 +750,9 @@
                   </div>
                 </div>
               </div>
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+              <div class="col-span-4">
+                <el-checkbox v-model="checked">Venta exentas</el-checkbox>
+               
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -830,14 +804,9 @@
                   </div>
                 </div>
               </div>
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+              <div class="col-span-4">
+                <el-checkbox v-model="checked">Ventas afectas</el-checkbox>
+               
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -912,16 +881,11 @@
                 </div>
               </el-form-item>
             </div>
-            <!-- Son, Operacion superiora {a evaluar }, entregado por -->
-            <div class="grid grid-cols-12">
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+            <!-- Son, Operacion superior a {evaluar }, entregado por -->
+            <div class="grid grid-cols-12 gap-8">
+              <div class="col-span-4 ">
+                <el-checkbox v-model="checked">Son</el-checkbox>
+               
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -973,14 +937,9 @@
                   </div>
                 </div>
               </div>
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+              <div class="col-span-4">
+                <el-checkbox v-model="checked">Superior a evaluar</el-checkbox>
+                
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1032,14 +991,9 @@
                   </div>
                 </div>
               </div>
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+              <div class="col-span-4">
+                <el-checkbox v-model="checked">Entregado por</el-checkbox>
+              
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1093,15 +1047,10 @@
               </div>
             </div>
             <!-- NOMBRE DUI Y FIRMA -->
-            <div class="grid grid-cols-12">
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+            <div class="grid grid-cols-12 gap-8">
+              <div class="col-span-4">
+                <el-checkbox v-model="checked">Nombre</el-checkbox>
+         
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1153,14 +1102,9 @@
                   </div>
                 </div>
               </div>
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+              <div class="col-span-4">
+                <el-checkbox v-model="checked">Dui</el-checkbox>
+               
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1212,14 +1156,9 @@
                   </div>
                 </div>
               </div>
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+              <div class="col-span-4">
+                <el-checkbox v-model="checked">Firma</el-checkbox>
+               
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1273,15 +1212,10 @@
               </div>
             </div>
             <!-- RECIVIDO POR, NPMBRE Y DUI -->
-            <div class="grid grid-cols-12">
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+            <div class="grid grid-cols-12 gap-8">
+              <div class="col-span-4 ">
+                <el-checkbox v-model="checked"> Recivido por</el-checkbox>
+             
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1333,14 +1267,9 @@
                   </div>
                 </div>
               </div>
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+              <div class="col-span-4 ">
+                <el-checkbox v-model="checked">Nombre</el-checkbox>
+               
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1392,14 +1321,9 @@
                   </div>
                 </div>
               </div>
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+              <div class="col-span-4 ">
+                <el-checkbox v-model="checked">Dui</el-checkbox>
+             
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1453,15 +1377,10 @@
               </div>
             </div>
             <!-- FIRMA, SUMAS, 13% DE IVA -->
-            <div class="grid grid-cols-12">
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+            <div class="grid grid-cols-12 gap-8">
+              <div class="col-span-4">
+                <el-checkbox v-model="checked">Firma</el-checkbox>
+              
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1513,14 +1432,9 @@
                   </div>
                 </div>
               </div>
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+              <div class="col-span-4">
+                <el-checkbox v-model="checked">Sumas</el-checkbox>
+               
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1572,14 +1486,9 @@
                   </div>
                 </div>
               </div>
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+              <div class="col-span-4">
+                <el-checkbox v-model="checked">13% de IVA</el-checkbox>
+              
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1633,15 +1542,10 @@
               </div>
             </div>
             <!-- subtotal, iva retenido, ventas extenta -->
-            <div class="grid grid-cols-12">
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+            <div class="grid grid-cols-12 gap-8">
+              <div class="col-span-4">
+                <el-checkbox v-model="checked">Subtotal</el-checkbox>
+                
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1693,14 +1597,9 @@
                   </div>
                 </div>
               </div>
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+              <div class="col-span-4">
+                <el-checkbox v-model="checked">Iva retenido</el-checkbox>
+           
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1752,14 +1651,9 @@
                   </div>
                 </div>
               </div>
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+              <div class="col-span-4">
+                <el-checkbox v-model="checked">Ventas extentas</el-checkbox>
+              
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1813,15 +1707,10 @@
               </div>
             </div>
             <!-- VENTA NO SUJETAS VENTA TOTAL  (RECUADRO) -->
-            <div class="grid grid-cols-12">
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+            <div class="grid grid-cols-12 gap-8">
+              <div class="col-span-4 ">
+                <el-checkbox v-model="checked"> Venta no sujetas</el-checkbox>
+              
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1873,14 +1762,8 @@
                   </div>
                 </div>
               </div>
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
+              <div class="col-span-4">
+                <el-checkbox v-model="checked">Venta total</el-checkbox>
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1932,15 +1815,10 @@
                   </div>
                 </div>
               </div>
-              <div class="col-span-4 space-x-2">
-                <el-checkbox v-model="checked"></el-checkbox>
-                <el-input
-                  placeholder="Please input"
-                  style="width: 68%"
-                  size="small"
-                  v-model="input"
-                ></el-input>
-                <div class="grid grid-cols-6 mt-3">
+              <div class="col-span-4">
+                <el-checkbox v-model="checked">Recuadro</el-checkbox>
+               
+                <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
                       <template>
@@ -2576,10 +2454,10 @@
                         v-model="d.current"
                       ></el-input>
                     </el-form-item>
-                    <div class="col-span-3 justify-items-center">
+                    <div class="col-span-2 float-right">
                       <el-link @click="closeDialog = true">
-                        Creacion de Factura
-                        <i class="el-icon-setting el-icon--right"></i>
+                        Configuración
+                        <i class="el-icon-setting"></i>
                       </el-link>
                     </div>
                   </div>
