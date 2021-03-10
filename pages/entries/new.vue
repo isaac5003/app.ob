@@ -499,13 +499,13 @@ export default {
         cargo: [
           {
             validator: newCargoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
         abono: [
           {
             validator: newAbonoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
       },
@@ -521,13 +521,13 @@ export default {
         cargo: [
           {
             validator: editCargoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
         abono: [
           {
             validator: editAbonoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
       },
