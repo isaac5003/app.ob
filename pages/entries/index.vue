@@ -132,7 +132,7 @@
           <el-button size="small" @click="showInvoicePreview = false"
             >Cerrar</el-button
           >
-        </span> 
+        </span>
       </el-dialog>
 
       <!--Cierre de dialogo-->
@@ -261,7 +261,7 @@
           label="Tipo"
           width="90"
           align="center"
-          prop="accountingEntryType.id"
+          prop="accountingEntryType"
         >
           <template slot-scope="scope">
             <span>{{ scope.row.accountingEntryType.name }}</span>
