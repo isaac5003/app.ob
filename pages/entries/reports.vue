@@ -104,7 +104,7 @@
       <!-- seleccion date range y cuentas -->
       <div class="grid grid-cols-12 gap-4" v-if="requirementForm == 'extended'">
         <div class="col-span-4">
-          <el-form-item label="Rango de fechas:">
+          <el-form-item label="Rango de fechas:" prop="dateRanges">
             <el-date-picker
               size="small"
               v-model="reportForm.dateRanges"
@@ -121,7 +121,7 @@
           </el-form-item>
         </div>
         <div class="col-span-8">
-          <el-form-item label="Cuentas:">
+          <el-form-item label="Cuentas:" prop="catalogos">
             <el-select
               v-model="catalogos"
               placeholder="Seleccionar cuentas"
@@ -194,6 +194,8 @@ export default {
       reportFormRules: {
         reportType: selectValidation("change", true),
         dateRange: selectValidation("change", true),
+        dateRanges: selectValidation("change", true),
+        catalogos: selectValidation("change", true),
       },
       catalogos: [],
       reports: [
