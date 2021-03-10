@@ -394,6 +394,7 @@ export default {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.newEntryDetailForm.abono = 0;
           callback();
         }
       } else if (abono && val) {
@@ -414,6 +415,7 @@ export default {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.newEntryDetailForm.cargo = 0;
           callback();
         }
       } else if (cargo && val) {
@@ -434,6 +436,7 @@ export default {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.editEntryDetailForm.abono = 0;
           callback();
         }
       } else if (abono && val) {
@@ -454,6 +457,7 @@ export default {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.editEntryDetailForm.cargo = 0;
           callback();
         }
       } else if (cargo && val) {
@@ -495,13 +499,13 @@ export default {
         cargo: [
           {
             validator: newCargoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
         abono: [
           {
             validator: newAbonoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
       },
@@ -517,13 +521,13 @@ export default {
         cargo: [
           {
             validator: editCargoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
         abono: [
           {
             validator: editAbonoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
       },
