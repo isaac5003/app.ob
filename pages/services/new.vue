@@ -181,7 +181,6 @@ export default {
       formName,
       { name, cost, sellingType, description, incIva, incRenta }
     ) {
-      console.log(incIva);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
