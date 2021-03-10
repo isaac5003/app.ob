@@ -36,7 +36,7 @@
        <strong class='text-black'> Medida de A:</strong> se refiere al ancho del campo de una columnnan a campo 
         "
         />
-        <!-- firts grid -->
+        <!-- firts grid-cols-span -->
         <div class="flex flex-col">
           <el-form label-position="top">
             <div class="grid grid-cols-12">
