@@ -1,6 +1,6 @@
 <template>
   <layout-content
-    v-loading="loading"
+    v-loading="pageLoading"
     page-title="Reportes"
     :breadcrumb="[
       { name: 'Contabilidad', to: '/entries' },
@@ -121,9 +121,9 @@
           </el-form-item>
         </div>
         <div class="col-span-8">
-          <el-form-item label="Cuentas:" prop="catalogos">
+          <el-form-item label="Cuentas:" prop="accounts">
             <el-select
-              v-model="catalogos"
+              v-model="reportForm.accounts"
               placeholder="Seleccionar cuentas"
               size="small"
               clearable
@@ -183,6 +183,7 @@ export default {
   data() {
     return {
       generating: false,
+      pageLoading: false,
       loading: false,
       errorMessage: "",
       reportForm: {
@@ -190,12 +191,13 @@ export default {
         dateRange: new Date(),
         radio: "pdf",
         dateRanges: "",
+        accounts: [],
       },
       reportFormRules: {
         reportType: selectValidation("change", true),
         dateRange: selectValidation("change", true),
         dateRanges: selectValidation("change", true),
-        catalogos: selectValidation("change", true),
+        accounts: selectValidation("change", true),
       },
       catalogos: [],
       reports: [
@@ -233,6 +235,7 @@ export default {
           case "movimientoCuentas":
             this.requirementForm = "extended";
             this.getCalogs();
+            this.pageLoading = true;
             break;
           default:
             this.requirementForm = "none";
@@ -2661,22 +2664,21 @@ export default {
       }
     },
     generateDetalleCuentas(dateRange, catalogos, fileType) {
-      const bussinesInfo = () => this.$axios.get("/business/info");
       const movements = () =>
         this.$axios.get("/entries/report/account-movements", {
           params: {
             startDate: this.$dateFns.format(dateRange[0], "yyyy-MM-dd"),
             endDate: this.$dateFns.format(dateRange[1], "yyyy-MM-dd"),
-            selectedAccounts: JSON.stringify(catalogos),
+            selectedAccounts: JSON.stringify(this.reportForm.accounts),
           },
         });
       switch (fileType) {
         case "pdf":
-          Promise.all([bussinesInfo(), movements()]).then((res) => {
-            const [bussinesInfo, movements] = res;
-            const { name, nit, nrc } = bussinesInfo.data.info;
+          Promise.all([movements()]).then((res) => {
+            const [movements] = res;
             const movementsReport = movements.data.accounts;
-
+            const reportTitleName = movements.data.name;
+            const bussinesInfo = movements.data.company;
             const values = [];
             const emptyRow = [{}, {}, {}, {}, {}, {}];
 
@@ -2771,15 +2773,13 @@ export default {
               pageOrientation: "portrait",
               pageMargins: [20, 60, 20, 40],
               header: getHeader(
-                name,
-                nit,
-                nrc,
-                [
-                  new Date(this.$dateFns.format(dateRange[0], "MM-dd-yyyy")),
-                  new Date(this.$dateFns.format(dateRange[1], "MM-dd-yyyy")),
-                ],
-                "DETALLE DE MOVIMIENTO DE CUENTAS",
-                "period"
+                bussinesInfo.name,
+                bussinesInfo.nit,
+                bussinesInfo.nrc,
+                null,
+                reportTitleName,
+                null,
+                null
               ),
               footer: getFooter(),
               content: [
@@ -2856,12 +2856,9 @@ export default {
 
           break;
         case "excel":
-          Promise.all([bussinesInfo(), movements()]).then((res) => {
-            const [bussinesInfo, movements] = res;
-            const { name, nit, nrc } = bussinesInfo.data.info;
-
+          Promise.all([movements()]).then(([res]) => {
             const data = [];
-            for (const account of movements.data.accounts) {
+            for (const account of res.data.accounts) {
               data.push([
                 account.code,
                 account.name,
@@ -2891,17 +2888,14 @@ export default {
               data.push([""]);
             }
             const document = [
-              [name],
+              [res.data.company.name],
               [
-                `DETALLE DE MOVIMIENTO DE CUENTAS EN EL PERÍODO DEL ${this.$dateFns.format(
-                  dateRange[0],
-                  "dd/MM/yyyy"
-                )} AL ${this.$dateFns.format(dateRange[1], "dd/MM/yyyy")}`,
+                res.data.name,
                 "",
                 "",
                 "",
-                `NIT: ${nit}`,
-                `NRC: ${nrc}`,
+                `NIT: ${res.data.company.nit}`,
+                `NRC: ${res.data.company.nrc}`,
               ],
               [""],
               [
@@ -2940,6 +2934,7 @@ export default {
     async getCalogs() {
       const { data } = await this.$axios.get("/entries/catalog");
       this.accountingCatalog = data.accountingCatalog;
+      this.pageLoading = false;
     },
     cancel() {
       this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
