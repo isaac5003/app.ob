@@ -715,7 +715,13 @@
                     v-if="
                       scope.row.status.id === '2' ||
                       scope.row.status.id === '5' ||
-                      scope.row.status.id != '3'
+                      scope.row.status.id != '3' ||
+                      (isLastInvoice(
+                        scope.row.sequence,
+                        scope.row.documentType.id,
+                        scope.row.authorization
+                      ) &&
+                        scope.row.status.id != '3')
                     "
                   >
                     <i class="el-icon-circle-close"></i>
