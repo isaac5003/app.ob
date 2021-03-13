@@ -1083,7 +1083,6 @@ export default {
       });
     },
     submitSeller(formName, { name, invoicesZone }) {
-      console.log(name, invoicesZone);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
