@@ -429,8 +429,8 @@ export default {
     generateReport(formData) {
       if (formData.dateRange) {
         let params = {
-          startDate: fixDate(formData.dateRange[0]),
-          endDate: fixDate(formData.dateRange[1]),
+          startDate: formData.dateRange[0],
+          endDate: formData.dateRange[1],
         };
         if (formData.customer != "") {
           params = { ...params, customer: formData.customer };
@@ -486,47 +486,56 @@ export default {
                     {
                       bold: false,
                       text: d.customer,
+                      decoration: d.statusId == 3 ? 'lineThrough' : false
                     },
 
                     {
                       bold: false,
                       text: d.date,
                       alignment: "right",
+                      decoration: d.statusId ==3 ? 'lineThrough' : false
                     },
                     {
                       bold: false,
                       text: d.documentNumber,
                       alignment: "right",
+                      decoration: d.statusId ==3 ? 'lineThrough' : false
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.vGravada),
                       alignment: "right",
+                       decoration: d.statusId ==3 ? 'lineThrough' : false
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.vNSujeta),
                       alignment: "right",
+                       decoration: d.statusId ==3 ? 'lineThrough' : false
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.vExenta),
                       alignment: "right",
+                       decoration: d.statusId ==3 ? 'lineThrough' : false
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.iva),
                       alignment: "right",
+                      decoration: d.statusId ==3 ? 'lineThrough' : false
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.ivaRetenido),
                       alignment: "right",
+                       decoration: d.statusId ==3 ? 'lineThrough' : false
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.total),
                       alignment: "right",
+                       decoration: d.statusId ==3 ? 'lineThrough' : false
                     },
                   ]);
                 }
@@ -688,13 +697,11 @@ export default {
 
               for (const r of general) {
                 data.push([""]);
-                data.push([r.code, "", "", "", "", "", "", "", ""]);
+                data.push([r.code, "", "", "", "", "", "", "", ""])
                 for (const d of r.documents) {
                   data.push([
                     d.customer,
-
                     d.date,
-
                     d.documentNumber,
                     d.vGravada,
                     d.vNSujeta,
@@ -704,6 +711,7 @@ export default {
                     d.total,
                   ]);
                 }
+            
                 data.push([""]);
                 data.push([
                   r.count + ` Registros para ` + r.code,
