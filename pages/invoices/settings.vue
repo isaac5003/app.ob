@@ -389,15 +389,18 @@
               ></el-input>
             </el-form-item>
             <el-form-item prop="" label="Tipo de pago">
-              <el-radio-group v-model="radio1" class="w-full">
+              <el-radio-group
+                v-model="newPaymentForm.cashPayment"
+                class="w-full"
+              >
                 <el-row :gutter="15">
                   <el-col :span="8">
-                    <el-radio border size="small" class="w-full"
+                    <el-radio border size="small" class="w-full" :label="true"
                       >Contado</el-radio
                     >
                   </el-col>
                   <el-col :span="8">
-                    <el-radio border label="excel" size="small" class="w-full"
+                    <el-radio border size="small" class="w-full" :label="false"
                       >Credito</el-radio
                     >
                   </el-col>
@@ -451,15 +454,18 @@
               ></el-input>
             </el-form-item>
             <el-form-item prop="" label="Tipo de pago">
-              <el-radio-group v-model="radio1" class="w-full">
+              <el-radio-group
+                v-model="editPaymentForm.cashPayment"
+                class="w-full"
+              >
                 <el-row :gutter="15">
                   <el-col :span="8">
-                    <el-radio border size="small" class="w-full"
+                    <el-radio border size="small" class="w-full" :label="true"
                       >Contado</el-radio
                     >
                   </el-col>
                   <el-col :span="8">
-                    <el-radio border size="small" class="w-full"
+                    <el-radio border size="small" class="w-full" :label="false"
                       >Credito</el-radio
                     >
                   </el-col>
@@ -730,6 +736,7 @@ export default {
       },
       newPaymentForm: {
         name: "",
+        cashPayment: true,
       },
       newSellerForm: {
         name: "",
@@ -741,6 +748,7 @@ export default {
       },
       editPaymentForm: {
         name: "",
+        cashPayment: true,
       },
       editZoneForm: {
         name: "",
@@ -1075,7 +1083,6 @@ export default {
       });
     },
     submitSeller(formName, { name, invoicesZone }) {
-      console.log(name, invoicesZone);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -1178,7 +1185,7 @@ export default {
         );
       });
     },
-    submitPayment(formName, { id, name }) {
+    submitPayment(formName, { id, name, cashPayment }) {
       const action = id ? "actualizar" : "guardar";
       const method = id ? "PUT" : "POST";
       const url = `/invoices/payment-condition/${id ? id : ""}`;
@@ -1201,7 +1208,7 @@ export default {
                 this.$axios({
                   method,
                   url,
-                  data: { name },
+                  data: { name, cashPayment },
                 })
                   .then((res) => {
                     this.$notify.success({
