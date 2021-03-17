@@ -744,6 +744,7 @@
                 placeholder="Fecha inicial"
                 style="width: 100%"
                 value-format="yyyy-MM-dd"
+                @change="setStorage(fiscalPeriodForm, firmantesForm)"
               >
               </el-date-picker>
             </el-form-item>
@@ -756,6 +757,7 @@
                 format="MMM-yyyy"
                 placeholder="Fecha final"
                 style="width: 100%"
+                @change="setStorage(fiscalPeriodForm, firmantesForm)"
               >
               </el-date-picker>
             </el-form-item>
@@ -812,6 +814,7 @@
                 show-word-limit
                 clearable
                 placeholder=""
+                @change="setStorage(fiscalPeriodForm, firmantesForm)"
               >
               </el-input>
             </el-form-item>
@@ -831,6 +834,7 @@
                 filterable
                 clearable
                 placeholder=""
+                @change="setStorage(fiscalPeriodForm, firmantesForm)"
               >
               </el-input>
             </el-form-item>
@@ -1350,7 +1354,7 @@ import {
   checkBeforeLeave,
   checkBeforeEnter,
 } from "../../tools";
-
+const storagekey = "entries-settings";
 export default {
   name: "EntriesSettings",
   components: { LayoutContent, Notification },
@@ -1413,8 +1417,13 @@ export default {
         this.errorMessage = err.response.data.message;
       })
       .then((alw) => (this.pageloading = false));
+
+    checkBeforeEnter(this, storagekey, ["fiscalPeriodForm", "firmantesForm"]);
   },
   fetchOnServer: false,
+  beforeRouteLeave(to, from, next) {
+    checkBeforeLeave(this, storagekey, next);
+  },
   data() {
     const newCargoValidateCompare = (rule, value, callback) => {
       const abono =
@@ -1820,6 +1829,12 @@ export default {
     };
   },
   methods: {
+    setStorage(fiscalPeriodForm, firmantesForm) {
+      localStorage.setItem(
+        storagekey,
+        JSON.stringify({ fiscalPeriodForm, firmantesForm })
+      );
+    },
     //general
     fetchGeneral() {
       this.$axios.get("/entries/setting/general").then((res) => {
