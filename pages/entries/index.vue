@@ -251,10 +251,13 @@
           prop="title"
           min-width="370"
         />
-        <el-table-column label="Cargo" width="110" align="right">
-          <template slot-scope="scope">
-            <span>{{ scope.row.cargo | formatMoney }}</span>
-          </template>
+        <el-table-column
+          label="Cargo"
+          width="110"
+          prop="cargo"
+          sortable="custom"
+          align="right"
+        >
         </el-table-column>
         <el-table-column
           sortable="custom"
