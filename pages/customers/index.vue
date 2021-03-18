@@ -163,7 +163,7 @@
         v-loading="tableloading"
       >
         <el-table-column prop="index" width="40" />
-        <el-table-column label="Nombre" min-width="360" sortable="custom">
+        <el-table-column label="Nombre" min-width="360" sortable="custom" prop="name">
           <template slot-scope="scope">
             <div class="flex flex-col">
               <span class="font-semibold text-xs">
