@@ -220,7 +220,7 @@
           </div>
         </div>
       </el-form>
-      <!-- ----dddddd -->
+      <!-- La tabla tiene las medidas exacta, la suma de las colummnas tiene 960-->
       <el-table
         @sort-change="sortBy"
         :data="entries.entries"
