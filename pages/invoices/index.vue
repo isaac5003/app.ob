@@ -544,6 +544,7 @@
           size="mini"
           v-loading="tableloading"
         >
+<!-- column 1 -->
           <el-table-column prop="index" width="50" label="#" />
           <el-table-column
             label="# Documento"

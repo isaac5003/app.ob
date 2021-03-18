@@ -227,6 +227,7 @@
         stripe
         size="mini"
       >
+      <!-- column 1 -->
         <el-table-column
           type="index"
           label="#"
