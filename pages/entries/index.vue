@@ -258,6 +258,9 @@
           sortable="custom"
           align="right"
         >
+              <template slot-scope="scope">
+            <span>{{ scope.row.cargo | formatMoney}}</span>
+          </template>
         </el-table-column>
         <el-table-column
           sortable="custom"
