@@ -227,13 +227,7 @@
         stripe
         size="mini"
       >
-        <el-table-column
-          type="index"
-          label="#"
-          prop="index"
-          width="40"
-          align="center"
-        />
+        <el-table-column label="#" prop="index" width="40" align="center" />
         <el-table-column
           sortable="custom"
           label="Serie"
