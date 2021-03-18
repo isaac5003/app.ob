@@ -544,7 +544,7 @@
           size="mini"
           v-loading="tableloading"
         >
-          <el-table-column prop="index" width="40" />
+          <el-table-column prop="index" width="50" label="#" />
           <el-table-column
             label="# Documento"
             prop="sequence"
@@ -578,7 +578,7 @@
           <el-table-column
             label="Cliente"
             prop="customerName"
-            min-width="350"
+            min-width="340"
             sortable="custom"
           />
           <el-table-column

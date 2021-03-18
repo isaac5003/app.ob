@@ -76,11 +76,11 @@
         stripe
         size="mini"
       >
-        <el-table-column prop="index" width="40" />
+        <el-table-column prop="index" width="50" label="#" />
         <el-table-column
           label="Descripción"
           prop="description"
-          min-width="490"
+          min-width="480"
           sortable="custom"
         />
         <el-table-column

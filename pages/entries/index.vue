@@ -231,7 +231,7 @@
           type="index"
           label="#"
           prop="index"
-          width="40"
+          width="50"
           align="center"
         />
         <el-table-column
@@ -249,7 +249,7 @@
           sortable="custom"
           label="Titulo"
           prop="title"
-          min-width="370"
+          min-width="360"
         />
         <el-table-column label="Cargo" width="110" align="right">
           <template slot-scope="scope">
