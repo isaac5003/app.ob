@@ -69,18 +69,60 @@
           </el-form-item>
         </div>
       </el-form>
+
+      <div class="grid grid-cols-12 float-right">
+        <div class="col-start-12 ml-6 -mb-6  object-none object-right-top bg-red-500">
+          q
+          <template slot-scope="scope">
+            <el-dropdown trigger="click">
+              <el-button type="primary" size="mini" icon="el-icon-more"/>
+            
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item
+                  @click.native="
+                    $router.push(`/services/edit?ref=${scope.row.id}`)
+                  "
+                >
+                  <i class="el-icon-edit-outline"></i> Editar servicio
+                </el-dropdown-item>
+                <el-dropdown-item @click.native="changeActive(scope.row)">
+                  <span v-if="scope.row.active">
+                    <i class="el-icon-close"></i> Desactivar
+                  </span>
+                  <span v-else> <i class="el-icon-check"></i> Activar </span>
+                  servicio
+                </el-dropdown-item>
+                <el-dropdown-item
+                  :divided="true"
+                  class="font-semibold"
+                  @click.native="deleteService(scope.row)"
+                >
+                  <span class="text-red-500">
+                    <i class="el-icon-delete"></i> Eliminar servicio
+                  </span>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </template>
+        </div>
+      </div>
       <el-table
         @sort-change="sortBy"
         v-loading="tableloading"
         :data="services.services"
         stripe
         size="mini"
+        ref="multipleTable"
+        @selection-change="handleSelectionChange"
       >
+        >
+        <el-table-column type="selection" width="50" v-model="selection.click">
+        </el-table-column>
         <el-table-column prop="index" width="40" />
         <el-table-column
           label="Descripción"
           prop="description"
-          min-width="490"
+          min-width="390"
           sortable="custom"
         />
         <el-table-column
@@ -197,6 +239,10 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+      selection: {
+        click: "",
+      },
+      multipleSelection: [],
       pageloading: true,
       tableloading: false,
       errorMessage: "",
@@ -219,6 +265,9 @@ export default {
     };
   },
   methods: {
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
     fetchServices() {
       this.tableloading = true;
       let params = this.page;
