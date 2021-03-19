@@ -146,6 +146,7 @@
               type="number"
               :min="1"
               size="small"
+              :disabled="activeAccount.isParent && activeAccount.subAccounts"
             />
           </el-form-item>
           <el-form-item
@@ -2012,6 +2013,7 @@ export default {
       this.fetchCatalog();
     },
     openEditAccount(account) {
+      console.log(account);
       if (account.code.length == 1) {
         this.showEditMayorDialog = true;
         this.activeAccount = { ...account };
