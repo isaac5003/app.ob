@@ -17,6 +17,74 @@
           .catch(() => {})
       "
     >
+    <el-dialog
+    title="Nueva Autorización"
+    :visible.sync="showAuthorization"
+    :append-to-body="true"
+    :close-on-click-modal="false"
+    width="400px"
+
+    >
+       <div class=" flex flex-col space-y-2">
+         <el-form
+        
+         >
+         
+             <!-- Autorización -->
+                <div class="grid grid-cols-12 gap-4">
+                  <div class="col-span-12">
+                    <el-form-item label="N° Autorización">
+                      <el-input
+                      placeholder="N° Autorización"
+                        class="w-full"
+                        size="small"
+                         v-model="d"
+                      ></el-input>
+                    </el-form-item>
+                  </div>
+                </div>
+                <!-- Inicial, Final -->
+                <div class="grid grid-cols-12 gap-4">
+                  <div class="col-span-6">
+                    <el-form-item label="Inicial">
+                      <el-input
+                      placeholder="Inicial"
+                        class="w-full"
+                        size="small"
+                         v-model="d"
+                      ></el-input>
+                    </el-form-item>
+                  </div>
+                  <div class="col-span-6">
+                    <el-form-item label="Final">
+                      <el-input
+                      placeholder="Final"
+                        class="w-full"
+                        size="small"
+                       v-model="d"
+                      ></el-input>
+                    </el-form-item>
+                  </div>
+                  </div>
+               
+             <div class="flex flex-rows justify-end">
+           <el-button
+           size="small"
+           type="primary"
+           >Guardar</el-button>
+           <el-button
+           size="small"
+            @click="showAuthorization = false"
+           >
+            Cancelar
+           </el-button>
+         </div>
+          
+         </el-form>
+        
+       </div>
+        
+      </el-dialog> 
       <el-tab-pane label="Zonas y vendedores" name="zones-sellers">
         <!-- dialogo zonas -->
         <el-dialog
@@ -539,7 +607,7 @@
                         type="primary"
                         icon="el-icon-plus"
                         size="mini"
-                        :disabled="true"
+                        @click="showAuthorization = true"
                       ></el-button>
                     </el-form-item>
                   </div>
@@ -645,14 +713,18 @@ export default {
     const documents = () => {
       return this.$axios.get("/invoices/documents");
     };
+     const showAuthorization = () => {
+      return this.$axios.get("/invoices/documents");
+    };
     // promesa que recibe los métodos con las peticiones http
-    Promise.all([zones(), sellers(), payment(), documents()])
+    Promise.all([zones(), sellers(), payment(), documents(), showAuthorization()])
       .then((res) => {
         const [zones, sellers, payment, documents] = res;
         this.zones = zones.data.zones;
         this.sellers = sellers.data.sellers;
         this.payments = payment.data.paymentConditions;
         this.documents = documents.data.documents;
+        this.showAuthorizationw = documents.data.documents;
         this.loading = false;
       })
       .catch((err) => {
@@ -682,12 +754,15 @@ export default {
       sellers: [],
       payments: [],
       documents: [],
+      showAuthorizationw:[],
       showNewZone: false,
       showNewSeller: false,
       showNewPayment: false,
       showEditPayment: false,
       showEditZone: false,
       showEditSeller: false,
+      showAuthorization:false,
+
       newZoneForm: {
         name: "",
       },
