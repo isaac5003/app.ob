@@ -194,7 +194,9 @@
           <el-button
             type="primary"
             size="small"
-            @click.native="submitEditedCatalog(activeAccount, 'activeAccount')"
+            @click.native="
+              submitEditedCatalog(accounts, 'activeAccount', activeAccount)
+            "
             >Guardar</el-button
           >
           <el-button @click="showEditMayorDialog = false" size="small"
@@ -464,11 +466,7 @@
             type="primary"
             size="small"
             @click.native="
-              submitEditedCatalog(
-                activeAccount,
-                'accountFormEdit',
-                activeAccount.parentCatalog
-              )
+              submitEditedCatalog(accounts, 'accountFormEdit', activeAccount)
             "
             >Guardar</el-button
           >
@@ -2013,7 +2011,6 @@ export default {
       this.fetchCatalog();
     },
     openEditAccount(account) {
-      console.log(account);
       if (account.code.length == 1) {
         this.showEditMayorDialog = true;
         this.activeAccount = { ...account };
@@ -2066,6 +2063,7 @@ export default {
       );
     },
     submitEditedCatalog(accounts, formName, activeAccount) {
+      console.log("REFFFF", accounts, formName, activeAccount);
       this.$refs[formName].validate((valid) => {
         if (!valid) {
           return false;
@@ -2104,9 +2102,8 @@ export default {
                 instance.confirmButtonText = "Procesando...";
 
                 this.$axios
-                  .put(`/entries/catalog/${accounts.id}`, {
-                    ...accounts,
-                    code: realCode,
+                  .put(`/entries/catalog/${activeAccount.id}`, {
+                    ...activeAccount,
                   })
                   .then((res) => {
                     this.$notify.success({
