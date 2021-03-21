@@ -234,12 +234,15 @@
                   <span v-else> <i class="el-icon-check"></i> Activar </span>
                   cliente
                 </el-dropdown-item>
-                <!-- <el-dropdown-item>
-                    <i class="el-icon-guide"></i> Sucursales
+                <el-dropdown-item
+                @click.native="
+                $router.push(`/customers/branchOffices?ref-${scope.row.id}`)"
+                >
+                    <i class="el-icon-map-location"></i> Sucursales
                   </el-dropdown-item>
-                  <el-dropdown-item>
+                  <!-- <el-dropdown-item>
                     <i class="el-icon-notebook-1"></i> Directorio
-                </el-dropdown-item>-->
+                </el-dropdown-item> -->
                 <el-dropdown-item
                   :divided="true"
                   class="text-red-500 font-semibold"
