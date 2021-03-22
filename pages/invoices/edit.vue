@@ -366,16 +366,16 @@
                     :value="c.id"
                   >
                     <div
-                        class="flex flex-row justify-between items-end py-1 leading-normal"
-                      >
-                        <div class="flex flex-col">
-                          <span class="text-xs text-gray-500">{{
-                            c.shortName
-                          }}</span>
-                          <span>{{ c.name }}</span>
-                        </div>
-                        <span class="text-xs text-gray-500">{{ c.nrc }}</span>
+                      class="flex flex-row justify-between items-end py-1 leading-normal"
+                    >
+                      <div class="flex flex-col">
+                        <span class="text-xs text-gray-500">{{
+                          c.shortName
+                        }}</span>
+                        <span>{{ c.name }}</span>
                       </div>
+                      <span class="text-xs text-gray-500">{{ c.nrc }}</span>
+                    </div>
                   </el-option>
                 </el-select>
               </el-form-item>
@@ -858,7 +858,7 @@ export default {
       },
       newServiceForm: {
         service: "",
-        quantity: null,
+        quantity: 1,
         chargeDescription: null,
         incTax: false,
         sellingType: null,
@@ -913,17 +913,19 @@ export default {
     },
     selectService(id, type, services) {
       const service = services.find((s) => s.id == id);
+
       switch (type) {
         case "new":
           this.newServiceForm.unitPrice = service.cost;
           this.newServiceForm.chargeDescription = service.description;
           this.newServiceForm.sellingType = service.sellingType.id;
+          this.newServiceForm.incTax = service.incIva;
           break;
         case "edit":
           this.editServiceForm.unitPrice = service.cost;
           this.editServiceForm.chargeDescription = service.description;
           this.editServiceForm.sellingType = service.sellingType.id;
-
+          this.editServiceForm.incTax = service.incIva;
           break;
       }
     },

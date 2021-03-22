@@ -144,6 +144,7 @@
                   :key="aC.id"
                   :label="`${aC.code} - ${aC.name}`"
                   :value="aC.id"
+                  :disabled="aC.isParent == true"
                 />
               </el-select>
             </el-form-item>
@@ -177,7 +178,7 @@
                 size="small"
                 autocomplete="off"
                 style="width: 100%"
-                :disabled="editEntryDetailForm.entryAccounting === ''"
+                :disabled="editEntryDetailForm.accountingCatalog === ''"
               />
             </el-form-item>
           </div>
@@ -369,14 +370,12 @@
                     @click="openEditEntryDetail(scope.$index, scope.row)"
                     size="small"
                     icon="el-icon-edit"
-                    circle
                   ></el-button>
                   <el-button
                     type="danger"
                     @click="deleteDetail(scope.$index)"
                     size="small"
                     icon="el-icon-delete"
-                    circle
                   ></el-button>
                 </div>
               </template>
@@ -384,24 +383,11 @@
           </el-table>
         </div>
         <!-- Guardar y Cancelar -->
-        <div class="grid grid-cols-12 gap-4 relative mt-4">
-          <div class="col-start-9 col-span-2">
-            <el-button
-              type="primary"
-              class="w-full"
-              size="small"
-              native-type="submit"
-              >Guardar</el-button
-            >
-          </div>
-          <div class="col-start-11 col-span-2">
-            <el-button
-              @click="cancel()"
-              class="w-full"
-              size="small"
-              >Cancelar</el-button
-            >
-          </div>
+        <div class="flex flex-row justify-end space-x-4">
+          <el-button type="primary" size="small" native-type="submit"
+            >Guardar</el-button
+          >
+          <el-button size="small" @click="cancel()">Cancelar</el-button>
         </div>
       </el-form>
     </div>
@@ -439,15 +425,15 @@ export default {
               ...d,
               accountingCatalog: d.accountingCatalog.id,
               code: d.accountingCatalog.code,
-              order: !d.order ? entry.data.entry.accountingEntryDetails.indexOf(d) + 1 : d.order,
-            
+              order: !d.order
+                ? entry.data.entry.accountingEntryDetails.indexOf(d) + 1
+                : d.order,
             };
           }
         );
         this.checkEntry();
       })
       .catch((err) => {
-        console.log(err);
         this.errorMessage = err.response.data.message;
       });
   },
@@ -458,12 +444,13 @@ export default {
       const abono =
         this.newEntryDetailForm.abono > 0
           ? this.newEntryDetailForm.abono.toFixed(2)
-          : "";
-      const val = value > 0 ? value.toFixed(2) : "";
+          : 0;
+      const val = value > 0 ? value.toFixed(2) : 0;
       if (!abono) {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.newEntryDetailForm.abono = 0;
           callback();
         }
       } else if (abono && val) {
@@ -478,12 +465,13 @@ export default {
       const cargo =
         this.newEntryDetailForm.cargo > 0
           ? this.newEntryDetailForm.cargo.toFixed(2)
-          : "";
-      const val = value > 0 ? value.toFixed(2) : "";
+          : 0;
+      const val = value > 0 ? value.toFixed(2) : 0;
       if (!cargo) {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.newEntryDetailForm.cargo = 0;
           callback();
         }
       } else if (cargo && val) {
@@ -496,14 +484,15 @@ export default {
     };
     const editCargoValidateCompare = (rule, value, callback) => {
       const abono =
-        this.newEntryDetailForm.abono > 0
-          ? this.newEntryDetailForm.abono.toFixed(2)
-          : "";
-      const val = value > 0 ? value.toFixed(2) : "";
+        this.editEntryDetailForm.abono > 0
+          ? this.editEntryDetailForm.abono.toFixed(2)
+          : 0;
+      const val = value > 0 ? value.toFixed(2) : 0;
       if (!abono) {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.editEntryDetailForm.abono = 0;
           callback();
         }
       } else if (abono && val) {
@@ -516,14 +505,15 @@ export default {
     };
     const editAbonoValidateCompare = (rule, value, callback) => {
       const cargo =
-        this.newEntryDetailForm.cargo > 0
-          ? this.newEntryDetailForm.cargo.toFixed(2)
-          : "";
-      const val = value > 0 ? value.toFixed(2) : "";
+        this.editEntryDetailForm.cargo > 0
+          ? this.editEntryDetailForm.cargo.toFixed(2)
+          : 0;
+      const val = value > 0 ? value.toFixed(2) : 0;
       if (!cargo) {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.editEntryDetailForm.cargo = 0;
           callback();
         }
       } else if (cargo && val) {
@@ -535,7 +525,6 @@ export default {
       }
     };
     return {
-    
       showEditEntryDetail: false,
       showAddEntryDetail: false,
       loading: false,
@@ -570,13 +559,13 @@ export default {
         cargo: [
           {
             validator: editCargoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
         abono: [
           {
             validator: editAbonoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
       },
@@ -586,13 +575,13 @@ export default {
         cargo: [
           {
             validator: newCargoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
         abono: [
           {
             validator: newAbonoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
       },
@@ -631,16 +620,16 @@ export default {
   },
   methods: {
     getEntrySerie({ accountingEntryType, rawDate }) {
-      console.log({ accountingEntryType, rawDate });
       if (accountingEntryType && rawDate) {
         this.$axios
-          .get(`entries/serie`, { params:{ accountingEntryType: accountingEntryType, date:rawDate }})
+          .get(`entries/serie`, {
+            params: { accountingEntryType: accountingEntryType, date: rawDate },
+          })
           .then((res) => {
             this.editEntryForm.serie = res.data.nextSerie;
             this.checkEntry();
           })
           .catch((err) => {
-            console.log(err);
             this.errorMessage = err.response.data.message;
           });
       }
@@ -703,7 +692,6 @@ export default {
           code: this.accountingCatalog.find(
             (c) => c.id == this.newEntryDetailForm.accountingCatalog
           ).code,
-         
         });
         this.showAddEntryDetail = false;
         this.checkEntry();
@@ -714,7 +702,13 @@ export default {
         if (!valid) {
           return false;
         }
-        this.accountingEntryDetails.splice(index, 1, { ...form });
+
+        this.accountingEntryDetails.splice(index, 1, {
+          ...form,
+          code: this.accountingCatalog.find(
+            (c) => c.id == form.accountingCatalog
+          ).code,
+        });
         this.showEditEntryDetail = false;
         this.checkEntry();
       });
@@ -750,7 +744,7 @@ export default {
                   instance.confirmButtonLoading = true;
                   instance.confirmButtonText = "Procesando...";
                   this.$axios
-                    .put(`/entries/${this.$route.query.ref}` , {
+                    .put(`/entries/${this.$route.query.ref}`, {
                       header: {
                         title: formData.title,
                         date: formData.rawDate,
@@ -762,7 +756,7 @@ export default {
                         return {
                           ...d,
                           accountingCatalog: d.accountingCatalog,
-                         order: !d.order ? details.indexOf(d) + 1 : d.order,
+                          order: !d.order ? details.indexOf(d) + 1 : d.order,
                         };
                       }),
                     })

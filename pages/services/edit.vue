@@ -166,6 +166,7 @@
   </layout-content>
 </template>
 
+
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
@@ -225,6 +226,8 @@ export default {
         cost: "",
         sellingType: "",
         description: "",
+        incIva: false,
+        incRenta: false,
       },
       servicesEditFormRules: {
         name: inputValidation(true, 5, 60),
@@ -238,7 +241,10 @@ export default {
     };
   },
   methods: {
-    submitEditService(formName, { name, cost, sellingType, description }) {
+    submitEditService(
+      formName,
+      { name, cost, sellingType, description, incIva, incRenta }
+    ) {
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -261,6 +267,8 @@ export default {
                     cost,
                     sellingType,
                     description,
+                    incIva,
+                    incRenta,
                   })
                   .then((res) => {
                     this.$notify.success({
@@ -323,6 +331,12 @@ export default {
           }
         },
       });
+    changeIva(sellingTypeValue) {
+      if (sellingTypeValue !== 3) {
+        this.servicesEditForm.incIva = false;
+      } else {
+        this.servicesEditForm.incIva = false;
+      }
     },
   },
 };

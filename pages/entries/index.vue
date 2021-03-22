@@ -132,7 +132,7 @@
           <el-button size="small" @click="showInvoicePreview = false"
             >Cerrar</el-button
           >
-        </span> 
+        </span>
       </el-dialog>
 
       <!--Cierre de dialogo-->
@@ -227,13 +227,7 @@
         stripe
         size="mini"
       >
-        <el-table-column
-          type="index"
-          label="#"
-          prop="index"
-          width="40"
-          align="center"
-        />
+        <el-table-column label="#" prop="index" width="40" align="center" />
         <el-table-column
           sortable="custom"
           label="Serie"
@@ -261,7 +255,7 @@
           label="Tipo"
           width="90"
           align="center"
-          prop="accountingEntryType.id"
+          prop="accountingEntryType"
         >
           <template slot-scope="scope">
             <span>{{ scope.row.accountingEntryType.name }}</span>

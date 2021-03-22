@@ -89,7 +89,7 @@
             "
             >Guardar</el-button
           >
-          <el-button @click="showEditEntryDetail = false" size="small"
+          <el-button @click="showNewEntryDetail = false" size="small"
             >Cancelar</el-button
           >
         </div>
@@ -263,9 +263,9 @@
               </el-form-item>
             </div>
             <div class="col-span-2">
-              <el-form-item label="Opciones de partida" prop="scuared">
+              <el-form-item label="Opciones de partida" prop="squared">
                 <el-checkbox
-                  v-model="newEntryForm.scuared"
+                  v-model="newEntryForm.squared"
                   disabled
                   border
                   size="small"
@@ -304,13 +304,13 @@
           :data="accountingEntryDetails"
           stripe
           size="mini"
-          :summary-method="getSummaries"
           show-summary
+          :summary-method="getSummaries"
         >
           <el-table-column type="index" label="#" min-width="70" />
           <el-table-column
             label="Cuenta contable"
-            prop="catalogCode"
+            prop="code"
             min-width="150"
           />
           <el-table-column label="Concepto" prop="concept" min-width="425" />
@@ -394,6 +394,7 @@ export default {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.newEntryDetailForm.abono = 0;
           callback();
         }
       } else if (abono && val) {
@@ -402,7 +403,7 @@ export default {
         );
       } else {
         callback();
-      } 
+      }
     };
     const newAbonoValidateCompare = (rule, value, callback) => {
       const cargo =
@@ -414,6 +415,7 @@ export default {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.newEntryDetailForm.cargo = 0;
           callback();
         }
       } else if (cargo && val) {
@@ -428,12 +430,13 @@ export default {
       const abono =
         this.editEntryDetailForm.abono > 0
           ? this.editEntryDetailForm.abono.toFixed(2)
-          : "";
-      const val = value > 0 ? value.toFixed(2) : "";
+          : 0;
+      const val = value > 0 ? value.toFixed(2) : 0;
       if (!abono) {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.editEntryDetailForm.abono = 0;
           callback();
         }
       } else if (abono && val) {
@@ -448,12 +451,13 @@ export default {
       const cargo =
         this.editEntryDetailForm.cargo > 0
           ? this.editEntryDetailForm.cargo.toFixed(2)
-          : "";
-      const val = value > 0 ? value.toFixed(2) : "";
+          : 0;
+      const val = value > 0 ? value.toFixed(2) : 0;
       if (!cargo) {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.editEntryDetailForm.cargo = 0;
           callback();
         }
       } else if (cargo && val) {
@@ -472,7 +476,7 @@ export default {
         entryType: "",
         date: this.$dateFns.format(new Date(), "yyyy-MM-dd"),
         serie: "",
-        scuared: "",
+        squared: "",
         accounted: "",
         title: "",
       },
@@ -495,13 +499,13 @@ export default {
         cargo: [
           {
             validator: newCargoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
         abono: [
           {
             validator: newAbonoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
       },
@@ -517,13 +521,13 @@ export default {
         cargo: [
           {
             validator: editCargoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
         abono: [
           {
             validator: editAbonoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
       },
@@ -585,14 +589,12 @@ export default {
           catalogCode: this.accountingCatalog.find(
             (c) => c.id == data.accountingCatalog
           ).code,
-     
         });
         this.showNewEntryDetail = false;
         this.checkEntry();
       });
     },
     changeEntryType({ entryType, date }) {
-      // console.log(`ENTRY TYPE :::${entryType} FECHA ::: ${date}`);
       if (entryType && date) {
         this.$axios
           .get("/entries/serie", {
@@ -602,7 +604,6 @@ export default {
             },
           })
           .then(({ data }) => {
-            console.log(data);
             this.newEntryForm.serie = data.nextSerie;
           })
           .catch((err) => {
@@ -638,6 +639,7 @@ export default {
         this.$refs["newEntryDetailForm"].resetFields();
       }
     },
+
     openEditEntryDetail(index, details) {
       this.getAccountingCatalog();
       this.editingEntryDetail = index;
@@ -652,22 +654,29 @@ export default {
         if (!valid) {
           return false;
         }
-        this.accountingEntryDetails.splice(index, 1, { ...form });
+        this.accountingEntryDetails.splice(index, 1, {
+          ...form,
+          code: this.accountingCatalog.find(
+            (c) => c.id == form.accountingCatalog
+          ).code,
+        });
+        console.log(this.accountingEntryDetails);
+
         this.showEditEntryDetail = false;
         this.checkEntry();
       });
     },
     checkEntry() {
-      let totalCargo = this.accountingEntryDetails.reduce(
-        (a, b) => a + (b.cargo ? b.cargo : 0),
-        0
-      );
-      let totalAbono = this.accountingEntryDetails.reduce(
+      const totalAbono = this.accountingEntryDetails.reduce(
         (a, b) => a + (b.abono ? b.abono : 0),
         0
       );
-      this.newEntryForm.scuared =
-        totalAbono.toFixed(3) === totalCargo.toFixed(3);
+      const totalCargo = this.accountingEntryDetails.reduce(
+        (a, b) => a + (b.cargo ? b.cargo : 0),
+        0
+      );
+      this.newEntryForm.squared =
+        totalAbono.toFixed(3) == totalCargo.toFixed(3);
       this.newEntryForm.accounted = false;
     },
     saveEntry(formName, formData, details) {
@@ -675,8 +684,6 @@ export default {
         if (!valid) {
           return false;
         }
-      
-
         const save = () => {
           this.$confirm(
             "¿Estás seguro que deseas guardar esta partida?",
@@ -695,7 +702,7 @@ export default {
                         title: formData.title,
                         serie: formData.serie,
                         date: formData.date,
-                        squared: formData.scuared,
+                        squared: formData.squared,
                         accounted: formData.accounted,
                         accountingEntryType: formData.entryType,
                       },
@@ -706,7 +713,7 @@ export default {
                           concept: d.concept,
                           cargo: d.cargo,
                           abono: d.abono,
-                          order:details.indexOf(d)+1,
+                          order: details.indexOf(d) + 1,
                         };
                       }),
                     })
@@ -785,6 +792,7 @@ export default {
         }
       });
     },
+
     cancel() {
       this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
         confirmButtonText: "Si, salir",

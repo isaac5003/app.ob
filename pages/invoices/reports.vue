@@ -88,7 +88,6 @@
                   start-placeholder="Fecha inicial"
                   end-placeholder="Fecha final"
                   format="dd/MM/yyyy"
-                  value-format="yyyy-MM-dd"
                 >
                 </el-date-picker>
               </el-form-item>
@@ -108,43 +107,46 @@
                     <el-option label="Todos los clientes" value="" />
                     <el-option-group key="ACTIVOS" label="ACTIVOS">
                       <el-option
-                       
                         v-for="item in activeCustomers"
                         :key="item.id"
                         :label="item.name"
                         :value="item.id"
                       >
-                  <div
-                        class="flex flex-row justify-between items-end py-1 leading-normal"
-                      >
-                        <div class="flex flex-col">
+                        <div
+                          class="flex flex-row justify-between items-end py-1 leading-normal"
+                        >
+                          <div class="flex flex-col">
+                            <span class="text-xs text-gray-500">{{
+                              item.shortName
+                            }}</span>
+                            <span>{{ item.name }}</span>
+                          </div>
                           <span class="text-xs text-gray-500">{{
-                            item.shortName
+                            item.nrc
                           }}</span>
-                          <span>{{ item.name }}</span>
                         </div>
-                        <span class="text-xs text-gray-500">{{ item.nrc }}</span>
-                      </div>
                       </el-option>
                     </el-option-group>
                     <el-option-group key="INACTIVOS" label="INACTIVOS">
                       <el-option
-                        v-for="item in activeCustomers"
+                        v-for="item in inactiveCustomers"
                         :key="item.id"
                         :label="item.name"
                         :value="item.id"
                       >
-                         <div
-                        class="flex flex-row justify-between items-end py-1 leading-normal"
-                      >
-                        <div class="flex flex-col">
+                        <div
+                          class="flex flex-row justify-between items-end py-1 leading-normal"
+                        >
+                          <div class="flex flex-col">
+                            <span class="text-xs text-gray-500">{{
+                              item.shortName
+                            }}</span>
+                            <span>{{ item.name }}</span>
+                          </div>
                           <span class="text-xs text-gray-500">{{
-                            item.shortName
+                            item.nrc
                           }}</span>
-                          <span>{{ item.name }}</span>
                         </div>
-                        <span class="text-xs text-gray-500">{{ item.nrc }}</span>
-                      </div>
                       </el-option>
                     </el-option-group>
                   </el-select>
@@ -208,11 +210,11 @@
                     clearable
                     filterable
                     default-first-option
-                    placeholder="Todos los clientes:"
+                    placeholder="Todos los vendedores:"
                     class="w-full"
                   >
                     <el-option-group key="ACTIVOS" label="ACTIVOS">
-                      <el-option label="Todos los clientes" value="" />
+                      <el-option label="Todos los vendedores" value="" />
                       <el-option
                         v-for="item in activeSellers"
                         :key="item.id"
@@ -246,8 +248,8 @@
                     placeholder="Todos las Zonas"
                     class="w-full"
                   >
-                    <el-option-group key="ACTIVOS" label="ACTIVOS">
-                      <el-option label="Tados las zonas" value="" />
+                    <el-option-group key="ACTIVAS" label="ACTIVAS">
+                      <el-option label="Todas las zonas" value="" />
                       <el-option
                         v-for="item in activeZones"
                         :key="item.id"
@@ -256,7 +258,7 @@
                       >
                       </el-option>
                     </el-option-group>
-                    <el-option-group key="INACTIVOS" label="INACTIVOS">
+                    <el-option-group key="INACTIVAS" label="INACTIVAS">
                       <el-option
                         v-for="item in inactiveZones"
                         :key="item.id"
@@ -283,7 +285,7 @@
                     <el-option-group key="ACTIVOS" label="ACTIVOS">
                       <el-option label="Todos los servicios" value="" />
                       <el-option
-                        v-for="item in activeService"
+                        v-for="item in activeServices"
                         :key="item.id"
                         :label="item.name"
                         :value="item.id"
@@ -292,7 +294,7 @@
                     </el-option-group>
                     <el-option-group key="INACTIVOS" label="INACTIVOS">
                       <el-option
-                        v-for="item in inactiveService"
+                        v-for="item in inactiveServices"
                         :key="item.id"
                         :label="item.name"
                         :value="item.id"
@@ -332,73 +334,53 @@ import {
   selectValidation,
   getHeader,
   getFooter,
+  fixDate,
 } from "../../tools";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import XLSX from "xlsx";
 export default {
-  name: "InvoicesIndex",
+  name: "InvoicesReport",
   components: {
     LayoutContent,
     Notification,
   },
   fetch() {
-    const activeCustomers = () =>
-      this.$axios.get("/customers", { params: { active: true } });
-    const inactiveCustomers = () =>
-      this.$axios.get("/customers", { params: { active: false } });
     const documentTypes = () => this.$axios.get("/invoices/document-types");
-    const activeSellers = () =>
-      this.$axios.get("/invoices/sellers", { params: { active: true } });
-    const inactiveSellers = () =>
-      this.$axios.get("/invoices/sellers", { params: { active: false } });
-    const activeZones = () =>
-      this.$axios.get("/invoices/zones", { params: { active: true } });
-    const inactiveZones = () =>
-      this.$axios.get("/invoices/zones", { params: { active: false } });
-    const activeService = () =>
-      this.$axios.get("/services", { params: { active: true } });
-    const inactiveService = () =>
-      this.$axios.get("/services", { params: { active: false } });
-
-    const status = () => this.$axios.get("/invoices/status");
+    const customers = () => this.$axios.get("/customers");
+    const sellers = () => this.$axios.get("/invoices/sellers");
+    const zones = () => this.$axios.get("/invoices/zones");
+    const services = () => this.$axios.get("/services");
+    const invoices = () => this.$axios.get("/invoices", { params: this.page });
+    const statuses = () => this.$axios.get("/invoices/status");
 
     Promise.all([
-      activeCustomers(),
-      inactiveCustomers(),
-      activeSellers(),
-      inactiveSellers(),
-      activeZones(),
-      inactiveZones(),
-      activeService(),
-      inactiveService(),
       documentTypes(),
-      status(),
+      customers(),
+      sellers(),
+      zones(),
+      services(),
+      invoices(),
+      statuses(),
     ])
       .then((res) => {
         const [
-          activeCustomers,
-          inactiveCustomers,
-          activeSellers,
-          inactiveSellers,
-          activeZones,
-          inactiveZones,
-          activeService,
-          inactiveService,
           documentTypes,
-          status,
+          customers,
+          sellers,
+          zones,
+          services,
+          invoices,
+          statuses,
         ] = res;
-        this.activeCustomers = activeCustomers.data.customers;
-        this.inactiveCustomers = inactiveCustomers.data.customers;
         this.documentTypes = documentTypes.data.documentTypes;
-        this.activeSellers = activeSellers.data.sellers;
-        this.inactiveSellers = inactiveSellers.data.sellers;
-        this.activeZones = activeZones.data.zones;
-        this.inactiveZones = inactiveZones.data.zones;
-        this.activeService = activeService.data.services;
-        this.inactiveService = inactiveService.data.services;
-        this.statuses = status.data.statuses;
+        this.customers = customers.data.customers;
+        this.sellers = sellers.data.sellers;
+        this.zones = zones.data.zones;
+        this.services = services.data.services;
+        this.invoices = invoices.data;
+        this.statuses = statuses.data.statuses;
         this.loading = false;
       })
       .catch((err) => {
@@ -432,149 +414,18 @@ export default {
       reports: [
         {
           id: 1,
-          name: "Detalle de reportes",
+          name: "Detalle de ventas",
         },
       ],
-      page: {
-        limit: 10,
-        page: 1,
-      },
     };
   },
-  activeCustomers: [],
-  inactiveCustomers: [],
   documentTypes: [],
-  activeSellers: [],
-  inactiveSellers: [],
-  activeZones: [],
-  inactiveZones: [],
-  activeService: [],
-  inactiveService: [],
+  customers: [],
+  sellers: [],
+  zones: [],
+  services: [],
   statuses: [],
   methods: {
-    cancel() {
-      this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
-        confirmButtonText: "Si, salir",
-        cancelButtonText: "Cancel",
-        type: "warning",
-      }).then(() => {
-        this.$router.push("/invoices");
-      });
-    },
-    fetchInvoices() {
-      let params = this.page;
-      if (this.status !== "") {
-        params = {
-          ...params,
-          active: this.status,
-        };
-      }
-      if (this.searchValue !== "") {
-        params = {
-          ...params,
-          search: this.searchValue.toLowerCase(),
-        };
-      }
-
-      this.$axios
-        .get("/invoices", {
-          params,
-        })
-        .then((res) => {
-          this.invoices = res.data;
-        })
-        .catch((err) => {
-          this.errorMessage = err.response.data.message;
-        });
-    },
-    handleSizeChange(val) {
-      this.page.limit = val;
-      this.fetchInvoices();
-    },
-    changeActive({ id, isActiveInvoice }) {
-      const action = isActiveInvoice ? "desactivar" : "activar";
-      this.$confirm(
-        `¿Estás seguro que deseas ${action} este cliente?`,
-        "Confirmación",
-        {
-          confirmButtonText: `Si, ${action}`,
-          cancelButtonText: "Cancelar",
-          type: "warning",
-          beforeClose: (action, instance, done) => {
-            if (action === "confirm") {
-              instance.confirmButtonLoading = true;
-              instance.confirmButtonText = "Procesando...";
-              this.$axios
-                .put(`/invoices/status/${id}`, {
-                  status: !isActiveInvoice,
-                })
-                .then((res) => {
-                  this.$notify.success({
-                    title: "Éxito",
-                    message: res.data.message,
-                  });
-                  this.fetchInvoices();
-                })
-                .catch((err) => {
-                  this.$notify.error({
-                    title: "Error",
-                    message: err.response.data.message,
-                  });
-                })
-                .then((alw) => {
-                  instance.confirmButtonLoading = false;
-                  instance.confirmButtonText = `Si, ${action}`;
-                  done();
-                });
-            }
-            done();
-          },
-        }
-      );
-    },
-    deleteInvoice({ id }) {
-      this.$confirm(
-        `¿Estás seguro que deseas eliminar este cliente?`,
-        "Confirmación",
-        {
-          confirmButtonText: `Si, eliminar`,
-          cancelButtonText: "Cancelar",
-          type: "warning",
-          beforeClose: (action, instance, done) => {
-            if (action === "confirm") {
-              instance.confirmButtonLoading = true;
-              instance.confirmButtonText = "Procesando...";
-              this.$axios
-                .delete(`/invoices/${id}`)
-                .then((res) => {
-                  this.$notify.success({
-                    title: "Éxito",
-                    message: res.data.message,
-                  });
-                  this.fetchInvoices();
-                })
-                .catch((err) => {
-                  this.$notify.error({
-                    title: "Error",
-                    message: err.response.data.message,
-                  });
-                })
-                .then((alw) => {
-                  instance.confirmButtonLoading = false;
-                  instance.confirmButtonText = `Si, eliminar`;
-                  done();
-                });
-            }
-            done();
-          },
-        }
-      );
-    },
-    async openInvoicePreview({ id }) {
-      const { data } = await this.$axios.get(`/invoices/${id}`);
-      this.selectedInvoice = data.invoice;
-      this.showInvoicePreview = true;
-    },
     generateReport(formData) {
       if (formData.dateRange) {
         let params = {
@@ -635,47 +486,56 @@ export default {
                     {
                       bold: false,
                       text: d.customer,
+                     decoration: d.status.id == 3 ? 'lineThrough' : false
                     },
 
                     {
                       bold: false,
                       text: d.date,
                       alignment: "right",
+                      decoration: d.status.id == 3 ? 'lineThrough' : false
                     },
                     {
                       bold: false,
                       text: d.documentNumber,
                       alignment: "right",
+                     decoration: d.status.id == 3 ? 'lineThrough' : false
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.vGravada),
                       alignment: "right",
+                       decoration: d.status.id == 3 ? 'lineThrough' : false
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.vNSujeta),
                       alignment: "right",
+                     decoration: d.status.id == 3 ? 'lineThrough' : false
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.vExenta),
                       alignment: "right",
+                      decoration: d.status.id == 3 ? 'lineThrough' : false
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.iva),
                       alignment: "right",
+                      decoration: d.status.id == 3 ? 'lineThrough' : false
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.ivaRetenido),
                       alignment: "right",
+                       decoration: d.status.id == 3 ? 'lineThrough' : false
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.total),
                       alignment: "right",
+                       decoration: d.status.id == 3 ? 'lineThrough' : false
                     },
                   ]);
                 }
@@ -837,13 +697,11 @@ export default {
 
               for (const r of general) {
                 data.push([""]);
-                data.push([r.code, "", "", "", "", "", "", "", ""]);
+                data.push([r.code, "", "", "", "", "", "", "", "",""])
                 for (const d of r.documents) {
                   data.push([
                     d.customer,
-
                     d.date,
-
                     d.documentNumber,
                     d.vGravada,
                     d.vNSujeta,
@@ -851,8 +709,10 @@ export default {
                     d.iva,
                     d.ivaRetenido,
                     d.total,
+                    d.status.name,
                   ]);
                 }
+            
                 data.push([""]);
                 data.push([
                   r.count + ` Registros para ` + r.code,
@@ -912,6 +772,32 @@ export default {
             break;
         }
       }
+    },
+  },
+  computed: {
+    activeCustomers() {
+      return this.customers.filter((c) => c.isActiveCustomer);
+    },
+    inactiveCustomers() {
+      return this.customers.filter((c) => !c.isActiveCustomer);
+    },
+    activeSellers() {
+      return this.sellers.filter((s) => s.active);
+    },
+    inactiveSellers() {
+      return this.sellers.filter((s) => !s.active);
+    },
+    activeZones() {
+      return this.zones.filter((z) => z.active);
+    },
+    inactiveZones() {
+      return this.zones.filter((z) => !z.active);
+    },
+    activeServices() {
+      return this.services.filter((s) => s.active);
+    },
+    inactiveServices() {
+      return this.services.filter((s) => !s.active);
     },
   },
 };
