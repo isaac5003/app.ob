@@ -7,27 +7,27 @@
       { name: 'Editar servicio', to: null },
     ]"
   >
-    <el-tabs
-      v-model="tab"
-      @tab-click="
-        $router
-          .replace({
-            path: `/services/edit`,
-            query: { ref: $route.query.ref, tab },
-          })
-          .catch(() => {})
+    <el-form
+      :model="servicesEditForm"
+      :rules="servicesEditFormRules"
+      status-icon
+      ref="servicesEditForm"
+      @submit.native.prevent="
+        submitEditService('servicesEditForm', servicesEditForm)
       "
     >
-      <el-tab-pane label="Información general" name="general-information">
-        <el-form
-          :model="servicesEditForm"
-          :ruler="servicesEditFormRules"
-          status-icon
-          ref="servicesEditForm"
-          @submit.native.prevent="
-            submitEditService('servicesEditForm', servicesEditForm)
-          "
-        >
+      <el-tabs
+        v-model="tab"
+        @tab-click="
+          $router
+            .replace({
+              path: `/services/edit`,
+              query: { ref: $route.query.ref, tab },
+            })
+            .catch(() => {})
+        "
+      >
+        <el-tab-pane label="Información general" name="general-information">
           <div class="grid grid-cols-12 gap-4">
             <el-form-item
               label="Nombre del servicio"
@@ -81,44 +81,39 @@
               </el-radio-group>
             </el-form-item>
           </div>
-
           <el-form-item label="Descripción del servicio" prop="description">
             <el-input
               ref="description"
               type="textarea"
               :rows="4"
               v-model="servicesEditForm.description"
-              @change="setStorage(servicesNewForm)"
               minlength="5"
               maxlength="5000"
               show-word-limit
               class="mt-1"
             />
           </el-form-item>
+        </el-tab-pane>
 
-          <div class="flex justify-end">
-            <el-button type="primary" size="small" native-type="submit"
-              >Guardar</el-button
-            >
-            <el-button size="small" @click="$router.push('/services')"
-              >Cancelar</el-button
-            >
-          </div>
-        </el-form>
-      </el-tab-pane>
-
-      <el-tab-pane label="Integraciones" name="integrations" class="space-y-4">
-        <Notification
-          class="w-full"
-          type="info"
-          title="Información"
-          message="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
-        />
-        <el-form :model="servicesCatalogForm" ref="servicesCatalogForm">
+        <el-tab-pane
+          label="Integraciones"
+          name="integrations"
+          class="space-y-4"
+        >
+          <Notification
+            class="w-full"
+            type="info"
+            title="Información"
+            message="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+          />
           <div class="grid grid-cols-12 gap-4">
-            <el-form-item label="Seleccione una cuenta" class="col-span-4">
+            <el-form-item
+              label="Seleccione una cuenta"
+              class="col-span-4"
+              prop="catalog"
+            >
               <el-select
-                v-model="servicesCatalogForm.accountingCatalog"
+                v-model="servicesEditForm.accountingCatalog"
                 placeholder="Seleccione una cuenta"
                 size="small"
                 clearable
@@ -132,37 +127,22 @@
                   :value="c.id"
                   :disabled="c.isParent == true"
                 >
-                  <div class="flex flex-row justify-between">
-                    <span class="mr-5 text-xs">
-                      {{ c.name }}
-                    </span>
-                    <span class="mr-5 text-xs">
-                      {{ c.code }}
-                    </span>
-                  </div>
                 </el-option>
               </el-select>
             </el-form-item>
           </div>
-          <div class="flex justify-end">
-            <el-button
-              type="primary"
-              size="small"
-              @click.native="
-                saveServiceIntegration(
-                  'servicesCatalogForm',
-                  servicesCatalogForm
-                )
-              "
-              >Guardar</el-button
-            >
-            <el-button size="small" @click="$router.push('/services')"
-              >Cancelar</el-button
-            >
-          </div>
-        </el-form>
-      </el-tab-pane>
-    </el-tabs>
+        </el-tab-pane>
+
+        <div class="flex justify-end">
+          <el-button type="primary" size="small" native-type="submit"
+            >Guardar</el-button
+          >
+          <el-button size="small" @click="$router.push('/services')"
+            >Cancelar</el-button
+          >
+        </div>
+      </el-tabs>
+    </el-form>
   </layout-content>
 </template>
 
@@ -214,10 +194,16 @@ export default {
   },
   data() {
     return {
+      cogInfo: "",
       catalogList: [],
-      catalag: "",
       tab: "general-information",
       acountGeneral: "",
+      acountInfo: [
+        {
+          id: 1,
+          name: "Jorge_vladimir@hotmail.com",
+        },
+      ],
       pageloading: true,
       sellingTypes: [],
       servicesEditForm: {
@@ -225,6 +211,7 @@ export default {
         cost: "",
         sellingType: "",
         description: "",
+        accountingCatalog: "",
       },
       servicesEditFormRules: {
         name: inputValidation(true, 5, 60),
@@ -232,13 +219,13 @@ export default {
         sellingType: selectValidation(true),
         description: inputValidation(false, 5),
       },
-      servicesCatalogForm: {
-        accountingCatalog: "",
-      },
     };
   },
   methods: {
-    submitEditService(formName, { name, cost, sellingType, description }) {
+    submitEditService(
+      formName,
+      { name, cost, sellingType, description, accountingCatalog }
+    ) {
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -255,13 +242,21 @@ export default {
               if (action === "confirm") {
                 instance.confirmButtonLoading = true;
                 instance.confirmButtonText = "Procesando...";
-                this.$axios
-                  .put(`/services/${this.$route.query.ref}`, {
+                const service = () =>
+                  this.$axios.put(`/services/${this.$route.query.ref}`, {
                     name,
                     cost,
                     sellingType,
                     description,
-                  })
+                  });
+                const integration = () =>
+                  this.$axios.put(
+                    `/services/${this.$route.query.ref}/integrations`,
+                    {
+                      accountingCatalog,
+                    }
+                  );
+                Promise.all([service(), integration()])
                   .then((res) => {
                     this.$notify.success({
                       title: "Exito",
@@ -286,42 +281,6 @@ export default {
             },
           }
         );
-      });
-    },
-    saveServiceIntegration(formName, { accountingCatalog }) {
-      this.$confirm("Esta seguro que desea guardar la cuenta", "Confirmar", {
-        confirmButtonText: "Si, guardar",
-        cancelButtonText: "Cancelar",
-        type: "warning",
-        beforeClose: (action, instance, done) => {
-          if (action === "confirm") {
-            instance.confirmButtonLoading = true;
-            instance.confirmButtonText = "Procesando...";
-
-            this.$axios
-              .put(`/services/${this.$route.query.ref}/integrations`, {
-                accountingCatalog,
-              })
-              .then((res) => {
-                this.$notify.success({
-                  title: "Exito",
-                  message: res.data.message,
-                });
-                // this.fetchGeneral();
-                instance.confirmButtonLoading = false;
-                instance.confirmButtonText = "Si, guardar";
-                done();
-              })
-
-              .catch((err) => {
-                this.errorMessage = err.response.data.messag;
-              });
-          } else {
-            instance.confirmButtonLoading = false;
-            instance.confirmButtonText = "Si, guardar";
-            done();
-          }
-        },
       });
     },
   },
