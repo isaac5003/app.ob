@@ -724,7 +724,6 @@ export default {
         this.sellers = sellers.data.sellers;
         this.payments = payment.data.paymentConditions;
         this.documents = documents.data.documents;
-        this.showAuthorizationw = documents.data.documents;
         this.loading = false;
       })
       .catch((err) => {
@@ -754,7 +753,7 @@ export default {
       sellers: [],
       payments: [],
       documents: [],
-      showAuthorizationw:[],
+   
       showNewZone: false,
       showNewSeller: false,
       showNewPayment: false,
