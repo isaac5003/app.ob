@@ -435,7 +435,6 @@
           </div>
         </div>
       </div>
-      <el-select v-model="true.false">jla</el-select>
 
       <el-table
         :data="tabla"
@@ -444,7 +443,8 @@
         stripe
         size="mini"
       >
-        <el-table-column type="selection" width="40" />
+        <el-table-column type="selection" width="40" v-model="tab">
+        </el-table-column>
 
         <el-table-column
           label="#"
@@ -457,7 +457,7 @@
           sortable="custom"
           prop="name"
         ></el-table-column>
-        <el-table-column label="Telefono" sortable="custom" prop="phone" />
+        <el-table-column label="Teléfono" sortable="custom" prop="phone" />
         <el-table-column
           label="Correo"
           sortable="custom"
@@ -467,8 +467,31 @@
           label="Pais"
           sortable="custom"
           prop="country"
+          show-overflow-tooltip
         ></el-table-column>
         <el-table-column label width="70" align="center">
+          <template slot="header" v-if="multipleSelection.length > 0" >
+            <el-dropdown>
+              <el-button
+                trigger="click"
+                icon="el-icon-more"
+                type="primary"
+                size="mini"
+               class="transition duration-500 ease-in  transform  hover:scale-110"
+              ></el-button>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>
+                  <i class="el-icon-edit"></i>Editar Sucursales
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <i class="el-icon-close"></i>Desactivar sucursales
+                </el-dropdown-item>
+                <el-dropdown-item :divided="true">
+                  <i class="el-icon-delete"></i> Eliminar sucursales
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </template>
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />
@@ -529,6 +552,7 @@ export default {
 
   data() {
     return {
+      tab: true,
       multipleSelection: [],
       text: "",
       pageloading: true,
@@ -547,6 +571,20 @@ export default {
           email: "example@example.com",
           country: "El Salvador",
         },
+         {
+          index: 2,
+          name: "Siman Sv de CV",
+          phone: "2332-3244",
+          email: "example@example.com",
+          country: "El Salvador",
+        },
+         {
+          index: 3,
+          name: "Siman Sv de CV",
+          phone: "2332-3244",
+          email: "example@example.com",
+          country: "El Salvador",
+        },
       ],
 
       page: {
@@ -556,11 +594,9 @@ export default {
     };
   },
   methods: {
-    handleClick() {
-      alert("button click");
-    },
     handleSelectionChange(val) {
       this.multipleSelection = val;
+      console.log(this.multipleSelection.length)
     },
   },
 };
