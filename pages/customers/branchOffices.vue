@@ -443,7 +443,7 @@
         stripe
         size="mini"
       >
-        <el-table-column type="selection" width="40" v-model="tab">
+        <el-table-column type="selection" width="60" v-model="tab">
         </el-table-column>
 
         <el-table-column
