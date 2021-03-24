@@ -70,42 +70,7 @@
         </div>
       </el-form>
 
-      <div class="grid grid-cols-12 float-right">
-        <div class="col-start-12 ml-6 -mb-6  object-none object-right-top bg-red-500">
-          q
-          <template slot-scope="scope">
-            <el-dropdown trigger="click">
-              <el-button type="primary" size="mini" icon="el-icon-more"/>
-            
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item
-                  @click.native="
-                    $router.push(`/services/edit?ref=${scope.row.id}`)
-                  "
-                >
-                  <i class="el-icon-edit-outline"></i> Editar servicio
-                </el-dropdown-item>
-                <el-dropdown-item @click.native="changeActive(scope.row)">
-                  <span v-if="scope.row.active">
-                    <i class="el-icon-close"></i> Desactivar
-                  </span>
-                  <span v-else> <i class="el-icon-check"></i> Activar </span>
-                  servicio
-                </el-dropdown-item>
-                <el-dropdown-item
-                  :divided="true"
-                  class="font-semibold"
-                  @click.native="deleteService(scope.row)"
-                >
-                  <span class="text-red-500">
-                    <i class="el-icon-delete"></i> Eliminar servicio
-                  </span>
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
-          </template>
-        </div>
-      </div>
+   
       <el-table
         @sort-change="sortBy"
         v-loading="tableloading"
@@ -116,7 +81,7 @@
         @selection-change="handleSelectionChange"
       >
         >
-        <el-table-column type="selection" width="50" v-model="selection.click">
+        <el-table-column type="selection" width="50" >
         </el-table-column>
         <el-table-column prop="index" width="40" />
         <el-table-column
@@ -164,6 +129,30 @@
           </template>
         </el-table-column>
         <el-table-column label width="70" align="center">
+          <!-- dropdpwn selecction -->
+             <template slot="header" v-if="multipleSelection.length > 0" >
+            <el-dropdown>
+              <el-button
+                trigger="click"
+                icon="el-icon-more"
+                type="primary"
+                size="mini"
+                 class="transition ease-out duration-700"
+              ></el-button>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>
+                  <i class="el-icon-view"></i>Vista previa
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <i class="el-icon-printer"></i>Imprimir documento
+                </el-dropdown-item>
+                <el-dropdown-item :divided="true">
+                  <i class="el-icon-refresh-left"></i> Revertir estados
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </template>
+          <!-- dropdown 1 -->
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />
@@ -239,9 +228,7 @@ export default {
   fetchOnServer: false,
   data() {
     return {
-      selection: {
-        click: "",
-      },
+     
       multipleSelection: [],
       pageloading: true,
       tableloading: false,
