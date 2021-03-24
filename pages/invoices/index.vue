@@ -178,7 +178,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 1 &&
-                    selectedInvoice.documentType.id != 3
+                  selectedInvoice.documentType.id != 3
                 "
                 >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
               >
@@ -194,7 +194,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 2 &&
-                    selectedInvoice.documentType.id != 3
+                  selectedInvoice.documentType.id != 3
                 "
                 >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
               >
@@ -210,7 +210,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 3 ||
-                    selectedInvoice.documentType.id == 3
+                  selectedInvoice.documentType.id == 3
                 "
                 >{{
                   (selectedInvoice.documentType.id == 1
@@ -351,38 +351,38 @@
                     :label="item.name"
                     :value="item.id"
                   >
-                   <div
-                        class="flex flex-row justify-between items-end py-1 leading-normal"
-                      >
-                        <div class="flex flex-col">
-                          <span class="text-xs text-gray-500">{{
-                            item.shortName
-                          }}</span>
-                          <span>{{ item.name }}</span>
-                        </div>
-                        <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                    <div
+                      class="flex flex-row justify-between items-end py-1 leading-normal"
+                    >
+                      <div class="flex flex-col">
+                        <span class="text-xs text-gray-500">{{
+                          item.shortName
+                        }}</span>
+                        <span>{{ item.name }}</span>
                       </div>
+                      <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                    </div>
                   </el-option>
                 </el-option-group>
                 <el-option-group key="INACTIVOS" label="INACTIVOS">
                   <el-option
-                   style="height:50px;"
+                    style="height: 50px"
                     v-for="item in activeCustomers"
                     :key="item.id"
                     :label="item.name"
                     :value="item.id"
                   >
-               <div
-                        class="flex flex-row justify-between items-end py-1 leading-normal"
-                      >
-                        <div class="flex flex-col">
-                          <span class="text-xs text-gray-500">{{
-                            item.shortName
-                          }}</span>
-                          <span>{{ item.name }}</span>
-                        </div>
-                        <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                    <div
+                      class="flex flex-row justify-between items-end py-1 leading-normal"
+                    >
+                      <div class="flex flex-col">
+                        <span class="text-xs text-gray-500">{{
+                          item.shortName
+                        }}</span>
+                        <span>{{ item.name }}</span>
                       </div>
+                      <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                    </div>
                   </el-option>
                 </el-option-group>
               </el-select>
@@ -543,8 +543,11 @@
           stripe
           size="mini"
           v-loading="tableloading"
+          ref="multipleTable"
+          @selection-change="handleSelectionChange"
         >
-          <el-table-column prop="index" width="40" />
+         <el-table-column type="selection" width="45"></el-table-column>
+          <el-table-column prop="index" width="50" />
           <el-table-column
             label="# Documento"
             prop="sequence"
@@ -578,7 +581,7 @@
           <el-table-column
             label="Cliente"
             prop="customerName"
-            min-width="350"
+            min-width="295"
             sortable="custom"
           />
           <el-table-column
@@ -634,6 +637,30 @@
             </template>
           </el-table-column>
           <el-table-column label width="70" align="center">
+               <!-- dropdpwn selecction -->
+             <template slot="header" v-if="multipleSelection.length > 0" >
+            <el-dropdown>
+              <el-button
+                trigger="click"
+                icon="el-icon-more"
+                type="primary"
+                size="mini"
+                 class="transition ease-out duration-700"
+              ></el-button>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>
+                  <i class="el-icon-view"></i>Vista previa
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <i class="el-icon-printer"></i>Imprimir documento
+                </el-dropdown-item>
+                <el-dropdown-item :divided="true">
+                  <i class="el-icon-refresh-left"></i> Revertir estados
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </template>
+          <!-- dropdown 1 --> 
             <template slot-scope="scope">
               <el-dropdown trigger="click" szie="mini">
                 <el-button icon="el-icon-more" size="mini" />
@@ -682,11 +709,11 @@
                     class="font-semibold"
                     v-if="
                       scope.row.status.id == '1' &&
-                        !isLastInvoice(
-                          scope.row.sequence,
-                          scope.row.documentType.id,
-                          scope.row.authorization
-                        )
+                      !isLastInvoice(
+                        scope.row.sequence,
+                        scope.row.documentType.id,
+                        scope.row.authorization
+                      )
                     "
                     @click.native="deleteInvoice(scope.row)"
                   >
@@ -698,12 +725,12 @@
                     @click.native="voidDocument(scope.row)"
                     v-if="
                       scope.row.status.id === '2' ||
-                        (isLastInvoice(
-                          scope.row.sequence,
-                          scope.row.documentType.id,
-                          scope.row.authorization
-                        ) &&
-                          scope.row.status.id != '3')
+                      (isLastInvoice(
+                        scope.row.sequence,
+                        scope.row.documentType.id,
+                        scope.row.authorization
+                      ) &&
+                        scope.row.status.id != '3')
                     "
                   >
                     <i class="el-icon-circle-close"></i>
@@ -785,6 +812,7 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+     multipleSelection: [],
       errorMessage: "",
       pageloading: true,
       tableloading: false,
@@ -821,6 +849,10 @@ export default {
     };
   },
   methods: {
+
+    handleSelectionChange(val){
+      this.multipleSelection=val;
+    },
     sortBy({ column, prop, order }) {
       this.filter.prop = prop;
       this.filter.order = order;
