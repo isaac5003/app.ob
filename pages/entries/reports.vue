@@ -131,9 +131,10 @@
               multiple
               default-first-option
               class="w-full"
+              :filter-method="filterAccounts"
             >
               <el-option
-                v-for="catalog in accountingCatalog"
+                v-for="catalog in filteredCatalog"
                 :key="catalog.id"
                 :label="catalog.code"
                 :value="catalog.id"
@@ -180,6 +181,11 @@ export default {
     LayoutContent,
     Notification,
   },
+  fetch() {
+    this.$axios.get("/entries/catalog").then((response) => {
+      this.filteredCatalog = response.data.accountingCatalog;
+    });
+  },
   data() {
     return {
       generating: false,
@@ -216,6 +222,7 @@ export default {
       ],
       requirementForm: null,
       accountingCatalog: [],
+      filteredCatalog: [],
     };
   },
   methods: {
@@ -234,8 +241,6 @@ export default {
 
           case "movimientoCuentas":
             this.requirementForm = "extended";
-            this.getCalogs();
-            this.pageLoading = true;
             break;
           default:
             this.requirementForm = "none";
@@ -2931,10 +2936,21 @@ export default {
           break;
       }
     },
-    async getCalogs() {
-      const { data } = await this.$axios.get("/entries/catalog");
-      this.accountingCatalog = data.accountingCatalog;
-      this.pageLoading = false;
+    filterAccounts(query) {
+      if (query !== "") {
+        this.loadingAccount = true;
+        this.$axios
+          .get("/entries/catalog", { params: { search: query.toLowerCase() } })
+          .then((res) => {
+            this.filteredCatalog = res.data.accountingCatalog;
+            this.loadingAccount = false;
+          })
+          .catch((err) => (this.errorMessage = err.response.data.message));
+      } else {
+        this.$axios.get("/entries/catalog").then((response) => {
+          this.filteredCatalog = response.data.accountingCatalog;
+        });
+      }
     },
     cancel() {
       this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
