@@ -161,9 +161,12 @@
         stripe
         size="mini"
         v-loading="tableloading"
+        ref="multipleTable"
+        @selection-change="handleSelectionChange"
       >
+        <el-table-column type="selection" width="40"></el-table-column>
         <el-table-column prop="index" width="40" />
-        <el-table-column label="Nombre" min-width="360" sortable="custom">
+        <el-table-column label="Nombre" min-width="320" sortable="custom">
           <template slot-scope="scope">
             <div class="flex flex-col">
               <span class="font-semibold text-xs">
@@ -211,6 +214,30 @@
           </template>
         </el-table-column>
         <el-table-column label width="70" align="center">
+           <!-- dropdpwn selecction -->
+             <template slot="header" v-if="multipleSelection.length > 0" >
+            <el-dropdown>
+              <el-button
+                trigger="click"
+                icon="el-icon-more"
+                type="primary"
+                size="mini"
+                 class="transition ease-out duration-700"
+              ></el-button>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>
+                  <i class="el-icon-view"></i>Vista previa
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <i class="el-icon-printer"></i>Imprimir documento
+                </el-dropdown-item>
+                <el-dropdown-item :divided="true">
+                  <i class="el-icon-refresh-left"></i> Revertir estados
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </template>
+          <!-- dropdown 1 -->
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />
@@ -316,9 +343,13 @@ export default {
       },
       showCustomerPreview: false,
       selectedCustomer: null,
+      multipleSelection:[],
     };
   },
   methods: {
+     handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
     fetchCustomers() {
       this.tableloading = true;
       let params = this.page;
