@@ -68,7 +68,7 @@
             />
           </el-form-item>
         </div>
-      </el-form>
+
 
    
       <el-table
@@ -130,14 +130,13 @@
         </el-table-column>
         <el-table-column label width="70" align="center">
           <!-- dropdpwn selecction -->
-             <template slot="header" v-if="multipleSelection.length > 0" >
-            <el-dropdown>
+             <template slot="header" v-if="multipleSelection.length > 0"> 
+              <el-dropdown slot="dropdown">
               <el-button
                 trigger="click"
                 icon="el-icon-more"
                 type="primary"
-                size="mini"
-                 class="transition ease-out duration-700"
+                size="small" 
               ></el-button>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item>
@@ -150,7 +149,7 @@
                   <i class="el-icon-refresh-left"></i> Revertir estados
                 </el-dropdown-item>
               </el-dropdown-menu>
-            </el-dropdown>
+            </el-dropdown>            
           </template>
           <!-- dropdown 1 -->
           <template slot-scope="scope">
@@ -228,7 +227,6 @@ export default {
   fetchOnServer: false,
   data() {
     return {
-     
       multipleSelection: [],
       pageloading: true,
       tableloading: false,
@@ -375,3 +373,4 @@ export default {
   },
 };
 </script>
+
