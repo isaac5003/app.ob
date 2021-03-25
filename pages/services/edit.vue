@@ -227,7 +227,15 @@ export default {
   methods: {
     submitEditService(
       formName,
-      { name, cost, sellingType, description, incIva, incRenta, accountingCatalog }
+      {
+        name,
+        cost,
+        sellingType,
+        description,
+        incIva,
+        incRenta,
+        accountingCatalog,
+      }
     ) {
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
@@ -323,6 +331,7 @@ export default {
           }
         },
       });
+    },
     changeIva(sellingTypeValue) {
       if (sellingTypeValue !== 3) {
         this.servicesEditForm.incIva = false;
