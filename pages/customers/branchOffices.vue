@@ -443,13 +443,12 @@
         stripe
         size="mini"
       >
-        <el-table-column type="selection" width="60" v-model="tab">
+        <el-table-column type="selection" width="45">
         </el-table-column>
 
         <el-table-column
           label="#"
-          width="60"
-          sortable="custom"
+          width="50"
           prop="index"
         ></el-table-column>
         <el-table-column
@@ -552,7 +551,6 @@ export default {
 
   data() {
     return {
-      tab: true,
       multipleSelection: [],
       text: "",
       pageloading: true,
