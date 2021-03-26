@@ -2532,10 +2532,6 @@ export default {
       );
     },
   },
-  computed: {
-    // filteredIntegrations() {
-    //   return this.integrations.filter((i) => hasModule(i.ref, this.$auth.user));
-    // },
-  },
+  computed: {},
 };
 </script>
