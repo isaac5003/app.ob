@@ -1,6 +1,7 @@
 <template>
   <layout-content
     page-title="Configuraciones"
+    v-loading="pageloading"
     :breadcrumb="[
       { name: 'Clientes', to: '/customers' },
       { name: 'Configuraciones', to: null },
@@ -48,6 +49,7 @@
                 clearable
                 filterable
                 class="w-full"
+                default-first-option
               >
                 <el-option
                   v-for="c in catalogs"
@@ -83,15 +85,21 @@ export default {
   name: "CustomerSettings",
   components: { LayoutContent, Notification },
   fetch() {
-    const catalog = () => this.$axios.get("/entries/catalog");
-    Promise.all([catalog()]).then((res) => {
-      const [catalog] = res;
-      this.catalogs = catalog.data.accountingCatalog;
+    this.$axios.get("/customers/setting/integrations").then(({ data }) => {
+      const catalog = () => this.$axios.get("/entries/catalog");
+      Promise.all([catalog()]).then((res) => {
+        const [catalog] = res;
+        this.catalogs = catalog.data.accountingCatalog;
+        this.integrationSettingForm.accountingCatalog =
+          data.integrations.catalog;
+        this.pageloading = false;
+      });
     });
   },
   fetchOnServer: false,
   data() {
     return {
+      pageloading: true,
       cogInfo: "",
       catalogs: [],
       tab: "integrations",
@@ -101,6 +109,12 @@ export default {
     };
   },
   methods: {
+    async fetchSettingCustumerIntegration() {
+      const { data } = await this.$axios.get("/entries/catalog");
+      this.pageloading = false;
+      this.integrationSettingForm.accountingCatalog =
+        data.integrations.accountingCatalog;
+    },
     submitSettingsIntegrations(formName, { accountingCatalog }) {
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
@@ -127,6 +141,8 @@ export default {
                       title: "Exito",
                       message: res.data.message,
                     });
+                    this.pageloading = true;
+                    this.fetchSettingCustumerIntegration();
                   })
                   .catch((err) => {
                     this.$notify.error({
