@@ -164,9 +164,9 @@
         ref="multipleTable"
         @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" width="40"></el-table-column>
-        <el-table-column prop="index" width="40" />
-        <el-table-column label="Nombre" min-width="320" sortable="custom">
+        <el-table-column type="selection" width="50"></el-table-column>
+        <el-table-column prop="index" width="50" />
+        <el-table-column label="Nombre" min-width="300" sortable="custom">
           <template slot-scope="scope">
             <div class="flex flex-col">
               <span class="font-semibold text-xs">
