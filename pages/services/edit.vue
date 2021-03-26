@@ -201,7 +201,6 @@ export default {
       .then((res) => {
         const [sellingTypes, service, catalog, integrationCatalog] = res;
         this.sellingTypes = sellingTypes.data.types;
-          console.log(service);
         this.servicesEditForm = {
           name: service.data.service.name,
           cost: service.data.service.cost,
