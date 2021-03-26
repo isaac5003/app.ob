@@ -297,7 +297,6 @@ export default {
                       this.$router.push("/services");
                     }, 300);
                   })
-                  //TODO: Hacer que redirija a listado de servicios
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
