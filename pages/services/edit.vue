@@ -23,7 +23,6 @@
             .replace({
               path: `/services/edit?ref=${$route.query.ref}`,
               query: { tab },
-
             })
             .catch(() => {})
         "
@@ -128,27 +127,28 @@
             message="En esta sección se realizan las configuraciones de integración con otros modulos de manera general. Estas configuraciones se aplicarán a todos los servicios que no tengan una configuración individual."
           />
           <div class="grid grid-cols-12 gap-4">
-            <el-form-item label="Seleccione una cuenta" prop="accountingCatalog" class="col-span-4">
-              <template>
-                <el-select
-                  v-model="servicesEditForm.accountingCatalog"
-                  placeholder="Seleccione una cuenta"
-                  size="small"
-                  clearable
-                  filterable
-                  class="w-full"
-                  
+            <el-form-item
+              label="Seleccione una cuenta"
+              prop="accountingCatalog"
+              class="col-span-4"
+            >
+              <el-select
+                v-model="servicesEditForm.accountingCatalog"
+                placeholder="Seleccione una cuenta"
+                size="small"
+                clearable
+                filterable
+                class="w-full"
+              >
+                <el-option
+                  v-for="c in catalogList"
+                  :key="c.id"
+                  :label="c.name"
+                  :value="c.id"
+                  :disabled="c.isParent == true"
                 >
-                  <el-option
-                    v-for="c in catalogList"
-                    :key="c.id"
-                    :label="c.name"
-                    :value="c.id"
-                    :disabled="c.isParent == true"
-                  >
-                  </el-option>
-                </el-select>
-              </template>
+                </el-option>
+              </el-select>
             </el-form-item>
           </div>
         </el-tab-pane>
@@ -190,27 +190,36 @@ export default {
     const sellingTypes = () => this.$axios.get("/services/selling-types");
     const service = () => this.$axios.get(`/services/${this.$route.query.ref}`);
     const catalog = () => this.$axios.get("/entries/catalog");
-    Promise.all([sellingTypes(), service(), catalog()])
+    const integrationServiceAccount = () =>
+      this.$axios.get(`/services/${this.$route.query.ref}/integrations`);
+    Promise.all([
+      sellingTypes(),
+      service(),
+      catalog(),
+      integrationServiceAccount(),
+    ])
       .then((res) => {
-        const [sellingTypes, service, catalog] = res;
+        const [sellingTypes, service, catalog, integrationCatalog] = res;
         this.sellingTypes = sellingTypes.data.types;
+          console.log(service);
         this.servicesEditForm = {
-          ...service.data.service,
+          name: service.data.service.name,
+          cost: service.data.service.cost,
+          incRenta: service.data.service.incRenta,
+          incIva: service.data.service.incIva,
+          description: service.data.service.description,
           sellingType: service.data.service.sellingType.id,
         };
         this.catalogList = catalog.data.accountingCatalog;
+        this.servicesEditForm.accountingCatalog =
+          integrationCatalog.data.integrations.catalog;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
       })
       .then((alw) => (this.pageloading = false));
-
-    checkBeforeEnter(this, storagekey, "servicesNewForm");
   },
   fetchOnServer: false,
-  beforeRouteLeave(to, from, next) {
-    checkBeforeLeave(this, storagekey, next);
-  },
   data() {
     return {
       catalogList: [],
@@ -232,6 +241,7 @@ export default {
         cost: inputValidation(true, 0, null, "number"),
         sellingType: selectValidation(true),
         description: inputValidation(false, 5),
+        accountingCatalog: selectValidation(true),
       },
     };
   },
@@ -282,19 +292,20 @@ export default {
                   );
                 Promise.all([service(), integration()])
                   .then((res) => {
-                    console.log(res[0].data.message, res[0].data.message)
+                    const [service, integrationCatalog] = res;
                     this.$notify.success({
                       title: "Exito",
-                      message: res[0].data.message,
+                      message: `${service.data.message} y ${integrationCatalog.data.message}`,
                     });
+                    setTimeout(() => {
+                      this.$router.push("/services");
+                    }, 300);
                   })
-                //TODO: Hacer que redirija a listado de servicios
+                  //TODO: Hacer que redirija a listado de servicios
                   .catch((err) => {
-                    console.log(err)
                     this.$notify.error({
                       title: "Error",
                       message: err.response.data.message,
-
                     });
                   })
                   .then((alw) => {
@@ -316,6 +327,11 @@ export default {
       } else {
         this.servicesEditForm.incIva = false;
       }
+    },
+  },
+  watch: {
+    "servicesEditForm.name": function (val, oldVal) {
+      this.servicesEditForm.description = val;
     },
   },
 };
