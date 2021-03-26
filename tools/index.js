@@ -391,7 +391,15 @@ function checkBeforeEnter(self, storagekey, form) {
         }
       )
       .then(() => {
-        self[form] = JSON.parse(stored);
+        const value = JSON.parse(stored)
+        if (Array.isArray(form)) {
+          for (arr of form) {
+            self[arr] = value[arr];
+          }
+        } else {
+          self[form] = value
+        }
+
       })
       .catch(() => {
         localStorage.removeItem(storagekey);
