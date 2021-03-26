@@ -201,12 +201,9 @@ export default {
       .then((res) => {
         const [sellingTypes, service, catalog, integrationCatalog] = res;
         this.sellingTypes = sellingTypes.data.types;
+
         this.servicesEditForm = {
-          name: service.data.service.name,
-          cost: service.data.service.cost,
-          incRenta: service.data.service.incRenta,
-          incIva: service.data.service.incIva,
-          description: service.data.service.description,
+          ...service.data.service,
           sellingType: service.data.service.sellingType.id,
         };
         this.catalogList = catalog.data.accountingCatalog;
@@ -326,11 +323,6 @@ export default {
       } else {
         this.servicesEditForm.incIva = false;
       }
-    },
-  },
-  watch: {
-    "servicesEditForm.name": function (val, oldVal) {
-      this.servicesEditForm.description = val;
     },
   },
 };
