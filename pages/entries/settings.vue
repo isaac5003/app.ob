@@ -34,6 +34,14 @@
               :min="1"
               size="small"
               autocomplete="off"
+              @change="
+                setStorage(
+                  fiscalPeriodForm,
+                  firmantesForm,
+                  mayorAccountForm,
+                  subAccountForm
+                )
+              "
             />
           </el-form-item>
           <el-form-item
@@ -50,6 +58,14 @@
               maxlength="100"
               minlength="3"
               show-word-limit
+              @change="
+                setStorage(
+                  fiscalPeriodForm,
+                  firmantesForm,
+                  mayorAccountForm,
+                  subAccountForm
+                )
+              "
             />
           </el-form-item>
           <el-form-item class="col-span-2">
@@ -59,6 +75,14 @@
               class="mt-5"
               style="width: 100%"
               v-model="item.isAcreedora"
+              @change="
+                setStorage(
+                  fiscalPeriodForm,
+                  firmantesForm,
+                  mayorAccountForm,
+                  subAccountForm
+                )
+              "
             >
               Acreedora
             </el-checkbox>
@@ -70,6 +94,14 @@
               class="mt-5"
               style="width: 100%"
               v-model="item.isBalance"
+              @change="
+                setStorage(
+                  fiscalPeriodForm,
+                  firmantesForm,
+                  mayorAccountForm,
+                  subAccountForm
+                )
+              "
             >
               Balance
             </el-checkbox>
@@ -245,6 +277,14 @@
                   :min="1"
                   size="small"
                   autocomplete="off"
+                  @change="
+                    setStorage(
+                      fiscalPeriodForm,
+                      firmantesForm,
+                      mayorAccountForm,
+                      subAccountForm
+                    )
+                  "
                 />
               </el-form-item>
               <div class="col-span-5">
@@ -267,6 +307,14 @@
                       maxlength="100"
                       minlength="3"
                       show-word-limit
+                      @change="
+                        setStorage(
+                          fiscalPeriodForm,
+                          firmantesForm,
+                          mayorAccountForm,
+                          subAccountForm
+                        )
+                      "
                     />
                   </el-form-item>
                   <el-form-item class="col-span-6" label="Descripción">
@@ -278,6 +326,14 @@
                       maxlength="100"
                       minlength="3"
                       show-word-limit
+                      @change="
+                        setStorage(
+                          fiscalPeriodForm,
+                          firmantesForm,
+                          mayorAccountForm,
+                          subAccountForm
+                        )
+                      "
                     />
                   </el-form-item>
                 </div>
@@ -289,6 +345,14 @@
                   class="mt-5"
                   style="width: 100%"
                   v-model="item.isAcreedora"
+                  @change="
+                    setStorage(
+                      fiscalPeriodForm,
+                      firmantesForm,
+                      mayorAccountForm,
+                      subAccountForm
+                    )
+                  "
                 >
                   Acreedora
                 </el-checkbox>
@@ -300,6 +364,14 @@
                   class="mt-5"
                   style="width: 100%"
                   v-model="subAccountForm.items[i].isBalance"
+                  @change="
+                    setStorage(
+                      fiscalPeriodForm,
+                      firmantesForm,
+                      mayorAccountForm,
+                      subAccountForm
+                    )
+                  "
                 >
                   Balance
                 </el-checkbox>
@@ -744,7 +816,9 @@
                 placeholder="Fecha inicial"
                 style="width: 100%"
                 value-format="yyyy-MM-dd"
-                @change="setStorage(fiscalPeriodForm, firmantesForm)"
+                @change="
+                  setStorage(fiscalPeriodForm, firmantesForm, mayorAccountForm)
+                "
               >
               </el-date-picker>
             </el-form-item>
@@ -757,7 +831,9 @@
                 format="MMM-yyyy"
                 placeholder="Fecha final"
                 style="width: 100%"
-                @change="setStorage(fiscalPeriodForm, firmantesForm)"
+                @change="
+                  setStorage(fiscalPeriodForm, firmantesForm, mayorAccountForm)
+                "
               >
               </el-date-picker>
             </el-form-item>
@@ -814,7 +890,9 @@
                 show-word-limit
                 clearable
                 placeholder=""
-                @change="setStorage(fiscalPeriodForm, firmantesForm)"
+                @change="
+                  setStorage(fiscalPeriodForm, firmantesForm, mayorAccountForm)
+                "
               >
               </el-input>
             </el-form-item>
@@ -834,7 +912,9 @@
                 filterable
                 clearable
                 placeholder=""
-                @change="setStorage(fiscalPeriodForm, firmantesForm)"
+                @change="
+                  setStorage(fiscalPeriodForm, firmantesForm, mayorAccountForm)
+                "
               >
               </el-input>
             </el-form-item>
@@ -1418,7 +1498,12 @@ export default {
       })
       .then((alw) => (this.pageloading = false));
 
-    checkBeforeEnter(this, storagekey, ["fiscalPeriodForm", "firmantesForm"]);
+    checkBeforeEnter(this, storagekey, [
+      "fiscalPeriodForm",
+      "firmantesForm",
+      "mayorAccountForm",
+      "subAccountForm",
+    ]);
   },
   fetchOnServer: false,
   beforeRouteLeave(to, from, next) {
@@ -1829,10 +1914,20 @@ export default {
     };
   },
   methods: {
-    setStorage(fiscalPeriodForm, firmantesForm) {
+    setStorage(
+      fiscalPeriodForm,
+      firmantesForm,
+      mayorAccountForm,
+      subAccountForm
+    ) {
       localStorage.setItem(
         storagekey,
-        JSON.stringify({ fiscalPeriodForm, firmantesForm })
+        JSON.stringify({
+          fiscalPeriodForm,
+          firmantesForm,
+          mayorAccountForm,
+          subAccountForm,
+        })
       );
     },
     //general
