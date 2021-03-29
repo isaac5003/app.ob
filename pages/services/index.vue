@@ -69,7 +69,7 @@
           </el-form-item>
         </div>
       </el-form>
-   
+
       <el-table
         @sort-change="sortBy"
         v-loading="tableloading"
@@ -80,13 +80,12 @@
         @selection-change="handleSelectionChange"
       >
         >
-        <el-table-column type="selection" width="50" >
-        </el-table-column>
-        <el-table-column prop="index" width="40" />
+        <el-table-column type="selection" width="50"> </el-table-column>
+        <el-table-column prop="index" width="50" label="#" />
         <el-table-column
           label="Descripción"
           prop="description"
-          min-width="390"
+          min-width="430"
           sortable="custom"
         />
         <el-table-column
@@ -129,13 +128,13 @@
         </el-table-column>
         <el-table-column label width="70" align="center">
           <!-- dropdpwn selecction -->
-             <template slot="header" v-if="multipleSelection.length > 0"> 
-              <el-dropdown slot="dropdown">
+          <template slot="header" v-if="multipleSelection.length > 0">
+            <el-dropdown slot="dropdown">
               <el-button
                 trigger="click"
                 icon="el-icon-more"
                 type="primary"
-                size="small" 
+                size="small"
               ></el-button>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item>
@@ -148,7 +147,7 @@
                   <i class="el-icon-refresh-left"></i> Revertir estados
                 </el-dropdown-item>
               </el-dropdown-menu>
-            </el-dropdown>            
+            </el-dropdown>
           </template>
           <!-- dropdown 1 -->
           <template slot-scope="scope">
