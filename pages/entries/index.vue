@@ -229,7 +229,7 @@
          ref="multipleTable"
         @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" width="45"></el-table-column>
+        <el-table-column type="selection" width="45"/>
         <el-table-column
           type="index"
           label="#"
