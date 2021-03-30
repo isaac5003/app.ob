@@ -39,7 +39,11 @@
                   fiscalPeriodForm,
                   firmantesForm,
                   mayorAccountForm,
-                  subAccountForm
+                  subAccountForm,
+                  activeAccount,
+                  newDisplayName,
+                  specialAccounts,
+                  newDisplayNameEstado
                 )
               "
             />
@@ -63,7 +67,11 @@
                   fiscalPeriodForm,
                   firmantesForm,
                   mayorAccountForm,
-                  subAccountForm
+                  subAccountForm,
+                  activeAccount,
+                  newDisplayName,
+                  specialAccounts,
+                  newDisplayNameEstado
                 )
               "
             />
@@ -80,7 +88,11 @@
                   fiscalPeriodForm,
                   firmantesForm,
                   mayorAccountForm,
-                  subAccountForm
+                  subAccountForm,
+                  activeAccount,
+                  newDisplayName,
+                  specialAccounts,
+                  newDisplayNameEstado
                 )
               "
             >
@@ -99,7 +111,11 @@
                   fiscalPeriodForm,
                   firmantesForm,
                   mayorAccountForm,
-                  subAccountForm
+                  subAccountForm,
+                  activeAccount,
+                  newDisplayName,
+                  specialAccounts,
+                  newDisplayNameEstado
                 )
               "
             >
@@ -178,6 +194,18 @@
               type="number"
               :min="1"
               size="small"
+              @change="
+                setStorage(
+                  fiscalPeriodForm,
+                  firmantesForm,
+                  mayorAccountForm,
+                  subAccountForm,
+                  activeAccount,
+                  newDisplayName,
+                  specialAccounts,
+                  newDisplayNameEstado
+                )
+              "
             />
           </el-form-item>
           <el-form-item
@@ -197,7 +225,22 @@
               },
             ]"
           >
-            <el-input v-model="activeAccount.name" size="small" />
+            <el-input
+              v-model="activeAccount.name"
+              size="small"
+              @change="
+                setStorage(
+                  fiscalPeriodForm,
+                  firmantesForm,
+                  mayorAccountForm,
+                  subAccountForm,
+                  activeAccount,
+                  newDisplayName,
+                  specialAccounts,
+                  newDisplayNameEstado
+                )
+              "
+            />
           </el-form-item>
           <el-form-item prop="service" class="col-span-2">
             <el-checkbox
@@ -206,6 +249,18 @@
               size="small"
               border
               class="w-full mt-5"
+              @change="
+                setStorage(
+                  fiscalPeriodForm,
+                  firmantesForm,
+                  mayorAccountForm,
+                  subAccountForm,
+                  activeAccount,
+                  newDisplayName,
+                  specialAccounts,
+                  newDisplayNameEstado
+                )
+              "
             />
           </el-form-item>
           <el-form-item prop="service" class="col-span-2">
@@ -215,6 +270,18 @@
               size="small"
               border
               class="w-full mt-5"
+              @change="
+                setStorage(
+                  fiscalPeriodForm,
+                  firmantesForm,
+                  mayorAccountForm,
+                  subAccountForm,
+                  activeAccount,
+                  newDisplayName,
+                  specialAccounts,
+                  newDisplayNameEstado
+                )
+              "
             />
           </el-form-item>
         </div>
@@ -282,7 +349,11 @@
                       fiscalPeriodForm,
                       firmantesForm,
                       mayorAccountForm,
-                      subAccountForm
+                      subAccountForm,
+                      activeAccount,
+                      newDisplayName,
+                      specialAccounts,
+                      newDisplayNameEstado
                     )
                   "
                 />
@@ -312,7 +383,11 @@
                           fiscalPeriodForm,
                           firmantesForm,
                           mayorAccountForm,
-                          subAccountForm
+                          subAccountForm,
+                          activeAccount,
+                          newDisplayName,
+                          specialAccounts,
+                          newDisplayNameEstado
                         )
                       "
                     />
@@ -331,7 +406,11 @@
                           fiscalPeriodForm,
                           firmantesForm,
                           mayorAccountForm,
-                          subAccountForm
+                          subAccountForm,
+                          activeAccount,
+                          newDisplayName,
+                          specialAccounts,
+                          newDisplayNameEstado
                         )
                       "
                     />
@@ -350,7 +429,11 @@
                       fiscalPeriodForm,
                       firmantesForm,
                       mayorAccountForm,
-                      subAccountForm
+                      subAccountForm,
+                      activeAccount,
+                      newDisplayName,
+                      specialAccounts,
+                      newDisplayNameEstado
                     )
                   "
                 >
@@ -369,7 +452,11 @@
                       fiscalPeriodForm,
                       firmantesForm,
                       mayorAccountForm,
-                      subAccountForm
+                      subAccountForm,
+                      activeAccount,
+                      newDisplayName,
+                      specialAccounts,
+                      newDisplayNameEstado
                     )
                   "
                 >
@@ -483,6 +570,18 @@
                 :min="1"
                 size="small"
                 :disabled="activeAccount.subAccounts"
+                @change="
+                  setStorage(
+                    fiscalPeriodForm,
+                    firmantesForm,
+                    mayorAccountForm,
+                    subAccountForm,
+                    activeAccount,
+                    newDisplayName,
+                    specialAccounts,
+                    newDisplayNameEstado
+                  )
+                "
               />
             </el-form-item>
             <el-form-item
@@ -502,10 +601,40 @@
                 },
               ]"
             >
-              <el-input v-model="activeAccount.name" size="small" />
+              <el-input
+                v-model="activeAccount.name"
+                size="small"
+                @change="
+                  setStorage(
+                    fiscalPeriodForm,
+                    firmantesForm,
+                    mayorAccountForm,
+                    subAccountForm,
+                    activeAccount,
+                    newDisplayName,
+                    specialAccounts,
+                    newDisplayNameEstado
+                  )
+                "
+              />
             </el-form-item>
             <el-form-item class="col-span-3" label="Descripción">
-              <el-input v-model="activeAccount.description" size="small" />
+              <el-input
+                v-model="activeAccount.description"
+                size="small"
+                @change="
+                  setStorage(
+                    fiscalPeriodForm,
+                    firmantesForm,
+                    mayorAccountForm,
+                    subAccountForm,
+                    activeAccount,
+                    newDisplayName,
+                    specialAccounts,
+                    newDisplayNameEstado
+                  )
+                "
+              />
             </el-form-item>
             <el-form-item class="col-span-2">
               <el-checkbox
@@ -514,6 +643,18 @@
                 size="small"
                 border
                 class="w-full mt-5"
+                @change="
+                  setStorage(
+                    fiscalPeriodForm,
+                    firmantesForm,
+                    mayorAccountForm,
+                    subAccountForm,
+                    activeAccount,
+                    newDisplayName,
+                    specialAccounts,
+                    newDisplayNameEstado
+                  )
+                "
               />
             </el-form-item>
             <el-form-item class="col-span-2">
@@ -523,6 +664,18 @@
                 size="small"
                 border
                 class="w-full mt-5"
+                @change="
+                  setStorage(
+                    fiscalPeriodForm,
+                    firmantesForm,
+                    mayorAccountForm,
+                    subAccountForm,
+                    activeAccount,
+                    newDisplayName,
+                    specialAccounts,
+                    newDisplayNameEstado
+                  )
+                "
               />
             </el-form-item>
           </div>
@@ -654,6 +807,18 @@
             size="small"
             clearable
             :disabled="!allowNewDisplayName"
+            @change="
+              setStorage(
+                fiscalPeriodForm,
+                firmantesForm,
+                mayorAccountForm,
+                subAccountForm,
+                activeAccount,
+                newDisplayName,
+                specialAccounts,
+                newDisplayNameEstado
+              )
+            "
           />
         </div>
       </div>
@@ -677,7 +842,7 @@
     </el-dialog>
     <!-- Estadoderesultados -->
     <el-dialog
-      :title="`Agregar cuenta a: ${selectedParentAccountEstado.name}`"
+      :title="`Agregar cuenta a2: ${selectedParentAccountEstado.name}`"
       :visible.sync="showAddAccountEstado"
       width="500px"
       :append-to-body="true"
@@ -752,6 +917,18 @@
             size="small"
             clearable
             :disabled="!allowNewDisplayNameEstado"
+            @change="
+              setStorage(
+                fiscalPeriodForm,
+                firmantesForm,
+                mayorAccountForm,
+                subAccountForm,
+                activeAccount,
+                newDisplayName,
+                specialAccounts,
+                newDisplayNameEstado
+              )
+            "
           />
         </div>
       </div>
@@ -787,16 +964,6 @@
     >
       <!--  tab generales -->
       <el-tab-pane label="Generales" name="general">
-        <!-- <div class="grid grid-cols-12">
-          <div class="col-span-12">
-            <Notification
-              class="mb-4 w-full"
-              type="info"
-              title="Información"
-              
-            />
-          </div>
-        </div> -->
         <el-form
           :model="fiscalPeriodForm"
           :rules="fiscalPeriodFormRules"
@@ -817,7 +984,15 @@
                 style="width: 100%"
                 value-format="yyyy-MM-dd"
                 @change="
-                  setStorage(fiscalPeriodForm, firmantesForm, mayorAccountForm)
+                  setStorage(
+                    fiscalPeriodForm,
+                    firmantesForm,
+                    mayorAccountForm,
+                    subAccountForm,
+                    activeAccount,
+                    newDisplayName,
+                    newDisplayNameEstado
+                  )
                 "
               >
               </el-date-picker>
@@ -832,7 +1007,15 @@
                 placeholder="Fecha final"
                 style="width: 100%"
                 @change="
-                  setStorage(fiscalPeriodForm, firmantesForm, mayorAccountForm)
+                  setStorage(
+                    fiscalPeriodForm,
+                    firmantesForm,
+                    mayorAccountForm,
+                    subAccountForm,
+                    activeAccount,
+                    newDisplayName,
+                    newDisplayNameEstado
+                  )
                 "
               >
               </el-date-picker>
@@ -859,16 +1042,6 @@
       </el-tab-pane>
       <!-- Firmantes -->
       <el-tab-pane label="Firmantes" name="signatures">
-        <!-- <div class="grid grid-cols-12">
-          <div class="col-span-12">
-            <Notification
-              class="mb-4 w-full"
-              type="info"
-              title="Información"
-              
-            />
-          </div>
-        </div> -->
         <el-form
           :model="firmantesForm"
           :rules="firmantesFormRules"
@@ -891,7 +1064,15 @@
                 clearable
                 placeholder=""
                 @change="
-                  setStorage(fiscalPeriodForm, firmantesForm, mayorAccountForm)
+                  setStorage(
+                    fiscalPeriodForm,
+                    firmantesForm,
+                    mayorAccountForm,
+                    subAccountForm,
+                    activeAccount,
+                    newDisplayName,
+                    newDisplayNameEstado
+                  )
                 "
               >
               </el-input>
@@ -913,7 +1094,15 @@
                 clearable
                 placeholder=""
                 @change="
-                  setStorage(fiscalPeriodForm, firmantesForm, mayorAccountForm)
+                  setStorage(
+                    fiscalPeriodForm,
+                    firmantesForm,
+                    mayorAccountForm,
+                    subAccountForm,
+                    activeAccount,
+                    newDisplayName,
+                    newDisplayNameEstado
+                  )
                 "
               >
               </el-input>
@@ -931,6 +1120,17 @@
                 filterable
                 clearable
                 placeholder=""
+                @change="
+                  setStorage(
+                    fiscalPeriodForm,
+                    firmantesForm,
+                    mayorAccountForm,
+                    subAccountForm,
+                    activeAccount,
+                    newDisplayName,
+                    newDisplayNameEstado
+                  )
+                "
               >
               </el-input>
             </el-form-item>
@@ -1077,6 +1277,18 @@
                   placeholder="Escribe el numero o nombre de la cuenta"
                   class="w-full"
                   size="small"
+                  @change="
+                    setStorage(
+                      fiscalPeriodForm,
+                      firmantesForm,
+                      mayorAccountForm,
+                      subAccountForm,
+                      activeAccount,
+                      newDisplayName,
+                      specialAccounts,
+                      newDisplayNameEstado
+                    )
+                  "
                 >
                   <el-option
                     v-for="item in catalogs"
@@ -1097,6 +1309,18 @@
                   placeholder="Escribe el numero o nombre de la cuenta"
                   class="w-full"
                   size="small"
+                  @change="
+                    setStorage(
+                      fiscalPeriodForm,
+                      firmantesForm,
+                      mayorAccountForm,
+                      subAccountForm,
+                      activeAccount,
+                      newDisplayName,
+                      specialAccounts,
+                      newDisplayNameEstado
+                    )
+                  "
                 >
                   <el-option
                     v-for="item in catalogs"
@@ -1117,6 +1341,18 @@
                   placeholder="Escribe el numero o nombre de la cuenta"
                   class="w-full"
                   size="small"
+                  @change="
+                    setStorage(
+                      fiscalPeriodForm,
+                      firmantesForm,
+                      mayorAccountForm,
+                      subAccountForm,
+                      activeAccount,
+                      newDisplayName,
+                      specialAccounts,
+                      newDisplayNameEstado
+                    )
+                  "
                 >
                   <el-option
                     v-for="item in catalogs"
@@ -1137,6 +1373,18 @@
                   placeholder="Escribe el numero o nombre de la cuenta"
                   class="w-full"
                   size="small"
+                  @change="
+                    setStorage(
+                      fiscalPeriodForm,
+                      firmantesForm,
+                      mayorAccountForm,
+                      subAccountForm,
+                      activeAccount,
+                      newDisplayName,
+                      specialAccounts,
+                      newDisplayNameEstado
+                    )
+                  "
                 >
                   <el-option
                     v-for="item in catalogs"
@@ -1375,50 +1623,6 @@
           <el-button size="small">Cancelar</el-button>
         </div>
       </el-tab-pane>
-
-      <!--  tab de firmante -->
-      <!-- tab integraciones -->
-      <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
-        <Notification
-          class="w-full"
-          type="info"
-          title="Integraciones"
-          message="En esta sección se realizan las configuraciones de integración con otros modulos de manera general. Estas configuraciones se aplicarán a todos los clientes que no tengan una configuración individual."
-        />
-        <el-tabs
-          tab-position="left"
-          v-model="utab"
-          @tab-click="
-            $router
-              .replace({
-                path: `/invoices/settings`,
-                query: { tab, utab },
-              })
-              .catch(() => {})
-          "
-        >
-          <el-tab-pane
-            v-for="(integration, k) of filteredIntegrations"
-            :key="k"
-            :name="integration.id"
-          >
-            <span slot="label" class="flex items-center justify-between"
-              ><svg
-                class="w-5 h-5 mr-2"
-                fill="none"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="1.5"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                v-html="integration.icon"
-              />
-              {{ integration.name }}</span
-            >
-            {{ integration.name }}
-          </el-tab-pane>
-        </el-tabs>
-      </el-tab-pane> -->
     </el-tabs>
   </layout-content>
 </template>
@@ -1503,6 +1707,10 @@ export default {
       "firmantesForm",
       "mayorAccountForm",
       "subAccountForm",
+      "activeAccount",
+      "newDisplayName",
+      "specialAccounts",
+      "newDisplayNameEstado",
     ]);
   },
   fetchOnServer: false,
@@ -1918,7 +2126,11 @@ export default {
       fiscalPeriodForm,
       firmantesForm,
       mayorAccountForm,
-      subAccountForm
+      subAccountForm,
+      activeAccount,
+      newDisplayName,
+      specialAccounts,
+      newDisplayNameEstado
     ) {
       localStorage.setItem(
         storagekey,
@@ -1927,6 +2139,10 @@ export default {
           firmantesForm,
           mayorAccountForm,
           subAccountForm,
+          activeAccount,
+          newDisplayName,
+          specialAccounts,
+          newDisplayNameEstado,
         })
       );
     },
