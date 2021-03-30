@@ -32,7 +32,7 @@ export default {
         {
           name: "Configuraciones",
           icon: getIcon("cog"),
-          path: "/providers/reports",
+          path: "/providers/settings",
         },
       ],
     };
