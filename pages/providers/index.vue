@@ -40,43 +40,42 @@
           <!-- no esta definido por que no esta la api  -->
           <div class="col-span-2 flex flex-col">
             <span class="font-semibold">Es proveedor</span>
-            <div>
-              <el-tag size="small" type="warning" class="w-auto">{{
-                selectedProvider
-                  ? selectedProvider.isActiveProvider
-                    ? "SI"
-                    : "NO"
-                  : ""
-              }}</el-tag>
-            </div>
+
+            <el-tag size="small" type="warning" class="w-auto">{{
+              selectedProvider
+                ? selectedProvider.isActiveProvider
+                  ? "SI"
+                  : "NO"
+                : ""
+            }}</el-tag>
           </div>
         </div>
         <div class="grid grid-cols-12 gap-4">
           <div
             class="col-span-2 flex flex-col"
-            v-if=" selectedProvider &&  selectedProvider.providerType.id == 2"
+            v-if="selectedProvider && selectedProvider.customerType.id == 2"
           >
             <span class="font-semibold">DUI</span>
-            <span>{{  selectedProvider ?  selectedProvider.dui : "" }}</span>
+            <span>{{ selectedProvider ? selectedProvider.dui : "" }}</span>
           </div>
           <div class="col-span-3 flex flex-col">
             <span class="font-semibold">NIT</span>
-            <span>{{  selectedProvider ?  selectedProvider.nit : "" }}</span>
+            <span>{{ selectedProvider ? selectedProvider.nit : "" }}</span>
           </div>
           <template
             v-if="
-               selectedProvider &&
-              (! selectedProvider.customerTypeNatural ||
-                 selectedProvider.customerTypeNatural.id == 2)
+              selectedProvider &&
+              (!selectedProvider.customerTypeNatural ||
+                selectedProvider.customerTypeNatural.id == 2)
             "
           >
             <div class="col-span-2 flex flex-col">
               <span class="font-semibold">NRC</span>
-              <span>{{  selectedProvider ?  selectedProvider.nrc : "" }}</span>
+              <span>{{ selectedProvider ? selectedProvider.nrc : "" }}</span>
             </div>
             <div class="col-span-5 flex flex-col">
               <span class="font-semibold">GIRO</span>
-              <span>{{  selectedProvider ?  selectedProvider.giro : "" }}</span>
+              <span>{{ selectedProvider ? selectedProvider.giro : "" }}</span>
             </div>
           </template>
         </div>
@@ -84,27 +83,27 @@
           <div class="col-span-3 flex flex-col">
             <span class="font-semibold">Tipo de cliente</span>
             <span>{{
-             selectedProvider ?  selectedProvider.customerType.name : ""
+              selectedProvider ? selectedProvider.customerType.name : ""
             }}</span>
           </div>
           <div
             class="col-span-3 flex flex-col"
-            v-if=" selectedProvider &&  selectedProvider.customerTaxerType"
+            v-if="selectedProvider && selectedProvider.customerTaxerType"
           >
             <span class="font-semibold">Tipo de contribuyente</span>
             <span>{{
-               selectedProvider &&  selectedProvider.customerTaxerType
-                ?  selectedProvider.customerTaxerType.name
+              selectedProvider && selectedProvider.customerTaxerType
+                ? selectedProvider.customerTaxerType.name
                 : ""
             }}</span>
           </div>
           <div
             class="col-span-3 flex flex-col"
-            v-if="  selectedProvider &&  selectedProvider.customerTaxerType == 2"
+            v-if="selectedProvider && selectedProvider.customerTaxerType == 2"
           >
             <span class="font-semibold">Tipo de persona natural</span>
 
-            <span>{{  selectedProvider.customerTypeNatural.name }}</span>
+            <span>{{ selectedProvider.customerTypeNatural.name }}</span>
           </div>
         </div>
       </div>
@@ -151,7 +150,7 @@
             size="small"
             style="margin-top: 22px"
             clearable
-            v-debounce:500ms="fetchCustomers"
+            v-debounce:500ms="fetchProviders"
             @change="fetchProviders"
           />
         </el-form-item>
@@ -165,7 +164,7 @@
         ref="multipleTable"
         @selection-change="handleSelectionChange"
       >
-      <el-table-column type="selection" width="50"/>
+        <el-table-column type="selection" width="50" />
         <el-table-column prop="index" label="#" width="50" />
         <el-table-column
           label="Nombre"
@@ -192,7 +191,7 @@
         >
           <template slot-scope="scope">
             <span>
-              {{ scope.row.providerType.name }}
+              {{ scope.row.customerType.name }}
             </span>
           </template>
         </el-table-column>
@@ -201,7 +200,7 @@
         <el-table-column
           label="Estado"
           width="110"
-          prop="isActiveCustomer"
+          prop="isActiveProviders"
           sortable="custom"
         >
           <template slot-scope="scope">
@@ -220,11 +219,11 @@
           </template>
         </el-table-column>
         <el-table-column label width="70" align="center">
-            <template slot="header" v-if="multipleSelection.length > 0">
-                <el-dropdown>
-                    <el-button type="primary" icon="el-icon-more"></el-button>
-                </el-dropdown>
-            </template>
+          <template slot="header" v-if="multipleSelection.length > 0">
+            <el-dropdown>
+              <el-button type="primary" icon="el-icon-more"></el-button>
+            </el-dropdown>
+          </template>
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />
@@ -236,7 +235,7 @@
                 </el-dropdown-item>
                 <el-dropdown-item
                   @click.native="
-                    $router.push(`/customers/edit?ref=${scope.row.id}`)
+                    $router.push(`/providers/edit?ref=${scope.row.id}`)
                   "
                 >
                   <i class="el-icon-edit-outline"></i> Editar cliente
@@ -257,7 +256,7 @@
                 <el-dropdown-item
                   :divided="true"
                   class="text-red-500 font-semibold"
-                  @click.native="deleteCustomer(scope.row)"
+                  @click.native="deleteProvider(scope.row)"
                 >
                   <i class="el-icon-delete"></i> Eliminar cliente
                 </el-dropdown-item>
@@ -316,7 +315,7 @@ export default {
       errorMessage: "",
       searchValue: "",
       status: "",
-      multipleSelection:[],
+      multipleSelection: [],
       sellingTypes: [],
       providers: {
         providers: [],
@@ -335,9 +334,9 @@ export default {
     };
   },
   methods: {
-      handleSelectionChange(val){
-          this.multipleSelection=val;
-      },
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
     fetchProviders() {
       this.tableloading = true;
       let params = this.page;
@@ -446,7 +445,7 @@ export default {
       );
     },
     async openProviderPreview({ id }) {
-      const { data } = await this.$axios.get(`/customers/${id}`);
+      const { data } = await this.$axios.get(`/providers/${id}`);
       (this.selectedProvider = data.provider),
         (this.showProviderPreview = true);
     },
