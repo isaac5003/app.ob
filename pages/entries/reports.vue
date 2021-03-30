@@ -219,7 +219,6 @@ export default {
         { name: "Libro diario mayor", id: "diarioMayor" },
         { name: "Libro de auxiliares", id: "libroAuxiliares" },
         { name: "Catalógo de cuentas", id: "catalogoCuentas" },
-        //{ name: "Detalle de cuentas", id: "detalleCuentas" },
         { name: "Detalle de movimiento cuentas", id: "movimientoCuentas" },
       ],
       requirementForm: null,
@@ -297,9 +296,6 @@ export default {
             break;
           case "catalogoCuentas":
             this.getAccountingCatalog(radio);
-            break;
-            // case "detalleCuentas":
-            // this.generateDetalleCuentas(dateRange, catalogList);
             break;
           case "movimientoCuentas":
             this.generateDetalleCuentas(dateRanges, catalogos, radio);
@@ -2215,7 +2211,6 @@ export default {
               ]);
 
               for (const j of i.movements) {
-                // values.push(emptyRow);
                 values.push([
                   {},
                   {
@@ -2461,7 +2456,6 @@ export default {
               ]);
 
               for (const j of i.movements) {
-                // values.push(emptyRow);
                 values.push([
                   {
                     text: j.entryNumber,
