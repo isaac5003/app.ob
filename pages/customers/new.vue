@@ -4,7 +4,6 @@
     page-title="Nuevo cliente"
     :breadcrumb="[
       { name: 'Clientes', to: '/customers' },
-      { name: 'Listado de clientes', to: '/customers' },
       { name: 'Nuevo cliente', to: null },
     ]"
   >
