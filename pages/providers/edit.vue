@@ -424,9 +424,9 @@ export default {
         this.providersTypes = customerTypes.data.types;
         this.providersTypeNaturals = customerTypeNaturals.data.typeNaturals;
         this.providersTaxerTypes = customerTaxerTypes.data.taxerTypes;
-        const providers = customerData.data.customer;
+        const customer = customerData.data.customer;
         let branch = customer.customerBranches[0];
-        this.providers = customer;
+        this.customer = customer;
 
         this.countries = countries.data.countries;
         this.rawStates = states.data.states;
