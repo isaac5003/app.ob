@@ -66,8 +66,6 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import { getIcon, hasModule } from "../../tools";
-
 export default {
   name: "CustomerSettings",
   components: { LayoutContent, Notification },
@@ -75,6 +73,7 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+      tab: "integrations",
       cogIfo: "",
       cogSetting: [
         {
@@ -94,10 +93,7 @@ export default {
           name: "Jorge, designer",
         },
       ],
-      tab: "integrations",
-      utab: "invoicing",
     };
   },
-  computed: {},
 };
 </script>
