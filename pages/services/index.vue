@@ -69,18 +69,23 @@
           </el-form-item>
         </div>
       </el-form>
+
       <el-table
         @sort-change="sortBy"
         v-loading="tableloading"
         :data="services.services"
         stripe
         size="mini"
+        ref="multipleTable"
+        @selection-change="handleSelectionChange"
       >
-        <el-table-column prop="index" width="40" />
+        >
+        <el-table-column type="selection" width="50" />
+        <el-table-column prop="index" width="50" label="#" />
         <el-table-column
           label="Descripción"
           prop="description"
-          min-width="490"
+          min-width="430"
           sortable="custom"
         />
         <el-table-column
@@ -122,6 +127,29 @@
           </template>
         </el-table-column>
         <el-table-column label width="70" align="center">
+          <!-- dropdpwn selecction -->
+          <template slot="header" v-if="multipleSelection.length > 0">
+            <el-dropdown slot="dropdown">
+              <el-button
+                trigger="click"
+                icon="el-icon-more"
+                type="primary"
+                size="small"
+              ></el-button>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>
+                  <i class="el-icon-view"></i>Vista previa
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <i class="el-icon-printer"></i>Imprimir documento
+                </el-dropdown-item>
+                <el-dropdown-item :divided="true">
+                  <i class="el-icon-refresh-left"></i> Revertir estados
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </template>
+          <!-- dropdown 1 -->
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />
@@ -197,6 +225,7 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+      multipleSelection: [],
       pageloading: true,
       tableloading: false,
       errorMessage: "",
@@ -219,6 +248,9 @@ export default {
     };
   },
   methods: {
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
     fetchServices() {
       this.tableloading = true;
       let params = this.page;
@@ -339,3 +371,4 @@ export default {
   },
 };
 </script>
+
