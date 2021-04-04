@@ -537,6 +537,7 @@
         </div>
       </el-form>
       <div class="flex flex-col space-y-2">
+        <!-- La tabla esta en la medida establecida -->
         <el-table
           @sort-change="sortBy"
           :data="invoices.invoices"

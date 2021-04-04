@@ -226,10 +226,10 @@
         :data="entries.entries"
         stripe
         size="mini"
-         ref="multipleTable"
+        ref="multipleTable"
         @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" width="45"/>
+        <el-table-column type="selection" width="45" />
         <el-table-column
           type="index"
           label="#"
@@ -293,15 +293,15 @@
           </template>
         </el-table-column>
         <el-table-column label width="70" align="center">
-             <!-- dropdpwn selecction -->
-             <template slot="header" v-if="multipleSelection.length > 0" >
+          <!-- dropdpwn selecction -->
+          <template slot="header" v-if="multipleSelection.length > 0">
             <el-dropdown>
               <el-button
                 trigger="click"
                 icon="el-icon-more"
                 type="primary"
                 size="mini"
-                 class="transition ease-out duration-700"
+                class="transition ease-out duration-700"
               ></el-button>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item>
@@ -391,7 +391,7 @@ export default {
   fetchOnServer: false,
   data() {
     return {
-      multipleSelection:[],
+      multipleSelection: [],
       page: {
         limit: 10,
         page: 1,
@@ -420,7 +420,7 @@ export default {
     };
   },
   methods: {
-      handleSelectionChange(val) {
+    handleSelectionChange(val) {
       this.multipleSelection = val;
     },
     fetchEntries() {
