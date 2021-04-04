@@ -80,7 +80,7 @@
         @selection-change="handleSelectionChange"
       >
         >
-        <el-table-column type="selection" width="50"> </el-table-column>
+        <el-table-column type="selection" width="50" />
         <el-table-column prop="index" width="50" label="#" />
         <el-table-column
           label="Descripción"
