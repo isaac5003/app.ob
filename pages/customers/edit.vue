@@ -368,7 +368,7 @@
             message="En esta sección se realizan las configuraciones de integración con otros modulos de manera general. Estas configuraciones se aplicarán a todos los servicios que no tengan una configuración individual."
           />
 
-          <el-form label-position="top">
+      
             <div class="grid grid-cols-12 gap-4">
               <el-form-item label="Seleccione una cuenta" class="col-span-4">
                 <template>
@@ -396,14 +396,12 @@
                 type="primary"
                 size="small"
                 native-type="submit"
-                :loading="generating"
                 >Guardar</el-button
               >
               <el-button size="small" @click="$router.push('/customers')"
                 >Cancelar</el-button
               >
             </div>
-          </el-form>
         </el-tab-pane>
       </el-tabs>
       <div class="flex justify-end" v-if="activeTab != 'integrations'">
