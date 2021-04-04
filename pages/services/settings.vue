@@ -24,55 +24,40 @@
           title="Integraciones"
           message="En esta sección se realizan las configuraciones de integración con otros modulos de manera general. Estas configuraciones se aplicarán a todos los servicios que no tengan una configuración individual."
         />
-        <el-tabs
-          tab-position="left"
-          v-model="utab"
-          @tab-click="
-            $router
-              .replace({
-                path: `/services/settings`,
-                query: { tab, utab },
-              })
-              .catch(() => {})
-          "
-        >
-          <el-form label-position="top">
-            <div class="grid grid-cols-12 gap-4">
-              <el-form-item label="Seleccione una cuenta" class="col-span-4">
-                <template>
-                  <el-select
-                    v-model="cogIfo"
-                    placeholder="Seleccione una cuenta"
-                    size="small"
-                    clearable
-                    filterable
-                    class="w-full"
-                  >
-                    <el-option
-                      v-for="c in cogSetting"
-                      :key="c.id"
-                      :label="c.name"
-                      :value="c.id"
-                    >
-                    </el-option>
-                  </el-select>
-                </template>
-              </el-form-item>
-            </div>
-            <div class="flex flex-row justify-end">
-              <el-button
-                type="primary"
+        <el-form label-position="top">
+          <div class="grid grid-cols-12 gap-4">
+            <el-form-item label="Seleccione una cuenta" class="col-span-4">
+              <el-select
+                v-model="cogIfo"
+                placeholder="Seleccione una cuenta"
                 size="small"
-                native-type="submit"
-                :loading="generating"
-                >Guardar</el-button
+                clearable
+                filterable
+                class="w-full"
               >
-              <el-button size="small" @click="$router.push('/services')"
-                >Cancelar</el-button
-              >
-            </div>
-          </el-form>
-        </el-tabs>
+                <el-option
+                  v-for="c in cogSetting"
+                  :key="c.id"
+                  :label="c.name"
+                  :value="c.id"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </div>
+          <div class="flex flex-row justify-end">
+            <el-button
+              type="primary"
+              size="small"
+              native-type="submit"
+              :loading="generating"
+              >Guardar</el-button
+            >
+            <el-button size="small" @click="$router.push('/services')"
+              >Cancelar</el-button
+            >
+          </div>
+        </el-form>
       </el-tab-pane>
     </el-tabs>
   </layout-content>
