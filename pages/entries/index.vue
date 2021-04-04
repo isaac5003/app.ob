@@ -227,14 +227,7 @@
         stripe
         size="mini"
       >
-      <!-- column 1 -->
-        <el-table-column
-          type="index"
-          label="#"
-          prop="index"
-          width="50"
-          align="center"
-        />
+        <el-table-column label="#" prop="index" width="40" align="center" />
         <el-table-column
           sortable="custom"
           label="Serie"
@@ -252,7 +245,13 @@
           prop="title"
           min-width="360"
         />
-        <el-table-column label="Cargo" width="110" align="right">
+        <el-table-column
+          label="Cargo"
+          width="110"
+          prop="cargo"
+          sortable="custom"
+          align="right"
+        >
           <template slot-scope="scope">
             <span>{{ scope.row.cargo | formatMoney }}</span>
           </template>
