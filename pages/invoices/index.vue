@@ -178,7 +178,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 1 &&
-                    selectedInvoice.documentType.id != 3
+                  selectedInvoice.documentType.id != 3
                 "
                 >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
               >
@@ -194,7 +194,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 2 &&
-                    selectedInvoice.documentType.id != 3
+                  selectedInvoice.documentType.id != 3
                 "
                 >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
               >
@@ -210,7 +210,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 3 ||
-                    selectedInvoice.documentType.id == 3
+                  selectedInvoice.documentType.id == 3
                 "
                 >{{
                   (selectedInvoice.documentType.id == 1
@@ -351,38 +351,38 @@
                     :label="item.name"
                     :value="item.id"
                   >
-                   <div
-                        class="flex flex-row justify-between items-end py-1 leading-normal"
-                      >
-                        <div class="flex flex-col">
-                          <span class="text-xs text-gray-500">{{
-                            item.shortName
-                          }}</span>
-                          <span>{{ item.name }}</span>
-                        </div>
-                        <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                    <div
+                      class="flex flex-row justify-between items-end py-1 leading-normal"
+                    >
+                      <div class="flex flex-col">
+                        <span class="text-xs text-gray-500">{{
+                          item.shortName
+                        }}</span>
+                        <span>{{ item.name }}</span>
                       </div>
+                      <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                    </div>
                   </el-option>
                 </el-option-group>
                 <el-option-group key="INACTIVOS" label="INACTIVOS">
                   <el-option
-                   style="height:50px;"
+                    style="height: 50px"
                     v-for="item in activeCustomers"
                     :key="item.id"
                     :label="item.name"
                     :value="item.id"
                   >
-               <div
-                        class="flex flex-row justify-between items-end py-1 leading-normal"
-                      >
-                        <div class="flex flex-col">
-                          <span class="text-xs text-gray-500">{{
-                            item.shortName
-                          }}</span>
-                          <span>{{ item.name }}</span>
-                        </div>
-                        <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                    <div
+                      class="flex flex-row justify-between items-end py-1 leading-normal"
+                    >
+                      <div class="flex flex-col">
+                        <span class="text-xs text-gray-500">{{
+                          item.shortName
+                        }}</span>
+                        <span>{{ item.name }}</span>
                       </div>
+                      <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                    </div>
                   </el-option>
                 </el-option-group>
               </el-select>
@@ -620,6 +620,14 @@
                 <i class="el-icon-question"></i>
                 {{ scope.row.status.name }}</el-tag
               >
+              <el-tag
+                size="small"
+                type="info"
+                v-else-if="scope.row.status.id == '5'"
+              >
+                <i class="el-icon-success"></i>
+                {{ scope.row.status.name }}</el-tag
+              >
             </template>
           </el-table-column>
           <el-table-column
@@ -651,7 +659,10 @@
                   >
                     <i class="el-icon-edit-outline"></i> Editar documento
                   </el-dropdown-item>
-                  <el-dropdown-item>
+                  <el-dropdown-item
+                    v-if="scope.row.status.id == '2'"
+                    @click.native="paidDocument(scope.row)"
+                  >
                     <i class="el-icon-check"></i> Marcar como pagado
                   </el-dropdown-item>
                   <el-dropdown-item
@@ -674,7 +685,9 @@
                   <el-dropdown-item
                     :divided="true"
                     v-if="
-                      scope.row.status.id == '2' || scope.row.status.id == '3'
+                      scope.row.status.id == '2' ||
+                      scope.row.status.id == '3' ||
+                      scope.row.status.id == '5'
                     "
                     @click.native="reverseDocument(scope.row)"
                   >
@@ -685,11 +698,11 @@
                     class="font-semibold"
                     v-if="
                       scope.row.status.id == '1' &&
-                        !isLastInvoice(
-                          scope.row.sequence,
-                          scope.row.documentType.id,
-                          scope.row.authorization
-                        )
+                      !isLastInvoice(
+                        scope.row.sequence,
+                        scope.row.documentType.id,
+                        scope.row.authorization
+                      )
                     "
                     @click.native="deleteInvoice(scope.row)"
                   >
@@ -701,12 +714,14 @@
                     @click.native="voidDocument(scope.row)"
                     v-if="
                       scope.row.status.id === '2' ||
-                        (isLastInvoice(
-                          scope.row.sequence,
-                          scope.row.documentType.id,
-                          scope.row.authorization
-                        ) &&
-                          scope.row.status.id != '3')
+                      scope.row.status.id === '5' ||
+                      scope.row.status.id != '3' ||
+                      (isLastInvoice(
+                        scope.row.sequence,
+                        scope.row.documentType.id,
+                        scope.row.authorization
+                      ) &&
+                        scope.row.status.id != '3')
                     "
                   >
                     <i class="el-icon-circle-close"></i>
@@ -1428,6 +1443,44 @@ export default {
             } else {
               done();
             }
+          },
+        }
+      );
+    },
+    paidDocument({ id }) {
+      this.$confirm(
+        `¿Estás seguro que deseas pagar este documento?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, pagar`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .put(`/invoices/status/paid/${id}`)
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchInvoices();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, pagar`;
+                  done();
+                });
+            }
+            done();
           },
         }
       );

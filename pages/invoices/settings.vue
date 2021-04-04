@@ -17,7 +17,7 @@
           .catch(() => {})
       "
     >
-    <!-- Creacion de factura -->
+      <!-- Creacion de factura -->
       <el-dialog
         title="Crear modelo de factura"
         width="1040px"
@@ -37,7 +37,7 @@
         "
         />
         <!-- firts grid-cols-span -->
-        <div class="flex flex-col ">
+        <div class="flex flex-col">
           <el-form label-position="top">
             <div class="grid grid-cols-12">
               <el-form-item class="col-span-3">
@@ -60,7 +60,7 @@
               </el-form-item>
             </div>
             <!-- senores, fecha y Direccion  -->
-            <div class="grid grid-cols-12 gap-8 ">
+            <div class="grid grid-cols-12 gap-8">
               <div class="col-span-4">
                 <el-checkbox v-model="checked">Señor (es)</el-checkbox>
                 <div class="grid grid-cols-6">
@@ -533,7 +533,7 @@
             </div>
             <!-- cant  descripcion  preciounitario -->
             <div class="grid grid-cols-12 gap-8">
-              <div class="col-span-4 ">
+              <div class="col-span-4">
                 <el-checkbox v-model="checked">Cantidad</el-checkbox>
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
@@ -588,7 +588,7 @@
               </div>
               <div class="col-span-4">
                 <el-checkbox v-model="checked">Descripción</el-checkbox>
-                
+
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -642,7 +642,7 @@
               </div>
               <div class="col-span-4">
                 <el-checkbox v-model="checked">Precio unitario</el-checkbox>
-                
+
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -698,7 +698,7 @@
             <div class="grid grid-cols-12 border-b-2 gap-8">
               <div class="col-span-4 space-x-2">
                 <el-checkbox v-model="checked">Venta No sujetas</el-checkbox>
-               
+
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -752,7 +752,7 @@
               </div>
               <div class="col-span-4">
                 <el-checkbox v-model="checked">Venta exentas</el-checkbox>
-               
+
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -806,7 +806,7 @@
               </div>
               <div class="col-span-4">
                 <el-checkbox v-model="checked">Ventas afectas</el-checkbox>
-               
+
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -883,9 +883,9 @@
             </div>
             <!-- Son, Operacion superior a {evaluar }, entregado por -->
             <div class="grid grid-cols-12 gap-8">
-              <div class="col-span-4 ">
+              <div class="col-span-4">
                 <el-checkbox v-model="checked">Son</el-checkbox>
-               
+
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -939,7 +939,7 @@
               </div>
               <div class="col-span-4">
                 <el-checkbox v-model="checked">Superior a evaluar</el-checkbox>
-                
+
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -993,7 +993,7 @@
               </div>
               <div class="col-span-4">
                 <el-checkbox v-model="checked">Entregado por</el-checkbox>
-              
+
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1050,7 +1050,7 @@
             <div class="grid grid-cols-12 gap-8">
               <div class="col-span-4">
                 <el-checkbox v-model="checked">Nombre</el-checkbox>
-         
+
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1104,7 +1104,7 @@
               </div>
               <div class="col-span-4">
                 <el-checkbox v-model="checked">Dui</el-checkbox>
-               
+
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1158,7 +1158,7 @@
               </div>
               <div class="col-span-4">
                 <el-checkbox v-model="checked">Firma</el-checkbox>
-               
+
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1213,9 +1213,9 @@
             </div>
             <!-- RECIVIDO POR, NPMBRE Y DUI -->
             <div class="grid grid-cols-12 gap-8">
-              <div class="col-span-4 ">
+              <div class="col-span-4">
                 <el-checkbox v-model="checked"> Recivido por</el-checkbox>
-             
+
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1267,9 +1267,9 @@
                   </div>
                 </div>
               </div>
-              <div class="col-span-4 ">
+              <div class="col-span-4">
                 <el-checkbox v-model="checked">Nombre</el-checkbox>
-               
+
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1321,9 +1321,9 @@
                   </div>
                 </div>
               </div>
-              <div class="col-span-4 ">
+              <div class="col-span-4">
                 <el-checkbox v-model="checked">Dui</el-checkbox>
-             
+
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1380,7 +1380,7 @@
             <div class="grid grid-cols-12 gap-8">
               <div class="col-span-4">
                 <el-checkbox v-model="checked">Firma</el-checkbox>
-              
+
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1434,7 +1434,7 @@
               </div>
               <div class="col-span-4">
                 <el-checkbox v-model="checked">Sumas</el-checkbox>
-               
+
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1488,7 +1488,7 @@
               </div>
               <div class="col-span-4">
                 <el-checkbox v-model="checked">13% de IVA</el-checkbox>
-              
+
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1545,7 +1545,7 @@
             <div class="grid grid-cols-12 gap-8">
               <div class="col-span-4">
                 <el-checkbox v-model="checked">Subtotal</el-checkbox>
-                
+
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1599,7 +1599,7 @@
               </div>
               <div class="col-span-4">
                 <el-checkbox v-model="checked">Iva retenido</el-checkbox>
-           
+
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1653,7 +1653,7 @@
               </div>
               <div class="col-span-4">
                 <el-checkbox v-model="checked">Ventas extentas</el-checkbox>
-              
+
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1708,9 +1708,9 @@
             </div>
             <!-- VENTA NO SUJETAS VENTA TOTAL  (RECUADRO) -->
             <div class="grid grid-cols-12 gap-8">
-              <div class="col-span-4 ">
+              <div class="col-span-4">
                 <el-checkbox v-model="checked"> Venta no sujetas</el-checkbox>
-              
+
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -1817,7 +1817,7 @@
               </div>
               <div class="col-span-4">
                 <el-checkbox v-model="checked">Recuadro</el-checkbox>
-               
+
                 <div class="grid grid-cols-6">
                   <div class="col-span-2">
                     <el-form-item label="Media de X">
@@ -2229,7 +2229,7 @@
           :append-to-body="true"
           title="Nueva condición de pago"
           :visible.sync="showNewPayment"
-          width="30%"
+          width="400px"
           @close="closeDialog('newPaymentForm')"
         >
           <el-form
@@ -2241,30 +2241,52 @@
               submitPayment('newPaymentForm', newPaymentForm)
             "
           >
-            <div>
-              <el-form-item label="Nombre de la condición de pago" prop="name">
-                <el-input
-                  v-model="newPaymentForm.name"
-                  clearable
-                  type="text"
-                  maxlength="100"
-                  minlength="5"
-                  show-word-limit
-                ></el-input>
-              </el-form-item>
+            <el-form-item label="Nombre de la condición de pago" prop="name">
+              <el-input
+                v-model="newPaymentForm.name"
+                clearable
+                type="text"
+                maxlength="100"
+                minlength="5"
+                show-word-limit
+              ></el-input>
+            </el-form-item>
+            <el-form-item prop="" label="Tipo de pago">
+              <el-radio-group
+                v-model="newPaymentForm.cashPayment"
+                class="w-full"
+              >
+                <el-row :gutter="15">
+                  <el-col :span="8">
+                    <el-radio border size="small" class="w-full" :label="true"
+                      >Contado</el-radio
+                    >
+                  </el-col>
+                  <el-col :span="8">
+                    <el-radio border size="small" class="w-full" :label="false"
+                      >Credito</el-radio
+                    >
+                  </el-col>
+                </el-row>
+              </el-radio-group>
+            </el-form-item>
+
+            <div class="flex flex-row justify-end">
+              <span slot="foot">
+                <el-button
+                  type="primary"
+                  size="small"
+                  @click.native="
+                    submitPayment('newPaymentForm', newPaymentForm)
+                  "
+                  >Guardar</el-button
+                >
+                <el-button @click="showNewPayment = false" size="small"
+                  >Cancelar</el-button
+                >
+              </span>
             </div>
           </el-form>
-          <span slot="footer" class="dialog-footer">
-            <el-button
-              type="primary"
-              size="small"
-              @click.native="submitPayment('newPaymentForm', newPaymentForm)"
-              >Guardar</el-button
-            >
-            <el-button @click="showNewPayment = false" size="small"
-              >Cancelar</el-button
-            >
-          </span>
         </el-dialog>
 
         <!-- Dialogo para editar condicion de pago -->
@@ -2272,7 +2294,7 @@
           :append-to-body="true"
           title="Editar condición de pago"
           :visible.sync="showEditPayment"
-          width="30%"
+          width="400px"
           @close="closeDialog('editPaymentForm')"
         >
           <el-form
@@ -2294,18 +2316,41 @@
                 show-word-limit
               ></el-input>
             </el-form-item>
+            <el-form-item prop="" label="Tipo de pago">
+              <el-radio-group
+                v-model="editPaymentForm.cashPayment"
+                class="w-full"
+              >
+                <el-row :gutter="15">
+                  <el-col :span="8">
+                    <el-radio border size="small" class="w-full" :label="true"
+                      >Contado</el-radio
+                    >
+                  </el-col>
+                  <el-col :span="8">
+                    <el-radio border size="small" class="w-full" :label="false"
+                      >Credito</el-radio
+                    >
+                  </el-col>
+                </el-row>
+              </el-radio-group>
+            </el-form-item>
+            <div class="flex justify-end">
+              <span slot="footer" class="dialog-footer">
+                <el-button
+                  type="primary"
+                  size="small"
+                  @click.native="
+                    submitPayment('editPaymentForm', editPaymentForm)
+                  "
+                  >Guardar</el-button
+                >
+                <el-button @click="showEditPayment = false" size="small"
+                  >Cancelar</el-button
+                >
+              </span>
+            </div>
           </el-form>
-          <span slot="footer" class="dialog-footer">
-            <el-button
-              type="primary"
-              size="small"
-              @click.native="submitPayment('editPaymentForm', editPaymentForm)"
-              >Guardar</el-button
-            >
-            <el-button @click="showEditPayment = false" size="small"
-              >Cancelar</el-button
-            >
-          </span>
         </el-dialog>
 
         <div class="grid grid-cols-12 gap-4">
@@ -2497,9 +2542,6 @@ export default {
     if (this.$route.query.tab) {
       this.tab = this.$route.query.tab;
     }
-    if (this.$route.query.utab) {
-      this.utab = this.$route.query.utab;
-    }
 
     const zones = () => {
       return this.$axios.get("/invoices/zones");
@@ -2536,6 +2578,7 @@ export default {
       input: "",
       num: 1,
       closeDialog: false,
+      radio1: "",
       tab: "zones-sellers",
       utab: "invoicing",
       integrations: [
@@ -2567,6 +2610,7 @@ export default {
       },
       newPaymentForm: {
         name: "",
+        cashPayment: true,
       },
       newSellerForm: {
         name: "",
@@ -2578,6 +2622,7 @@ export default {
       },
       editPaymentForm: {
         name: "",
+        cashPayment: true,
       },
       editZoneForm: {
         name: "",
@@ -2915,7 +2960,6 @@ export default {
       });
     },
     submitSeller(formName, { name, invoicesZone }) {
-      console.log(name, invoicesZone);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -3018,7 +3062,7 @@ export default {
         );
       });
     },
-    submitPayment(formName, { id, name }) {
+    submitPayment(formName, { id, name, cashPayment }) {
       const action = id ? "actualizar" : "guardar";
       const method = id ? "PUT" : "POST";
       const url = `/invoices/payment-condition/${id ? id : ""}`;
@@ -3041,7 +3085,7 @@ export default {
                 this.$axios({
                   method,
                   url,
-                  data: { name },
+                  data: { name, cashPayment },
                 })
                   .then((res) => {
                     this.$notify.success({
@@ -3081,9 +3125,6 @@ export default {
     },
   },
   computed: {
-    filteredIntegrations() {
-      return this.integrations.filter((i) => hasModule(i.ref, this.$auth.user));
-    },
     activeZones() {
       return this.zones.filter((zone) => zone.active);
     },
