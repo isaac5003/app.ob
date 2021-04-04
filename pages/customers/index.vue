@@ -162,8 +162,9 @@
         size="mini"
         v-loading="tableloading"
       >
+        <!-- column 1 -->
         <el-table-column prop="index" width="50" label="#" />
-        <el-table-column label="Nombre" min-width="350" sortable="custom" prop="name">
+        <el-table-column label="Nombre" min-width="350" sortable="custom">
           <template slot-scope="scope">
             <div class="flex flex-col">
               <span class="font-semibold text-xs">

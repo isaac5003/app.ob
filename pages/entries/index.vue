@@ -220,7 +220,7 @@
           </div>
         </div>
       </el-form>
-      <!-- ----dddddd -->
+      <!-- La tabla tiene las medidas exacta, la suma de las colummnas tiene 960-->
       <el-table
         @sort-change="sortBy"
         :data="entries.entries"
@@ -245,7 +245,13 @@
           prop="title"
           min-width="360"
         />
-        <el-table-column label="Cargo" width="110" align="right">
+        <el-table-column
+          label="Cargo"
+          width="110"
+          prop="cargo"
+          sortable="custom"
+          align="right"
+        >
           <template slot-scope="scope">
             <span>{{ scope.row.cargo | formatMoney }}</span>
           </template>

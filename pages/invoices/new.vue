@@ -87,7 +87,7 @@
                 <el-checkbox
                   v-if="
                     newServiceForm.sellingType == 3 &&
-                      salesNewForm.documentType != 3
+                    salesNewForm.documentType != 3
                   "
                   border
                   v-model="newServiceForm.incTax"
@@ -161,7 +161,9 @@
                 v-model="editServiceForm.service"
                 clearable
                 filterable
-                @change="selectService(editServiceForm.service, 'edit', services)"
+                @change="
+                  selectService(editServiceForm.service, 'edit', services)
+                "
                 size="small"
                 class="w-full"
                 placeholder="Seleccionar servicio"
@@ -216,7 +218,7 @@
                   border
                   v-if="
                     editServiceForm.sellingType == 3 &&
-                      salesNewForm.documentType != 3
+                    salesNewForm.documentType != 3
                   "
                   v-model="editServiceForm.incTax"
                   size="small"
@@ -584,7 +586,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 1 &&
-                        salesNewForm.documentType != 3
+                      salesNewForm.documentType != 3
                     "
                     >{{
                       calcSujeta(salesNewForm.documentType, scope.row)
@@ -603,7 +605,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 2 &&
-                        salesNewForm.documentType != 3
+                      salesNewForm.documentType != 3
                     "
                     >{{
                       calcExenta(salesNewForm.documentType, scope.row)
@@ -622,7 +624,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 3 ||
-                        salesNewForm.documentType == 3
+                      salesNewForm.documentType == 3
                     "
                     >{{
                       calcGravada(salesNewForm.documentType, scope.row)
@@ -885,9 +887,9 @@ export default {
           this.errorMessage = err.response.data.message;
         });
     },
-   selectService(id, type, services) {
-          const service = services.find((s) => s.id == id);
-    
+    selectService(id, type, services) {
+      const service = services.find((s) => s.id == id);
+
       switch (type) {
         case "new":
           this.newServiceForm.unitPrice = service.cost;
