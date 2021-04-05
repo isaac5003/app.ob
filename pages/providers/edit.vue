@@ -2,7 +2,7 @@
   <layout-content
     page-title="Editar proveedor"
     :breadcrumb="[
-      { name: 'Clientes', to: '/providers' },
+      { name: 'Proveedores', to: '/providers' },
       { name: 'Editar proveedor', to: null },
     ]"
   >
@@ -11,7 +11,7 @@
       status-icon
       ref="providerEditForm"
       @submit.native.prevent="
-        submitEditProviders('providerEditForm', providerEditForm)
+        submitEditCustomer('providerEditForm', providerEditForm)
       "
       class="flex flex-col"
     >
@@ -253,7 +253,7 @@
             >
               <el-select
                 class="w-full"
-                v-model="providerEditForm.providersTypeNatural"
+                v-model="providerEditForm.customerTypeNatural"
                 size="small"
                 placeholder="Seleccionar tipo de persona natural"
                 filterable
@@ -302,7 +302,7 @@
               label="NRC"
               prop="nrc"
               class="col-span-2"
-              v-if="providerEditForm.providersType == 1"
+              v-if="providerEditForm.customerType == 1"
             >
               <el-input
                 type="text"
@@ -316,8 +316,8 @@
           <div
             class="grid grid-cols-12 gap-4"
             v-if="
-              providerEditForm.providersType == 1 ||
-              providerEditForm.providersTypeNatural == 2
+              providerEditForm.customerType == 1 ||
+              providerEditForm.customerTypeNatural == 2
             "
           >
             <el-form-item
@@ -327,7 +327,7 @@
             >
               <el-select
                 class="w-full"
-                v-model="providerEditForm.providersTaxerType"
+                v-model="providerEditForm.customerTaxerType"
                 size="small"
                 placeholder="Seleccionar tipo de contribuyente"
                 filterable
@@ -336,7 +336,7 @@
                 @change="setStorage(providerEditForm)"
               >
                 <el-option
-                  v-for="ct in providersTaxerTypes"
+                  v-for="ct in customerTaxerTypes"
                   :key="ct.id"
                   :label="ct.name"
                   :value="ct.id"
@@ -386,21 +386,21 @@ export default {
   },
   components: { LayoutContent, Notification },
   fetch() {
-    const providers = () =>
-      this.$axios.get(`/providers/${this.$route.query.ref}`);
-    const providersTypes = () => this.$axios.get(`/providers/types`);
-    const providersTypeNaturals = () =>
-      this.$axios.get(`/providers/type-naturals`);
-    const providersTaxerTypes = () => this.$axios.get(`/providers/taxer-types`);
+    const customer = () =>
+      this.$axios.get(`/customers/${this.$route.query.ref}`);
+    const customerTypes = () => this.$axios.get(`/customers/types`);
+    const customerTypeNaturals = () =>
+      this.$axios.get(`/customers/type-naturals`);
+    const customerTaxerTypes = () => this.$axios.get(`/customers/taxer-types`);
     const countries = () => this.$axios.get(`/others/countries`);
     const states = () => this.$axios.get(`/others/states`);
     const cities = () => this.$axios.get(`/others/cities`);
 
     Promise.all([
-      providersTypes(),
-      providersTypeNaturals(),
-      providersTaxerTypes(),
-      providers(),
+      customerTypes(),
+      customerTypeNaturals(),
+      customerTaxerTypes(),
+      customer(),
       countries(),
       states(),
       cities(),
@@ -412,18 +412,18 @@ export default {
         }
 
         const [
-          providersTypes,
-          providersTypeNaturals,
-          providersTaxerTypes,
-          providers,
+          customerTypes,
+          customerTypeNaturals,
+          customerTaxerTypes,
+          customerData,
           countries,
           states,
           cities,
         ] = res;
 
-        this.providersTypes = customerTypes.data.types;
-        this.providersTypeNaturals = customerTypeNaturals.data.typeNaturals;
-        this.providersTaxerTypes = customerTaxerTypes.data.taxerTypes;
+        this.customerTypes = customerTypes.data.types;
+        this.customerTypeNaturals = customerTypeNaturals.data.typeNaturals;
+        this.customerTaxerTypes = customerTaxerTypes.data.taxerTypes;
         const customer = customerData.data.customer;
         let branch = customer.customerBranches[0];
         this.customer = customer;
@@ -488,9 +488,9 @@ export default {
       countries: [],
       rawStates: [],
       rawCities: [],
-      providersTypes: [],
-      providersTypeNaturals: [],
-      providersTaxerTypes: [],
+      customerTypes: [],
+      customerTypeNaturals: [],
+      customerTaxerTypes: [],
       providerEditForm: {
         name: "",
         shortName: "",
@@ -499,9 +499,9 @@ export default {
         nit: "",
         nrc: "",
         giro: "",
-        providersType: "",
-        providersTypeNatural: "",
-        providersTaxerType: "",
+        customerType: "",
+        customerTypeNatural: "",
+        customerTaxerType: "",
         contactName: "",
         address1: "",
         address2: "",
@@ -530,7 +530,7 @@ export default {
       }
       this.setStorage(this.providerEditForm);
     },
-    submitEditProviders(formName, formData) {
+    submitEditCustomer(formName, formData) {
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -548,7 +548,7 @@ export default {
                 instance.confirmButtonLoading = true;
                 instance.confirmButtonText = "Procesando...";
                 this.$axios
-                  .put(`/providers/${this.$route.query.ref}`, {
+                  .put(`/customers/${this.$route.query.ref}`, {
                     name: formData.name,
                     shortName: formData.shortName,
                     isCustomer: formData.isCustomer,
