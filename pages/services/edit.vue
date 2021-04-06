@@ -201,14 +201,13 @@ export default {
       .then((res) => {
         const [sellingTypes, service, catalog, integrationCatalog] = res;
         this.sellingTypes = sellingTypes.data.types;
+        this.catalogList = catalog.data.accountingCatalog;
 
         this.servicesEditForm = {
           ...service.data.service,
           sellingType: service.data.service.sellingType.id,
+          accountingCatalog: integrationCatalog.data.integrations.catalog,
         };
-        this.catalogList = catalog.data.accountingCatalog;
-        this.servicesEditForm.accountingCatalog =
-          integrationCatalog.data.integrations.catalog;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
