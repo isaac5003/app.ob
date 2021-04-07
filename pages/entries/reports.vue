@@ -19,8 +19,10 @@
         }"
       />
     </div>
-
-    <el-form
+  
+  <div class="grid grid-cols-12 gap-4">
+    <div class="col-span-4">
+        <el-form
       :model="reportForm"
       :rules="reportFormRules"
       ref="reportForm"
@@ -29,11 +31,11 @@
       "
       status-icon
     >
-      <!-- first row -->
-      <div class="grid grid-cols-12 gap-4">
-        <!-- Tipos de reporte -->
-        <div class="col-span-4">
-          <el-form-item label="Seleccione el reporte" prop="reportType">
+          <el-form-item
+            label="Seleccione el reporte:"
+            class="col-span-4"
+            prop="reporType"
+          >
             <el-select
               v-model="reportForm.reportType"
               placeholder="Seleccione reporte"
@@ -60,10 +62,75 @@
               </el-option-group>
             </el-select>
           </el-form-item>
+        
+          <el-form-item
+            class="col-span-4"
+            prop="dateRange"
+            label="Seleccione la fecha"
+             v-if="requirementForm == 'compact'"
+          >
+            <el-date-picker
+              v-model="reportForm.dateRange"
+              type="month"
+              format="MMMM yyyy"
+              placeholder="Selecciona un mes"
+              size="small"
+              style="width: 100%"
+            />
+          </el-form-item>
+        
+        <!-- seleccion date range y cuentas -->
+        <div class="flex flex-col" v-if="requirementForm == 'extended'">
+          
+            <el-form-item
+              class="col-span-4"
+              label="Rango de fechas:"
+              prop="dateRanges"
+            >
+              <el-date-picker
+                size="small"
+                v-model="reportForm.dateRanges"
+                type="daterange"
+                unlink-panels
+                range-separator="-"
+                start-placeholder="Fecha inicio"
+                end-placeholder="Fecha final"
+                :editable="false"
+                format="dd/MM/yyyy"
+                value-format="yyyy-MM-dd"
+                style="width: 100%"
+              />
+            </el-form-item>
+        
+            <el-form-item label="Cuentas:" class="col-span-4" prop="accounts">
+              <el-select
+                v-model="reportForm.accounts"
+                placeholder="Seleccionar cuentas"
+                size="small"
+                clearable
+                filterable
+                multiple
+                default-first-option
+                class="w-full"
+              >
+                <el-option
+                  v-for="catalog in accountingCatalog"
+                  :key="catalog.id"
+                  :label="catalog.code"
+                  :value="catalog.id"
+                  :disabled="catalog.isParent == true"
+                >
+                  <div class="flex flex-row justify-between">
+                    <span class="mr-5 text-sm">{{ catalog.name }}</span>
+                    <span class="text-gray-600">{{ catalog.code }}</span>
+                  </div>
+                </el-option>
+              </el-select>
+            </el-form-item>
         </div>
 
-        <div class="col-span-5">
-          <el-form-item prop="" label="Formato de reporte">
+  
+          <el-form-item prop="" label="Formato de reporte" class="col-span-4">
             <el-radio-group
               v-model="reportForm.radio"
               :disabled="reportForm.reportType ? false : true"
@@ -83,85 +150,26 @@
               </el-row>
             </el-radio-group>
           </el-form-item>
+    
+        <div class="flex flex-row justify-end">
+          <el-button
+            :disabled="reportForm.reportType ? false : true"
+            type="primary"
+            size="small"
+            icon="el-icon-download"
+            native-type="submit"
+            :loading="generating"
+            >Descargar</el-button
+          ><el-button size="small" @click="cancel()">Cancelar</el-button>
         </div>
-      </div>
-
-      <!-- seleccionar fecha -->
-      <div class="grid grid-cols-12 gap-4" v-if="requirementForm == 'compact'">
-        <div class="col-span-4">
-          <el-form-item prop="dateRange" label="Seleccione la fecha">
-            <el-date-picker
-              v-model="reportForm.dateRange"
-              type="month"
-              format="MMMM yyyy"
-              placeholder="Selecciona un mes"
-              size="small"
-              style="width: 100%"
-            />
-          </el-form-item>
-        </div>
-      </div>
-      <!-- seleccion date range y cuentas -->
-      <div class="grid grid-cols-12 gap-4" v-if="requirementForm == 'extended'">
-        <div class="col-span-4">
-          <el-form-item label="Rango de fechas:" prop="dateRanges">
-            <el-date-picker
-              size="small"
-              v-model="reportForm.dateRanges"
-              type="daterange"
-              unlink-panels
-              range-separator="-"
-              start-placeholder="Fecha inicio"
-              end-placeholder="Fecha final"
-              :editable="false"
-              format="dd/MM/yyyy"
-              value-format="yyyy-MM-dd"
-              style="width: 100%"
-            />
-          </el-form-item>
-        </div>
-        <div class="col-span-8">
-          <el-form-item label="Cuentas:" prop="accounts">
-            <el-select
-              v-model="reportForm.accounts"
-              placeholder="Seleccionar cuentas"
-              size="small"
-              clearable
-              filterable
-              multiple
-              default-first-option
-              class="w-full"
-            >
-              <el-option
-                v-for="catalog in accountingCatalog"
-                :key="catalog.id"
-                :label="catalog.code"
-                :value="catalog.id"
-                :disabled="catalog.isParent == true"
-              >
-                <div class="flex flex-row justify-between">
-                  <span class="mr-5 text-sm">{{ catalog.name }}</span>
-                  <span class="text-gray-600">{{ catalog.code }}</span>
-                </div>
-              </el-option>
-            </el-select>
-          </el-form-item>
-        </div>
-      </div>
-
-      <!-- Guardar y Cancelar -->
-      <div class="flex flex-row justify-end">
-        <el-button
-          :disabled="reportForm.reportType ? false : true"
-          type="primary"
-          size="small"
-          icon="el-icon-download"
-          native-type="submit"
-          :loading="generating"
-          >Descargar</el-button
-        ><el-button size="small" @click="cancel()">Cancelar</el-button>
-      </div>
-    </el-form>
+        </el-form>
+    </div>
+    <div class="col-span-8"> 
+       <h1>Vista Previa</h1>
+         <img src="https://i.imgur.com/H38k1H0.png" alt="">
+    </div>
+  </div>
+     
   </layout-content>
 </template>
 
