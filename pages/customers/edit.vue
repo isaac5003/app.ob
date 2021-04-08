@@ -368,43 +368,31 @@
             message="En esta sección se realizan las configuraciones de integración con otros modulos de manera general. Estas configuraciones se aplicarán a todos los servicios que no tengan una configuración individual."
           />
 
-      
-            <div class="grid grid-cols-12 gap-4">
-              <el-form-item label="Seleccione una cuenta" class="col-span-4">
-                <template>
-                  <el-select
-                    v-model="cogInfo"
-                    placeholder="Seleccione una cuenta"
-                    size="small"
-                    clearable
-                    filterable
-                    class="w-full"
+          <div class="grid grid-cols-12 gap-4">
+            <el-form-item label="Seleccione una cuenta" class="col-span-4">
+              <template>
+                <el-select
+                  v-model="cogInfo"
+                  placeholder="Seleccione una cuenta"
+                  size="small"
+                  clearable
+                  filterable
+                  class="w-full"
+                >
+                  <el-option
+                    v-for="c in cogSetting"
+                    :key="c.id"
+                    :label="c.name"
+                    :value="c.id"
                   >
-                    <el-option
-                      v-for="c in cogSetting"
-                      :key="c.id"
-                      :label="c.name"
-                      :value="c.id"
-                    >
-                    </el-option>
-                  </el-select>
-                </template>
-              </el-form-item>
-            </div>
-            <div class="flex justify-end">
-              <el-button
-                type="primary"
-                size="small"
-                native-type="submit"
-                >Guardar</el-button
-              >
-              <el-button size="small" @click="$router.push('/customers')"
-                >Cancelar</el-button
-              >
-            </div>
+                  </el-option>
+                </el-select>
+              </template>
+            </el-form-item>
+          </div>
         </el-tab-pane>
       </el-tabs>
-      <div class="flex justify-end" v-if="activeTab != 'integrations'">
+      <div class="flex justify-end">
         <el-button type="primary" size="small" native-type="submit"
           >Actualizar</el-button
         >
