@@ -69,7 +69,7 @@ import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
 
 export default {
-  name: "CustomerSettings",
+  name: "ProviderSettings",
   components: { LayoutContent, Notification },
   fetch() {},
   fetchOnServer: false,
@@ -83,4 +83,3 @@ export default {
   computed: {},
 };
 </script>
-s
