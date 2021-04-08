@@ -747,7 +747,7 @@ export default {
         cancelButtonText: "Cancelar",
         type: "warning",
       }).then(() => {
-        this.$router.push("/entries");
+        this.$router.push("/customers");
       });
     },
   },
