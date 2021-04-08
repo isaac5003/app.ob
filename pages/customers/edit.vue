@@ -356,16 +356,43 @@
             </el-form-item>
           </div>
         </el-tab-pane>
-        <!-- <el-tab-pane label="Integraciones" name="integrations">
+        <el-tab-pane
+          label="Integraciones"
+          name="integrations"
+          class="space-y-2"
+        >
           <Notification
             class="w-full"
             type="info"
             title="Integraciones"
-            message="En esta sección se muestran las configuraciones necesarias para poder integrar otros modulos del sistema cuando estos están disponibles."
+            message="En esta sección se realizan las configuraciones de integración con otros modulos de manera general. Estas configuraciones se aplicarán a todos los servicios que no tengan una configuración individual."
           />
-        </el-tab-pane> -->
+
+          <div class="grid grid-cols-12 gap-4">
+            <el-form-item label="Seleccione una cuenta" class="col-span-4">
+              <template>
+                <el-select
+                  v-model="cogInfo"
+                  placeholder="Seleccione una cuenta"
+                  size="small"
+                  clearable
+                  filterable
+                  class="w-full"
+                >
+                  <el-option
+                    v-for="c in cogSetting"
+                    :key="c.id"
+                    :label="c.name"
+                    :value="c.id"
+                  >
+                  </el-option>
+                </el-select>
+              </template>
+            </el-form-item>
+          </div>
+        </el-tab-pane>
       </el-tabs>
-      <div class="flex justify-end" v-if="activeTab != 'integrations'">
+      <div class="flex justify-end">
         <el-button type="primary" size="small" native-type="submit"
           >Actualizar</el-button
         >
@@ -416,11 +443,6 @@ export default {
       cities(),
     ])
       .then((res) => {
-        // Se ubica en el tab seleccionado
-        if (this.$route.query.tab) {
-          this.activeTab = this.$route.query.tab;
-        }
-
         const [
           customerTypes,
           customerTypeNaturals,
@@ -493,6 +515,12 @@ export default {
   },
   data() {
     return {
+      cogInfo: "",
+      cogSetting: [
+        {
+          name: "jorge",
+        },
+      ],
       pageloading: true,
       activeTab: "general-information",
       countries: [],
