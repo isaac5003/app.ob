@@ -13,63 +13,64 @@
       width="900px"
       :append-to-body="true"
     >
-      <div class="flex flex-col space-y-4">
+      <div class="flex flex-col space-y-6">
         <div class="grid grid-cols-12 gap-4">
-          <div class="col-span-4 flex flex-col">
-            <span class="text-gray-700 font-bold text-sm w-full">Cliente</span>
+          <div class="col-span-3 flex flex-col">
+            <span class="text-gray-700 font-bold text-xs">Cliente</span>
             <span class="">
               {{ taxesPreview ? taxesPreview.name : "" }}
             </span>
           </div>
-          <div class="col-span-4 flex flex-col">
-            <span class="text-gray-700 font-bold text-sm w-full">Fecha</span>
+          <div class="col-span-2 flex flex-col">
+            <span class="text-gray-700 font-bold text-xs">Fecha</span>
             <span class="">{{ taxesPreview ? taxesPreview.date : "" }} </span>
           </div>
-          <div class="col-span-4 flex flex-col">
-            <span class="text-gray-700 font-bold text-sm w-full"
+          <div class="col-span-2 flex flex-col">
+            <span class="text-gray-700 font-bold text-xs"
               >Tipo de registro</span
             >
             <span class="">
               {{ taxesPreview ? taxesPreview.registerType : "" }}</span
             >
           </div>
-        </div>
-        <!-- <div class="grid grid-cols-12 gap-4 relative">
-          <div class="col-span-8 flex flex-col">
-            <span class="text-gray-700 font-bold text-sm w-full"
-              >Titulo de la partida partida</span
+          <div class="col-span-2 flex flex-col">
+            <span class="text-gray-700 font-bold text-xs"
+              >Tipo de Documento</span
             >
-            <span class=""> {{ selecEntries ? selecEntries.title : "" }}</span>
+            <span class="">
+              {{ taxesPreview ? taxesPreview.documentType : "" }}</span
+            >
           </div>
-          <div class="col-span-4 col-start-9" v-if="selecEntries !== null">
-            <el-form>
-              <div class="inline-block">
-                <el-form-item label="Opciones de partidad:">
-                  <el-checkbox
-                    v-model="selecEntries.squared"
-                    size="small"
-                    class="w-full"
-                    label="Cuadrada"
-                    disabled
-                  >
-                  </el-checkbox>
-                </el-form-item>
-              </div>
-              <div class="inline-block">
-                <el-form-item label=" ">
-                  <el-checkbox
-                    v-model="selecEntries.accounted"
-                    size="small"
-                    class="w-full"
-                    label="Contabilizada"
-                    disabled
-                  >
-                  </el-checkbox>
-                </el-form-item>
-              </div>
-            </el-form>
+          <div class="col-span-3 flex flex-col">
+            <span class="text-gray-700 font-bold text-xs"
+              >N° de Autorización</span
+            >
+            <span class=""> {{ taxesPreview ? taxesPreview.number : "" }}</span>
           </div>
-        </div> -->
+        </div>
+
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-3 flex flex-col">
+            <span class="text-gray-700 font-bold text-xs">Correlativo</span>
+            <span class=""> 245800 </span>
+          </div>
+          <div class="col-span-2 flex flex-col">
+            <span class="text-gray-700 font-bold text-xs">IVA</span>
+            <span class="">{{ taxesPreview ? taxesPreview.iva : "" }} </span>
+          </div>
+          <div class="col-span-2 flex flex-col">
+            <span class="text-gray-700 font-bold text-xs">Sub Total</span>
+            <span class=""> $584</span>
+          </div>
+          <div class="col-span-2 flex flex-col">
+            <span class="text-gray-700 font-bold text-xs">Otros</span>
+            <span class=""> $2</span>
+          </div>
+          <div class="col-span-3 flex flex-col">
+            <span class="text-gray-700 font-bold text-xs">Total</span>
+            <span class=""> $586</span>
+          </div>
+        </div>
       </div>
 
       <span slot="footer" class="dialog-footer">
@@ -179,6 +180,7 @@
       size="mini"
       ref="multipleTable"
       :data="taxesList.taxesList"
+      @selection-change="selectionChange"
     >
       <el-table-column type="selection" width="50" />
       <el-table-column label="#" width="50" prop="id" />
@@ -189,8 +191,8 @@
         prop="name"
       ></el-table-column>
       <el-table-column
-        label="N° de autorización"
-        width="140"
+        label="N° autorización"
+        width="130"
         prop="number"
       ></el-table-column>
       <el-table-column
@@ -203,25 +205,28 @@
         width="150"
         prop="registerType"
       ></el-table-column>
-      <el-table-column label="IVA" width="60" prop="iva"></el-table-column>
-      <el-table-column label width="70" align="center">
+      <el-table-column label="IVA" width="50" prop="iva"></el-table-column>
+      <el-table-column label width="90" align="center">
         <!-- dropdpwn selecction -->
-        <template slot="header">
-          <el-dropdown>
+        <template slot="header" v-if="selectionData.length">
+          <el-dropdown trigger="click" szie="mini" type="primary">
+            <!-- <el-button icon="el-icon-more" size="mini" type="primary" /> -->
             <el-button
-              trigger="click"
-              icon="el-icon-more"
-              type="primary"
               size="mini"
-              class="transition ease-out duration-700"
-            ></el-button>
+              type="primary"
+              class="group transition transform duration-300 hover:shadow-md hover:pr-20"
+            >
+              <span class="hidden group-hover:inline"> 10 items</span>
+              <i class="el-icon-more"
+            /></el-button>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>
-                <i class="el-icon-view"></i>Vista previa
+              <el-dropdown-item class="text-red-500 font-semibold">
+                <i class="el-icon-delete"></i> Eliminar
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </template>
+
         <!-- dropdown 1 -->
         <template slot-scope="scope">
           <el-dropdown trigger="click" szie="mini">
@@ -230,17 +235,12 @@
               <el-dropdown-item @click.native="openPreviewEntry(scope.row)">
                 <i class="el-icon-view"></i> Vista previa
               </el-dropdown-item>
-              <el-dropdown-item
-                @click.native="
-                  $router.push(`/entries/edit?ref=${scope.row.id}`)
-                "
-              >
+              <el-dropdown-item>
                 <i class="el-icon-edit-outline"></i> Editar
               </el-dropdown-item>
               <el-dropdown-item
                 :divided="true"
                 class="text-red-500 font-semibold"
-                @click.native="deleteEntry(scope.row.id)"
               >
                 <i class="el-icon-delete"></i> Eliminar
               </el-dropdown-item>
@@ -261,6 +261,16 @@
         :pager-count="5"
       />
     </div> -->
+    <div class="flex flex-col items-center space-y-5">
+      <ul class="flex flex-col space-y-3 w-10 z-10">
+        <li
+          class="block group flex items-center rounded text-black h-10 w-10 cursor-pointer space-x-15 p-2 transition transform duration-300 hover:w-24 hover:text-white hover:bg-blue-900 hover:shadow-md"
+        >
+          Holaa
+          <span class="hidden group-hover:block"> 222</span>
+        </li>
+      </ul>
+    </div>
   </layout-content>
 </template>
 
@@ -277,6 +287,7 @@ export default {
     return {
       showTaxePreview: false,
       taxesPreview: {},
+      selectionData: {},
       taxesForm: {
         search: "",
         date: "",
@@ -387,10 +398,13 @@ export default {
     };
   },
   methods: {
-    openPreviewEntry(data) {
-      console.log(data);
-      this.taxesPreview = data;
+    openPreviewEntry(dataTable) {
+      console.log(dataTable);
+      this.taxesPreview = dataTable;
       this.showTaxePreview = true;
+    },
+    selectionChange(selectionData) {
+      this.selectionData = selectionData;
     },
   },
 };
