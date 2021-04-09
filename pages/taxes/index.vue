@@ -6,7 +6,80 @@
       { name: 'Listado de IVA', to: null },
     ]"
   >
-    <div class="flex flex-col space-y-2">
+    <el-dialog
+      title="Vista previa"
+      size="mini"
+      :visible.sync="showTaxePreview"
+      width="900px"
+      :append-to-body="true"
+    >
+      <div class="flex flex-col space-y-4">
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-4 flex flex-col">
+            <span class="text-gray-700 font-bold text-sm w-full">Cliente</span>
+            <span class="">
+              {{ taxesPreview ? taxesPreview.name : "" }}
+            </span>
+          </div>
+          <div class="col-span-4 flex flex-col">
+            <span class="text-gray-700 font-bold text-sm w-full">Fecha</span>
+            <span class="">{{ taxesPreview ? taxesPreview.date : "" }} </span>
+          </div>
+          <div class="col-span-4 flex flex-col">
+            <span class="text-gray-700 font-bold text-sm w-full"
+              >Tipo de registro</span
+            >
+            <span class="">
+              {{ taxesPreview ? taxesPreview.registerType : "" }}</span
+            >
+          </div>
+        </div>
+        <!-- <div class="grid grid-cols-12 gap-4 relative">
+          <div class="col-span-8 flex flex-col">
+            <span class="text-gray-700 font-bold text-sm w-full"
+              >Titulo de la partida partida</span
+            >
+            <span class=""> {{ selecEntries ? selecEntries.title : "" }}</span>
+          </div>
+          <div class="col-span-4 col-start-9" v-if="selecEntries !== null">
+            <el-form>
+              <div class="inline-block">
+                <el-form-item label="Opciones de partidad:">
+                  <el-checkbox
+                    v-model="selecEntries.squared"
+                    size="small"
+                    class="w-full"
+                    label="Cuadrada"
+                    disabled
+                  >
+                  </el-checkbox>
+                </el-form-item>
+              </div>
+              <div class="inline-block">
+                <el-form-item label=" ">
+                  <el-checkbox
+                    v-model="selecEntries.accounted"
+                    size="small"
+                    class="w-full"
+                    label="Contabilizada"
+                    disabled
+                  >
+                  </el-checkbox>
+                </el-form-item>
+              </div>
+            </el-form>
+          </div>
+        </div> -->
+      </div>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button size="small" @click="showTaxePreview = false"
+          >Cerrar</el-button
+        >
+      </span>
+    </el-dialog>
+
+    <div class="flex flex-col space-4">
       <el-form>
         <div class="grid grid-cols-12 gap-4">
           <el-form-item class="col-span-4 col-start-9">
@@ -14,6 +87,8 @@
               suffix-icon="el-icon-search"
               placeholder="Buscar..."
               size="small"
+              v-model="taxesForm.search"
+              clearable
             ></el-input>
           </el-form-item>
         </div>
@@ -31,15 +106,23 @@
               :editable="false"
               format="dd/MM/yyyy"
               value-format="yyyy-MM-dd"
+              v-model="taxesForm.date"
             />
           </el-form-item>
           <el-form-item label="Cliente:" class="col-span-3">
             <el-select
+              v-model="taxesForm.customer"
               class="w-full"
               size="small"
-              filterable
               clearable
-            ></el-select>
+            >
+              <el-option
+                v-for="i in customers"
+                :key="i.id"
+                :label="i.name"
+                :value="i.id"
+              />
+            </el-select>
           </el-form-item>
           <el-form-item label="Proveedores:" class="col-span-3">
             <el-select
@@ -47,7 +130,14 @@
               size="small"
               filterable
               clearable
-            ></el-select>
+              v-model="taxesForm.provider"
+            >
+              <el-option
+                v-for="i in providers"
+                :key="i.id"
+                :label="i.name"
+                :value="i.id"
+            /></el-select>
           </el-form-item>
           <el-form-item label="Tipo de registro:" class="col-span-2">
             <el-select
@@ -55,7 +145,15 @@
               size="small"
               filterable
               clearable
-            ></el-select>
+              v-model="taxesForm.registerType"
+            >
+              <el-option
+                v-for="i in registerTypes"
+                :key="i.id"
+                :label="i.name"
+                :value="i.id"
+              />
+            </el-select>
           </el-form-item>
         </div>
         <div class="grid grid-cols-12 gap-4">
@@ -65,32 +163,47 @@
               size="small"
               filterable
               clearable
-            ></el-select>
+              v-model="taxesForm.documentType"
+              ><el-option
+                v-for="i in documentTypes"
+                :key="i.id"
+                :label="i.name"
+                :value="i.id"
+            /></el-select>
           </el-form-item>
         </div>
       </el-form>
     </div>
     <el-table
-      @sort-change="sortBy"
       stripe
       size="mini"
       ref="multipleTable"
-      @selection-change="handleSelectionChange"
+      :data="taxesList.taxesList"
     >
       <el-table-column type="selection" width="50" />
-      <el-table-column label="#" width="50" />
-      <el-table-column label="Fecha" width="80"></el-table-column>
+      <el-table-column label="#" width="50" prop="id" />
+      <el-table-column label="Fecha" width="110" prop="date"></el-table-column>
       <el-table-column
-        label="Proveedores/clientes"
-        width="180"
+        label="Proveedor/cliente"
+        min-width="180"
+        prop="name"
       ></el-table-column>
       <el-table-column
-        label="N° de  autorización"
+        label="N° de autorización"
+        width="140"
+        prop="number"
+      ></el-table-column>
+      <el-table-column
+        label="Tipo de documento"
         width="150"
+        prop="documentType"
       ></el-table-column>
-      <el-table-column label="Tipo de documento" width="150"></el-table-column>
-      <el-table-column label="Tipo de registro" width="150"></el-table-column>
-      <el-table-column label="IVA" width="80"></el-table-column>
+      <el-table-column
+        label="Tipo de registro"
+        width="150"
+        prop="registerType"
+      ></el-table-column>
+      <el-table-column label="IVA" width="60" prop="iva"></el-table-column>
       <el-table-column label width="70" align="center">
         <!-- dropdpwn selecction -->
         <template slot="header">
@@ -105,12 +218,6 @@
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item>
                 <i class="el-icon-view"></i>Vista previa
-              </el-dropdown-item>
-              <el-dropdown-item>
-                <i class="el-icon-printer"></i>Imprimir documento
-              </el-dropdown-item>
-              <el-dropdown-item :divided="true">
-                <i class="el-icon-refresh-left"></i> Revertir estados
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -128,17 +235,14 @@
                   $router.push(`/entries/edit?ref=${scope.row.id}`)
                 "
               >
-                <i class="el-icon-edit-outline"></i> Editar partida
-              </el-dropdown-item>
-              <el-dropdown-item @click.native="printEntry(scope.row)">
-                <i class="el-icon-printer"></i> Imprimir partida
+                <i class="el-icon-edit-outline"></i> Editar
               </el-dropdown-item>
               <el-dropdown-item
                 :divided="true"
                 class="text-red-500 font-semibold"
                 @click.native="deleteEntry(scope.row.id)"
               >
-                <i class="el-icon-delete"></i> Eliminar partida
+                <i class="el-icon-delete"></i> Eliminar
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -169,5 +273,125 @@ export default {
     titleTemplate: `%s | IVA`,
   },
   components: { LayoutContent, Notification },
+  data() {
+    return {
+      showTaxePreview: false,
+      taxesPreview: {},
+      taxesForm: {
+        search: "",
+        date: "",
+        customer: "",
+        provider: "",
+        registerType: "",
+        documentType: "",
+      },
+      customers: [
+        {
+          id: "1",
+          name: "Cliente 1",
+        },
+        {
+          id: "2",
+          name: "Cliente 2",
+        },
+        {
+          id: "3",
+          name: "Cliente 3",
+        },
+        {
+          id: "4",
+          name: "Cliente 4",
+        },
+        {
+          id: "5",
+          name: "Cliente 5",
+        },
+      ],
+      providers: [
+        {
+          id: "1",
+          name: "Proveedor 1",
+        },
+        {
+          id: "2",
+          name: "Proveedor 2",
+        },
+        {
+          id: "3",
+          name: "Proveedor 3",
+        },
+        {
+          id: "4",
+          name: "Proveedor 4",
+        },
+        {
+          id: "5",
+          name: "Proveedor 5",
+        },
+      ],
+      registerTypes: [
+        {
+          id: "1",
+          name: "Débito Fiscal",
+        },
+        {
+          id: "2",
+          name: "Cédito Fiscal",
+        },
+      ],
+      documentTypes: [
+        {
+          id: "1",
+          name: "Cédito Fiscal",
+        },
+        {
+          id: "2",
+          name: "Consumidor Final",
+        },
+        {
+          id: "3",
+          name: "Nota de Crédito",
+        },
+        {
+          id: "4",
+          name: "Factura de Exportación",
+        },
+        {
+          id: "5",
+          name: "Otros",
+        },
+      ],
+      taxesList: {
+        taxesList: [
+          {
+            id: "1",
+            date: "08/04/2021",
+            name: "AP TECHNOLOGY S.A de C.V",
+            number: "69875105",
+            documentType: "Nota de Crédito",
+            registerType: "Crédito Fiscal",
+            iva: "10%",
+          },
+          {
+            id: "2",
+            date: "08/04/2021",
+            name: "OPTICA LA REALEZA S.A de C.V",
+            number: "35698965",
+            documentType: "Nota de Crédito",
+            registerType: "Crédito Fiscal",
+            iva: "5%",
+          },
+        ],
+        count: 0,
+      },
+    };
+  },
+  methods: {
+    openPreviewEntry(data) {
+      console.log(data);
+      this.taxesPreview = data;
+      this.showTaxePreview = true;
+    },
+  },
 };
 </script>
