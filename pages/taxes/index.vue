@@ -182,8 +182,8 @@
       :data="taxesList.taxesList"
       @selection-change="selectionChange"
     >
-      <el-table-column type="selection" width="50" />
-      <el-table-column label="#" width="50" prop="id" />
+      <el-table-column type="selection" width="40" />
+      <el-table-column label="#" width="40" prop="id" />
       <el-table-column label="Fecha" width="110" prop="date"></el-table-column>
       <el-table-column
         label="Proveedor/cliente"
@@ -206,21 +206,18 @@
         prop="registerType"
       ></el-table-column>
       <el-table-column label="IVA" width="50" prop="iva"></el-table-column>
-      <el-table-column label width="90" align="center">
+      <el-table-column label width="110" align="center">
         <!-- dropdpwn selecction -->
         <template slot="header" v-if="selectionData.length">
           <el-dropdown trigger="click" szie="mini" type="primary">
-            <!-- <el-button icon="el-icon-more" size="mini" type="primary" /> -->
-            <el-button
-              size="mini"
-              type="primary"
-              class="group transition transform duration-300 hover:shadow-md hover:pr-20"
-            >
-              <span class="hidden group-hover:inline"> 10 items</span>
+            <el-button size="mini" type="primary" class="group">
+              <span class="hidden group-hover:inline">
+                {{ selectionData.length }} Filas</span
+              >
               <i class="el-icon-more"
             /></el-button>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item class="text-red-500 font-semibold">
+              <el-dropdown-item class="font-semibold">
                 <i class="el-icon-delete"></i> Eliminar
               </el-dropdown-item>
             </el-dropdown-menu>
@@ -249,28 +246,6 @@
         </template>
       </el-table-column>
     </el-table>
-    <!--  <div class="flex justify-end">
-      <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="fetchEntries"
-        :current-page.sync="page.page"
-        :page-sizes="[5, 10, 15, 25, 50, 100]"
-        :page-size="page.size"
-        layout="total, sizes, prev, pager, next"
-        :total="parseInt(entries.count)"
-        :pager-count="5"
-      />
-    </div> -->
-    <div class="flex flex-col items-center space-y-5">
-      <ul class="flex flex-col space-y-3 w-10 z-10">
-        <li
-          class="block group flex items-center rounded text-black h-10 w-10 cursor-pointer space-x-15 p-2 transition transform duration-300 hover:w-24 hover:text-white hover:bg-blue-900 hover:shadow-md"
-        >
-          Holaa
-          <span class="hidden group-hover:block"> 222</span>
-        </li>
-      </ul>
-    </div>
   </layout-content>
 </template>
 
