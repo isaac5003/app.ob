@@ -11,9 +11,7 @@
         class="item"
         effect="dark"
         :open-delay="1000"
-        :content="
-          `${$auth.user.workspace.company.name} | ${$auth.user.workspace.branch.name}`
-        "
+        :content="`${$auth.user.workspace.company.name} | ${$auth.user.workspace.branch.name}`"
         placement="right"
       >
         <el-popover
@@ -152,10 +150,8 @@
       <el-tooltip
         class="item"
         effect="dark"
-        :content="
-          `${$auth.user.names} 
-        ${$auth.user.lastnames}`
-        "
+        :content="`${$auth.user.names} 
+        ${$auth.user.lastnames}`"
         placement="right"
       >
         <nuxt-link
@@ -217,6 +213,14 @@ export default {
           path: "/entries",
           name: "Contabilidad",
           icon: getIcon("cash"),
+          exact: false,
+        },
+        {
+          always: false,
+          id: "53a36e54-bab2-4824-9e43-b40efab8bab9",
+          path: "/taxes",
+          name: "Iva",
+          icon: getIcon("receipt-tax"),
           exact: false,
         },
       ],
