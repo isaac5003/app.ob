@@ -12,7 +12,7 @@ export default {
   name: "IVA",
   middleware: "access",
   meta: {
-    id: "0f88f2ea-aae9-44ad-8df0-0ee3debbf167",
+    id: "53a36e54-bab2-4824-9e43-b40efab8bab9",
   },
   components: { LayoutSubmenu },
   data() {
