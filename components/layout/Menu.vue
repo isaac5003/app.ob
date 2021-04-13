@@ -217,7 +217,7 @@ export default {
         },
         {
           always: false,
-          id: "a98b98e6-b2d5-42a3-853d-9516f64eade8",
+          id: "53a36e54-bab2-4824-9e43-b40efab8bab9",
           path: "/taxes",
           name: "Iva",
           icon: getIcon("receipt-tax"),
