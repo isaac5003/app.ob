@@ -1387,29 +1387,41 @@ export default {
           signatures,
           general,
         ] = res;
+        if (balance.data.balanceGeneral) {
+          this.tableData = balance.data.balanceGeneral.report;
+          this.specialAccounts = { ...balance.data.balanceGeneral.special };
+        }
+        if (general.data.general) {
+          this.fiscalPeriodForm.startDate = general.data.general.periodStart;
+          this.fiscalPeriodForm.endDate = general.data.general.peridoEnd;
+        }
+
+        if (signatures.data.signature) {
+          this.firmantesForm = signatures.data.signatures;
+        }
+
+        if (results.data.estadoResultados) {
+          this.tablesData = results.data.estadoResultados.map((r) => {
+            const obj = { ...r };
+            if (r.children) {
+              const children = r.children.map((ch) => {
+                return {
+                  ...ch,
+                  code: ch.id,
+                };
+              });
+              obj["children"] = children;
+            }
+            return obj;
+          });
+        }
+
+        this.catalogs = accounts.data.accountingCatalog;
         this.accounts = accountCatalogs.data.accountingCatalog;
         this.accountsCount = accountCatalogs.data.count;
-        this.catalogs = accounts.data.accountingCatalog;
-        this.tableData = balance.data.balanceGeneral.report;
-        this.firmantesForm = signatures.data.signatures;
-        this.fiscalPeriodForm.startDate = general.data.general.periodStart;
-        this.fiscalPeriodForm.endDate = general.data.general.peridoEnd;
-        this.specialAccounts = { ...balance.data.balanceGeneral.special };
-        this.tablesData = results.data.estadoResultados.map((r) => {
-          const obj = { ...r };
-          if (r.children) {
-            const children = r.children.map((ch) => {
-              return {
-                ...ch,
-                code: ch.id,
-              };
-            });
-            obj["children"] = children;
-          }
-          return obj;
-        });
       })
       .catch((err) => {
+        console.log(err);
         this.errorMessage = err.response.data.message;
       })
       .then((alw) => (this.pageloading = false));
