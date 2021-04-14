@@ -1,12 +1,23 @@
 <template>
   <layout-content
     page-title="Configuraciones"
+    v-loading="pageloading"
     :breadcrumb="[
       { name: 'Clientes', to: '/customers' },
       { name: 'Configuraciones', to: null },
     ]"
   >
-    <el-form label-position="top">
+    <el-form
+      label-position="top"
+      :model="integrationSettingForm"
+      ref="integrationSettingForm"
+      @submit.native.prevent="
+        submitSettingsIntegrations(
+          'integrationSettingForm',
+          integrationSettingForm
+        )
+      "
+    >
       <el-tabs
         v-model="tab"
         @tab-click="
@@ -32,18 +43,20 @@
           <div class="grid grid-cols-12 gap-4">
             <el-form-item label="Seleccione una cuenta" class="col-span-4">
               <el-select
-                v-model="cogInfo"
+                v-model="integrationSettingForm.accountingCatalog"
                 placeholder="Seleccione una cuenta"
                 size="small"
                 clearable
                 filterable
                 class="w-full"
+                default-first-option
               >
                 <el-option
-                  v-for="c in cogSetting"
+                  v-for="c in catalogs"
                   :key="c.id"
                   :label="c.name"
                   :value="c.id"
+                  :disabled="c.isParent == true"
                 >
                 </el-option>
               </el-select>
@@ -71,16 +84,85 @@ import Notification from "../../components/Notification";
 export default {
   name: "CustomerSettings",
   components: { LayoutContent, Notification },
-  fetch() {},
+  fetch() {
+    this.$axios.get("/customers/setting/integrations").then(({ data }) => {
+      const catalog = () => this.$axios.get("/entries/catalog");
+      Promise.all([catalog()]).then((res) => {
+        const [catalog] = res;
+        this.catalogs = catalog.data.accountingCatalog;
+        this.integrationSettingForm.accountingCatalog =
+          data.integrations.catalog;
+        this.pageloading = false;
+      });
+    });
+  },
   fetchOnServer: false,
   data() {
     return {
+      pageloading: true,
       cogInfo: "",
-      cogSetting: [{ name: "Isaac" }],
+      catalogs: [],
       tab: "integrations",
+      integrationSettingForm: {
+        accountingCatalog: "",
+      },
     };
   },
-  computed: {},
+  methods: {
+    async fetchSettingCustumerIntegration() {
+      const { data } = await this.$axios.get("/entries/catalog");
+      this.pageloading = false;
+      this.integrationSettingForm.accountingCatalog =
+        data.integrations.accountingCatalog;
+    },
+    submitSettingsIntegrations(formName, { accountingCatalog }) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+
+        this.$confirm(
+          "¿Estás seguro que deseas guardar esta configuración?",
+          "Confirmación",
+          {
+            confirmButtonText: "Si, guardar",
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                this.$axios
+                  .put("/customers/setting/integrations", {
+                    accountingCatalog,
+                  })
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Exito",
+                      message: res.data.message,
+                    });
+                    this.pageloading = true;
+                    this.fetchSettingCustumerIntegration();
+                  })
+                  .catch((err) => {
+                    this.$notify.error({
+                      title: "Error",
+                      message: err.response.data.message,
+                    });
+                  })
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = "Si, guardar";
+                    done();
+                  });
+              } else {
+                done();
+              }
+            },
+          }
+        );
+      });
+    },
+  },
 };
 </script>
-s
