@@ -367,7 +367,7 @@
                 <el-option-group key="INACTIVOS" label="INACTIVOS">
                   <el-option
                     style="height: 50px"
-                    v-for="item in activeCustomers"
+                    v-for="item in inactiveCustomers"
                     :key="item.id"
                     :label="item.name"
                     :value="item.id"
@@ -547,7 +547,7 @@
           ref="multipleTable"
           @selection-change="handleSelectionChange"
         >
-          <el-table-column type="selection" width="45"/>
+          <el-table-column type="selection" width="45" />
           <el-table-column prop="index" width="50" label=" #" />
           <el-table-column
             label="# Documento"
