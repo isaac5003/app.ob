@@ -1395,7 +1395,7 @@ export default {
           this.fiscalPeriodForm.endDate = general.data.general.peridoEnd;
         }
 
-        if (signatures.data.signature) {
+        if (signatures.data.signatures) {
           this.firmantesForm = signatures.data.signatures;
         }
 
