@@ -857,8 +857,8 @@ export default {
       },
       newServiceFormRules: {
         service: selectValidation(true),
-        quantity: amountValidate("blur", true, 1),
-        unitPrice: amountValidate("blur", true, 0),
+        quantity: amountValidate("change", true, 1),
+        unitPrice: amountValidate("change", true, 0),
         chargeDescription: inputValidation(true, 5, 5000),
       },
       services: [],
