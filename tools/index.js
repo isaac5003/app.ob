@@ -100,9 +100,9 @@ function selectValidation(required = true) {
   ];
 }
 
-function amountValidate(trigger, required = false, min = null, max = null) {
+function amountValidate(trigger, required = true, min = null, max = null) {
   const validation = (rule, value, callback) => {
-    if (value == "" && required) {
+    if (!value && required) {
       callback(new Error("Este campo es requerido."));
     } else if (typeof parseFloat(value) !== "number") {
       callback(new Error("Ingresa un número valido."));
@@ -117,6 +117,7 @@ function amountValidate(trigger, required = false, min = null, max = null) {
 
   return [
     {
+      required,
       validator: validation,
       trigger,
     },

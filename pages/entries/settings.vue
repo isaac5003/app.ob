@@ -146,6 +146,7 @@
               type="number"
               :min="1"
               size="small"
+              :disabled="activeAccount.isParent && activeAccount.subAccounts"
             />
           </el-form-item>
           <el-form-item
@@ -193,7 +194,9 @@
           <el-button
             type="primary"
             size="small"
-            @click.native="submitEditedCatalog(activeAccount, 'activeAccount')"
+            @click.native="
+              submitEditedCatalog(accounts, 'activeAccount', activeAccount)
+            "
             >Guardar</el-button
           >
           <el-button @click="showEditMayorDialog = false" size="small"
@@ -463,11 +466,7 @@
             type="primary"
             size="small"
             @click.native="
-              submitEditedCatalog(
-                activeAccount,
-                'accountFormEdit',
-                activeAccount.parentCatalog
-              )
+              submitEditedCatalog(accounts, 'accountFormEdit', activeAccount)
             "
             >Guardar</el-button
           >
@@ -1387,29 +1386,41 @@ export default {
           signatures,
           general,
         ] = res;
+        if (balance.data.balanceGeneral) {
+          this.tableData = balance.data.balanceGeneral.report;
+          this.specialAccounts = { ...balance.data.balanceGeneral.special };
+        }
+        if (general.data.general) {
+          this.fiscalPeriodForm.startDate = general.data.general.periodStart;
+          this.fiscalPeriodForm.endDate = general.data.general.peridoEnd;
+        }
+
+        if (signatures.data.signature) {
+          this.firmantesForm = signatures.data.signatures;
+        }
+
+        if (results.data.estadoResultados) {
+          this.tablesData = results.data.estadoResultados.map((r) => {
+            const obj = { ...r };
+            if (r.children) {
+              const children = r.children.map((ch) => {
+                return {
+                  ...ch,
+                  code: ch.id,
+                };
+              });
+              obj["children"] = children;
+            }
+            return obj;
+          });
+        }
+
+        this.catalogs = accounts.data.accountingCatalog;
         this.accounts = accountCatalogs.data.accountingCatalog;
         this.accountsCount = accountCatalogs.data.count;
-        this.catalogs = accounts.data.accountingCatalog;
-        this.tableData = balance.data.balanceGeneral.report;
-        this.firmantesForm = signatures.data.signatures;
-        this.fiscalPeriodForm.startDate = general.data.general.periodStart;
-        this.fiscalPeriodForm.endDate = general.data.general.peridoEnd;
-        this.specialAccounts = { ...balance.data.balanceGeneral.special };
-        this.tablesData = results.data.estadoResultados.map((r) => {
-          const obj = { ...r };
-          if (r.children) {
-            const children = r.children.map((ch) => {
-              return {
-                ...ch,
-                code: ch.id,
-              };
-            });
-            obj["children"] = children;
-          }
-          return obj;
-        });
       })
       .catch((err) => {
+        console.log(err);
         this.errorMessage = err.response.data.message;
       })
       .then((alw) => (this.pageloading = false));
@@ -2064,6 +2075,7 @@ export default {
       );
     },
     submitEditedCatalog(accounts, formName, activeAccount) {
+      console.log("REFFFF", accounts, formName, activeAccount);
       this.$refs[formName].validate((valid) => {
         if (!valid) {
           return false;
@@ -2102,9 +2114,8 @@ export default {
                 instance.confirmButtonText = "Procesando...";
 
                 this.$axios
-                  .put(`/entries/catalog/${accounts.id}`, {
-                    ...accounts,
-                    code: realCode,
+                  .put(`/entries/catalog/${activeAccount.id}`, {
+                    ...activeAccount,
                   })
                   .then((res) => {
                     this.$notify.success({
