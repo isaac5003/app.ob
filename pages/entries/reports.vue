@@ -85,70 +85,71 @@
           </el-form-item>
         </div>
       </div>
-
       <!-- seleccionar fecha -->
       <div class="grid grid-cols-12 gap-4" v-if="requirementForm == 'compact'">
-        <div class="col-span-4">
-          <el-form-item prop="dateRange" label="Seleccione la fecha">
-            <el-date-picker
-              v-model="reportForm.dateRange"
-              type="month"
-              format="MMMM yyyy"
-              placeholder="Selecciona un mes"
-              size="small"
-              style="width: 100%"
-            />
-          </el-form-item>
-        </div>
+        <el-form-item
+          prop="dateRange"
+          label="Seleccione la fecha"
+          class="col-span-4"
+        >
+          <el-date-picker
+            v-model="reportForm.dateRange"
+            type="month"
+            format="MMMM yyyy"
+            placeholder="Selecciona un mes"
+            size="small"
+            style="width: 100%"
+          />
+        </el-form-item>
       </div>
       <!-- seleccion date range y cuentas -->
       <div class="grid grid-cols-12 gap-4" v-if="requirementForm == 'extended'">
-        <div class="col-span-4">
-          <el-form-item label="Rango de fechas:" prop="dateRanges">
-            <el-date-picker
-              size="small"
-              v-model="reportForm.dateRanges"
-              type="daterange"
-              unlink-panels
-              range-separator="-"
-              start-placeholder="Fecha inicio"
-              end-placeholder="Fecha final"
-              :editable="false"
-              format="dd/MM/yyyy"
-              value-format="yyyy-MM-dd"
-              style="width: 100%"
-            />
-          </el-form-item>
-        </div>
-        <div class="col-span-8">
-          <el-form-item label="Cuentas:" prop="accounts">
-            <el-select
-              v-model="reportForm.accounts"
-              placeholder="Seleccionar cuentas"
-              size="small"
-              clearable
-              filterable
-              multiple
-              default-first-option
-              class="w-full"
+        <el-form-item
+          label="Rango de fechas:"
+          prop="dateRanges"
+          class="col-span-4"
+        >
+          <el-date-picker
+            size="small"
+            v-model="reportForm.dateRanges"
+            type="daterange"
+            unlink-panels
+            range-separator="-"
+            start-placeholder="Fecha inicio"
+            end-placeholder="Fecha final"
+            :editable="false"
+            format="dd/MM/yyyy"
+            value-format="yyyy-MM-dd"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="Cuentas:" prop="accounts" class="col-span-8">
+          <el-select
+            v-model="reportForm.accounts"
+            placeholder="Seleccionar cuentas"
+            size="small"
+            clearable
+            filterable
+            multiple
+            default-first-option
+            class="w-full"
+            :filter-method="filterAccounts"
+          >
+            <el-option
+              v-for="catalog in filteredCatalog"
+              :key="catalog.id"
+              :label="catalog.code"
+              :value="catalog.id"
+              :disabled="catalog.isParent == true"
             >
-              <el-option
-                v-for="catalog in accountingCatalog"
-                :key="catalog.id"
-                :label="catalog.code"
-                :value="catalog.id"
-                :disabled="catalog.isParent == true"
-              >
-                <div class="flex flex-row justify-between">
-                  <span class="mr-5 text-sm">{{ catalog.name }}</span>
-                  <span class="text-gray-600">{{ catalog.code }}</span>
-                </div>
-              </el-option>
-            </el-select>
-          </el-form-item>
-        </div>
+              <div class="flex flex-row justify-between">
+                <span class="mr-5 text-sm">{{ catalog.name }}</span>
+                <span class="text-gray-600">{{ catalog.code }}</span>
+              </div>
+            </el-option>
+          </el-select>
+        </el-form-item>
       </div>
-
       <!-- Guardar y Cancelar -->
       <div class="flex flex-row justify-end">
         <el-button
@@ -180,6 +181,13 @@ export default {
     LayoutContent,
     Notification,
   },
+  fetch() {
+    this.$axios.get("/entries/catalog").then((response) => {
+      this.catalog = response.data.accountingCatalog;
+      this.filteredCatalog = this.catalog;
+    });
+  },
+  fetchOnServer: false,
   data() {
     return {
       generating: false,
@@ -211,11 +219,12 @@ export default {
         { name: "Libro diario mayor", id: "diarioMayor" },
         { name: "Libro de auxiliares", id: "libroAuxiliares" },
         { name: "Catalógo de cuentas", id: "catalogoCuentas" },
-        //{ name: "Detalle de cuentas", id: "detalleCuentas" },
         { name: "Detalle de movimiento cuentas", id: "movimientoCuentas" },
       ],
       requirementForm: null,
       accountingCatalog: [],
+      filteredCatalog: [],
+      catalog: [],
     };
   },
   methods: {
@@ -234,8 +243,6 @@ export default {
 
           case "movimientoCuentas":
             this.requirementForm = "extended";
-            this.getCalogs();
-            this.pageLoading = true;
             break;
           default:
             this.requirementForm = "none";
@@ -289,9 +296,6 @@ export default {
             break;
           case "catalogoCuentas":
             this.getAccountingCatalog(radio);
-            break;
-            // case "detalleCuentas":
-            // this.generateDetalleCuentas(dateRange, catalogList);
             break;
           case "movimientoCuentas":
             this.generateDetalleCuentas(dateRanges, catalogos, radio);
@@ -2207,7 +2211,6 @@ export default {
               ]);
 
               for (const j of i.movements) {
-                // values.push(emptyRow);
                 values.push([
                   {},
                   {
@@ -2453,7 +2456,6 @@ export default {
               ]);
 
               for (const j of i.movements) {
-                // values.push(emptyRow);
                 values.push([
                   {
                     text: j.entryNumber,
@@ -2931,10 +2933,18 @@ export default {
           break;
       }
     },
-    async getCalogs() {
-      const { data } = await this.$axios.get("/entries/catalog");
-      this.accountingCatalog = data.accountingCatalog;
-      this.pageLoading = false;
+    filterAccounts(query) {
+      if (query !== "") {
+        this.loadingAccount = true;
+        this.filteredCatalog = this.catalog.filter(
+          (c) =>
+            c.name.toLowerCase().includes(query.toLowerCase()) ||
+            c.code.includes(query.toLowerCase())
+        );
+      } else {
+        this.filteredCatalog = this.catalog;
+      }
+      this.loadingAccount = false;
     },
     cancel() {
       this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
