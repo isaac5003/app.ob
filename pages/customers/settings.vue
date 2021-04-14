@@ -164,7 +164,5 @@ export default {
       });
     },
   },
-  computed: {},
 };
-//TODO: this.$axios.get("/entries/catalog");
 </script>
