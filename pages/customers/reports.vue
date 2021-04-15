@@ -330,7 +330,6 @@ export default {
               const valuesTable = [];
               const valuesGeneral = [];
               const valuesTributary = [];
-              console.log(customerData.customerBranches[0].contactInfo)
               valuesGeneral.push([
                 {
                   bold: true,
