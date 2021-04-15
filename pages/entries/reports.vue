@@ -18,7 +18,7 @@
       }"
     />
 
-    <div class="grid grid-cols-12 gap-4 h-full">
+    <div class="grid grid-cols-12 gap-4">
       <div class="col-span-4">
         <el-form
           :model="reportForm"
@@ -86,6 +86,7 @@
                 format="dd/MM/yyyy"
                 value-format="yyyy-MM-dd"
                 style="width: 100%"
+               @change="generateRangeAccount(reportForm.dateRanges, reportForm.accounts)"
               />
             </el-form-item>
 
@@ -99,6 +100,7 @@
                 multiple
                 default-first-option
                 class="w-full"
+               @change="generateRangeAccount(reportForm.dateRanges,reportForm.accounts)"
               >
                 <el-option
                   v-for="catalog in accountingCatalog"
@@ -150,9 +152,9 @@
           </div>
         </el-form>
       </div>
-      <div class="col-span-8">
+      <div class="col-span-8" >
         <h1>Vista Previa</h1>
-        <iframe class="w-full h-full" id="iframe" src=""></iframe>
+        <iframe class="w-full h-130" id="iframe" src=""></iframe>
       </div>
     </div>
   </layout-content>
@@ -233,7 +235,7 @@ export default {
             break;
           default:
             this.requirementForm = "none";
-            this.generateReport("reportForm", this.reportForm, true);
+            this.generateReport("reportForm", this.reportForm,  true);
             break;
         }
       }
@@ -270,7 +272,8 @@ export default {
           case "estadoResultadosAnual":
             this.generateEstadoResultadosAnual(
               this.$dateFns.format(new Date(dateRange), "yyyy-MM-dd"),
-              radio
+              radio,
+              preview
             );
             break;
           case "balanceComprobacion":
@@ -289,7 +292,8 @@ export default {
             // this.generateDetalleCuentas(dateRange, catalogList);
             break;
           case "movimientoCuentas":
-            this.generateDetalleCuentas(dateRanges, radio);
+            this.generateDetalleCuentas(dateRanges, radio, preview);
+          
             break;
         }
       });
@@ -590,7 +594,7 @@ export default {
           break;
       }
     },
-    generateEstadoResultadosAnual(dateRange, fileType) {
+    generateEstadoResultadosAnual(dateRange, fileType, preview) {
       const bussinesInfo = () => this.$axios.get("/business/info");
       const settingsGeneral = () => this.$axios.get("/entries/setting/general");
       const signatures = () => this.$axios.get("/entries/setting/signatures");
@@ -827,7 +831,7 @@ export default {
                     },
                   };
                   this.generating = false;
-                  pdfMake.createPdf(docDefinition).open();
+                  this.generatePDF(docDefinition, preview)
                 });
             }
           );
@@ -2658,7 +2662,7 @@ export default {
           break;
       }
     },
-    generateDetalleCuentas(dateRange, fileType) {
+    generateDetalleCuentas(dateRange, fileType, preview) {
       const movements = () =>
         this.$axios.get("/entries/report/account-movements", {
           params: {
@@ -2667,6 +2671,7 @@ export default {
             selectedAccounts: JSON.stringify(this.reportForm.accounts),
           },
         });
+     
       switch (fileType) {
         case "pdf":
           Promise.all([movements()]).then((res) => {
@@ -2846,7 +2851,8 @@ export default {
               },
             };
             this.generating = false;
-            pdfMake.createPdf(docDefinition).open();
+            
+           this.generatePDF(docDefinition, preview);
           });
 
           break;
@@ -2950,7 +2956,12 @@ export default {
       } else {
         pdfMake.createPdf(docDefinition).open();
       }
-    },
+    },  
+    generateRangeAccount(dateRanges, accounts){
+    if(dateRanges.length > 0 && accounts.length > 0 ){
+      this.generateDetalleCuentas(dateRanges, 'pdf', true)
+    }
+    }
   },
 };
 </script>
