@@ -130,7 +130,6 @@ export default {
     LayoutContent,
     Notification,
   },
-
   data() {
     return {
       errorMessage: "",
@@ -324,7 +323,6 @@ export default {
           Promise.all([bussinesInfo(), customer(), branches()])
             .then((res) => {
               const [bussinesInfo, customer, branch] = res;
-
               const { name, nit, nrc } = bussinesInfo.data.info;
               const customerData = customer.data.customer;
               const branches = branch.data.branches;
@@ -332,7 +330,7 @@ export default {
               const valuesTable = [];
               const valuesGeneral = [];
               const valuesTributary = [];
-
+              console.log(customerData.customerBranches[0].contactInfo)
               valuesGeneral.push([
                 {
                   bold: true,
@@ -359,12 +357,13 @@ export default {
                   text: customerData.isActiveCustomer ? "Activo" : "Inactivo",
                 },
               ]);
-              valuesGeneral.push([
+              
+               valuesGeneral.push([
                 { bold: true, text: "Contacto: " },
                 {
-                  text: customerData.customerBranches.contacName
-                    ? customerData.customerBranches.contacName
-                    : "----------------",
+                  text:customerData.customerBranches[0].contactName
+                    ?  customerData.customerBranches[0].contactName
+                    : "--------",
                 },
                 {
                   bold: true,
@@ -372,8 +371,8 @@ export default {
                   text: "Telefono: ",
                 },
                 {
-                  text: customerData.customerBranches.contactInfo
-                    ? customerData.customerBranches.contactInfo
+                  text: customerData.customerBranches[0].contactInfo.phones
+                    ? customerData.customerBranches[0].contactInfo.phones
                     : "--------",
                 },
                 {
@@ -382,8 +381,8 @@ export default {
                   text: "Correo: ",
                 },
                 {
-                  text: customerData.customerBranches.contactInfo
-                    ? customerData.customerBranches.contactInfo
+                  text: customerData.customerBranches[0].contactInfo.emails
+                    ? customerData.customerBranches[0].contactInfo.emails
                     : "-------",
                 },
               ]);
@@ -399,6 +398,7 @@ export default {
                   style: "generalInfo",
                 },
               ]);
+
               valuesTributary.push([
                 {
                   bold: true,
@@ -631,6 +631,7 @@ export default {
               this.errorMessage =
                 "Error al generar el PDF, contacta con tu administrador";
             });
+          
           break;
         case "excel":
           Promise.all([bussinesInfo(), customer(), branches()])
