@@ -9,59 +9,68 @@ code
     ]"
   >
     <div class="flex flex-col space-y-2">
-      <el-form label-position="top"
-      :model="ivaForm"
-      ref="ivaForm"
-      >
-        <div class=" grid grid-cols-12 gap-4">
-          <el-form-item label="Tipo de registro" class="col-span-3" prop="value">
-            <el-select class="w-full" clearable filterable size="small"
-            v-model="ivaForm.value"
-       
+      <el-form label-position="top" :model="ivaForm" ref="ivaForm">
+        <div class="grid grid-cols-12 gap-4">
+          <el-form-item
+            label="Tipo de registro"
+            class="col-span-3"
+            prop="value"
+          >
+            <el-select
+              class="w-full"
+              clearable
+              filterable
+              size="small"
+              v-model="ivaForm.value"
             >
-            <el-option
-            v-for="item in filetype"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id"
-            >
-
-            </el-option>
+              <el-option
+                v-for="item in filetype"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              >
+              </el-option>
             </el-select>
           </el-form-item>
 
-         <el-form-item label="Tipo de documento" class="col-span-3" v-if="ivaForm.value != 'credifical'"  >
+          <el-form-item
+            label="Tipo de documento"
+            class="col-span-3"
+            v-if="ivaForm.value != 'credifical'"
+          >
             <el-select
-            v-model="ivaForm.value1" 
-            class="w-full" 
-            clearable
-             filterable
-              size="small">
+              v-model="ivaForm.value1"
+              class="w-full"
+              clearable
+              filterable
+              size="small"
+            >
+              <el-option label="Tipo de documento" value="" />
               <el-option
-              v-for="item in filetype1"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
+                v-for="item in filetype1"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
               >
-                
-                </el-option>
+              </el-option>
             </el-select>
           </el-form-item>
-            <el-form-item label="Tipo de documento" class="col-span-3" v-else  >
+          <el-form-item label="Tipo de documento" class="col-span-3" v-else>
             <el-select
-            v-model="ivaForm.value2" 
-            class="w-full" 
-            clearable
-             filterable
-              size="small">
+              v-model="ivaForm.value2"
+              class="w-full"
+              clearable
+              filterable
+              size="small"
+            >
+              <el-option label="Tipo de documento" value="" />
               <el-option
-              v-for="item in filetype2"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
+                v-for="item in filetype2"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
               >
-                
-                </el-option>
+              </el-option>
             </el-select>
           </el-form-item>
           <el-form-item
@@ -79,16 +88,20 @@ code
           </el-form-item>
         </div>
         <div class="class grid grid-cols-12 gap-4">
-          <el-form-item label="Cliente" class="col-span-5" v-if="ivaForm.value != 'credifical'">
-            <el-select class="w-full" clearable filterable  size="small">
-            </el-select>
-          </el-form-item>
-         <el-form-item label="Proveedor" class="col-span-5" v-else>
+          <el-form-item
+            label="Cliente"
+            class="col-span-5"
+            v-if="ivaForm.value != 'credifical'"
+          >
             <el-select class="w-full" clearable filterable size="small">
             </el-select>
-          </el-form-item>  
+          </el-form-item>
+          <el-form-item label="Proveedor" class="col-span-5" v-else>
+            <el-select class="w-full" clearable filterable size="small">
+            </el-select>
+          </el-form-item>
           <el-form-item
-            class="col-span-3 "
+            class="col-span-3"
             prop="dateRange"
             label="Fecha de emisión del documento"
           >
@@ -111,9 +124,14 @@ code
         </div>
 
         <div class="grid grid-cols-12">
-          <el-form-item label="Subtotal" class="col-span-2" v-if="ivaform.num !='consuFinal'">
+          <el-form-item
+            label="Subtotal"
+            class="col-span-2"
+            v-if="ivaForm.value2 != 'consuFinal'"
+            reset
+          >
             <el-input-number
-             v-model="ivaForm.num"
+              v-model="ivaForm.value2"
               class="w-full"
               type="number"
               :min="0.0"
@@ -124,7 +142,7 @@ code
             >
             </el-input-number>
           </el-form-item>
-                 <el-form-item label="Impuestos" class="col-span-2" v-else>
+          <el-form-item label="Impuestos" class="col-span-2" v-else>
             <el-input-number
               class="w-full"
               type="number"
@@ -164,19 +182,14 @@ code
             <el-input class="w-full" size="small" :disabled="true"> </el-input>
           </el-form-item>
         </div>
-          <div class="flex flex-row justify-end">
-          <el-button
-            type="primary"
-            size="small"
-
-            native-type="submit"
+        <div class="flex flex-row justify-end">
+          <el-button type="primary" size="small" native-type="submit"
             >Guardar
           </el-button>
           <el-button size="small" @click="$router.push('/taxes')"
             >Cancelar</el-button
           >
         </div>
-
       </el-form>
     </div>
   </layout-content>
@@ -200,38 +213,31 @@ export default {
   },
   components: { LayoutContent },
 
-  data(){
-      return{
-        ivaForm:{
-          value:"",
-          value1:"",
-          value2:"",
-          num:1
-        },
-          
-        filetype:[
-            {name:"Débito Fiscal",id:"deviFilcal" },
-            {name:"Credito fiscal", id:"credifical"}
-        
-        ],
-          filetype1:[
-            {name:"Credito fiscal",id:"crediFilcal" },
-            {name:"Consumidor final", id:"consuiFinal"},
-            {name:"Nota de debito", id:"notadevi"},
-            {name:"Factura de exportación", id:"factExport"}
-        
-        ],
-          filetype2:[
-            {name:"Credito fiscal",id:"crediFilcal1" },
-            {name:"Consumidor final", id:"consuFinal"},
-            {name:"Otros", id:"others"}
-        
-        ],
-          requirementForm: null,
-      }
+  data() {
+    return {
+      ivaForm: {
+        value: "",
+        value1: "",
+        value2: "",
       },
-    methods:{
-   
-    }
+
+      filetype: [
+        { name: "Débito Fiscal", id: "deviFilcal" },
+        { name: "Credito fiscal", id: "credifical" },
+      ],
+      filetype1: [
+        { name: "Credito fiscal", id: "crediFilcal" },
+        { name: "Consumidor final", id: "consuiFinal" },
+        { name: "Nota de debito", id: "notadevi" },
+        { name: "Factura de exportación", id: "factExport" },
+      ],
+      filetype2: [
+        { name: "Credito fiscal", id: "crediFilcal1" },
+        { name: "Consumidor final", id: "consuFinal" },
+        { name: "Otros", id: "others" },
+      ],
+    };
+  },
+  methods: {},
 };
 </script>
