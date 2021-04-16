@@ -419,6 +419,24 @@ export default {
                   text: "NIT: ",
                 },
                 { text: customerData.nit ? customerData.nit : "-------" },
+                {},
+                {}
+              ]);
+               valuesTributary.push([
+                {
+                 
+                },
+                {
+                
+                },
+                {},
+                {},
+                {},
+                {},
+                {},
+                {},
+              ]);
+              valuesTributary.push([
                 {
                   bold: true,
                   text: "GIRO: ",
@@ -426,6 +444,26 @@ export default {
                 {
                   text: customerData.giro ? customerData.giro : " -------",
                 },
+                {},
+                {},
+                {},
+                {},
+                {},
+                {},
+              ]);
+                 valuesTributary.push([
+                {
+                 
+                },
+                {
+                
+                },
+                {},
+                {},
+                {},
+                {},
+                {},
+                {},
               ]);
               valuesTributary.push([
                 {
