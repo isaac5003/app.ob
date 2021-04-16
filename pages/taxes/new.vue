@@ -80,7 +80,7 @@ code
         </div>
         <div class="class grid grid-cols-12 gap-4">
           <el-form-item label="Cliente" class="col-span-5" v-if="ivaForm.value != 'credifical'">
-            <el-select class="w-full" clearable filterable size="small">
+            <el-select class="w-full" clearable filterable  size="small">
             </el-select>
           </el-form-item>
          <el-form-item label="Proveedor" class="col-span-5" v-else>
@@ -111,7 +111,20 @@ code
         </div>
 
         <div class="grid grid-cols-12">
-          <el-form-item label="Precio" class="col-span-2">
+          <el-form-item label="Subtotal" class="col-span-2" v-if="ivaform.num !='consuFinal'">
+            <el-input-number
+             v-model="ivaForm.num"
+              class="w-full"
+              type="number"
+              :min="0.0"
+              :step="0.01"
+              size="small"
+              autocomplete="off"
+              :precision="2"
+            >
+            </el-input-number>
+          </el-form-item>
+                 <el-form-item label="Impuestos" class="col-span-2" v-else>
             <el-input-number
               class="w-full"
               type="number"
@@ -183,7 +196,7 @@ const storagekey = "new-taxes";
 export default {
   name: "TaxesNew",
   head: {
-    titleTemplate: `%s | Nuevo servicio`,
+    titleTemplate: `%s | Nuevo registro`,
   },
   components: { LayoutContent },
 
@@ -193,6 +206,7 @@ export default {
           value:"",
           value1:"",
           value2:"",
+          num:1
         },
           
         filetype:[
@@ -209,7 +223,7 @@ export default {
         ],
           filetype2:[
             {name:"Credito fiscal",id:"crediFilcal1" },
-            {name:"Consumidor final", id:"consuiFinal"},
+            {name:"Consumidor final", id:"consuFinal"},
             {name:"Otros", id:"others"}
         
         ],

@@ -19,7 +19,7 @@ export default {
     return {
       menu: [
             {
-          name: "Listado de IVA",
+          name: "Nuevo registro",
           icon: getIcon("plus"),
           path: "/taxes/new",
          
