@@ -45,7 +45,6 @@ code
               filterable
               size="small"
             >
-              <el-option label="Tipo de documento" value="" />
               <el-option
                 v-for="item in filetype1"
                 :key="item.id"
@@ -62,8 +61,7 @@ code
               clearable
               filterable
               size="small"
-            >
-              <el-option label="Tipo de documento" value="" />
+            >                                                                              
               <el-option
                 v-for="item in filetype2"
                 :key="item.id"
@@ -102,7 +100,7 @@ code
           </el-form-item>
           <el-form-item
             class="col-span-3"
-            prop="dateRange"
+       
             label="Fecha de emisión del documento"
           >
             <el-date-picker
@@ -128,7 +126,8 @@ code
             label="Subtotal"
             class="col-span-2"
             v-if="ivaForm.value2 != 'consuFinal'"
-            reset
+            
+            prop="value2"
           >
             <el-input-number
               v-model="ivaForm.value2"
@@ -218,23 +217,23 @@ export default {
       ivaForm: {
         value: "",
         value1: "",
-        value2: "",
+        value2: ""
       },
 
       filetype: [
         { name: "Débito Fiscal", id: "deviFilcal" },
-        { name: "Credito fiscal", id: "credifical" },
+        { name: "Credito fiscal", id: "credifical" }
       ],
       filetype1: [
         { name: "Credito fiscal", id: "crediFilcal" },
         { name: "Consumidor final", id: "consuiFinal" },
         { name: "Nota de debito", id: "notadevi" },
-        { name: "Factura de exportación", id: "factExport" },
+        { name: "Factura de exportación", id: "factExport" }
       ],
       filetype2: [
         { name: "Credito fiscal", id: "crediFilcal1" },
         { name: "Consumidor final", id: "consuFinal" },
-        { name: "Otros", id: "others" },
+        { name: "Otros", id: "others"}
       ],
     };
   },
