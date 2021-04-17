@@ -372,7 +372,7 @@
             <el-form-item label="Seleccione una cuenta" class="col-span-4">
               <template>
                 <el-select
-                  v-model="cogInfo"
+                  v-model="customersEditForm.accountingCatalog"
                   placeholder="Seleccione una cuenta"
                   size="small"
                   clearable
@@ -380,10 +380,11 @@
                   class="w-full"
                 >
                   <el-option
-                    v-for="c in cogSetting"
-                    :key="c.id"
-                    :label="c.name"
-                    :value="c.id"
+                    v-for="a in accountingCatalogs"
+                    :key="a.id"
+                    :label="a.name"
+                    :value="a.id"
+                    :disabled="a.isParent == true"
                   >
                   </el-option>
                 </el-select>
@@ -432,6 +433,9 @@ export default {
     const countries = () => this.$axios.get(`/others/countries`);
     const states = () => this.$axios.get(`/others/states`);
     const cities = () => this.$axios.get(`/others/cities`);
+    const getAccountingCatalogs = () => this.$axios.get("/entries/catalog");
+    const settingsIntegrations = () =>
+      this.$axios.get("/customers/setting/integrations");
 
     Promise.all([
       customerTypes(),
@@ -441,6 +445,8 @@ export default {
       countries(),
       states(),
       cities(),
+      getAccountingCatalogs(),
+      settingsIntegrations(),
     ])
       .then((res) => {
         const [
@@ -451,6 +457,8 @@ export default {
           countries,
           states,
           cities,
+          getAccountingCatalogs,
+          settingsIntegrations,
         ] = res;
 
         this.customerTypes = customerTypes.data.types;
@@ -463,6 +471,8 @@ export default {
         this.countries = countries.data.countries;
         this.rawStates = states.data.states;
         this.rawCities = cities.data.cities;
+        this.accountingCatalogs = getAccountingCatalogs.data.accountingCatalog;
+        console.log(settingsIntegrations.data.integrations.catalog);
 
         const phone = branch.contactInfo.phones
           ? branch.contactInfo.phones[0]
@@ -496,8 +506,22 @@ export default {
           country: branch.country.id,
           state: branch.state.id,
           city: branch.city.id,
+          accountingCatalog: settingsIntegrations.data.integrations.catalog,
         };
 
+        /*   this.$axios
+          .get("/customers/setting/integrations")
+          .then((res) => {
+            console.log(res.data.integrations.catalog);
+            this.accountingCatalog = res.data.integrations.catalog;
+          })
+          .catch((err) => {
+            this.$notify.error({
+              title: "Error",
+              message: err.response.data.message,
+            });
+          });
+ */
         this.loading = false;
       })
       .catch((err) => {
@@ -515,12 +539,6 @@ export default {
   },
   data() {
     return {
-      cogInfo: "",
-      cogSetting: [
-        {
-          name: "jorge",
-        },
-      ],
       pageloading: true,
       activeTab: "general-information",
       countries: [],
@@ -548,8 +566,10 @@ export default {
         country: "",
         state: "",
         city: "",
+        accountingCatalog: "",
       },
       customer: null,
+      accountingCatalogs: [],
     };
   },
   methods: {
@@ -569,6 +589,7 @@ export default {
       this.setStorage(this.customersEditForm);
     },
     submitEditCustomer(formName, formData) {
+      console.log(formData.accountingCatalog);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -585,8 +606,8 @@ export default {
               if (action === "confirm") {
                 instance.confirmButtonLoading = true;
                 instance.confirmButtonText = "Procesando...";
-                this.$axios
-                  .put(`/customers/${this.$route.query.ref}`, {
+                const customer = () =>
+                  this.$axios.put(`/customers/${this.$route.query.ref}`, {
                     name: formData.name,
                     shortName: formData.shortName,
                     isProvider: formData.isProvider,
@@ -619,11 +640,18 @@ export default {
                       state: formData.state,
                       city: formData.city,
                     },
-                  })
+                  });
+                const integration = () =>
+                  this.$axios.put("/customers/setting/integrations", {
+                    accountingCatalog: formData.accountingCatalog,
+                  });
+                Promise.all([customer(), integration()])
                   .then((res) => {
+                    const [customer, integration] = res;
+
                     this.$notify.success({
                       title: "Exito",
-                      message: res.data.message,
+                      message: `${customer.data.message} y ${integration.data.message}`,
                     });
                     setTimeout(() => {
                       this.$router.push("/customers");
