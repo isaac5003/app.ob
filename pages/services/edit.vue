@@ -166,20 +166,26 @@ export default {
     const sellingTypes = () => this.$axios.get("/services/selling-types");
     const service = () => this.$axios.get(`/services/${this.$route.query.ref}`);
     const catalogs = () => this.$axios.get("/entries/catalog");
-    Promise.all([sellingTypes(), service(), catalogs()])
+    const integrations = () =>
+      this.$axios.get("/services/setting/integrations");
+
+    Promise.all([sellingTypes(), service(), catalogs(), integrations()])
       .then((res) => {
-        const [sellingTypes, service, catalogs] = res;
+        const [sellingTypes, service, catalogs, integrations] = res;
         this.accountingCatalogs = catalogs.data.accountingCatalog;
         this.sellingTypes = sellingTypes.data.types;
         this.servicesEditForm = {
           ...service.data.service,
           sellingType: service.data.service.sellingType.id,
+          accountingCatalog: integrations.data.integrations.catalog,
         };
 
         this.$axios
           .get("/services/setting/integrations")
           .then((res) => {
             console.log(res);
+            this.servicesEditForm.accountingCatalog =
+              res.data.integrations.catalog;
           })
           .catch((err) => {
             this.$notify.error({
@@ -258,19 +264,26 @@ export default {
               if (action === "confirm") {
                 instance.confirmButtonLoading = true;
                 instance.confirmButtonText = "Procesando...";
-                this.$axios
-                  .put(`/services/${this.$route.query.ref}`, {
+                const services = () =>
+                  this.$axios.put(`/services/${this.$route.query.ref}`, {
                     name,
                     cost,
                     sellingType,
                     description,
                     incIva,
                     incRenta,
-                  })
+                  });
+                const integration = () =>
+                  this.$axios.put("/services/setting/integrations", {
+                    accountingCatalog,
+                  });
+                Promise.all([services(), integration()])
                   .then((res) => {
+                    const [services, integration] = res;
+                    console.log(services);
                     this.$notify.success({
                       title: "Exito",
-                      message: res.data.message,
+                      message: `${services.data.message} y ${integration.data.message} `,
                     });
                     this.$router.push("/services");
                   })
