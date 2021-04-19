@@ -476,7 +476,6 @@
         </div>
       </span>
     </el-dialog>
-
     <!-- BALANCE General
     ADDaccount -->
     <el-dialog
@@ -1420,7 +1419,6 @@ export default {
         this.accountsCount = accountCatalogs.data.count;
       })
       .catch((err) => {
-        console.log(err);
         this.errorMessage = err.response.data.message;
       })
       .then((alw) => (this.pageloading = false));
@@ -2023,15 +2021,14 @@ export default {
       this.fetchCatalog();
     },
     openEditAccount(account) {
-      if (account.code.length == 1) {
+      if (account.isParent) {
         this.showEditMayorDialog = true;
         this.activeAccount = { ...account };
       } else {
         this.showEditAccount = true;
-
         this.activeAccount = {
           ...account,
-          code: `0${account.code.slice(-1)}`,
+          code: account.code.slice(account.parentCatalog.code.length),
         };
       }
     },
@@ -2075,7 +2072,9 @@ export default {
       );
     },
     submitEditedCatalog(accounts, formName, activeAccount) {
-      console.log("REFFFF", accounts, formName, activeAccount);
+      console.log(accounts);
+      console.log(formName);
+      console.log(activeAccount);
       this.$refs[formName].validate((valid) => {
         if (!valid) {
           return false;
@@ -2084,14 +2083,17 @@ export default {
         // Genera el codigo real a guardar
         const realCode =
           Object.keys(activeAccount).length > 0
-            ? `${activeAccount.code}${accounts.code}`
+            ? `${activeAccount.parentCatalog.code}${activeAccount.code}`
             : `${accounts.code}`;
+
+        console.log("realCode" + realCode);
 
         // Verifica si los codigos nuevos y los guardados estan duplicados entre ellos.
         // const catalog = this.accounts.map((a) => a.code);
         const catalog = this.accounts
           .filter((a) => a.id != accounts.id)
           .map((a) => a.code);
+        console.log(catalog);
 
         if (catalog.includes(realCode)) {
           return this.$notify({
