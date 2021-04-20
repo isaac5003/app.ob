@@ -1899,6 +1899,9 @@ export default {
       this.subAccountForm.items.splice(index, 1);
     },
     submitNewCatalog(mayorAccounts, formName, activeAccount) {
+      console.log(mayorAccounts);
+      console.log(formName);
+      console.log(activeAccount);
       this.$refs[formName].validate((valid) => {
         if (!valid) return false;
 
@@ -2021,6 +2024,8 @@ export default {
       this.fetchCatalog();
     },
     openEditAccount(account) {
+      console.log(account);
+      //console.log(account.parentCatalog.code.length);
       if (account.isParent) {
         this.showEditMayorDialog = true;
         this.activeAccount = { ...account };
@@ -2081,17 +2086,14 @@ export default {
         }
 
         // Genera el codigo real a guardar
-        const realCode =
-          Object.keys(activeAccount).length > 0
-            ? `${activeAccount.parentCatalog.code}${activeAccount.code}`
-            : `${accounts.code}`;
+        const realCode = activeAccount.parentCatalog.code + activeAccount.code;
 
         console.log("realCode" + realCode);
 
         // Verifica si los codigos nuevos y los guardados estan duplicados entre ellos.
         // const catalog = this.accounts.map((a) => a.code);
         const catalog = this.accounts
-          .filter((a) => a.id != accounts.id)
+          .filter((a) => a.id !== activeAccount.id)
           .map((a) => a.code);
         console.log(catalog);
 
@@ -2529,11 +2531,6 @@ export default {
         }
       );
     },
-  },
-  computed: {
-    // filteredIntegrations() {
-    //   return this.integrations.filter((i) => hasModule(i.ref, this.$auth.user));
-    // },
   },
 };
 </script>
