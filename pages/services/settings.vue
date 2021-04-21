@@ -111,10 +111,9 @@ export default {
   },
   methods: {
     async fetchSettingServicesIntegration() {
-      const { data } = await this.$axios.get("/entries/catalog");
+      const { data } = await this.$axios.get("/services/setting/integrations");
       this.pageloading = false;
-      this.integrationSettingForm.accountingCatalog =
-        data.integrations.accountingCatalog;
+      this.integrationSettingForm.accountingCatalog = data.integrations.catalog;
     },
     submitSettingsIntegrations(formName, { accountingCatalog }) {
       this.$refs[formName].validate(async (valid) => {
@@ -153,10 +152,11 @@ export default {
                   .then((alw) => {
                     instance.confirmButtonLoading = false;
                     instance.confirmButtonText = "Si, guardar";
-                    localStorage.removeItem(storagekey);
                     done();
                   });
               } else {
+                instance.confirmButtonLoading = false;
+                instance.confirmButtonText = "Si, guardar";
                 done();
               }
             },
