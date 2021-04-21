@@ -204,8 +204,9 @@ export default {
             const customersData = customers.data.customers;
             const { name, nit, nrc } = bussinesInfo.data.info;
             const values = [];
-            const emptyRow = [{}, {}, {}, {}, {}];
+            const emptyRow = [{}, {}, {}, {}, {}, {}, {}];
             console.log(customersData);
+            console.log(bussinesInfo);
 
             for (const c of customersData) {
               values.push(emptyRow);
@@ -222,6 +223,8 @@ export default {
                 {
                   text: c.nrc,
                 },
+                { text: "" },
+                { text: "" },
                 {
                   text: c.isActiveCustomer ? "Activo" : "Inactivo",
                 },
@@ -239,7 +242,7 @@ export default {
                   layout: "noBorders",
                   table: {
                     headerRows: 1,
-                    widths: ["auto", "15%", "15%", "10%", "10%"],
+                    widths: ["auto", "15%", "15%", "10%", "10%", "10%", "10%"],
                     heights: -5,
                     body: [
                       [
@@ -257,6 +260,14 @@ export default {
                         },
                         {
                           text: "NRC",
+                          style: "tableHeader",
+                        },
+                        {
+                          text: "NOMBRE DE CONTACTO",
+                          style: "tableHeader",
+                        },
+                        {
+                          text: "Nº DE CONTACTO",
                           style: "tableHeader",
                         },
                         {
@@ -356,12 +367,12 @@ export default {
                   text: customerData.isActiveCustomer ? "Activo" : "Inactivo",
                 },
               ]);
-              
-               valuesGeneral.push([
+
+              valuesGeneral.push([
                 { bold: true, text: "Contacto: " },
                 {
-                  text:customerData.customerBranches[0].contactName
-                    ?  customerData.customerBranches[0].contactName
+                  text: customerData.customerBranches[0].contactName
+                    ? customerData.customerBranches[0].contactName
                     : "--------",
                 },
                 {
@@ -419,22 +430,9 @@ export default {
                 },
                 { text: customerData.nit ? customerData.nit : "-------" },
                 {},
-                {}
-              ]);
-               valuesTributary.push([
-                {
-                 
-                },
-                {
-                
-                },
-                {},
-                {},
-                {},
-                {},
-                {},
                 {},
               ]);
+              valuesTributary.push([{}, {}, {}, {}, {}, {}, {}, {}]);
               valuesTributary.push([
                 {
                   bold: true,
@@ -450,20 +448,7 @@ export default {
                 {},
                 {},
               ]);
-                 valuesTributary.push([
-                {
-                 
-                },
-                {
-                
-                },
-                {},
-                {},
-                {},
-                {},
-                {},
-                {},
-              ]);
+              valuesTributary.push([{}, {}, {}, {}, {}, {}, {}, {}]);
               valuesTributary.push([
                 {
                   bold: true,
@@ -668,7 +653,7 @@ export default {
               this.errorMessage =
                 "Error al generar el PDF, contacta con tu administrador";
             });
-          
+
           break;
         case "excel":
           Promise.all([bussinesInfo(), customer(), branches()])
