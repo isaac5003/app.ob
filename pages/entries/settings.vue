@@ -480,7 +480,7 @@
     <!-- BALANCE General
     ADDaccount -->
     <el-dialog
-      :title="`Agregar cuenta a: ${selectedParentAccount.name}`"
+      :title="`Agregar cuenta a11: ${selectedParentAccount.name}`"
       :visible.sync="showAddAccount"
       width="500px"
       :append-to-body="true"
@@ -979,7 +979,6 @@
             />
           </div>
         </div>
-
         <el-form>
           <div class="grid grid-cols-12 gap-4">
             <div class="col-span-3">
@@ -1064,7 +1063,6 @@
             </div>
           </div>
         </el-form>
-
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-12">
             <el-table
@@ -1111,7 +1109,7 @@
                     v-if="scope.row.showAdd"
                     class="item"
                     effect="dark"
-                    content="Agregar nueva cuenta"
+                    content="Agregar nueva cuenta11"
                     placement="top"
                   >
                     <el-button
@@ -1141,7 +1139,6 @@
             </el-table>
           </div>
         </div>
-
         <div class="flex justify-end mt-4">
           <el-button
             type="primary"
@@ -2181,9 +2178,12 @@ export default {
       }
     },
     addSubAccount(selected, list) {
+      console.log(selected);
+      console.log(list);
       let addTo = this.tableData.find((td) => {
         return td.children.find((c) => c.id == selected.id);
       });
+      console.log(this.tableData);
       addTo = addTo.children.find((c) => c.id == selected.id);
       for (const code of list) {
         const account = this.catalogs.find((c) => c.id == code);
