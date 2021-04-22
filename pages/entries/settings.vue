@@ -2190,6 +2190,7 @@ export default {
 
         if (addTo.children.filter((c) => c.id == account.code).length > 0) {
           return alert("No posible");
+          //Agregar alerta
         }
         addTo.children.push({
           id: account.code,
