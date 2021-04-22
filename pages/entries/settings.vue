@@ -714,16 +714,6 @@
     >
       <!--  tab generales -->
       <el-tab-pane label="Generales" name="general">
-        <!-- <div class="grid grid-cols-12">
-          <div class="col-span-12">
-            <Notification
-              class="mb-4 w-full"
-              type="info"
-              title="Información"
-              
-            />
-          </div>
-        </div> -->
         <el-form
           :model="fiscalPeriodForm"
           :rules="fiscalPeriodFormRules"
@@ -778,16 +768,6 @@
       </el-tab-pane>
       <!-- Firmantes -->
       <el-tab-pane label="Firmantes" name="signatures">
-        <!-- <div class="grid grid-cols-12">
-          <div class="col-span-12">
-            <Notification
-              class="mb-4 w-full"
-              type="info"
-              title="Información"
-              
-            />
-          </div>
-        </div> -->
         <el-form
           :model="firmantesForm"
           :rules="firmantesFormRules"
@@ -1291,13 +1271,8 @@
 import { endOfMonth, format, startOfMonth, differenceInMonths } from "date-fns";
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import { getIcon, hasModule } from "../../tools";
-import {
-  inputValidation,
-  selectValidation,
-  checkBeforeLeave,
-  checkBeforeEnter,
-} from "../../tools";
+import { getIcon } from "../../tools";
+import { inputValidation, selectValidation } from "../../tools";
 
 export default {
   name: "EntriesSettings",
