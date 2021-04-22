@@ -480,7 +480,7 @@
     <!-- BALANCE General
     ADDaccount -->
     <el-dialog
-      :title="`Agregar cuenta a11: ${selectedParentAccount.name}`"
+      :title="`Agregar cuenta a: ${selectedParentAccount.name}`"
       :visible.sync="showAddAccount"
       width="500px"
       :append-to-body="true"
