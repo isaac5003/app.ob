@@ -218,7 +218,7 @@ export default {
         {
           always: false,
           id: "a98b98e6-b2d5-42a3-853d-9516f64eade8",
-          path: "/chargeAccounts",
+          path: "/receivable",
           name: "Cuentas por cobrar",
           icon: getIcon("clipboard-list"),
           exact: false,
