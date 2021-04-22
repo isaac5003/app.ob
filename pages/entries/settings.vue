@@ -2189,8 +2189,11 @@ export default {
         const account = this.catalogs.find((c) => c.id == code);
 
         if (addTo.children.filter((c) => c.id == account.code).length > 0) {
-          return alert("No posible");
-          //Agregar alerta
+          this.$notify.error({
+            title: "Error",
+            message: "No se puede agregar una cuenta que ya existe.",
+          });
+          return false;
         }
         addTo.children.push({
           id: account.code,
