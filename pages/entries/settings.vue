@@ -2187,6 +2187,10 @@ export default {
       addTo = addTo.children.find((c) => c.id == selected.id);
       for (const code of list) {
         const account = this.catalogs.find((c) => c.id == code);
+
+        if (addTo.children.filter((c) => c.id == account.code).length > 0) {
+          return alert("No posible");
+        }
         addTo.children.push({
           id: account.code,
           name: account.name,
