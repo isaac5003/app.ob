@@ -1417,7 +1417,6 @@ export default {
         this.accountsCount = accountCatalogs.data.count;
       })
       .catch((err) => {
-        console.log(err);
         this.errorMessage = err.response.data.message;
       })
       .then((alw) => (this.pageloading = false));
@@ -2072,7 +2071,6 @@ export default {
       );
     },
     submitEditedCatalog(accounts, formName, activeAccount) {
-      console.log("REFFFF", accounts, formName, activeAccount);
       this.$refs[formName].validate((valid) => {
         if (!valid) {
           return false;
@@ -2178,12 +2176,9 @@ export default {
       }
     },
     addSubAccount(selected, list) {
-      console.log(selected);
-      console.log(list);
       let addTo = this.tableData.find((td) => {
         return td.children.find((c) => c.id == selected.id);
       });
-      console.log(this.tableData);
       addTo = addTo.children.find((c) => c.id == selected.id);
       for (const code of list) {
         const account = this.catalogs.find((c) => c.id == code);
