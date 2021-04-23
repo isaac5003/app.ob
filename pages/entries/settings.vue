@@ -476,7 +476,6 @@
         </div>
       </span>
     </el-dialog>
-
     <!-- BALANCE General
     ADDaccount -->
     <el-dialog
@@ -1420,7 +1419,6 @@ export default {
         this.accountsCount = accountCatalogs.data.count;
       })
       .catch((err) => {
-        console.log(err);
         this.errorMessage = err.response.data.message;
       })
       .then((alw) => (this.pageloading = false));
@@ -2023,15 +2021,14 @@ export default {
       this.fetchCatalog();
     },
     openEditAccount(account) {
-      if (account.code.length == 1) {
+      if (account.isParent) {
         this.showEditMayorDialog = true;
         this.activeAccount = { ...account };
       } else {
         this.showEditAccount = true;
-
         this.activeAccount = {
           ...account,
-          code: `0${account.code.slice(-1)}`,
+          code: account.code.slice(account.parentCatalog.code.length),
         };
       }
     },
@@ -2075,22 +2072,18 @@ export default {
       );
     },
     submitEditedCatalog(accounts, formName, activeAccount) {
-      console.log("REFFFF", accounts, formName, activeAccount);
       this.$refs[formName].validate((valid) => {
         if (!valid) {
           return false;
         }
 
         // Genera el codigo real a guardar
-        const realCode =
-          Object.keys(activeAccount).length > 0
-            ? `${activeAccount.code}${accounts.code}`
-            : `${accounts.code}`;
+        const realCode = `${activeAccount.parentCatalog.code}${activeAccount.code}`;
 
         // Verifica si los codigos nuevos y los guardados estan duplicados entre ellos.
         // const catalog = this.accounts.map((a) => a.code);
         const catalog = this.accounts
-          .filter((a) => a.id != accounts.id)
+          .filter((a) => a.id !== activeAccount.id)
           .map((a) => a.code);
 
         if (catalog.includes(realCode)) {
@@ -2116,6 +2109,7 @@ export default {
                 this.$axios
                   .put(`/entries/catalog/${activeAccount.id}`, {
                     ...activeAccount,
+                    code: realCode,
                   })
                   .then((res) => {
                     this.$notify.success({
@@ -2527,11 +2521,6 @@ export default {
         }
       );
     },
-  },
-  computed: {
-    // filteredIntegrations() {
-    //   return this.integrations.filter((i) => hasModule(i.ref, this.$auth.user));
-    // },
   },
 };
 </script>
