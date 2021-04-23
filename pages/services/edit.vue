@@ -136,12 +136,15 @@
                 v-model="servicesEditForm.accountingCatalog"
                 placeholder="Seleccione una cuenta"
                 size="small"
+                remote
                 clearable
                 filterable
                 class="w-full"
+                :loading="loadingAccount"
+                :remote-method="findAccount"
               >
                 <el-option
-                  v-for="c in catalogList"
+                  v-for="c in filteredCatalog"
                   :key="c.id"
                   :label="c.name"
                   :value="c.id"
@@ -200,8 +203,8 @@ export default {
     ])
       .then((res) => {
         const [sellingTypes, service, catalog, integrationCatalog] = res;
+        this.filteredCatalog = catalog.data.accountingCatalog;
         this.sellingTypes = sellingTypes.data.types;
-        this.catalogList = catalog.data.accountingCatalog;
 
         this.servicesEditForm = {
           ...service.data.service,
@@ -217,9 +220,10 @@ export default {
   fetchOnServer: false,
   data() {
     return {
-      catalogList: [],
+      filteredCatalog: [],
       tab: "general-information",
       acountGeneral: "",
+      loadingAccount: false,
       pageloading: true,
       sellingTypes: [],
       servicesEditForm: {
@@ -241,6 +245,20 @@ export default {
     };
   },
   methods: {
+    findAccount(query) {
+      if (query !== "") {
+        this.loadingAccount = true;
+        this.$axios
+          .get("/entries/catalog", { params: { search: query.toLowerCase() } })
+          .then((res) => {
+            this.filteredCatalog = res.data.accountingCatalog;
+            this.loadingAccount = false;
+          })
+          .catch((err) => (this.errorMessage = err.response.data.message));
+      } else {
+        this.filteredCatalog = [];
+      }
+    },
     submitEditService(
       formName,
       {
