@@ -435,7 +435,7 @@ export default {
     const cities = () => this.$axios.get(`/others/cities`);
     const getAccountingCatalogs = () => this.$axios.get("/entries/catalog");
     const settingsIntegrations = () =>
-      this.$axios.get("/customers/setting/integrations");
+      this.$axios.get(`/customers/${this.$route.query.ref}/integrations`);
 
     Promise.all([
       customerTypes(),
@@ -472,7 +472,6 @@ export default {
         this.rawStates = states.data.states;
         this.rawCities = cities.data.cities;
         this.accountingCatalogs = getAccountingCatalogs.data.accountingCatalog;
-        console.log(settingsIntegrations.data.integrations.catalog);
 
         const phone = branch.contactInfo.phones
           ? branch.contactInfo.phones[0]
@@ -508,7 +507,6 @@ export default {
           city: branch.city.id,
           accountingCatalog: settingsIntegrations.data.integrations.catalog,
         };
-
         /*   this.$axios
           .get("/customers/setting/integrations")
           .then((res) => {
@@ -525,7 +523,6 @@ export default {
         this.loading = false;
       })
       .catch((err) => {
-        console.log(err);
         this.$message.error(err.response.data.message);
         this.$router.push("/customers");
       })
@@ -589,7 +586,6 @@ export default {
       this.setStorage(this.customersEditForm);
     },
     submitEditCustomer(formName, formData) {
-      console.log(formData.accountingCatalog);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -642,9 +638,12 @@ export default {
                     },
                   });
                 const integration = () =>
-                  this.$axios.put("/customers/setting/integrations", {
-                    accountingCatalog: formData.accountingCatalog,
-                  });
+                  this.$axios.put(
+                    `/customers/${this.$route.query.ref}/integrations`,
+                    {
+                      accountingCatalog: formData.accountingCatalog,
+                    }
+                  );
                 Promise.all([customer(), integration()])
                   .then((res) => {
                     const [customer, integration] = res;
