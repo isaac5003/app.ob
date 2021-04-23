@@ -1,5 +1,92 @@
 <template>
   <div class="flex w-screen h-screen font-body">
+    <!-- Dialogo para Nueva pass -->
+    <el-dialog
+      title="Confirmar nueva contraseña"
+      :visible.sync="showConfirmPassword"
+      :append-to-body="false"
+      :close-on-click-modal="false"
+      width="500px"
+    >
+      <notification
+        class="-mt-4"
+        type="info"
+        title="Atención"
+        message="Ingresa y confirma tu nueva contraseña"
+      />
+      <div class="flex flex-col">
+        <el-form>
+          <div class="grid grid-cols-12 mt-2">
+            <el-form-item class="col-span-12" label="Nueva contraseña:">
+              <el-input
+                v-model="recoverPasswor1"
+                show-password
+                size="small"
+                class="w-full"
+                type="password"
+                placeholder="********"
+              ></el-input>
+            </el-form-item>
+            <el-form-item class="col-span-12" label="Confirmar contraseña:">
+              <el-input
+                v-model="recoverPasswor2"
+                show-password
+                size="small"
+                class="w-full"
+                type="password"
+                placeholder="********"
+              ></el-input>
+            </el-form-item>
+          </div>
+
+          <div class="flex flex-row justify-end">
+            <el-button size="small" type="primary">Guardar</el-button>
+            <el-button size="small" @click="showConfirmPassword = false"
+              >Cancelar</el-button
+            >
+          </div>
+        </el-form>
+      </div>
+    </el-dialog>
+    <!-- Dialogo para recuperar contrase;a -->
+    <el-dialog
+      title="Recuperar contraseña"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      width="500px"
+      :visible.sync="showRecoveryPassword"
+    >
+      <notification
+        class="w-full -mt-4"
+        type="info"
+        title="Atención"
+        message="Ingresa el correo electrónico que tienes registrado con
+                 Openbox Cloud y te enviaremos un vinculo para que puedas
+                ingresar tu nueva contraseña”"
+      />
+      <div class="flex flex-col">
+        <el-form>
+          <div class="grid grid-cols-12 gap-4 mt-2">
+            <el-form-item class="col-span-12" label="Introduzca el correo:">
+              <el-input
+                v-model="recoverEmail"
+                size="small"
+                class="w-full"
+                type="email"
+                placeholder="correo@openbox.cloud"
+              ></el-input>
+            </el-form-item>
+          </div>
+
+          <div class="flex flex-row justify-end">
+            <el-button size="small" type="primary">Recuperar</el-button>
+            <el-button size="small" @click="showRecoveryPassword = false"
+              >Cancelar</el-button
+            >
+          </div>
+        </el-form>
+      </div>
+    </el-dialog>
     <div class="w-1/2 flex items-center justify-center">
       <el-form
         class="w-90 flex flex-col space-y-12"
@@ -35,25 +122,23 @@
             placeholder="Contraseña"
             type="password"
             v-model="password"
-          />          
-          <div class="flex items-center  justify-between mt-10 ">
-                 <template>
-  <!-- `checked` debe ser true o false -->
-  <el-checkbox 
-  v-model="trust">
-     <span 
-     class="text-xs">
-     Recuerdame
-     </span>
-     </el-checkbox>
-    </template>
-    <div 
-    class=" flex items-center ">
-    <a href="javascript:" 
-    class="text-xs text-blue-900 hover:underline"
-    >Olvidé mi contraseña</a>
-
-          </div>
+            show-password
+          />
+          <div class="flex items-center justify-between mt-10">
+            <template>
+              <!-- `checked` debe ser true o false -->
+              <el-checkbox v-model="trust">
+                <span class="text-xs"> Recuerdame </span>
+              </el-checkbox>
+            </template>
+            <div class="flex items-center">
+              <a
+                href="javascript:"
+                class="text-xs text-blue-900 hover:underline"
+                @click="showRecoveryPassword = true"
+                >Olvidé mi contraseña</a
+              >
+            </div>
           </div>
         </div>
         <div class="flex justify-center">
@@ -85,19 +170,27 @@
     </div>
   </div>
 </template>
-
 <script>
+import Notification from "../../components/Notification";
 export default {
+  components: { Notification },
   layout: "login",
   name: "Login",
+  fetch() {
+    this.showConfirmPassword = this.$route.query.resetToken ? true : false;
+  },
   data() {
     return {
       loading: false,
       errorMessage: "",
       email: "",
+      recoverEmail: "",
       password: "",
+      recoverPasswor1: "",
+      recoverPasswor2: "",
       trust: false,
-      
+      showRecoveryPassword: false,
+      showConfirmPassword: false,
     };
   },
   methods: {
