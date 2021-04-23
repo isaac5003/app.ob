@@ -370,25 +370,26 @@
 
           <div class="grid grid-cols-12 gap-4">
             <el-form-item label="Seleccione una cuenta" class="col-span-4">
-              <template>
-                <el-select
-                  v-model="customersEditForm.accountingCatalog"
-                  placeholder="Seleccione una cuenta"
-                  size="small"
-                  clearable
-                  filterable
-                  class="w-full"
+              <el-select
+                filterable
+                remote
+                v-model="customersEditForm.accountingCatalog"
+                placeholder="Seleccione una cuenta"
+                size="small"
+                clearable
+                class="w-full"
+                :remote-method="findAccount"
+                :loading="loadingAccount"
+              >
+                <el-option
+                  v-for="a in filteredCatalog"
+                  :key="a.id"
+                  :label="a.name"
+                  :value="a.id"
+                  :disabled="a.isParent == true"
                 >
-                  <el-option
-                    v-for="a in accountingCatalogs"
-                    :key="a.id"
-                    :label="a.name"
-                    :value="a.id"
-                    :disabled="a.isParent == true"
-                  >
-                  </el-option>
-                </el-select>
-              </template>
+                </el-option>
+              </el-select>
             </el-form-item>
           </div>
         </el-tab-pane>
@@ -433,10 +434,9 @@ export default {
     const countries = () => this.$axios.get(`/others/countries`);
     const states = () => this.$axios.get(`/others/states`);
     const cities = () => this.$axios.get(`/others/cities`);
-    const getAccountingCatalogs = () => this.$axios.get("/entries/catalog");
     const settingsIntegrations = () =>
       this.$axios.get(`/customers/${this.$route.query.ref}/integrations`);
-
+    const catalog = () => this.$axios.get("/entries/catalog");
     Promise.all([
       customerTypes(),
       customerTypeNaturals(),
@@ -445,8 +445,8 @@ export default {
       countries(),
       states(),
       cities(),
-      getAccountingCatalogs(),
       settingsIntegrations(),
+      catalog(),
     ])
       .then((res) => {
         const [
@@ -457,8 +457,8 @@ export default {
           countries,
           states,
           cities,
-          getAccountingCatalogs,
           settingsIntegrations,
+          catalog,
         ] = res;
 
         this.customerTypes = customerTypes.data.types;
@@ -471,7 +471,7 @@ export default {
         this.countries = countries.data.countries;
         this.rawStates = states.data.states;
         this.rawCities = cities.data.cities;
-        this.accountingCatalogs = getAccountingCatalogs.data.accountingCatalog;
+        this.filteredCatalog = catalog.data.accountingCatalog;
 
         const phone = branch.contactInfo.phones
           ? branch.contactInfo.phones[0]
@@ -566,7 +566,8 @@ export default {
         accountingCatalog: "",
       },
       customer: null,
-      accountingCatalogs: [],
+      filteredCatalog: [],
+      loadingAccount: false,
     };
   },
   methods: {
@@ -675,6 +676,20 @@ export default {
           }
         );
       });
+    },
+    findAccount(query) {
+      if (query !== "") {
+        this.loadingAccount = true;
+        this.$axios
+          .get("/entries/catalog", { params: { search: query.toLowerCase() } })
+          .then((res) => {
+            this.filteredCatalog = res.data.accountingCatalog;
+            this.loadingAccount = false;
+          })
+          .catch((err) => (this.errorMessage = err.response.data.message));
+      } else {
+        this.filteredCatalog = [];
+      }
     },
   },
   computed: {
