@@ -61,7 +61,7 @@ code
               clearable
               filterable
               size="small"
-            >                                                                              
+            >
               <el-option
                 v-for="item in filetype2"
                 :key="item.id"
@@ -100,7 +100,6 @@ code
           </el-form-item>
           <el-form-item
             class="col-span-3"
-       
             label="Fecha de emisión del documento"
           >
             <el-date-picker
@@ -112,12 +111,10 @@ code
             />
           </el-form-item>
           <el-form-item label="N° de autorización" class="col-span-2">
-            <el-input size="small" placeholder="" :disabled="true" readonly>
-            </el-input>
+            <el-input size="small" placeholder="000000" readonly> </el-input>
           </el-form-item>
           <el-form-item label="N° de correlativo" class="col-span-2">
-            <el-input size="small" placeholder="" :disabled="true" readonly>
-            </el-input>
+            <el-input size="small" placeholder="000000" readonly> </el-input>
           </el-form-item>
         </div>
 
@@ -126,7 +123,6 @@ code
             label="Subtotal"
             class="col-span-2"
             v-if="ivaForm.value2 != 'consuFinal'"
-            
             prop="value2"
           >
             <el-input-number
@@ -162,6 +158,7 @@ code
               size="small"
               autocomplete="off"
               :precision="2"
+              :disabled="true"
             >
             </el-input-number>
           </el-form-item>
@@ -217,23 +214,23 @@ export default {
       ivaForm: {
         value: "",
         value1: "",
-        value2: ""
+        value2: "",
       },
 
       filetype: [
         { name: "Débito Fiscal", id: "deviFilcal" },
-        { name: "Credito fiscal", id: "credifical" }
+        { name: "Credito fiscal", id: "credifical" },
       ],
       filetype1: [
         { name: "Credito fiscal", id: "crediFilcal" },
         { name: "Consumidor final", id: "consuiFinal" },
         { name: "Nota de debito", id: "notadevi" },
-        { name: "Factura de exportación", id: "factExport" }
+        { name: "Factura de exportación", id: "factExport" },
       ],
       filetype2: [
         { name: "Credito fiscal", id: "crediFilcal1" },
         { name: "Consumidor final", id: "consuFinal" },
-        { name: "Otros", id: "others"}
+        { name: "Otros", id: "others" },
       ],
     };
   },
