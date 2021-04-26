@@ -1291,7 +1291,69 @@
         </div>
       </el-tab-pane>
 
-      <!--  tab de firmante -->
+      <!--  tab de Integraciones  -->
+      <el-tab-pane label="Integraciones" name="integraciones">
+        <div class="grid grid-cols-12">
+          <div class="col-span-12">
+            <Notification
+              class="mb-4 w-full"
+              type="info"
+              title="Información" 
+            />
+          </div>
+        </div>
+
+        <div class="flex flex-col space-y-2">
+          <el-form>
+            <div class="grid grid-cols-12 gap-4">
+              <el-form-item label="Cuenta contable para pagos de contado" class="col-span-4">
+                <el-select
+                  class="w-full"
+                  size="small"
+                  clearable
+                  filterable
+                ></el-select>
+              </el-form-item>
+              <el-form-item
+                prop=""
+                label="Tipo de integración contable"
+                class="col-span-5"
+              >
+                <el-radio-group class="w-full">
+                  <el-row :gutter="15">
+                    <el-col :span="8">
+                      <el-radio
+                        border
+                        label="Automatico"
+                        size="small"
+                        class="w-full"
+                        >Automático</el-radio
+                      >
+                    </el-col>
+                    <el-col :span="8">
+                      <el-radio
+                        border
+                        label="Manual"
+                        size="small"
+                        class="w-full"
+                        >Manual</el-radio
+                      >
+                    </el-col>
+                  </el-row>
+                </el-radio-group>
+              </el-form-item>
+            </div>
+                <div class="flex justify-end ">
+          <el-button
+            type="primary"
+            size="small"
+            >Guardar</el-button
+          >
+          <el-button size="small" @click="$router.push('/entries')">Cancelar</el-button>
+        </div>
+          </el-form>
+        </div>
+      </el-tab-pane>
       <!-- tab integraciones -->
       <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
         <Notification
