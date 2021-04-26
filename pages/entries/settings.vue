@@ -1306,7 +1306,7 @@
         <div class="flex flex-col space-y-2">
           <el-form>
             <div class="grid grid-cols-12 gap-4">
-              <el-form-item label="Seleccione una cuenta contable para pagos de contado" class="col-span-4">
+              <el-form-item label="Cuenta contable para pagos de contado" class="col-span-4">
                 <el-select
                   class="w-full"
                   size="small"
