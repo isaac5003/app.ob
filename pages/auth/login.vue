@@ -177,7 +177,7 @@ export default {
   layout: "login",
   name: "Login",
   fetch() {
-    this.showConfirmPassword = this.$route.query.resetToken ? true : false;
+    this.showConfirmPassword = this.$route.query["reset-token"] ? true : false;
   },
   data() {
     return {
