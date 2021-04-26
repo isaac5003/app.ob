@@ -17,9 +17,11 @@
         function: () => $router.go(),
       }"
     />
-
     <div class="grid grid-cols-12 gap-4">
-      <div class="col-span-4">
+      <div class="col-start-5 col-span-2">Vista previa</div>
+    </div>
+    <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-4 h-full">
         <el-form
           :model="reportForm"
           :rules="reportFormRules"
@@ -86,7 +88,12 @@
                 format="dd/MM/yyyy"
                 value-format="yyyy-MM-dd"
                 style="width: 100%"
-               @change="generateRangeAccount(reportForm.dateRanges, reportForm.accounts)"
+                @change="
+                  generateRangeAccount(
+                    reportForm.dateRanges,
+                    reportForm.accounts
+                  )
+                "
               />
             </el-form-item>
 
@@ -100,7 +107,12 @@
                 multiple
                 default-first-option
                 class="w-full"
-               @change="generateRangeAccount(reportForm.dateRanges,reportForm.accounts)"
+                @change="
+                  generateRangeAccount(
+                    reportForm.dateRanges,
+                    reportForm.accounts
+                  )
+                "
               >
                 <el-option
                   v-for="catalog in accountingCatalog"
@@ -152,9 +164,9 @@
           </div>
         </el-form>
       </div>
-      <div class="col-span-8" >
-        <h1>Vista Previa</h1>
-        <iframe class="w-full h-130" id="iframe" src=""></iframe>
+
+      <div class="col-span-8 min-h-4/5">
+        <iframe class="w-full h-full" id="iframe" src=""></iframe>
       </div>
     </div>
   </layout-content>
@@ -235,7 +247,7 @@ export default {
             break;
           default:
             this.requirementForm = "none";
-            this.generateReport("reportForm", this.reportForm,  true);
+            this.generateReport("reportForm", this.reportForm, true);
             break;
         }
       }
@@ -293,7 +305,7 @@ export default {
             break;
           case "movimientoCuentas":
             this.generateDetalleCuentas(dateRanges, radio, preview);
-          
+
             break;
         }
       });
@@ -831,7 +843,7 @@ export default {
                     },
                   };
                   this.generating = false;
-                  this.generatePDF(docDefinition, preview)
+                  this.generatePDF(docDefinition, preview);
                 });
             }
           );
@@ -2671,7 +2683,7 @@ export default {
             selectedAccounts: JSON.stringify(this.reportForm.accounts),
           },
         });
-     
+
       switch (fileType) {
         case "pdf":
           Promise.all([movements()]).then((res) => {
@@ -2851,8 +2863,8 @@ export default {
               },
             };
             this.generating = false;
-            
-           this.generatePDF(docDefinition, preview);
+
+            this.generatePDF(docDefinition, preview);
           });
 
           break;
@@ -2956,12 +2968,13 @@ export default {
       } else {
         pdfMake.createPdf(docDefinition).open();
       }
-    },  
-    generateRangeAccount(dateRanges, accounts){
-    if(dateRanges.length > 0 && accounts.length > 0 ){
-      this.generateDetalleCuentas(dateRanges, 'pdf', true)
-    }
-    }
+    },
+    generateRangeAccount(dateRanges, accounts) {
+      if (dateRanges.length > 0 && accounts.length > 0) {
+        this.generateDetalleCuentas(dateRanges, "pdf", true);
+      }
+    },
   },
 };
 </script>
+
