@@ -109,7 +109,7 @@
           <div class="grid grid-cols-12 gap-4">
             <el-form-item label="Seleccione una cuenta" class="col-span-4">
               <el-select
-                v-model="cogInfo"
+                v-model="servicesEditForm.accountingCatalog"
                 placeholder="Seleccione una cuenta"
                 size="small"
                 clearable
@@ -117,10 +117,11 @@
                 class="w-full"
               >
                 <el-option
-                  v-for="c in cogSetting"
-                  :key="c.id"
-                  :label="c.name"
-                  :value="c.id"
+                  v-for="a in accountingCatalogs"
+                  :key="a.id"
+                  :label="a.name"
+                  :value="a.id"
+                  :disabled="a.isParent == true"
                 >
                 </el-option>
               </el-select>
@@ -140,8 +141,6 @@
     </el-form>
   </layout-content>
 </template>
-
-
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
@@ -166,21 +165,39 @@ export default {
     }
     const sellingTypes = () => this.$axios.get("/services/selling-types");
     const service = () => this.$axios.get(`/services/${this.$route.query.ref}`);
+    const catalogs = () => this.$axios.get("/entries/catalog");
+    const integrations = () =>
+      this.$axios.get("/services/setting/integrations");
 
-    Promise.all([sellingTypes(), service()])
+    Promise.all([sellingTypes(), service(), catalogs(), integrations()])
       .then((res) => {
-        const [sellingTypes, service] = res;
+        const [sellingTypes, service, catalogs, integrations] = res;
+        this.accountingCatalogs = catalogs.data.accountingCatalog;
         this.sellingTypes = sellingTypes.data.types;
         this.servicesEditForm = {
           ...service.data.service,
           sellingType: service.data.service.sellingType.id,
+          accountingCatalog: integrations.data.integrations.catalog,
         };
+
+        this.$axios
+          .get("/services/setting/integrations")
+          .then((res) => {
+            console.log(res);
+            this.servicesEditForm.accountingCatalog =
+              res.data.integrations.catalog;
+          })
+          .catch((err) => {
+            this.$notify.error({
+              title: "Error",
+              message: err.response.data.message,
+            });
+          });
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
       })
       .then((alw) => (this.pageloading = false));
-
     checkBeforeEnter(this, storagekey, "servicesNewForm");
   },
   fetchOnServer: false,
@@ -189,8 +206,6 @@ export default {
   },
   data() {
     return {
-      cogInfo: "",
-      cogSetting: [{ name: "Isaac" }],
       tab: "general-information",
       acountGeneral: "",
       acountInfo: [
@@ -208,6 +223,7 @@ export default {
         description: "",
         incIva: false,
         incRenta: false,
+        accountingCatalog: "",
       },
       servicesEditFormRules: {
         name: inputValidation(true, 5, 60),
@@ -215,13 +231,23 @@ export default {
         sellingType: selectValidation(true),
         description: inputValidation(false, 5),
       },
+      accountingCatalogs: [],
     };
   },
   methods: {
     submitEditService(
       formName,
-      { name, cost, sellingType, description, incIva, incRenta }
+      {
+        name,
+        cost,
+        sellingType,
+        description,
+        incIva,
+        incRenta,
+        accountingCatalog,
+      }
     ) {
+      console.log(accountingCatalog);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -238,19 +264,26 @@ export default {
               if (action === "confirm") {
                 instance.confirmButtonLoading = true;
                 instance.confirmButtonText = "Procesando...";
-                this.$axios
-                  .put(`/services/${this.$route.query.ref}`, {
+                const services = () =>
+                  this.$axios.put(`/services/${this.$route.query.ref}`, {
                     name,
                     cost,
                     sellingType,
                     description,
                     incIva,
                     incRenta,
-                  })
+                  });
+                const integration = () =>
+                  this.$axios.put("/services/setting/integrations", {
+                    accountingCatalog,
+                  });
+                Promise.all([services(), integration()])
                   .then((res) => {
+                    const [services, integration] = res;
+                    console.log(services);
                     this.$notify.success({
                       title: "Exito",
-                      message: res.data.message,
+                      message: `${services.data.message} y ${integration.data.message} `,
                     });
                     this.$router.push("/services");
                   })
