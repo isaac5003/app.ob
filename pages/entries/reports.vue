@@ -10,7 +10,7 @@
     <Notification
       v-if="errorMessage"
       type="danger"
-      title="Error de comunicación"
+      title="Error de comunicaciÃ³n"
       :message="errorMessage"
       :action="{
         title: 'Intentar nuevamente',
@@ -210,12 +210,12 @@ export default {
         { name: "Balance general mensual", id: "balanceGeneral" },
         { name: "Estado de resultados anual", id: "estadoResultadosAnual" },
         { name: "Estado de resultados mensual", id: "estadoResultados" },
-        { name: "Balance de comprobación", id: "balanceComprobacion" },
+        { name: "Balance de comprobaciÃ³n", id: "balanceComprobacion" },
       ],
       auxiliarReports: [
         { name: "Libro diario mayor", id: "diarioMayor" },
         { name: "Libro de auxiliares", id: "libroAuxiliares" },
-        { name: "Catalógo de cuentas", id: "catalogoCuentas" },
+        { name: "CatalÃ³go de cuentas", id: "catalogoCuentas" },
         //{ name: "Detalle de cuentas", id: "detalleCuentas" },
         { name: "Detalle de movimiento cuentas", id: "movimientoCuentas" },
       ],
@@ -336,7 +336,7 @@ export default {
               );
               const signature = signatures.data.signatures;
               const postTitle =
-                "(Expresado en dólares de los Estados Unidos de América)";
+                "(Expresado en dÃ³lares de los Estados Unidos de AmÃ©rica)";
               const values = [];
               const emptyRow = [
                 {
@@ -556,7 +556,7 @@ export default {
               );
               const signature = signatures.data.signatures;
               const postTitle =
-                "(Expresado en dólares de los Estados Unidos de América)";
+                "(Expresado en dÃ³lares de los Estados Unidos de AmÃ©rica)";
               const data = [];
               for (const er of estadoResultado) {
                 data.push([""]);
@@ -619,7 +619,7 @@ export default {
               const generales = settingsGeneral.data.general;
               const signature = signatures.data.signatures;
               const postTitle =
-                "(Expresado en dólares de los Estados Unidos de América)";
+                "(Expresado en dÃ³lares de los Estados Unidos de AmÃ©rica)";
               this.$axios
                 .get("/entries/report/estado-resultados", {
                   params: {
@@ -856,7 +856,7 @@ export default {
               const generales = settingsGeneral.data.general;
               const signature = signatures.data.signatures;
               const postTitle =
-                "(Expresado en dólares de los Estados Unidos de América)";
+                "(Expresado en dÃ³lares de los Estados Unidos de AmÃ©rica)";
               this.$axios
                 .get("/entries/report/estado-resultados", {
                   params: {
@@ -1069,7 +1069,7 @@ export default {
                     body: [
                       [
                         {
-                          text: "CÓDIGO\nDE LA CUENTA",
+                          text: "CÃ“DIGO\nDE LA CUENTA",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -1093,7 +1093,7 @@ export default {
                         {},
                         {
                           alignment: "center",
-                          text: "SALDO DEL\nPERÍODO",
+                          text: "SALDO DEL\nPERÃODO",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -1191,7 +1191,7 @@ export default {
               [reportTitleName, "", "", "", `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               [
-                "CÓD. DE LA CUENTA",
+                "CÃ“D. DE LA CUENTA",
                 "NOMBRE DE LA CUENTA",
                 "BALANCE INICIAL",
                 "MES ACTUAL",
@@ -1235,7 +1235,7 @@ export default {
             const { name, nit, nrc } = bussinesInfo.data.info;
             const { accountant, auditor, legal } = signatures.data.signatures;
             const postTitle =
-              "(Expresado en dólares de los Estados Unidos de América)";
+              "(Expresado en dÃ³lares de los Estados Unidos de AmÃ©rica)";
             let activoValues = [];
             let pasivoValues = [];
             let patrimonioValues = [];
@@ -1548,7 +1548,7 @@ export default {
             const { accountant, auditor, legal } = signatures.data.signatures;
             const reportTitleName = general.data.name;
             const postTitle =
-              "(Expresado en dólares de los Estados Unidos de América)";
+              "(Expresado en dÃ³lares de los Estados Unidos de AmÃ©rica)";
             let activoValues = [];
             let pasivoValues = [];
             let patrimonioValues = [];
@@ -1641,7 +1641,7 @@ export default {
               const startDate = periodStart;
               const endDate = peridoEnd;
               const postTitle =
-                "(Expresado en dólares de los Estados Unidos de América)";
+                "(Expresado en dÃ³lares de los Estados Unidos de AmÃ©rica)";
 
               this.$axios
                 .get("/entries/report/balance-general", {
@@ -1974,7 +1974,7 @@ export default {
               const startDate = periodStart;
               const endDate = peridoEnd;
               const postTitle =
-                "(Expresado en dólares de los Estados Unidos de América)";
+                "(Expresado en dÃ³lares de los Estados Unidos de AmÃ©rica)";
 
               this.$axios
                 .get("/entries/report/balance-general", {
@@ -2116,7 +2116,7 @@ export default {
                           style: "tableHeader",
                         },
                         {
-                          text: "DESCRIPCIÓN LA CUENTA",
+                          text: "DESCRIPCIÃ“N LA CUENTA",
                           style: "tableHeader",
                         },
                         {
@@ -2292,7 +2292,7 @@ export default {
                     body: [
                       [
                         {
-                          text: "CÓD. DE LA CUENTA",
+                          text: "CÃ“D. DE LA CUENTA",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -2316,7 +2316,7 @@ export default {
                         {},
                         {
                           alignment: "center",
-                          text: "SALDO DEL\nPERÍODO",
+                          text: "SALDO DEL\nPERÃODO",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -2394,7 +2394,7 @@ export default {
               [reportTitleName, "", "", "", `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               [
-                "CÓD. DE LA",
+                "CÃ“D. DE LA",
                 "NOMBRE DE LA CUENTA",
                 "FECHA DE",
                 "MES ACTUAL",
@@ -2541,7 +2541,7 @@ export default {
                     body: [
                       [
                         {
-                          text: "CÓD. DE LA CUENTA\nN° DE PARTIDA",
+                          text: "CÃ“D. DE LA CUENTA\nNÂ° DE PARTIDA",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -2565,7 +2565,7 @@ export default {
                         {},
                         {
                           alignment: "center",
-                          text: "SALDO DEL\nPERÍODO",
+                          text: "SALDO DEL\nPERÃODO",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -2642,7 +2642,7 @@ export default {
               [reportTitleName, "", "", "", `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               [
-                "CÓD. DE LA CUENTA",
+                "CÃ“D. DE LA CUENTA",
                 "NOMBRE DE LA CUENTA",
                 "FECHA DE",
                 "MES ACTUAL",
@@ -2650,7 +2650,7 @@ export default {
                 "SALDO DEL",
               ],
               [
-                "N° DE PARTIDA",
+                "NÂ° DE PARTIDA",
                 "CONCEPTO",
                 "PARTIDA",
                 "CARGOS",
@@ -2805,7 +2805,7 @@ export default {
                     body: [
                       [
                         {
-                          text: "CÓD. DE LA CUENTA\nN° DE PARTIDA",
+                          text: "CÃ“D. DE LA CUENTA\nNÂ° DE PARTIDA",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -2829,7 +2829,7 @@ export default {
                         {},
                         {
                           alignment: "center",
-                          text: "SALDO DEL\nPERÍODO",
+                          text: "SALDO DEL\nPERÃODO",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -2912,7 +2912,7 @@ export default {
               ],
               [""],
               [
-                "CÓD. DE LA CUENTA",
+                "CÃ“D. DE LA CUENTA",
                 "NOMBRE DE LA CUENTA",
                 "FECHA DE",
                 "MES ACTUAL",
@@ -2920,7 +2920,7 @@ export default {
                 "SALDO DEL",
               ],
               [
-                "N° DE PARTIDA",
+                "NÂ° DE PARTIDA",
                 "CONCEPTO",
                 "PARTIDA",
                 "CARGOS",
@@ -2950,7 +2950,7 @@ export default {
       this.pageLoading = false;
     },
     cancel() {
-      this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
+      this.$confirm("Â¿EstÃ¡s seguro que deseas salir?", "ConfirmaciÃ³n", {
         confirmButtonText: "Si, salir",
         cancelButtonText: "Cancelar",
         type: "warning",
@@ -2977,4 +2977,3 @@ export default {
   },
 };
 </script>
-
