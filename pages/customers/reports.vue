@@ -356,12 +356,12 @@ export default {
                   text: customerData.isActiveCustomer ? "Activo" : "Inactivo",
                 },
               ]);
-              
-               valuesGeneral.push([
+
+              valuesGeneral.push([
                 { bold: true, text: "Contacto: " },
                 {
-                  text:customerData.customerBranches[0].contactName
-                    ?  customerData.customerBranches[0].contactName
+                  text: customerData.customerBranches[0].contactName
+                    ? customerData.customerBranches[0].contactName
                     : "--------",
                 },
                 {
@@ -419,22 +419,9 @@ export default {
                 },
                 { text: customerData.nit ? customerData.nit : "-------" },
                 {},
-                {}
-              ]);
-               valuesTributary.push([
-                {
-                 
-                },
-                {
-                
-                },
-                {},
-                {},
-                {},
-                {},
-                {},
                 {},
               ]);
+              valuesTributary.push([{}, {}, {}, {}, {}, {}, {}, {}]);
               valuesTributary.push([
                 {
                   bold: true,
@@ -442,6 +429,7 @@ export default {
                 },
                 {
                   text: customerData.giro ? customerData.giro : " -------",
+                  colSpan: 6,
                 },
                 {},
                 {},
@@ -450,20 +438,7 @@ export default {
                 {},
                 {},
               ]);
-                 valuesTributary.push([
-                {
-                 
-                },
-                {
-                
-                },
-                {},
-                {},
-                {},
-                {},
-                {},
-                {},
-              ]);
+              valuesTributary.push([{}, {}, {}, {}, {}, {}, {}, {}]);
               valuesTributary.push([
                 {
                   bold: true,
@@ -668,7 +643,7 @@ export default {
               this.errorMessage =
                 "Error al generar el PDF, contacta con tu administrador";
             });
-          
+
           break;
         case "excel":
           Promise.all([bussinesInfo(), customer(), branches()])
