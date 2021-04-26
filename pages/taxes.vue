@@ -24,11 +24,11 @@ export default {
           path: "/taxes",
           epath: ["/taxes/edit"],
         },
-        /* {
+         {
           name: "Reportes",
           icon: getIcon("document-text"),
-          path: "/services/reports",
-        }, */
+          path: "/taxes/reports",
+        }, 
       ],
     };
   },
