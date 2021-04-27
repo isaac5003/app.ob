@@ -118,7 +118,7 @@ code
           </el-form-item>
         </div>
 
-        <div class="grid grid-cols-12">
+        <div class="grid grid-cols-12 gap-4">
           <el-form-item
             label="Subtotal"
             class="col-span-2"
@@ -127,31 +127,18 @@ code
           >
             <el-input-number
               v-model="ivaForm.value2"
-              class="w-full"
               type="number"
               :min="0.0"
               :step="0.01"
               size="small"
               autocomplete="off"
               :precision="2"
-            >
-            </el-input-number>
-          </el-form-item>
-          <el-form-item label="Impuestos" class="col-span-2" v-else>
-            <el-input-number
-              class="w-full"
-              type="number"
-              :min="0.0"
-              :step="0.01"
-              size="small"
-              autocomplete="off"
-              :precision="2"
+              style="width: 100%"
             >
             </el-input-number>
           </el-form-item>
           <el-form-item label="IVA" class="col-span-2">
             <el-input-number
-              class="w-full"
               type="number"
               :min="0.0"
               :step="0.01"
@@ -159,23 +146,25 @@ code
               autocomplete="off"
               :precision="2"
               :disabled="true"
+              style="width: 100%"
             >
             </el-input-number>
           </el-form-item>
           <el-form-item label="Impestos" class="col-span-2">
             <el-input-number
-              class="w-full"
               type="number"
               :min="0.0"
               :step="0.01"
               size="small"
               autocomplete="off"
               :precision="2"
+              style="width: 100%"
             >
             </el-input-number>
           </el-form-item>
-          <el-form-item label="Total" class="col-span-1">
-            <el-input class="w-full" size="small" :disabled="true"> </el-input>
+          <el-form-item label="Total" class="col-span-2">
+            <el-input style="width: 100%" size="small" :disabled="true">
+            </el-input>
           </el-form-item>
         </div>
         <div class="flex flex-row justify-end">
