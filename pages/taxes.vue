@@ -18,6 +18,12 @@ export default {
   data() {
     return {
       menu: [
+            {
+          name: "Nuevo registro",
+          icon: getIcon("plus"),
+          path: "/taxes/new",
+         
+        },
         {
           name: "Listado de IVA",
           icon: getIcon("menu"),
