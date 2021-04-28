@@ -513,10 +513,10 @@
       </el-tab-pane>
 
       <el-tab-pane label="Correlativos">
-        <el-form v-model="documents">
+        <el-form :model="correlativeForm" ref="correlativeForm">
           <div class="grid grid-cols-12 gap-4">
             <div
-              v-for="(d, i) of documents"
+              v-for="(d, i) of correlativeForm"
               :key="i"
               class="col-span-4 bg-white"
             >
@@ -551,7 +551,7 @@
                       <el-input
                         class="w-full"
                         size="small"
-                        :disabled="true"
+                        :disabled="d.active && d.used ? true : false"
                         v-model="d.authorization"
                       ></el-input>
                     </el-form-item>
@@ -564,7 +564,7 @@
                       <el-input
                         class="w-full"
                         size="small"
-                        :disabled="true"
+                        :disabled="d.active && d.used ? true : false"
                         v-model="d.initial"
                       ></el-input>
                     </el-form-item>
@@ -574,7 +574,7 @@
                       <el-input
                         class="w-full"
                         size="small"
-                        :disabled="true"
+                        :disabled="d.active && d.used ? true : false"
                         v-model="d.final"
                       ></el-input>
                     </el-form-item>
@@ -587,7 +587,7 @@
                       <el-input
                         class="w-full"
                         size="small"
-                        :disabled="true"
+                        :disabled="d.active && d.used ? true : false"
                         v-model="d.current"
                       ></el-input>
                     </el-form-item>
@@ -599,7 +599,14 @@
         </el-form>
         <!-- Botones Guardar y Cancelar -->
         <div class="flex justify-end dialog-footer mt-4">
-          <el-button type="primary" size="small">Guardar</el-button>
+          <el-button
+            type="primary"
+            size="small"
+            @click.native.prevent="
+              submitCorrelativeForm('correlativeForm', correlativeForm)
+            "
+            >Guardar</el-button
+          >
           <el-button size="small" @click="$router.push('/invoices')"
             >Cancelar</el-button
           >
@@ -652,7 +659,10 @@ export default {
         this.zones = zones.data.zones;
         this.sellers = sellers.data.sellers;
         this.payments = payment.data.paymentConditions;
-        this.documents = documents.data.documents;
+        this.correlativeForm = {
+          ...documents.data.documents,
+        };
+        console.log(this.correlativeForm);
         this.loading = false;
       })
       .catch((err) => {
@@ -681,13 +691,19 @@ export default {
       zones: [],
       sellers: [],
       payments: [],
-      documents: [],
+      // documents: [],
       showNewZone: false,
       showNewSeller: false,
       showNewPayment: false,
       showEditPayment: false,
       showEditZone: false,
       showEditSeller: false,
+      correlativeForm: {
+        authorization: "",
+        initial: "",
+        final: "",
+        current: "",
+      },
       newZoneForm: {
         name: "",
       },
@@ -715,6 +731,59 @@ export default {
     };
   },
   methods: {
+    submitCorrelativeForm(
+      formName,
+      { authorization, initial, final, current }
+    ) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+        this.$confirm(
+          "¿Estás seguro que deseas actualizar esta?",
+          "Confirmación",
+          {
+            confirmButtonText: "Si, actualizar",
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                this.$axios
+                  .put("/invoices/documents", {
+                    authorization,
+                    initial,
+                    final,
+                    current,
+                  })
+
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Exito",
+                      message: res.data.message,
+                    });
+                    this.$router.push("/invoices");
+                  })
+                  .catch((err) => {
+                    this.$notify.error({
+                      title: "Error",
+                      message: err.response.data.message,
+                    });
+                  })
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = "Si, actualizar";
+                    done();
+                  });
+              } else {
+                done();
+              }
+            },
+          }
+        );
+      });
+    },
     closeDialog(name) {
       this.$refs[name].resetFields();
     },
