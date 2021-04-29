@@ -146,6 +146,7 @@
               type="number"
               :min="1"
               size="small"
+              :disabled="activeAccount.isParent && activeAccount.subAccounts"
             />
           </el-form-item>
           <el-form-item
@@ -193,7 +194,9 @@
           <el-button
             type="primary"
             size="small"
-            @click.native="submitEditedCatalog(activeAccount, 'activeAccount')"
+            @click.native="
+              submitEditedCatalog(accounts, 'activeAccount', activeAccount)
+            "
             >Guardar</el-button
           >
           <el-button @click="showEditMayorDialog = false" size="small"
@@ -463,11 +466,7 @@
             type="primary"
             size="small"
             @click.native="
-              submitEditedCatalog(
-                activeAccount,
-                'accountFormEdit',
-                activeAccount.parentCatalog
-              )
+              submitEditedCatalog(accounts, 'accountFormEdit', activeAccount)
             "
             >Guardar</el-button
           >
@@ -1292,7 +1291,69 @@
         </div>
       </el-tab-pane>
 
-      <!--  tab de firmante -->
+      <!--  tab de Integraciones  -->
+      <el-tab-pane label="Integraciones" name="integraciones">
+        <div class="grid grid-cols-12">
+          <div class="col-span-12">
+            <Notification
+              class="mb-4 w-full"
+              type="info"
+              title="Información" 
+            />
+          </div>
+        </div>
+
+        <div class="flex flex-col space-y-2">
+          <el-form>
+            <div class="grid grid-cols-12 gap-4">
+              <el-form-item label="Cuenta contable para pagos de contado" class="col-span-4">
+                <el-select
+                  class="w-full"
+                  size="small"
+                  clearable
+                  filterable
+                ></el-select>
+              </el-form-item>
+              <el-form-item
+                prop=""
+                label="Tipo de integración contable"
+                class="col-span-5"
+              >
+                <el-radio-group class="w-full">
+                  <el-row :gutter="15">
+                    <el-col :span="8">
+                      <el-radio
+                        border
+                        label="Automatico"
+                        size="small"
+                        class="w-full"
+                        >Automático</el-radio
+                      >
+                    </el-col>
+                    <el-col :span="8">
+                      <el-radio
+                        border
+                        label="Manual"
+                        size="small"
+                        class="w-full"
+                        >Manual</el-radio
+                      >
+                    </el-col>
+                  </el-row>
+                </el-radio-group>
+              </el-form-item>
+            </div>
+                <div class="flex justify-end ">
+          <el-button
+            type="primary"
+            size="small"
+            >Guardar</el-button
+          >
+          <el-button size="small" @click="$router.push('/entries')">Cancelar</el-button>
+        </div>
+          </el-form>
+        </div>
+      </el-tab-pane>
       <!-- tab integraciones -->
       <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
         <Notification
@@ -1340,7 +1401,7 @@
 </template>
 
 <script>
-import { endOfMonth, format, startOfMonth } from "date-fns";
+import { endOfMonth, format, startOfMonth, differenceInMonths } from "date-fns";
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
 import { getIcon, hasModule } from "../../tools";
@@ -1387,29 +1448,41 @@ export default {
           signatures,
           general,
         ] = res;
+        if (balance.data.balanceGeneral) {
+          this.tableData = balance.data.balanceGeneral.report;
+          this.specialAccounts = { ...balance.data.balanceGeneral.special };
+        }
+        if (general.data.general) {
+          this.fiscalPeriodForm.startDate = general.data.general.periodStart;
+          this.fiscalPeriodForm.endDate = general.data.general.peridoEnd;
+        }
+
+        if (signatures.data.signatures) {
+          this.firmantesForm = signatures.data.signatures;
+        }
+
+        if (results.data.estadoResultados) {
+          this.tablesData = results.data.estadoResultados.map((r) => {
+            const obj = { ...r };
+            if (r.children) {
+              const children = r.children.map((ch) => {
+                return {
+                  ...ch,
+                  code: ch.id,
+                };
+              });
+              obj["children"] = children;
+            }
+            return obj;
+          });
+        }
+
+        this.catalogs = accounts.data.accountingCatalog;
         this.accounts = accountCatalogs.data.accountingCatalog;
         this.accountsCount = accountCatalogs.data.count;
-        this.catalogs = accounts.data.accountingCatalog;
-        this.tableData = balance.data.balanceGeneral.report;
-        this.firmantesForm = signatures.data.signatures;
-        this.fiscalPeriodForm.startDate = general.data.general.periodStart;
-        this.fiscalPeriodForm.endDate = general.data.general.peridoEnd;
-        this.specialAccounts = { ...balance.data.balanceGeneral.special };
-        this.tablesData = results.data.estadoResultados.map((r) => {
-          const obj = { ...r };
-          if (r.children) {
-            const children = r.children.map((ch) => {
-              return {
-                ...ch,
-                code: ch.id,
-              };
-            });
-            obj["children"] = children;
-          }
-          return obj;
-        });
       })
       .catch((err) => {
+        console.log(err);
         this.errorMessage = err.response.data.message;
       })
       .then((alw) => (this.pageloading = false));
@@ -2064,6 +2137,7 @@ export default {
       );
     },
     submitEditedCatalog(accounts, formName, activeAccount) {
+      console.log("REFFFF", accounts, formName, activeAccount);
       this.$refs[formName].validate((valid) => {
         if (!valid) {
           return false;
@@ -2102,9 +2176,8 @@ export default {
                 instance.confirmButtonText = "Procesando...";
 
                 this.$axios
-                  .put(`/entries/catalog/${accounts.id}`, {
-                    ...accounts,
-                    code: realCode,
+                  .put(`/entries/catalog/${activeAccount.id}`, {
+                    ...activeAccount,
                   })
                   .then((res) => {
                     this.$notify.success({
@@ -2422,45 +2495,59 @@ export default {
       const periodStart = fiscalPeriodForm.startDate;
       let peridoEnd = endOfMonth(new Date(fiscalPeriodForm.endDate));
       peridoEnd = this.$dateFns.format(new Date(peridoEnd), "yyyy-MM-dd");
-      this.$confirm(
-        "¿Estás seguro que deseas actualizar el periodo fiscal?",
-        "Confirmación",
-        {
-          confirmButtonText: "Si, guardar",
-          cancelButtonText: "Cancelar",
-          type: "warning",
-          beforeClose: (action, instance, done) => {
-            if (action === "confirm") {
-              instance.confirmButtonLoading = true;
-              instance.confirmButtonText = "Procesando...";
+      const totalOfMonth =
+        differenceInMonths(new Date(peridoEnd), new Date(periodStart)) + 1;
+      if (new Date(peridoEnd) < new Date(periodStart)) {
+        this.$notify.error({
+          title: "Error",
+          message: "El mes final tiene que ser mayor al mes inicial",
+        });
+      } else if (totalOfMonth != 12) {
+        this.$notify.error({
+          title: "Error",
+          message: "El periodo fiscal debe tener 12 meses exactos",
+        });
+      } else {
+        this.$confirm(
+          "¿Estás seguro que deseas actualizar el periodo fiscal?",
+          "Confirmación",
+          {
+            confirmButtonText: "Si, guardar",
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
 
-              this.$axios
-                .put(`/entries/setting/general`, {
-                  periodStart,
-                  peridoEnd,
-                })
-                .then((res) => {
-                  this.$notify.success({
-                    title: "Exito",
-                    message: res.data.message,
+                this.$axios
+                  .put(`/entries/setting/general`, {
+                    periodStart,
+                    peridoEnd,
+                  })
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Exito",
+                      message: res.data.message,
+                    });
+                    this.fetchGeneral();
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = "Si, guardar";
+                    done();
+                  })
+
+                  .catch((err) => {
+                    this.errorMessage = err.response.data.messag;
                   });
-                  this.fetchGeneral();
-                  instance.confirmButtonLoading = false;
-                  instance.confirmButtonText = "Si, guardar";
-                  done();
-                })
-
-                .catch((err) => {
-                  this.errorMessage = err.response.data.messag;
-                });
-            } else {
-              instance.confirmButtonLoading = false;
-              instance.confirmButtonText = "Si, guardar";
-              done();
-            }
-          },
-        }
-      );
+              } else {
+                instance.confirmButtonLoading = false;
+                instance.confirmButtonText = "Si, guardar";
+                done();
+              }
+            },
+          }
+        );
+      }
     },
     saveSettingsSignature(formName, firmantesForm) {
       this.$confirm(

@@ -577,7 +577,10 @@
               <el-table-column
                 prop="vnosujeta"
                 :label="
-                  this.salesNewForm.documentType != 3 ? 'V. No sujeta' : ''
+                  this.salesNewForm.documentType != 3 &&
+                  this.salesNewForm.documentType != 6
+                    ? 'V. No sujeta'
+                    : ''
                 "
                 min-width="75"
                 align="right"
@@ -586,7 +589,8 @@
                   <span
                     v-if="
                       scope.row.sellingType == 1 &&
-                      salesNewForm.documentType != 3
+                      salesNewForm.documentType != 3 &&
+                      salesNewForm.documentType != 6
                     "
                     >{{
                       calcSujeta(salesNewForm.documentType, scope.row)
@@ -597,7 +601,12 @@
               </el-table-column>
               <el-table-column
                 prop="vexenta"
-                :label="this.salesNewForm.documentType != 3 ? 'V. Exenta' : ''"
+                :label="
+                  this.salesNewForm.documentType != 3 &&
+                  this.salesNewForm.documentType != 6
+                    ? 'V. Exenta'
+                    : ''
+                "
                 min-width="75"
                 align="right"
               >
@@ -605,7 +614,8 @@
                   <span
                     v-if="
                       scope.row.sellingType == 2 &&
-                      salesNewForm.documentType != 3
+                      salesNewForm.documentType != 3 &&
+                      salesNewForm.documentType != 6
                     "
                     >{{
                       calcExenta(salesNewForm.documentType, scope.row)
@@ -624,7 +634,8 @@
                   <span
                     v-if="
                       scope.row.sellingType == 3 ||
-                      salesNewForm.documentType == 3
+                      salesNewForm.documentType == 3 ||
+                      salesNewForm.documentType == 6
                     "
                     >{{
                       calcGravada(salesNewForm.documentType, scope.row)
@@ -659,7 +670,12 @@
         <!-- sumas -->
         <table class="flex justify-end">
           <tbody class="text-sm divide-y divide-gray-300">
-            <tr class="flex space-x-16" v-if="salesNewForm.documentType != 3">
+            <tr
+              class="flex space-x-16"
+              v-if="
+                salesNewForm.documentType != 3 && salesNewForm.documentType != 6
+              "
+            >
               <td align="right" class="text-blue-900 w-50">SUMAS:</td>
               <td align="right" class="text-gray-800">
                 {{ sumas | formatMoney }}
@@ -671,25 +687,45 @@
                 {{ taxes | formatMoney }}
               </td>
             </tr>
-            <tr class="flex space-x-16" v-if="salesNewForm.documentType != 3">
+            <tr
+              class="flex space-x-16"
+              v-if="
+                salesNewForm.documentType != 3 && salesNewForm.documentType != 6
+              "
+            >
               <td align="right" class="text-blue-900 w-50">Subtotal:</td>
               <td align="right" class="text-gray-800">
                 {{ subtotal | formatMoney }}
               </td>
             </tr>
-            <tr class="flex space-x-16" v-if="salesNewForm.documentType != 3">
+            <tr
+              class="flex space-x-16"
+              v-if="
+                salesNewForm.documentType != 3 && salesNewForm.documentType != 6
+              "
+            >
               <td align="right" class="text-blue-900 w-50">Iva retenido:</td>
               <td align="right" class="text-gray-800">
                 {{ ivaRetenido | formatMoney }}
               </td>
             </tr>
-            <tr class="flex space-x-16" v-if="salesNewForm.documentType != 3">
+            <tr
+              class="flex space-x-16"
+              v-if="
+                salesNewForm.documentType != 3 && salesNewForm.documentType != 6
+              "
+            >
               <td align="right" class="text-blue-900 w-50">Ventas exentas:</td>
               <td align="right" class="text-gray-800">
                 {{ ventasExentas | formatMoney }}
               </td>
             </tr>
-            <tr class="flex space-x-16" v-if="salesNewForm.documentType != 3">
+            <tr
+              class="flex space-x-16"
+              v-if="
+                salesNewForm.documentType != 3 && salesNewForm.documentType != 6
+              "
+            >
               <td align="right" class="text-blue-900 w-50">
                 Ventas no sujetas:
               </td>
@@ -857,8 +893,8 @@ export default {
       },
       newServiceFormRules: {
         service: selectValidation(true),
-        quantity: amountValidate("blur", true, 1),
-        unitPrice: amountValidate("blur", true, 0),
+        quantity: amountValidate("change", true, 1),
+        unitPrice: amountValidate("change", true, 0),
         chargeDescription: inputValidation(true, 5, 5000),
       },
       services: [],
@@ -895,11 +931,14 @@ export default {
           this.newServiceForm.unitPrice = service.cost;
           this.newServiceForm.chargeDescription = service.description;
           this.newServiceForm.sellingType = service.sellingType.id;
+          this.newServiceForm.incTax = service.incIva;
+
           break;
         case "edit":
           this.editServiceForm.unitPrice = service.cost;
           this.editServiceForm.chargeDescription = service.description;
           this.editServiceForm.sellingType = service.sellingType.id;
+          this.editServiceForm.incTax = service.incIva;
 
           break;
       }
@@ -1146,6 +1185,7 @@ export default {
     },
 
     calcUnitPrice(documentType, { unitPrice, incTax, sellingType }) {
+      console.log(unitPrice, incTax, sellingType);
       if (sellingType == 1 || sellingType == 2) {
         return unitPrice;
       } else {
@@ -1158,6 +1198,8 @@ export default {
               return unitPrice / (incTax ? 1.13 : 1);
 
             case 3:
+            case 4:
+            case 6:
               return unitPrice;
           }
         }
@@ -1184,6 +1226,7 @@ export default {
           return (unitPrice / (incTax ? 1.13 : 1)) * quantity;
 
         case 3:
+        case 6:
           switch (sellingType) {
             case 1:
               return unitPrice * quantity;
@@ -1203,6 +1246,7 @@ export default {
           return unitPrice * quantity;
 
         case 3:
+        case 6:
           return 0;
       }
     },
@@ -1232,6 +1276,7 @@ export default {
             }
             break;
           case 3:
+          case 6:
             for (const d of this.details) {
               sumas += parseFloat(d.quantity) * parseFloat(d.unitPrice);
             }

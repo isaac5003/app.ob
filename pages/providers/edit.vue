@@ -1,18 +1,17 @@
 <template>
   <layout-content
-    v-loading="pageloading"
-    page-title="Editar cliente"
+    page-title="Editar proveedor"
     :breadcrumb="[
-      { name: 'Clientes', to: '/customers' },
-      { name: 'Editar cliente', to: null },
+      { name: 'Proveedores', to: '/providers' },
+      { name: 'Editar proveedor', to: null },
     ]"
   >
     <el-form
-      :model="customersEditForm"
+      :model="providerEditForm"
       status-icon
-      ref="customersEditForm"
+      ref="providerEditForm"
       @submit.native.prevent="
-        submitEditCustomer('customersEditForm', customersEditForm)
+        submitEditCustomer('providerEditForm', providerEditForm)
       "
       class="flex flex-col"
     >
@@ -20,7 +19,7 @@
         v-model="activeTab"
         @tab-click="
           $router.push({
-            path: `/customers/edit?ref=${$route.query.ref}`,
+            path: `/providers/edit?ref=${$route.query.ref}`,
             query: { tab: activeTab },
           })
         "
@@ -35,13 +34,13 @@
               <el-input
                 clearable
                 type="text"
-                v-model="customersEditForm.name"
+                v-model="providerEditForm.name"
                 size="small"
                 autocomplete="off"
                 maxlength="100"
                 minlength="5"
                 show-word-limit
-                @change="setStorage(customersEditForm)"
+                @change="setStorage(providerEditForm)"
               />
             </el-form-item>
             <el-form-item
@@ -52,25 +51,25 @@
               <el-input
                 clearable
                 type="text"
-                v-model="customersEditForm.shortName"
+                v-model="providerEditForm.shortName"
                 size="small"
                 autocomplete="off"
                 maxlength="15"
                 minlength="3"
                 show-word-limit
-                @change="setStorage(customersEditForm)"
+                @change="setStorage(providerEditForm)"
               />
             </el-form-item>
             <el-form-item
               label="Es tambien proveedor"
-              prop="isProvider"
+              prop="isCustomer"
               class="col-span-2"
               v-if="false"
             >
               <el-radio-group
-                v-model="customersEditForm.isProvider"
+                v-model="providerEditForm.isCustomer"
                 class="w-full"
-                @change="setStorage(customersEditForm)"
+                @change="setStorage(providerEditForm)"
               >
                 <el-radio :label="true">Si</el-radio>
                 <el-radio :label="false">No</el-radio>
@@ -86,13 +85,13 @@
               <el-input
                 clearable
                 type="text"
-                v-model="customersEditForm.address1"
+                v-model="providerEditForm.address1"
                 size="small"
                 autocomplete="off"
                 maxlength="150"
                 minlength="5"
                 show-word-limit
-                @change="setStorage(customersEditForm)"
+                @change="setStorage(providerEditForm)"
               />
             </el-form-item>
             <el-form-item
@@ -103,13 +102,13 @@
               <el-input
                 clearable
                 type="text"
-                v-model="customersEditForm.address2"
+                v-model="providerEditForm.address2"
                 size="small"
                 autocomplete="off"
                 maxlength="150"
                 minlength="5"
                 show-word-limit
-                @change="setStorage(customersEditForm)"
+                @change="setStorage(providerEditForm)"
               />
             </el-form-item>
           </div>
@@ -117,7 +116,7 @@
             <el-form-item label="País" prop="country" class="col-span-4">
               <el-select
                 class="w-full"
-                v-model="customersEditForm.country"
+                v-model="providerEditForm.country"
                 size="small"
                 placeholder="Seleccionar país"
                 filterable
@@ -136,7 +135,7 @@
             <el-form-item label="Departamento" prop="state" class="col-span-4">
               <el-select
                 class="w-full"
-                v-model="customersEditForm.state"
+                v-model="providerEditForm.state"
                 size="small"
                 placeholder="Seleccionar país"
                 filterable
@@ -155,13 +154,13 @@
             <el-form-item label="Municipio" prop="city" class="col-span-4">
               <el-select
                 class="w-full"
-                v-model="customersEditForm.city"
+                v-model="providerEditForm.city"
                 size="small"
                 placeholder="Seleccionar país"
                 filterable
                 clearable
                 default-first-option
-                @change="setStorage(customersEditForm)"
+                @change="setStorage(providerEditForm)"
               >
                 <el-option
                   v-for="city in cities"
@@ -181,25 +180,25 @@
               <el-input
                 clearable
                 type="text"
-                v-model="customersEditForm.contactName"
+                v-model="providerEditForm.contactName"
                 size="small"
                 autocomplete="off"
                 maxlength="50"
                 minlength="5"
                 show-word-limit
-                @change="setStorage(customersEditForm)"
+                @change="setStorage(providerEditForm)"
               />
             </el-form-item>
             <el-form-item label="Teléfono" prop="cellphone" class="col-span-4">
               <el-input
                 clearable
                 type="text"
-                v-model="customersEditForm.phone"
+                v-model="providerEditForm.phone"
                 size="small"
                 autocomplete="off"
                 placeholder="####-####"
                 v-mask="'####-####'"
-                @change="setStorage(customersEditForm)"
+                @change="setStorage(providerEditForm)"
               />
             </el-form-item>
             <el-form-item
@@ -210,10 +209,10 @@
               <el-input
                 clearable
                 type="text"
-                v-model="customersEditForm.email"
+                v-model="providerEditForm.email"
                 size="small"
                 autocomplete="off"
-                @change="setStorage(customersEditForm)"
+                @change="setStorage(providerEditForm)"
               />
             </el-form-item>
           </div>
@@ -230,13 +229,13 @@
             >
               <el-select
                 class="w-full"
-                v-model="customersEditForm.customerType"
+                v-model="providerEditForm.customerType"
                 size="small"
                 placeholder="Seleccionar tipo de cliente"
                 filterable
                 clearable
                 default-first-option
-                @change="setStorage(customersEditForm)"
+                @change="setStorage(providerEditForm)"
               >
                 <el-option
                   v-for="ct in customerTypes"
@@ -250,17 +249,17 @@
               label="Tipo de persona natural"
               prop="customerTypeNatural"
               class="col-span-4"
-              v-if="customersEditForm.customerType == 2"
+              v-if="providerEditForm.customerType == 2"
             >
               <el-select
                 class="w-full"
-                v-model="customersEditForm.customerTypeNatural"
+                v-model="providerEditForm.customerTypeNatural"
                 size="small"
                 placeholder="Seleccionar tipo de persona natural"
                 filterable
                 clearable
                 default-first-option
-                @change="setStorage(customersEditForm)"
+                @change="setStorage(providerEditForm)"
               >
                 <el-option
                   v-for="ct in customerTypeNaturals"
@@ -276,49 +275,49 @@
               label="DUI"
               prop="dui"
               class="col-span-4"
-              v-if="customersEditForm.customerType == 2"
+              v-if="providerEditForm.customerType == 2"
             >
               <el-input
                 type="text"
-                v-model="customersEditForm.dui"
+                v-model="providerEditForm.dui"
                 size="small"
                 autocomplete="off"
                 placeholder="########-#"
                 v-mask="'########-#'"
-                @change="setStorage(customersEditForm)"
+                @change="setStorage(providerEditForm)"
               />
             </el-form-item>
             <el-form-item label="NIT" prop="nit" class="col-span-6">
               <el-input
                 type="text"
-                v-model="customersEditForm.nit"
+                v-model="providerEditForm.nit"
                 size="small"
                 autocomplete="off"
                 placeholder="####-######-###-#"
                 v-mask="'####-######-###-#'"
-                @change="setStorage(customersEditForm)"
+                @change="setStorage(providerEditForm)"
               />
             </el-form-item>
             <el-form-item
               label="NRC"
               prop="nrc"
               class="col-span-2"
-              v-if="customersEditForm.customerType == 1"
+              v-if="providerEditForm.customerType == 1"
             >
               <el-input
                 type="text"
-                v-model="customersEditForm.nrc"
+                v-model="providerEditForm.nrc"
                 size="small"
                 autocomplete="off"
-                @change="setStorage(customersEditForm)"
+                @change="setStorage(providerEditForm)"
               />
             </el-form-item>
           </div>
           <div
             class="grid grid-cols-12 gap-4"
             v-if="
-              customersEditForm.customerType == 1 ||
-              customersEditForm.customerTypeNatural == 2
+              providerEditForm.customerType == 1 ||
+              providerEditForm.customerTypeNatural == 2
             "
           >
             <el-form-item
@@ -328,13 +327,13 @@
             >
               <el-select
                 class="w-full"
-                v-model="customersEditForm.customerTaxerType"
+                v-model="providerEditForm.customerTaxerType"
                 size="small"
                 placeholder="Seleccionar tipo de contribuyente"
                 filterable
                 clearable
                 default-first-option
-                @change="setStorage(customersEditForm)"
+                @change="setStorage(providerEditForm)"
               >
                 <el-option
                   v-for="ct in customerTaxerTypes"
@@ -347,28 +346,20 @@
             <el-form-item label="Giro" prop="giro" class="col-span-8">
               <el-input
                 type="text"
-                v-model="customersEditForm.giro"
+                v-model="providerEditForm.giro"
                 size="small"
                 autocomplete="off"
-                @change="setStorage(customersEditForm)"
+                @change="setStorage(providerEditForm)"
               />
             </el-form-item>
           </div>
         </el-tab-pane>
-        <!-- <el-tab-pane label="Integraciones" name="integrations">
-          <Notification
-            class="w-full"
-            type="info"
-            title="Integraciones"
-            message="En esta sección se muestran las configuraciones necesarias para poder integrar otros modulos del sistema cuando estos están disponibles."
-          />
-        </el-tab-pane> -->
       </el-tabs>
       <div class="flex justify-end" v-if="activeTab != 'integrations'">
         <el-button type="primary" size="small" native-type="submit"
           >Actualizar</el-button
         >
-        <el-button size="small" @click="$router.push('/customers')"
+        <el-button size="small" @click="$router.push('/providers')"
           >Cancelar</el-button
         >
       </div>
@@ -386,12 +377,12 @@ import {
 } from "../../tools";
 import Notification from "../../components/Notification";
 
-const storagekey = "edit-customer";
+const storagekey = "edit-provider";
 
 export default {
-  name: "CustomerEdit",
+  name: "ProviderEdit",
   head: {
-    titleTemplate: `%s | Editar cliente`,
+    titleTemplate: `%s | Editar proveedor`,
   },
   components: { LayoutContent, Notification },
   fetch() {
@@ -450,7 +441,7 @@ export default {
         this.customersEditForm = {
           name: customer.name,
           shortName: customer.shortName,
-          isProvider: customer.isProvider,
+          isCustomer: customer.isCustomer,
           dui: customer.dui,
           nit: customer.nit,
           nrc: customer.nrc,
@@ -480,11 +471,11 @@ export default {
       .catch((err) => {
         console.log(err);
         this.$message.error(err.response.data.message);
-        this.$router.push("/customers");
+        this.$router.push("/providers");
       })
       .then((alw) => (this.pageloading = false));
 
-    checkBeforeEnter(this, storagekey, "customersEditForm");
+    checkBeforeEnter(this, storagekey, "providerEditForm");
   },
   fetchOnServer: false,
   beforeRouteLeave(to, from, next) {
@@ -500,10 +491,10 @@ export default {
       customerTypes: [],
       customerTypeNaturals: [],
       customerTaxerTypes: [],
-      customersEditForm: {
+      providerEditForm: {
         name: "",
         shortName: "",
-        isProvider: false,
+        isCustomer: false,
         dui: "",
         nit: "",
         nrc: "",
@@ -524,20 +515,20 @@ export default {
     };
   },
   methods: {
-    setStorage(customersEditForm) {
-      localStorage.setItem(storagekey, JSON.stringify(customersEditForm));
+    setStorage(providerEditForm) {
+      localStorage.setItem(storagekey, JSON.stringify(providerEditForm));
     },
     clearSelect(name) {
       switch (name) {
         case "state":
-          this.customersEditForm.state = "";
-          this.customersEditForm.city = "";
+          this.providerEditForm.state = "";
+          this.providerEditForm.city = "";
           break;
         case "city":
-          this.customersEditForm.city = "";
+          this.providerEditForm.city = "";
           break;
       }
-      this.setStorage(this.customersEditForm);
+      this.setStorage(this.providerEditForm);
     },
     submitEditCustomer(formName, formData) {
       this.$refs[formName].validate(async (valid) => {
@@ -546,7 +537,7 @@ export default {
         }
 
         this.$confirm(
-          "¿Estás seguro que deseas actualizar este cliente?",
+          "¿Estás seguro que deseas actualizar este proveedor?",
           "Confirmación",
           {
             confirmButtonText: "Si, actualizar",
@@ -560,7 +551,7 @@ export default {
                   .put(`/customers/${this.$route.query.ref}`, {
                     name: formData.name,
                     shortName: formData.shortName,
-                    isProvider: formData.isProvider,
+                    isCustomer: formData.isCustomer,
                     dui: formData.dui,
                     nit: formData.nit,
                     nrc: formData.nrc,
@@ -597,7 +588,7 @@ export default {
                       message: res.data.message,
                     });
                     setTimeout(() => {
-                      this.$router.push("/customers");
+                      this.$router.push("/providers");
                     }, 300);
                   })
                   .catch((err) => {
@@ -624,12 +615,12 @@ export default {
   computed: {
     states() {
       return this.rawStates.filter(
-        (s) => s.country.id == this.customersEditForm.country
+        (s) => s.country.id == this.providerEditForm.country
       );
     },
     cities() {
       return this.rawCities.filter(
-        (c) => c.state.id == this.customersEditForm.state
+        (c) => c.state.id == this.providerEditForm.state
       );
     },
   },

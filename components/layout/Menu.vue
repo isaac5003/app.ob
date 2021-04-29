@@ -223,6 +223,13 @@ export default {
           icon: getIcon("collection"),
           exact: false,
         },
+        {
+          id: "f6000cbb-1e6d-4f7d-a7cc-cadd78d23076",
+          path: "/providers",
+          name: "Proveedores",
+          icon: getIcon("truck"),
+          exact: false,
+        },
       ],
       changeWorkSpace: {
         cid: "",

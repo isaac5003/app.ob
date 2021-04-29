@@ -366,16 +366,16 @@
                     :value="c.id"
                   >
                     <div
-                        class="flex flex-row justify-between items-end py-1 leading-normal"
-                      >
-                        <div class="flex flex-col">
-                          <span class="text-xs text-gray-500">{{
-                            c.shortName
-                          }}</span>
-                          <span>{{ c.name }}</span>
-                        </div>
-                        <span class="text-xs text-gray-500">{{ c.nrc }}</span>
+                      class="flex flex-row justify-between items-end py-1 leading-normal"
+                    >
+                      <div class="flex flex-col">
+                        <span class="text-xs text-gray-500">{{
+                          c.shortName
+                        }}</span>
+                        <span>{{ c.name }}</span>
                       </div>
+                      <span class="text-xs text-gray-500">{{ c.nrc }}</span>
+                    </div>
                   </el-option>
                 </el-select>
               </el-form-item>
@@ -555,7 +555,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 1 &&
-                        salesEditForm.documentType != 3
+                      salesEditForm.documentType != 3
                     "
                     >{{
                       calcSujeta(salesEditForm.documentType, scope.row)
@@ -574,7 +574,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 2 &&
-                        salesEditForm.documentType != 3
+                      salesEditForm.documentType != 3
                     "
                     >{{
                       calcExenta(salesEditForm.documentType, scope.row)
@@ -593,7 +593,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 3 ||
-                        salesEditForm.documentType == 3
+                      salesEditForm.documentType == 3
                     "
                     >{{
                       calcGravada(salesEditForm.documentType, scope.row)
@@ -858,7 +858,7 @@ export default {
       },
       newServiceForm: {
         service: "",
-        quantity: null,
+        quantity: 1,
         chargeDescription: null,
         incTax: false,
         sellingType: null,
@@ -874,8 +874,8 @@ export default {
       },
       newServiceFormRules: {
         service: selectValidation(true),
-        quantity: amountValidate("blur", true, 1),
-        unitPrice: amountValidate("blur", true, 0),
+        quantity: amountValidate("change", true, 1),
+        unitPrice: amountValidate("change", true, 0),
         chargeDescription: inputValidation(true, 5, 5000),
       },
       services: [],
@@ -913,17 +913,19 @@ export default {
     },
     selectService(id, type, services) {
       const service = services.find((s) => s.id == id);
+
       switch (type) {
         case "new":
           this.newServiceForm.unitPrice = service.cost;
           this.newServiceForm.chargeDescription = service.description;
           this.newServiceForm.sellingType = service.sellingType.id;
+          this.newServiceForm.incTax = service.incIva;
           break;
         case "edit":
           this.editServiceForm.unitPrice = service.cost;
           this.editServiceForm.chargeDescription = service.description;
           this.editServiceForm.sellingType = service.sellingType.id;
-
+          this.editServiceForm.incTax = service.incIva;
           break;
       }
     },
