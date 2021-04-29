@@ -534,7 +534,13 @@
                     <el-form-item>
                       <el-switch
                         v-model="correlative.active"
-                        @change="changeActiveCorrelative(correlative, index)"
+                        @change="
+                          changeActiveCorrelative(
+                            'correlativeForm',
+                            correlative,
+                            index
+                          )
+                        "
                       ></el-switch>
                     </el-form-item>
                   </div>
@@ -1274,55 +1280,62 @@ export default {
       const { data } = await this.$axios.get("/invoices/documents");
       this.correlativeForm.documents = data.documents;
     },
-    changeActiveCorrelative(correlative, index) {
-      this.$confirm(
-        `¿Estás seguro que deseas ${
-          correlative.active ? "activar" : "desactivar"
-        } este documento?`,
-        "Confirmación",
-        {
-          confirmButtonText: `Si, ${
-            correlative.active ? "activar" : "desactivar"
-          }`,
-          cancelButtonText: "Cancelar",
-          type: "warning",
-          beforeClose: (action, instance, done) => {
-            if (action === "confirm") {
-              instance.confirmButtonLoading = true;
-              instance.confirmButtonText = "Procesando...";
-              this.$axios
-                .put(`/invoices/documents/status/${correlative.id}`, {
-                  status: correlative.active,
-                })
-
-                .then((res) => {
-                  this.$notify.success({
-                    title: "Exito",
-                    message: res.data.message,
-                  });
-                  this.fetchDocuments();
-                })
-                .catch((err) => {
-                  this.$notify.error({
-                    title: "Error",
-                    message: err.response.data.message,
-                  });
-                })
-                .then((alw) => {
-                  instance.confirmButtonLoading = false;
-                  instance.confirmButtonText = `Si, ${
-                    correlative.active ? "activar" : "desactivar"
-                  }`;
-                  done();
-                });
-            } else {
-              done();
-            }
-          },
+    changeActiveCorrelative(formName, correlative, index) {
+      if (!correlative.id) {
+        if (this.$refs[formName] && !correlative.active) {
+          this.$refs[formName].resetFields();
         }
-      ).catch(() => {
-        this.correlativeForm.documents[index].active = !correlative.active;
-      });
+        this.correlativeForm.documents[index].active = correlative.active;
+      } else {
+        this.$confirm(
+          `¿Estás seguro que deseas ${
+            correlative.active ? "activar" : "desactivar"
+          } este documento?`,
+          "Confirmación",
+          {
+            confirmButtonText: `Si, ${
+              correlative.active ? "activar" : "desactivar"
+            }`,
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                this.$axios
+                  .put(`/invoices/documents/status/${correlative.id}`, {
+                    status: correlative.active,
+                  })
+
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Exito",
+                      message: res.data.message,
+                    });
+                    this.fetchDocuments();
+                  })
+                  .catch((err) => {
+                    this.$notify.error({
+                      title: "Error",
+                      message: err.response.data.message,
+                    });
+                  })
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = `Si, ${
+                      correlative.active ? "activar" : "desactivar"
+                    }`;
+                    done();
+                  });
+              } else {
+                done();
+              }
+            },
+          }
+        ).catch(() => {
+          this.correlativeForm.documents[index].active = !correlative.active;
+        });
+      }
     },
     submitCorrelativeForm(formName) {
       this.$refs[formName].validate(async (valid) => {
