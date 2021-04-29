@@ -476,7 +476,6 @@
         </div>
       </span>
     </el-dialog>
-
     <!-- BALANCE General
     ADDaccount -->
     <el-dialog
@@ -714,16 +713,6 @@
     >
       <!--  tab generales -->
       <el-tab-pane label="Generales" name="general">
-        <!-- <div class="grid grid-cols-12">
-          <div class="col-span-12">
-            <Notification
-              class="mb-4 w-full"
-              type="info"
-              title="Información"
-              
-            />
-          </div>
-        </div> -->
         <el-form
           :model="fiscalPeriodForm"
           :rules="fiscalPeriodFormRules"
@@ -772,24 +761,12 @@
               "
               >Guardar</el-button
             >
-            <el-button size="small" @click="$router.push('/entries')">
-              Cancelar
-            </el-button>
+            <el-button size="small" @click="cancel()"> Cancelar </el-button>
           </div>
         </el-form>
       </el-tab-pane>
       <!-- Firmantes -->
       <el-tab-pane label="Firmantes" name="signatures">
-        <!-- <div class="grid grid-cols-12">
-          <div class="col-span-12">
-            <Notification
-              class="mb-4 w-full"
-              type="info"
-              title="Información"
-              
-            />
-          </div>
-        </div> -->
         <el-form
           :model="firmantesForm"
           :rules="firmantesFormRules"
@@ -864,9 +841,7 @@
               "
               >Guardar</el-button
             >
-            <el-button size="small" @click="$router.push('/entries')"
-              >Cancelar</el-button
-            >
+            <el-button size="small" @click="cancel()">Cancelar</el-button>
           </div>
         </el-form>
       </el-tab-pane>
@@ -979,7 +954,6 @@
             />
           </div>
         </div>
-
         <el-form>
           <div class="grid grid-cols-12 gap-4">
             <div class="col-span-3">
@@ -1064,7 +1038,6 @@
             </div>
           </div>
         </el-form>
-
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-12">
             <el-table
@@ -1111,7 +1084,7 @@
                     v-if="scope.row.showAdd"
                     class="item"
                     effect="dark"
-                    content="Agregar nueva cuenta"
+                    content="Agregar nueva cuenta11"
                     placement="top"
                   >
                     <el-button
@@ -1141,7 +1114,6 @@
             </el-table>
           </div>
         </div>
-
         <div class="flex justify-end mt-4">
           <el-button
             type="primary"
@@ -1155,7 +1127,7 @@
             "
             >Guardar</el-button
           >
-          <el-button size="small">Cancelar</el-button>
+          <el-button size="small" @click="cancel()">Cancelar</el-button>
         </div>
       </el-tab-pane>
 
@@ -1287,7 +1259,7 @@
             @click.native="submitResults(tablesData)"
             >Guardar</el-button
           >
-          <el-button size="small">Cancelar</el-button>
+          <el-button size="small" @click="cancel()">Cancelar</el-button>
         </div>
       </el-tab-pane>
 
@@ -1295,18 +1267,17 @@
       <el-tab-pane label="Integraciones" name="integraciones">
         <div class="grid grid-cols-12">
           <div class="col-span-12">
-            <Notification
-              class="mb-4 w-full"
-              type="info"
-              title="Información" 
-            />
+            <Notification class="mb-4 w-full" type="info" title="Información" />
           </div>
         </div>
 
         <div class="flex flex-col space-y-2">
           <el-form>
             <div class="grid grid-cols-12 gap-4">
-              <el-form-item label="Cuenta contable para pagos de contado" class="col-span-4">
+              <el-form-item
+                label="Cuenta contable para pagos de contado"
+                class="col-span-4"
+              >
                 <el-select
                   class="w-full"
                   size="small"
@@ -1343,14 +1314,12 @@
                 </el-radio-group>
               </el-form-item>
             </div>
-                <div class="flex justify-end ">
-          <el-button
-            type="primary"
-            size="small"
-            >Guardar</el-button
-          >
-          <el-button size="small" @click="$router.push('/entries')">Cancelar</el-button>
-        </div>
+            <div class="flex justify-end">
+              <el-button type="primary" size="small">Guardar</el-button>
+              <el-button size="small" @click="$router.push('/entries')"
+                >Cancelar</el-button
+              >
+            </div>
           </el-form>
         </div>
       </el-tab-pane>
@@ -1404,13 +1373,8 @@
 import { endOfMonth, format, startOfMonth, differenceInMonths } from "date-fns";
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import { getIcon, hasModule } from "../../tools";
-import {
-  inputValidation,
-  selectValidation,
-  checkBeforeLeave,
-  checkBeforeEnter,
-} from "../../tools";
+import { getIcon } from "../../tools";
+import { inputValidation, selectValidation } from "../../tools";
 
 export default {
   name: "EntriesSettings",
@@ -1482,7 +1446,6 @@ export default {
         this.accountsCount = accountCatalogs.data.count;
       })
       .catch((err) => {
-        console.log(err);
         this.errorMessage = err.response.data.message;
       })
       .then((alw) => (this.pageloading = false));
@@ -2085,15 +2048,14 @@ export default {
       this.fetchCatalog();
     },
     openEditAccount(account) {
-      if (account.code.length == 1) {
+      if (account.isParent) {
         this.showEditMayorDialog = true;
         this.activeAccount = { ...account };
       } else {
         this.showEditAccount = true;
-
         this.activeAccount = {
           ...account,
-          code: `0${account.code.slice(-1)}`,
+          code: account.code.slice(account.parentCatalog.code.length),
         };
       }
     },
@@ -2137,22 +2099,18 @@ export default {
       );
     },
     submitEditedCatalog(accounts, formName, activeAccount) {
-      console.log("REFFFF", accounts, formName, activeAccount);
       this.$refs[formName].validate((valid) => {
         if (!valid) {
           return false;
         }
 
         // Genera el codigo real a guardar
-        const realCode =
-          Object.keys(activeAccount).length > 0
-            ? `${activeAccount.code}${accounts.code}`
-            : `${accounts.code}`;
+        const realCode = `${activeAccount.parentCatalog.code}${activeAccount.code}`;
 
         // Verifica si los codigos nuevos y los guardados estan duplicados entre ellos.
         // const catalog = this.accounts.map((a) => a.code);
         const catalog = this.accounts
-          .filter((a) => a.id != accounts.id)
+          .filter((a) => a.id !== activeAccount.id)
           .map((a) => a.code);
 
         if (catalog.includes(realCode)) {
@@ -2178,6 +2136,7 @@ export default {
                 this.$axios
                   .put(`/entries/catalog/${activeAccount.id}`, {
                     ...activeAccount,
+                    code: realCode,
                   })
                   .then((res) => {
                     this.$notify.success({
@@ -2249,6 +2208,14 @@ export default {
       addTo = addTo.children.find((c) => c.id == selected.id);
       for (const code of list) {
         const account = this.catalogs.find((c) => c.id == code);
+
+        if (addTo.children.filter((c) => c.id == account.code).length > 0) {
+          this.$notify.error({
+            title: "Error",
+            message: "No se puede agregar una cuenta que ya existe.",
+          });
+          return false;
+        }
         addTo.children.push({
           id: account.code,
           name: account.name,
@@ -2589,11 +2556,6 @@ export default {
         }
       );
     },
-  },
-  computed: {
-    // filteredIntegrations() {
-    //   return this.integrations.filter((i) => hasModule(i.ref, this.$auth.user));
-    // },
   },
 };
 </script>

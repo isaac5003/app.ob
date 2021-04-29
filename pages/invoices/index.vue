@@ -364,6 +364,7 @@
                     </div>
                   </el-option>
                 </el-option-group>
+                   <!-- toda esbien -->
                 <el-option-group key="INACTIVOS" label="INACTIVOS">
                   <el-option
                     style="height: 50px"
