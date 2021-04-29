@@ -7,33 +7,29 @@
       { name: 'Reportes', to: null },
     ]"
   >
-    <div class="flex justify-center" v-if="errorMessage">
-      <Notification
-        class="w-1/2"
-        type="danger"
-        title="Error de comunicación"
-        :message="errorMessage"
-        :action="{
-          title: 'Intentar nuevamente',
-          function: () => $router.go(),
-        }"
-      />
+    <Notification
+      v-if="errorMessage"
+      type="danger"
+      title="Error de comunicaciÃƒÂ³n"
+      :message="errorMessage"
+      :action="{
+        title: 'Intentar nuevamente',
+        function: () => $router.go(),
+      }"
+    />
+    <div class="grid grid-cols-12 gap-4">
+      <div class="col-start-5 col-span-2">Vista previa</div>
     </div>
-
-    <el-form
-      :model="reportForm"
-      :rules="reportFormRules"
-      ref="reportForm"
-      @submit.native.prevent="
-        generateReport('reportForm', reportForm, catalogos)
-      "
-      status-icon
-    >
-      <!-- first row -->
-      <div class="grid grid-cols-12 gap-4">
-        <!-- Tipos de reporte -->
-        <div class="col-span-4">
-          <el-form-item label="Seleccione el reporte" prop="reportType">
+    <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-4 h-full">
+        <el-form
+          :model="reportForm"
+          :rules="reportFormRules"
+          ref="reportForm"
+          @submit.native.prevent="generateReport('reportForm', reportForm)"
+          status-icon
+        >
+          <el-form-item label="Seleccione el reporte:" prop="reportType">
             <el-select
               v-model="reportForm.reportType"
               placeholder="Seleccione reporte"
@@ -60,10 +56,81 @@
               </el-option-group>
             </el-select>
           </el-form-item>
-        </div>
 
-        <div class="col-span-5">
-          <el-form-item prop="" label="Formato de reporte">
+          <el-form-item
+            prop="dateRange"
+            label="Seleccione la fecha"
+            v-if="requirementForm == 'compact'"
+          >
+            <el-date-picker
+              v-model="reportForm.dateRange"
+              type="month"
+              format="MMMM yyyy"
+              placeholder="Selecciona un mes"
+              size="small"
+              style="width: 100%"
+              @change="generateReport('reportForm', reportForm, true)"
+            />
+          </el-form-item>
+
+          <!-- seleccion date range y cuentas -->
+          <div class="flex flex-col" v-if="requirementForm == 'extended'">
+            <el-form-item label="Rango de fechas:" prop="dateRanges">
+              <el-date-picker
+                size="small"
+                v-model="reportForm.dateRanges"
+                type="daterange"
+                unlink-panels
+                range-separator="-"
+                start-placeholder="Fecha inicio"
+                end-placeholder="Fecha final"
+                :editable="false"
+                format="dd/MM/yyyy"
+                value-format="yyyy-MM-dd"
+                style="width: 100%"
+                @change="
+                  generateRangeAccount(
+                    reportForm.dateRanges,
+                    reportForm.accounts
+                  )
+                "
+              />
+            </el-form-item>
+
+            <el-form-item label="Cuentas:" class="col-span-4" prop="accounts">
+              <el-select
+                v-model="reportForm.accounts"
+                placeholder="Seleccionar cuentas"
+                size="small"
+                clearable
+                filterable
+                multiple
+                default-first-option
+                class="w-full"
+                @change="
+                  generateRangeAccount(
+                    reportForm.dateRanges,
+                    reportForm.accounts
+                  )
+                "
+              >
+                <el-option
+                  v-for="catalog in accountingCatalog"
+                  :key="catalog.id"
+                  :label="catalog.code"
+                  :value="catalog.id"
+                  :disabled="catalog.isParent == true"
+                >
+                  <div class="flex flex-row justify-between">
+                    <span class="mr-5 text-sm">{{ catalog.name }}</span>
+                    <span class="text-gray-600">{{ catalog.code }}</span>
+                  </div>
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </div>
+
+          <el-form-item prop="" label="Formato de reporte" class="col-span-4">
             <el-radio-group
               v-model="reportForm.radio"
               :disabled="reportForm.reportType ? false : true"
@@ -83,85 +150,25 @@
               </el-row>
             </el-radio-group>
           </el-form-item>
-        </div>
+
+          <div class="flex flex-row justify-end">
+            <el-button
+              :disabled="reportForm.reportType ? false : true"
+              type="primary"
+              size="small"
+              icon="el-icon-download"
+              native-type="submit"
+              :loading="generating"
+              >Descargar</el-button
+            ><el-button size="small" @click="cancel()">Cancelar</el-button>
+          </div>
+        </el-form>
       </div>
 
-      <!-- seleccionar fecha -->
-      <div class="grid grid-cols-12 gap-4" v-if="requirementForm == 'compact'">
-        <div class="col-span-4">
-          <el-form-item prop="dateRange" label="Seleccione la fecha">
-            <el-date-picker
-              v-model="reportForm.dateRange"
-              type="month"
-              format="MMMM yyyy"
-              placeholder="Selecciona un mes"
-              size="small"
-              style="width: 100%"
-            />
-          </el-form-item>
-        </div>
+      <div class="col-span-8 min-h-4/5">
+        <iframe class="w-full h-full" id="iframe" src=""></iframe>
       </div>
-      <!-- seleccion date range y cuentas -->
-      <div class="grid grid-cols-12 gap-4" v-if="requirementForm == 'extended'">
-        <div class="col-span-4">
-          <el-form-item label="Rango de fechas:" prop="dateRanges">
-            <el-date-picker
-              size="small"
-              v-model="reportForm.dateRanges"
-              type="daterange"
-              unlink-panels
-              range-separator="-"
-              start-placeholder="Fecha inicio"
-              end-placeholder="Fecha final"
-              :editable="false"
-              format="dd/MM/yyyy"
-              value-format="yyyy-MM-dd"
-              style="width: 100%"
-            />
-          </el-form-item>
-        </div>
-        <div class="col-span-8">
-          <el-form-item label="Cuentas:" prop="accounts">
-            <el-select
-              v-model="reportForm.accounts"
-              placeholder="Seleccionar cuentas"
-              size="small"
-              clearable
-              filterable
-              multiple
-              default-first-option
-              class="w-full"
-            >
-              <el-option
-                v-for="catalog in accountingCatalog"
-                :key="catalog.id"
-                :label="catalog.code"
-                :value="catalog.id"
-                :disabled="catalog.isParent == true"
-              >
-                <div class="flex flex-row justify-between">
-                  <span class="mr-5 text-sm">{{ catalog.name }}</span>
-                  <span class="text-gray-600">{{ catalog.code }}</span>
-                </div>
-              </el-option>
-            </el-select>
-          </el-form-item>
-        </div>
-      </div>
-
-      <!-- Guardar y Cancelar -->
-      <div class="flex flex-row justify-end">
-        <el-button
-          :disabled="reportForm.reportType ? false : true"
-          type="primary"
-          size="small"
-          icon="el-icon-download"
-          native-type="submit"
-          :loading="generating"
-          >Descargar</el-button
-        ><el-button size="small" @click="cancel()">Cancelar</el-button>
-      </div>
-    </el-form>
+    </div>
   </layout-content>
 </template>
 
@@ -184,7 +191,6 @@ export default {
     return {
       generating: false,
       pageLoading: false,
-      loading: false,
       errorMessage: "",
       reportForm: {
         reportType: "",
@@ -199,18 +205,17 @@ export default {
         dateRanges: selectValidation("change", true),
         accounts: selectValidation("change", true),
       },
-      catalogos: [],
       reports: [
         { name: "Balance general anual", id: "balanceAnual" },
         { name: "Balance general mensual", id: "balanceGeneral" },
         { name: "Estado de resultados anual", id: "estadoResultadosAnual" },
         { name: "Estado de resultados mensual", id: "estadoResultados" },
-        { name: "Balance de comprobación", id: "balanceComprobacion" },
+        { name: "Balance de comprobaciÃƒÂ³n", id: "balanceComprobacion" },
       ],
       auxiliarReports: [
         { name: "Libro diario mayor", id: "diarioMayor" },
         { name: "Libro de auxiliares", id: "libroAuxiliares" },
-        { name: "Catalógo de cuentas", id: "catalogoCuentas" },
+        { name: "CatalÃƒÂ³go de cuentas", id: "catalogoCuentas" },
         //{ name: "Detalle de cuentas", id: "detalleCuentas" },
         { name: "Detalle de movimiento cuentas", id: "movimientoCuentas" },
       ],
@@ -220,6 +225,9 @@ export default {
   },
   methods: {
     showRequirements(id) {
+      this.reportForm.radio = "pdf";
+      const iframe = document.querySelector("#iframe");
+      iframe.src = "";
       if (!id) {
         this.requirementForm = null;
       } else {
@@ -230,15 +238,16 @@ export default {
           case "diarioMayor":
           case "libroAuxiliares":
             this.requirementForm = "compact";
+            this.generateReport("reportForm", this.reportForm, true);
             break;
-
           case "movimientoCuentas":
             this.requirementForm = "extended";
-            this.getCalogs();
             this.pageLoading = true;
+            this.getCalogs();
             break;
           default:
             this.requirementForm = "none";
+            this.generateReport("reportForm", this.reportForm, true);
             break;
         }
       }
@@ -246,7 +255,7 @@ export default {
     generateReport(
       formName,
       { dateRange, reportType, radio, dateRanges },
-      catalogos
+      preview = false
     ) {
       this.$refs[formName].validate((valid) => {
         if (!valid) {
@@ -256,50 +265,52 @@ export default {
         this.generating = true;
         switch (reportType) {
           case "balanceAnual":
-            this.balanceAnual(radio);
+            this.balanceAnual(radio, preview);
             break;
           case "balanceGeneral":
             this.balanceGeneral(
               this.$dateFns.format(new Date(dateRange), "yyyy-MM-dd"),
-              radio
+              radio,
+              preview
             );
             break;
           case "estadoResultados":
             this.generateEstadoResultados(
               this.$dateFns.format(new Date(dateRange), "yyyy-MM-dd"),
-              radio
+              radio,
+              preview
             );
-
             break;
           case "estadoResultadosAnual":
             this.generateEstadoResultadosAnual(
               this.$dateFns.format(new Date(dateRange), "yyyy-MM-dd"),
-              radio
+              radio,
+              preview
             );
-
             break;
           case "balanceComprobacion":
-            this.generateBalanceComprobacion(dateRange, radio);
+            this.generateBalanceComprobacion(dateRange, radio, preview);
             break;
           case "diarioMayor":
-            this.getDiarioMayor(dateRange, radio);
+            this.getDiarioMayor(dateRange, radio, preview);
             break;
           case "libroAuxiliares":
-            this.getAuxiliares(dateRange, radio);
+            this.getAuxiliares(dateRange, radio, preview);
             break;
           case "catalogoCuentas":
-            this.getAccountingCatalog(radio);
+            this.getAccountingCatalog(radio, preview);
             break;
             // case "detalleCuentas":
             // this.generateDetalleCuentas(dateRange, catalogList);
             break;
           case "movimientoCuentas":
-            this.generateDetalleCuentas(dateRanges, catalogos, radio);
+            this.generateDetalleCuentas(dateRanges, radio, preview);
+
             break;
         }
       });
     },
-    generateEstadoResultados(dateRange, fileType) {
+    generateEstadoResultados(dateRange, fileType, preview) {
       const bussinesInfo = () => this.$axios.get("/business/info");
       const estadoResultados = () =>
         this.$axios.get("/entries/report/estado-resultados", {
@@ -325,7 +336,7 @@ export default {
               );
               const signature = signatures.data.signatures;
               const postTitle =
-                "(Expresado en dólares de los Estados Unidos de América)";
+                "(Expresado en dÃƒÂ³lares de los Estados Unidos de AmÃƒÂ©rica)";
               const values = [];
               const emptyRow = [
                 {
@@ -525,7 +536,7 @@ export default {
                 },
               };
               this.generating = false;
-              pdfMake.createPdf(docDefinition).open();
+              this.generatePDF(docDefinition, preview);
             }
           );
           break;
@@ -545,7 +556,7 @@ export default {
               );
               const signature = signatures.data.signatures;
               const postTitle =
-                "(Expresado en dólares de los Estados Unidos de América)";
+                "(Expresado en dÃƒÂ³lares de los Estados Unidos de AmÃƒÂ©rica)";
               const data = [];
               for (const er of estadoResultado) {
                 data.push([""]);
@@ -595,7 +606,7 @@ export default {
           break;
       }
     },
-    generateEstadoResultadosAnual(dateRange, fileType) {
+    generateEstadoResultadosAnual(dateRange, fileType, preview) {
       const bussinesInfo = () => this.$axios.get("/business/info");
       const settingsGeneral = () => this.$axios.get("/entries/setting/general");
       const signatures = () => this.$axios.get("/entries/setting/signatures");
@@ -608,7 +619,7 @@ export default {
               const generales = settingsGeneral.data.general;
               const signature = signatures.data.signatures;
               const postTitle =
-                "(Expresado en dólares de los Estados Unidos de América)";
+                "(Expresado en dÃƒÂ³lares de los Estados Unidos de AmÃƒÂ©rica)";
               this.$axios
                 .get("/entries/report/estado-resultados", {
                   params: {
@@ -832,7 +843,7 @@ export default {
                     },
                   };
                   this.generating = false;
-                  pdfMake.createPdf(docDefinition).open();
+                  this.generatePDF(docDefinition, preview);
                 });
             }
           );
@@ -845,7 +856,7 @@ export default {
               const generales = settingsGeneral.data.general;
               const signature = signatures.data.signatures;
               const postTitle =
-                "(Expresado en dólares de los Estados Unidos de América)";
+                "(Expresado en dÃƒÂ³lares de los Estados Unidos de AmÃƒÂ©rica)";
               this.$axios
                 .get("/entries/report/estado-resultados", {
                   params: {
@@ -914,7 +925,7 @@ export default {
           break;
       }
     },
-    generateBalanceComprobacion(dateRange, fileType) {
+    generateBalanceComprobacion(dateRange, fileType, preview) {
       const bussinesInfo = () => this.$axios.get("/business/info");
       const balanceComprobacion = () =>
         this.$axios.get("/entries/report/balance-comprobacion", {
@@ -1058,7 +1069,7 @@ export default {
                     body: [
                       [
                         {
-                          text: "CÓDIGO\nDE LA CUENTA",
+                          text: "CÃƒâ€œDIGO\nDE LA CUENTA",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -1082,7 +1093,7 @@ export default {
                         {},
                         {
                           alignment: "center",
-                          text: "SALDO DEL\nPERÍODO",
+                          text: "SALDO DEL\nPERÃƒÂODO",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -1123,7 +1134,7 @@ export default {
               },
             };
             this.generating = false;
-            pdfMake.createPdf(docDefinition).open();
+            this.generatePDF(docDefinition, preview);
           });
           break;
         case "excel":
@@ -1180,7 +1191,7 @@ export default {
               [reportTitleName, "", "", "", `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               [
-                "CÓD. DE LA CUENTA",
+                "CÃƒâ€œD. DE LA CUENTA",
                 "NOMBRE DE LA CUENTA",
                 "BALANCE INICIAL",
                 "MES ACTUAL",
@@ -1206,7 +1217,7 @@ export default {
           break;
       }
     },
-    balanceGeneral(dateRange, fileType) {
+    balanceGeneral(dateRange, fileType, preview) {
       const general = () =>
         this.$axios.get("/entries/report/balance-general", {
           params: {
@@ -1224,7 +1235,7 @@ export default {
             const { name, nit, nrc } = bussinesInfo.data.info;
             const { accountant, auditor, legal } = signatures.data.signatures;
             const postTitle =
-              "(Expresado en dólares de los Estados Unidos de América)";
+              "(Expresado en dÃƒÂ³lares de los Estados Unidos de AmÃƒÂ©rica)";
             let activoValues = [];
             let pasivoValues = [];
             let patrimonioValues = [];
@@ -1526,7 +1537,7 @@ export default {
               },
             };
             this.generating = false;
-            pdfMake.createPdf(docDefinition).open();
+            this.generatePDF(docDefinition, preview);
           });
           break;
         case "excel":
@@ -1537,7 +1548,7 @@ export default {
             const { accountant, auditor, legal } = signatures.data.signatures;
             const reportTitleName = general.data.name;
             const postTitle =
-              "(Expresado en dólares de los Estados Unidos de América)";
+              "(Expresado en dÃƒÂ³lares de los Estados Unidos de AmÃƒÂ©rica)";
             let activoValues = [];
             let pasivoValues = [];
             let patrimonioValues = [];
@@ -1615,7 +1626,7 @@ export default {
           break;
       }
     },
-    balanceAnual(fileType) {
+    balanceAnual(fileType, preview) {
       const bussinesInfo = () => this.$axios.get("/business/info");
       const settingsGeneral = () => this.$axios.get("/entries/setting/general");
       const signatures = () => this.$axios.get("/entries/setting/signatures");
@@ -1630,7 +1641,7 @@ export default {
               const startDate = periodStart;
               const endDate = peridoEnd;
               const postTitle =
-                "(Expresado en dólares de los Estados Unidos de América)";
+                "(Expresado en dÃƒÂ³lares de los Estados Unidos de AmÃƒÂ©rica)";
 
               this.$axios
                 .get("/entries/report/balance-general", {
@@ -1948,7 +1959,7 @@ export default {
                     },
                   };
                   this.generating = false;
-                  pdfMake.createPdf(docDefinition).open();
+                  this.generatePDF(docDefinition, preview);
                 });
             }
           );
@@ -1963,7 +1974,7 @@ export default {
               const startDate = periodStart;
               const endDate = peridoEnd;
               const postTitle =
-                "(Expresado en dólares de los Estados Unidos de América)";
+                "(Expresado en dÃƒÂ³lares de los Estados Unidos de AmÃƒÂ©rica)";
 
               this.$axios
                 .get("/entries/report/balance-general", {
@@ -2055,7 +2066,7 @@ export default {
           break;
       }
     },
-    getAccountingCatalog(fileType) {
+    getAccountingCatalog(fileType, preview) {
       const catalog = () => this.$axios.get("/entries/catalog");
       const bussinesInfo = () => this.$axios.get("/business/info");
       switch (fileType) {
@@ -2105,7 +2116,7 @@ export default {
                           style: "tableHeader",
                         },
                         {
-                          text: "DESCRIPCIÓN LA CUENTA",
+                          text: "DESCRIPCIÃƒâ€œN LA CUENTA",
                           style: "tableHeader",
                         },
                         {
@@ -2127,7 +2138,7 @@ export default {
               },
             };
             this.generating = false;
-            pdfMake.createPdf(docDefinition).open();
+            this.generatePDF(docDefinition, preview);
           });
           break;
         case "excel":
@@ -2162,7 +2173,7 @@ export default {
           break;
       }
     },
-    getDiarioMayor(dateRange, fileType) {
+    getDiarioMayor(dateRange, fileType, preview) {
       const bussinesInfo = () => this.$axios.get("/business/info");
       const libroMayor = () => {
         return this.$axios.get("/entries/report/diario-mayor", {
@@ -2281,7 +2292,7 @@ export default {
                     body: [
                       [
                         {
-                          text: "CÓD. DE LA CUENTA",
+                          text: "CÃƒâ€œD. DE LA CUENTA",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -2305,7 +2316,7 @@ export default {
                         {},
                         {
                           alignment: "center",
-                          text: "SALDO DEL\nPERÍODO",
+                          text: "SALDO DEL\nPERÃƒÂODO",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -2339,7 +2350,7 @@ export default {
               },
             };
             this.generating = false;
-            pdfMake.createPdf(docDefinition).open();
+            this.generatePDF(docDefinition, preview);
           });
           break;
         case "excel":
@@ -2383,7 +2394,7 @@ export default {
               [reportTitleName, "", "", "", `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               [
-                "CÓD. DE LA",
+                "CÃƒâ€œD. DE LA",
                 "NOMBRE DE LA CUENTA",
                 "FECHA DE",
                 "MES ACTUAL",
@@ -2408,7 +2419,7 @@ export default {
           break;
       }
     },
-    getAuxiliares(dateRange, fileType) {
+    getAuxiliares(dateRange, fileType, preview) {
       const bussinesInfo = () => this.$axios.get("/business/info");
       const auxiliares = () => {
         return this.$axios.get("/entries/report/auxiliares", {
@@ -2530,7 +2541,7 @@ export default {
                     body: [
                       [
                         {
-                          text: "CÓD. DE LA CUENTA\nN° DE PARTIDA",
+                          text: "CÃƒâ€œD. DE LA CUENTA\nNÃ‚Â° DE PARTIDA",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -2554,7 +2565,7 @@ export default {
                         {},
                         {
                           alignment: "center",
-                          text: "SALDO DEL\nPERÍODO",
+                          text: "SALDO DEL\nPERÃƒÂODO",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -2588,7 +2599,7 @@ export default {
               },
             };
             this.generating = false;
-            pdfMake.createPdf(docDefinition).open();
+            this.generatePDF(docDefinition, preview);
           });
           break;
         case "excel":
@@ -2631,7 +2642,7 @@ export default {
               [reportTitleName, "", "", "", `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               [
-                "CÓD. DE LA CUENTA",
+                "CÃƒâ€œD. DE LA CUENTA",
                 "NOMBRE DE LA CUENTA",
                 "FECHA DE",
                 "MES ACTUAL",
@@ -2639,7 +2650,7 @@ export default {
                 "SALDO DEL",
               ],
               [
-                "N° DE PARTIDA",
+                "NÃ‚Â° DE PARTIDA",
                 "CONCEPTO",
                 "PARTIDA",
                 "CARGOS",
@@ -2663,7 +2674,7 @@ export default {
           break;
       }
     },
-    generateDetalleCuentas(dateRange, catalogos, fileType) {
+    generateDetalleCuentas(dateRange, fileType, preview) {
       const movements = () =>
         this.$axios.get("/entries/report/account-movements", {
           params: {
@@ -2672,6 +2683,7 @@ export default {
             selectedAccounts: JSON.stringify(this.reportForm.accounts),
           },
         });
+
       switch (fileType) {
         case "pdf":
           Promise.all([movements()]).then((res) => {
@@ -2793,7 +2805,7 @@ export default {
                     body: [
                       [
                         {
-                          text: "CÓD. DE LA CUENTA\nN° DE PARTIDA",
+                          text: "CÃƒâ€œD. DE LA CUENTA\nNÃ‚Â° DE PARTIDA",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -2817,7 +2829,7 @@ export default {
                         {},
                         {
                           alignment: "center",
-                          text: "SALDO DEL\nPERÍODO",
+                          text: "SALDO DEL\nPERÃƒÂODO",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -2851,7 +2863,8 @@ export default {
               },
             };
             this.generating = false;
-            pdfMake.createPdf(docDefinition).open();
+
+            this.generatePDF(docDefinition, preview);
           });
 
           break;
@@ -2899,7 +2912,7 @@ export default {
               ],
               [""],
               [
-                "CÓD. DE LA CUENTA",
+                "CÃƒâ€œD. DE LA CUENTA",
                 "NOMBRE DE LA CUENTA",
                 "FECHA DE",
                 "MES ACTUAL",
@@ -2907,7 +2920,7 @@ export default {
                 "SALDO DEL",
               ],
               [
-                "N° DE PARTIDA",
+                "NÃ‚Â° DE PARTIDA",
                 "CONCEPTO",
                 "PARTIDA",
                 "CARGOS",
@@ -2937,13 +2950,33 @@ export default {
       this.pageLoading = false;
     },
     cancel() {
-      this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
-        confirmButtonText: "Si, salir",
-        cancelButtonText: "Cancelar",
-        type: "warning",
-      }).then(() => {
+      this.$confirm(
+        "Ã‚Â¿EstÃƒÂ¡s seguro que deseas salir?",
+        "ConfirmaciÃƒÂ³n",
+        {
+          confirmButtonText: "Si, salir",
+          cancelButtonText: "Cancelar",
+          type: "warning",
+        }
+      ).then(() => {
         this.$router.push("/entries");
       });
+    },
+    generatePDF(docDefinition, preview) {
+      if (preview) {
+        const generator = pdfMake.createPdf(docDefinition);
+        generator.getDataUrl((dataUrl) => {
+          const iframe = document.querySelector("#iframe");
+          iframe.src = dataUrl;
+        });
+      } else {
+        pdfMake.createPdf(docDefinition).open();
+      }
+    },
+    generateRangeAccount(dateRanges, accounts) {
+      if (dateRanges.length > 0 && accounts.length > 0) {
+        this.generateDetalleCuentas(dateRanges, "pdf", true);
+      }
     },
   },
 };

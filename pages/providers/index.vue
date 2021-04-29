@@ -1,15 +1,15 @@
 <template>
   <layout-content
-    v-loading="pageloading"
-    page-title="Listado de clientes"
+    v-loanding="pageloading"
+    page-title="Listado de proveedores"
     :breadcrumb="[
-      { name: 'Clientes', to: '/customers' },
-      { name: 'Listado de clientes', to: null },
+      { name: 'Proveedores', to: '/providers' },
+      { name: 'Listado de Proveedores', to: null },
     ]"
   >
     <el-dialog
       title="Vista previa"
-      :visible.sync="showCustomerPreview"
+      :visible.sync="showProviderPreview"
       width="900px"
       :append-to-body="true"
     >
@@ -17,65 +17,65 @@
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-6 flex flex-col">
             <span class="font-semibold">Nombre o razón social</span>
-            <span>{{ selectedCustomer ? selectedCustomer.name : "" }}</span>
+            <span>{{ selectedProvider ? selectedProvider.name : "" }}</span>
           </div>
           <div class="col-span-2 flex flex-col">
             <span class="font-semibold">Identificador</span>
             <span>{{
-              selectedCustomer ? selectedCustomer.shortName : ""
+              selectedProvider ? selectedProvider.shortName : ""
             }}</span>
           </div>
           <div class="col-span-2 flex flex-col">
             <span class="font-semibold">Estado</span>
-            <div v-if="selectedCustomer">
+            <div v-if="selectedProvider">
               <el-tag
                 size="small"
                 type="success"
-                v-if="selectedCustomer.isActiveCustomer"
+                v-if="selectedProvider.isActiveProvider"
                 >Activo</el-tag
               >
               <el-tag size="small" type="warning" v-else>Inactivo</el-tag>
             </div>
           </div>
-          <div class="col-span-2 flex flex-col" v-if="hasModule()">
+          <!-- no esta definido por que no esta la api  -->
+          <div class="col-span-2 flex flex-col">
             <span class="font-semibold">Es proveedor</span>
-            <div>
-              <el-tag size="small" type="warning" class="w-auto">{{
-                selectedCustomer
-                  ? selectedCustomer.isProvider
-                    ? "SI"
-                    : "NO"
-                  : ""
-              }}</el-tag>
-            </div>
+
+            <el-tag size="small" type="warning" class="w-auto">{{
+              selectedProvider
+                ? selectedProvider.isActiveProvider
+                  ? "SI"
+                  : "NO"
+                : ""
+            }}</el-tag>
           </div>
         </div>
         <div class="grid grid-cols-12 gap-4">
           <div
             class="col-span-2 flex flex-col"
-            v-if="selectedCustomer && selectedCustomer.customerType.id == 2"
+            v-if="selectedProvider && selectedProvider.customerType.id == 2"
           >
             <span class="font-semibold">DUI</span>
-            <span>{{ selectedCustomer ? selectedCustomer.dui : "" }}</span>
+            <span>{{ selectedProvider ? selectedProvider.dui : "" }}</span>
           </div>
           <div class="col-span-3 flex flex-col">
             <span class="font-semibold">NIT</span>
-            <span>{{ selectedCustomer ? selectedCustomer.nit : "" }}</span>
+            <span>{{ selectedProvider ? selectedProvider.nit : "" }}</span>
           </div>
           <template
             v-if="
-              selectedCustomer &&
-              (!selectedCustomer.customerTypeNatural ||
-                selectedCustomer.customerTypeNatural.id == 2)
+              selectedProvider &&
+              (!selectedProvider.customerTypeNatural ||
+                selectedProvider.customerTypeNatural.id == 2)
             "
           >
             <div class="col-span-2 flex flex-col">
               <span class="font-semibold">NRC</span>
-              <span>{{ selectedCustomer ? selectedCustomer.nrc : "" }}</span>
+              <span>{{ selectedProvider ? selectedProvider.nrc : "" }}</span>
             </div>
             <div class="col-span-5 flex flex-col">
               <span class="font-semibold">GIRO</span>
-              <span>{{ selectedCustomer ? selectedCustomer.giro : "" }}</span>
+              <span>{{ selectedProvider ? selectedProvider.giro : "" }}</span>
             </div>
           </template>
         </div>
@@ -83,32 +83,32 @@
           <div class="col-span-3 flex flex-col">
             <span class="font-semibold">Tipo de cliente</span>
             <span>{{
-              selectedCustomer ? selectedCustomer.customerType.name : ""
+              selectedProvider ? selectedProvider.customerType.name : ""
             }}</span>
           </div>
           <div
             class="col-span-3 flex flex-col"
-            v-if="selectedCustomer && selectedCustomer.customerTaxerType"
+            v-if="selectedProvider && selectedProvider.customerTaxerType"
           >
             <span class="font-semibold">Tipo de contribuyente</span>
             <span>{{
-              selectedCustomer && selectedCustomer.customerTaxerType
-                ? selectedCustomer.customerTaxerType.name
+              selectedProvider && selectedProvider.customerTaxerType
+                ? selectedProvider.customerTaxerType.name
                 : ""
             }}</span>
           </div>
           <div
             class="col-span-3 flex flex-col"
-            v-if="selectedCustomer && selectedCustomer.customerTaxerType == 2"
+            v-if="selectedProvider && selectedProvider.customerTaxerType == 2"
           >
             <span class="font-semibold">Tipo de persona natural</span>
 
-            <span>{{ selectedCustomer.customerTypeNatural.name }}</span>
+            <span>{{ selectedProvider.customerTypeNatural.name }}</span>
           </div>
         </div>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="showCustomerPreview = false" size="small"
+        <el-button @click="showProviderPreview = false" size="small"
           >Cerrar</el-button
         >
       </span>
@@ -135,7 +135,7 @@
             class="w-full"
             clearable
             default-first-option
-            @change="fetchCustomers"
+            @change="fetchProviders"
           >
             <el-option label="Todos los estados" value="" />
             <el-option label="Activo" :value="true" />
@@ -150,23 +150,28 @@
             size="small"
             style="margin-top: 22px"
             clearable
-            v-debounce:500ms="fetchCustomers"
-            @change="fetchCustomers"
+            v-debounce:500ms="fetchProviders"
+            @change="fetchProviders"
           />
         </el-form-item>
       </el-form>
       <el-table
         @sort-change="sortBy"
-        :data="customers.customers"
+        :data="providers.providers"
         stripe
         size="mini"
-        v-loading="tableloading"
+        v-loading="tablelcoading"
         ref="multipleTable"
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="50" />
-        <el-table-column prop="index" width="50" label="#" />
-        <el-table-column label="Nombre" min-width="310" sortable="custom">
+        <el-table-column prop="index" label="#" width="50" />
+        <el-table-column
+          label="Nombre"
+          min-width="310"
+          sortable="custom"
+          prop="name"
+        >
           <template slot-scope="scope">
             <div class="flex flex-col">
               <span class="font-semibold text-xs">
@@ -195,14 +200,14 @@
         <el-table-column
           label="Estado"
           width="110"
-          prop="isActiveCustomer"
+          prop="isActiveProviders"
           sortable="custom"
         >
           <template slot-scope="scope">
             <el-tag
               size="small"
               type="success"
-              v-if="scope.row.isActiveCustomer"
+              v-if="scope.row.isActiveProvider"
             >
               <i class="el-icon-success"></i>
               Activo</el-tag
@@ -214,48 +219,29 @@
           </template>
         </el-table-column>
         <el-table-column label width="70" align="center">
-          <!-- dropdpwn selecction -->
           <template slot="header" v-if="multipleSelection.length > 0">
             <el-dropdown>
-              <el-button
-                trigger="click"
-                icon="el-icon-more"
-                type="primary"
-                size="mini"
-                class="transition ease-out duration-700"
-              ></el-button>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item>
-                  <i class="el-icon-view"></i>Vista previa
-                </el-dropdown-item>
-                <el-dropdown-item>
-                  <i class="el-icon-printer"></i>Imprimir documento
-                </el-dropdown-item>
-                <el-dropdown-item :divided="true">
-                  <i class="el-icon-refresh-left"></i> Revertir estados
-                </el-dropdown-item>
-              </el-dropdown-menu>
+              <el-button type="primary" icon="el-icon-more"></el-button>
             </el-dropdown>
           </template>
-          <!-- dropdown 1 -->
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item
-                  @click.native="openCustomerPreview(scope.row)"
+                  @click.native="openProviderPreview(scope.row)"
                 >
                   <i class="el-icon-view"></i> Vista previa
                 </el-dropdown-item>
                 <el-dropdown-item
                   @click.native="
-                    $router.push(`/customers/edit?ref=${scope.row.id}`)
+                    $router.push(`/providers/edit?ref=${scope.row.id}`)
                   "
                 >
                   <i class="el-icon-edit-outline"></i> Editar cliente
                 </el-dropdown-item>
                 <el-dropdown-item @click.native="changeActive(scope.row)">
-                  <span v-if="scope.row.isActiveCustomer">
+                  <span v-if="scope.row.isActiveProvider">
                     <i class="el-icon-close"></i> Desactivar
                   </span>
                   <span v-else> <i class="el-icon-check"></i> Activar </span>
@@ -270,7 +256,7 @@
                 <el-dropdown-item
                   :divided="true"
                   class="text-red-500 font-semibold"
-                  @click.native="deleteCustomer(scope.row)"
+                  @click.native="deleteProvider(scope.row)"
                 >
                   <i class="el-icon-delete"></i> Eliminar cliente
                 </el-dropdown-item>
@@ -282,55 +268,57 @@
       <div class="flex justify-end">
         <el-pagination
           @size-change="handleSizeChange"
-          @current-change="fetchCustomers"
+          @current-change="fetchProviders"
           :current-page.sync="page.page"
           :page-sizes="[5, 10, 15, 25, 50, 100]"
           :page-size="page.size"
           layout="total, sizes, prev, pager, next"
-          :total="parseInt(customers.count)"
+          :total="parseInt(providers.count)"
           :pager-count="5"
         />
       </div>
     </div>
   </layout-content>
 </template>
-
 <script>
+//Import components
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import { hasModule } from "../../tools/index.js";
+
 export default {
-  name: "CustomersIndex",
+  name: "ProvidersIndex",
   head: {
-    titleTemplate: `%s | Clientes`,
+    titleTemplate: `%s | Proveedores`,
   },
   components: { LayoutContent, Notification },
   fetch() {
-    const customers = () => {
-      return this.$axios.get("/customers", { params: this.page });
+    const providers = () => {
+      return this.$axios.get("/providers", { params: this.page });
     };
 
-    Promise.all([customers()])
+    Promise.all([providers()])
       .then((res) => {
-        const [customers] = res;
-        this.customers = customers.data;
+        const [providers] = res;
+        this.providers = providers.data;
       })
       .catch((err) => {
-        this.errorMessage = err.response.data.message;
+        this.errorMessage = err.respose.data.message;
       })
-      .then((alw) => (this.pageloading = false));
+      .then((alw) => (this.pageloadig = false));
   },
   fetchOnServer: false,
+
   data() {
     return {
-      pageloading: true,
-      tableloading: false,
+      pageloadig: true,
+      tableloading: true,
       errorMessage: "",
       searchValue: "",
       status: "",
+      multipleSelection: [],
       sellingTypes: [],
-      customers: {
-        customers: [],
+      providers: {
+        providers: [],
         count: 0,
       },
       filter: {
@@ -341,23 +329,22 @@ export default {
         limit: 10,
         page: 1,
       },
-      showCustomerPreview: false,
-      selectedCustomer: null,
-      multipleSelection: [],
+      showProviderPreview: false,
+      selectedProvider: null,
     };
   },
   methods: {
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
-    fetchCustomers() {
+    fetchProviders() {
       this.tableloading = true;
       let params = this.page;
       if (this.status !== "") {
-        params = { ...params, active: this.status };
+        paramas = { ...params, active: this.status };
       }
       if (this.searchValue !== "") {
-        params = { ...params, search: this.searchValue.toLowerCase() };
+        paramas = { ...params, search: this.searchValue.toLowerCase() };
       }
       if (this.filter.order) {
         params = {
@@ -366,24 +353,23 @@ export default {
           order: this.filter.order,
         };
       }
-
       this.$axios
-        .get("/customers", { params })
+        .get("/providers", { params })
         .then((res) => {
-          this.customers = res.data;
+          this.providers = res.data;
         })
         .catch((err) => {
-          this.errorMessage = err.response.data.message;
+          this.errorMessage = err.resposne.data.message;
         })
         .then((alw) => (this.tableloading = false));
     },
     handleSizeChange(val) {
       this.page.limit = val;
-      this.fetchCustomers();
+      this.fetchProviders();
     },
-    changeActive({ id, isActiveCustomer }) {
-      const action = isActiveCustomer ? "desactivar" : "activar";
-      this.$confirm(
+    changeActive({ id, isActiveProvider }) {
+      const action = isActiveProvider ? "desactivar" : "activar";
+      this.$confim(
         `¿Estás seguro que deseas ${action} este cliente?`,
         "Confirmación",
         {
@@ -395,18 +381,18 @@ export default {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
               this.$axios
-                .put(`/customers/status/${id}`, { status: !isActiveCustomer })
+                .put(`/providers/status/${id}`, { status: !isActiveProvider })
                 .then((res) => {
                   this.$notify.success({
-                    title: "Éxito",
+                    title: "Exito",
                     message: res.data.message,
                   });
-                  this.fetchCustomers();
+                  this.fetchProviders();
                 })
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    message: err.respose.data.message,
                   });
                 })
                 .then((alw) => {
@@ -420,7 +406,7 @@ export default {
         }
       );
     },
-    deleteCustomer({ id }) {
+    deleteProvider({ id }) {
       this.$confirm(
         `¿Estás seguro que deseas eliminar este cliente?`,
         "Confirmación",
@@ -433,13 +419,13 @@ export default {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
               this.$axios
-                .delete(`/customers/${id}`)
+                .delete(`/providers/${id}`)
                 .then((res) => {
                   this.$notify.success({
                     title: "Éxito",
                     message: res.data.message,
                   });
-                  this.fetchCustomers();
+                  this.fetchProviders();
                 })
                 .catch((err) => {
                   this.$notify.error({
@@ -458,11 +444,10 @@ export default {
         }
       );
     },
-
-    async openCustomerPreview({ id }) {
-      const { data } = await this.$axios.get(`/customers/${id}`);
-      (this.selectedCustomer = data.customer),
-        (this.showCustomerPreview = true);
+    async openProviderPreview({ id }) {
+      const { data } = await this.$axios.get(`/providers/${id}`);
+      (this.selectedProvider = data.provider),
+        (this.showProviderPreview = true);
     },
     hasModule() {
       return hasModule("f6000cbb-1e6d-4f7d-a7cc-cadd78d23076", this.$auth.user);
@@ -470,7 +455,7 @@ export default {
     sortBy({ column, prop, order }) {
       this.filter.prop = prop;
       this.filter.order = order;
-      this.fetchCustomers();
+      this.fetchProviders();
     },
   },
 };

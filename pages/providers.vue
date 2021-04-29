@@ -1,6 +1,6 @@
 <template>
   <div class="flex">
-    <layout-submenu page-name="Servicios" :menu="menu" icon="duplicate" />
+    <layout-submenu page-name="Proveedores" :menu="menu" icon="truck" />
     <nuxt-child />
   </div>
 </template>
@@ -9,35 +9,30 @@
 import LayoutSubmenu from "../components/layout/Submenu";
 import { getIcon } from "../tools";
 export default {
-  name: "Services",
-  middleware: "access",
-  meta: {
-    id: "0f88f2ea-aae9-44ad-8df0-0ee3debbf167",
-  },
+  name: "Providers",
   components: { LayoutSubmenu },
   data() {
     return {
       menu: [
         {
-          name: "Nuevo servicio",
+          name: "Nuevo proveedor",
           icon: getIcon("plus"),
-          path: "/services/new",
+          path: "/providers/new",
         },
         {
-          name: "Listado de servicios",
+          name: "Listado de proveedores",
           icon: getIcon("menu"),
-          path: "/services",
-          epath: ["/services/edit"],
+          path: "/providers",
         },
         {
           name: "Reportes",
           icon: getIcon("document-text"),
-          path: "/services/reports",
+          path: "/providers/reports",
         },
         {
           name: "Configuraciones",
           icon: getIcon("cog"),
-          path: "/services/settings",
+          path: "/providers/settings",
         },
       ],
     };
