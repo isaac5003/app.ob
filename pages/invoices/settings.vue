@@ -516,8 +516,8 @@
         <el-form :model="correlativeForm" ref="correlativeForm">
           <div class="grid grid-cols-12 gap-4">
             <div
-              v-for="(d, i) of correlativeForm.documents"
-              :key="i"
+              v-for="(correlative, index) of correlativeForm.documents"
+              :key="index"
               class="col-span-4 bg-white"
             >
               <div class="border-2 p-5 border-blue-800 rounded-md">
@@ -525,12 +525,17 @@
                 <div class="grid grid-cols-12 gap-4">
                   <div class="col-span-8">
                     <el-form-item class="font-semibold text-blue-800">{{
-                      d.documentType ? d.documentType.name : ""
+                      correlative.documentType
+                        ? correlative.documentType.name
+                        : ""
                     }}</el-form-item>
                   </div>
                   <div class="col-span-2">
                     <el-form-item>
-                      <el-switch v-model="d.active"></el-switch>
+                      <el-switch
+                        v-model="correlative.active"
+                        @change="changeActiveCorrelative(correlative, index)"
+                      ></el-switch>
                     </el-form-item>
                   </div>
                   <div class="col-span-2">
@@ -549,7 +554,7 @@
                   <div class="col-span-12">
                     <el-form-item
                       label="N° Autorización"
-                      :prop="`documents.${i}.authorization`"
+                      :prop="`documents.${index}.authorization`"
                       :rules="{
                         required: true,
                         message: 'Este campo es requerido',
@@ -559,8 +564,14 @@
                       <el-input
                         class="w-full"
                         size="small"
-                        :disabled="d.active ? (d.used ? true : false) : true"
-                        v-model="d.authorization"
+                        :disabled="
+                          correlative.active
+                            ? correlative.used
+                              ? true
+                              : false
+                            : true
+                        "
+                        v-model="correlative.authorization"
                       ></el-input>
                     </el-form-item>
                   </div>
@@ -570,7 +581,7 @@
                   <div class="col-span-6">
                     <el-form-item
                       label="Inicial"
-                      :prop="`documents.${i}.initial`"
+                      :prop="`documents.${index}.initial`"
                       :rules="{
                         required: true,
                         message: 'Este campo es requerido.',
@@ -580,15 +591,21 @@
                       <el-input
                         class="w-full"
                         size="small"
-                        :disabled="d.active ? (d.used ? true : false) : true"
-                        v-model="d.initial"
+                        :disabled="
+                          correlative.active
+                            ? correlative.used
+                              ? true
+                              : false
+                            : true
+                        "
+                        v-model="correlative.initial"
                       ></el-input>
                     </el-form-item>
                   </div>
                   <div class="col-span-6">
                     <el-form-item
                       label="Final"
-                      :prop="`documents.${i}.final`"
+                      :prop="`documents.${index}.final`"
                       :rules="{
                         required: true,
                         message: 'Este campo es requerido.',
@@ -598,8 +615,14 @@
                       <el-input
                         class="w-full"
                         size="small"
-                        :disabled="d.active ? (d.used ? true : false) : true"
-                        v-model="d.final"
+                        :disabled="
+                          correlative.active
+                            ? correlative.used
+                              ? true
+                              : false
+                            : true
+                        "
+                        v-model="correlative.final"
                       ></el-input>
                     </el-form-item>
                   </div>
@@ -609,7 +632,7 @@
                   <div class="col-span-12">
                     <el-form-item
                       label="Actual"
-                      :prop="`documents.${i}.current`"
+                      :prop="`documents.${index}.current`"
                       :rules="{
                         required: true,
                         message: 'Este campo es requerido.',
@@ -619,8 +642,14 @@
                       <el-input
                         class="w-full"
                         size="small"
-                        :disabled="d.active ? (d.used ? true : false) : true"
-                        v-model="d.current"
+                        :disabled="
+                          correlative.active
+                            ? correlative.used
+                              ? true
+                              : false
+                            : true
+                        "
+                        v-model="correlative.current"
                       ></el-input>
                     </el-form-item>
                   </div>
@@ -1079,7 +1108,6 @@ export default {
       });
     },
     submitSeller(formName, { name, invoicesZone }) {
-      console.log(name, invoicesZone);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -1134,7 +1162,6 @@ export default {
       this.showEditSeller = true;
     },
     submitEditSeller(formName, sellerId, { name, invoicesZone }) {
-      console.log(name, invoicesZone);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -1247,6 +1274,56 @@ export default {
       const { data } = await this.$axios.get("/invoices/documents");
       this.correlativeForm.documents = data.documents;
     },
+    changeActiveCorrelative(correlative, index) {
+      this.$confirm(
+        `¿Estás seguro que deseas ${
+          correlative.active ? "activar" : "desactivar"
+        } este documento?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, ${
+            correlative.active ? "activar" : "desactivar"
+          }`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .put(`/invoices/documents/status/${correlative.id}`, {
+                  status: correlative.active,
+                })
+
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Exito",
+                    message: res.data.message,
+                  });
+                  this.fetchDocuments();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, ${
+                    correlative.active ? "activar" : "desactivar"
+                  }`;
+                  done();
+                });
+            } else {
+              done();
+            }
+          },
+        }
+      ).catch(() => {
+        this.correlativeForm.documents[index].active = !correlative.active;
+      });
+    },
     submitCorrelativeForm(formName) {
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
@@ -1306,7 +1383,9 @@ export default {
   },
   computed: {
     filteredIntegrations() {
-      return this.integrations.filter((i) => hasModule(i.ref, this.$auth.user));
+      return this.integrations.filter((index) =>
+        hasModule(i.ref, this.$auth.user)
+      );
     },
     activeZones() {
       return this.zones.filter((zone) => zone.active);

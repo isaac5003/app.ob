@@ -777,7 +777,7 @@ export default {
         );
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
         this.errorMessage = err.response.data.message;
       });
   },
@@ -944,7 +944,7 @@ export default {
             this.selectBranch(this.salesNewForm.customerBranch, this.branches);
           })
           .catch((err) => {
-            console.log(err);
+            console.error(err);
             this.errorMessage = err.response.data.message;
           });
       } else {

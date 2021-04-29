@@ -660,7 +660,7 @@ export default {
                   pdfMake.createPdf(docDefinition).open();
                 })
                 .catch((err) => {
-                  console.log(err);
+                  console.error(err);
                   this.errorMessage = err.response.data.message;
                 })
                 .then((alw) => {

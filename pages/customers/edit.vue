@@ -318,7 +318,7 @@
             class="grid grid-cols-12 gap-4"
             v-if="
               customersEditForm.customerType == 1 ||
-              customersEditForm.customerTypeNatural == 2
+                customersEditForm.customerTypeNatural == 2
             "
           >
             <el-form-item
@@ -478,7 +478,7 @@ export default {
         this.loading = false;
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
         this.$message.error(err.response.data.message);
         this.$router.push("/customers");
       })

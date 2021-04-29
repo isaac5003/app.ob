@@ -660,7 +660,6 @@ export default {
             (c) => c.id == form.accountingCatalog
           ).code,
         });
-        console.log(this.accountingEntryDetails);
 
         this.showEditEntryDetail = false;
         this.checkEntry();

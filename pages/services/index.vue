@@ -277,7 +277,7 @@ export default {
                   this.fetchServices();
                 })
                 .catch((err) => {
-                  console.log(err);
+                  console.error(err);
                   this.$notify.error({
                     title: "Error",
                     message: err.response.data.message,
