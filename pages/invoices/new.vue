@@ -87,7 +87,7 @@
                 <el-checkbox
                   v-if="
                     newServiceForm.sellingType == 3 &&
-                    salesNewForm.documentType != 3
+                      salesNewForm.documentType != 3
                   "
                   border
                   v-model="newServiceForm.incTax"
@@ -218,7 +218,7 @@
                   border
                   v-if="
                     editServiceForm.sellingType == 3 &&
-                    salesNewForm.documentType != 3
+                      salesNewForm.documentType != 3
                   "
                   v-model="editServiceForm.incTax"
                   size="small"
@@ -586,7 +586,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 1 &&
-                      salesNewForm.documentType != 3
+                        salesNewForm.documentType != 3
                     "
                     >{{
                       calcSujeta(salesNewForm.documentType, scope.row)
@@ -605,7 +605,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 2 &&
-                      salesNewForm.documentType != 3
+                        salesNewForm.documentType != 3
                     "
                     >{{
                       calcExenta(salesNewForm.documentType, scope.row)
@@ -624,7 +624,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 3 ||
-                      salesNewForm.documentType == 3
+                        salesNewForm.documentType == 3
                     "
                     >{{
                       calcGravada(salesNewForm.documentType, scope.row)
@@ -766,9 +766,9 @@ export default {
         this.sellers = sellers.data.sellers;
         this.paymentConditions = paymentConditions.data.paymentConditions;
         this.customers = customers.data.customers;
-        this.documentTypes = documents.data.documents.map(
-          (d) => d.documentType
-        );
+        this.documentTypes = documents.data.documents
+          .filter((d) => d.active == true)
+          .map((d) => d.documentType);
         this.loading = false;
         this.salesNewForm.documentType = 1;
         this.validateDocumentType(

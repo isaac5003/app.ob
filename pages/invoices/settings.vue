@@ -512,11 +512,11 @@
         </div>
       </el-tab-pane>
 
-      <el-tab-pane label="Correlativos">
+      <el-tab-pane label="Correlativos" name="correlatives">
         <el-form :model="correlativeForm" ref="correlativeForm">
           <div class="grid grid-cols-12 gap-4">
             <div
-              v-for="(d, i) of documents"
+              v-for="(d, i) of correlativeForm.documents"
               :key="i"
               class="col-span-4 bg-white"
             >
@@ -547,11 +547,19 @@
                 <!-- Autorización -->
                 <div class="grid grid-cols-12 gap-4">
                   <div class="col-span-12">
-                    <el-form-item label="N° Autorización">
+                    <el-form-item
+                      label="N° Autorización"
+                      :prop="`documents.${i}.authorization`"
+                      :rules="{
+                        required: true,
+                        message: 'Este campo es requerido',
+                        trigger: 'blur',
+                      }"
+                    >
                       <el-input
                         class="w-full"
                         size="small"
-                        :disabled="d.active && d.used ? true : false"
+                        :disabled="d.active ? (d.used ? true : false) : true"
                         v-model="d.authorization"
                       ></el-input>
                     </el-form-item>
@@ -560,21 +568,37 @@
                 <!-- Inicial, Final -->
                 <div class="grid grid-cols-12 gap-4">
                   <div class="col-span-6">
-                    <el-form-item label="Inicial">
+                    <el-form-item
+                      label="Inicial"
+                      :prop="`documents.${i}.initial`"
+                      :rules="{
+                        required: true,
+                        message: 'Este campo es requerido.',
+                        trigger: 'blur',
+                      }"
+                    >
                       <el-input
                         class="w-full"
                         size="small"
-                        :disabled="d.active && d.used ? true : false"
+                        :disabled="d.active ? (d.used ? true : false) : true"
                         v-model="d.initial"
                       ></el-input>
                     </el-form-item>
                   </div>
                   <div class="col-span-6">
-                    <el-form-item label="Final">
+                    <el-form-item
+                      label="Final"
+                      :prop="`documents.${i}.final`"
+                      :rules="{
+                        required: true,
+                        message: 'Este campo es requerido.',
+                        trigger: 'blur',
+                      }"
+                    >
                       <el-input
                         class="w-full"
                         size="small"
-                        :disabled="d.active && d.used ? true : false"
+                        :disabled="d.active ? (d.used ? true : false) : true"
                         v-model="d.final"
                       ></el-input>
                     </el-form-item>
@@ -583,11 +607,19 @@
                 <!-- Actual -->
                 <div class="grid grid-cols-12 gap-4">
                   <div class="col-span-12">
-                    <el-form-item label="Actual">
+                    <el-form-item
+                      label="Actual"
+                      :prop="`documents.${i}.current`"
+                      :rules="{
+                        required: true,
+                        message: 'Este campo es requerido.',
+                        trigger: 'blur',
+                      }"
+                    >
                       <el-input
                         class="w-full"
                         size="small"
-                        :disabled="d.active && d.used ? true : false"
+                        :disabled="d.active ? (d.used ? true : false) : true"
                         v-model="d.current"
                       ></el-input>
                     </el-form-item>
@@ -602,9 +634,7 @@
           <el-button
             type="primary"
             size="small"
-            @click.native.prevent="
-              submitCorrelativeForm('correlativeForm', correlativeForm)
-            "
+            @click.native.prevent="submitCorrelativeForm('correlativeForm')"
             >Guardar</el-button
           >
           <el-button size="small" @click="$router.push('/invoices')"
@@ -659,8 +689,8 @@ export default {
         this.zones = zones.data.zones;
         this.sellers = sellers.data.sellers;
         this.payments = payment.data.paymentConditions;
-        this.documents = documents.data.documents;
-        console.log(this.correlativeForm);
+        this.correlativeForm.documents = documents.data.documents;
+
         this.loading = false;
       })
       .catch((err) => {
@@ -697,10 +727,7 @@ export default {
       showEditZone: false,
       showEditSeller: false,
       correlativeForm: {
-        authorization: "",
-        initial: "",
-        final: "",
-        current: "",
+        documents: [{ authorization: "", initial: "", final: "", current: "" }],
       },
       newZoneForm: {
         name: "",
@@ -729,62 +756,6 @@ export default {
     };
   },
   methods: {
-    submitCorrelativeForm(formName) {
-      this.$refs[formName].validate(async (valid) => {
-        if (!valid) {
-          return false;
-        }
-        this.$confirm(
-          "¿Estás seguro que deseas actualizar esta?",
-          "Confirmación",
-          {
-            confirmButtonText: "Si, actualizar",
-            cancelButtonText: "Cancelar",
-            type: "warning",
-            beforeClose: (action, instance, done) => {
-              if (action === "confirm") {
-                instance.confirmButtonLoading = true;
-                instance.confirmButtonText = "Procesando...";
-                this.$axios
-                  .put("/invoices/documents", {
-                    documents: this.documents.map((d) => {
-                      return {
-                        id: d.id,
-                        authorization: d.authorization,
-                        initial: d.initial,
-                        final: d.final,
-                        current: d.current,
-                        documentType: d.documentType.id,
-                      };
-                    }),
-                  })
-
-                  .then((res) => {
-                    this.$notify.success({
-                      title: "Exito",
-                      message: res.data.message,
-                    });
-                    this.$router.push("/invoices");
-                  })
-                  .catch((err) => {
-                    this.$notify.error({
-                      title: "Error",
-                      message: err.response.data.message,
-                    });
-                  })
-                  .then((alw) => {
-                    instance.confirmButtonLoading = false;
-                    instance.confirmButtonText = "Si, actualizar";
-                    done();
-                  });
-              } else {
-                done();
-              }
-            },
-          }
-        );
-      });
-    },
     closeDialog(name) {
       this.$refs[name].resetFields();
     },
@@ -1271,6 +1242,66 @@ export default {
     editZone(zone) {
       this.editZoneForm = { ...zone };
       this.showEditZone = true;
+    },
+    async fetchDocuments() {
+      const { data } = await this.$axios.get("/invoices/documents");
+      this.correlativeForm.documents = data.documents;
+    },
+    submitCorrelativeForm(formName) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+        this.$confirm(
+          "¿Estás seguro que deseas actualizar estos documentos?",
+          "Confirmación",
+          {
+            confirmButtonText: "Si, actualizar",
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                this.$axios
+                  .put("/invoices/documents", {
+                    documents: this.correlativeForm.documents.map((d) => {
+                      return {
+                        id: d.id,
+                        authorization: d.authorization,
+                        initial: d.initial,
+                        final: d.final,
+                        current: d.current,
+                        documentType: d.documentType.id,
+                      };
+                    }),
+                  })
+
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Exito",
+                      message: res.data.message,
+                    });
+                    this.fetchDocuments();
+                  })
+                  .catch((err) => {
+                    this.$notify.error({
+                      title: "Error",
+                      message: err.response.data.message,
+                    });
+                  })
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = "Si, actualizar";
+                    done();
+                  });
+              } else {
+                done();
+              }
+            },
+          }
+        );
+      });
     },
   },
   computed: {
