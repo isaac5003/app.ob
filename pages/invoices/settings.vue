@@ -516,7 +516,7 @@
         <el-form :model="correlativeForm" ref="correlativeForm">
           <div class="grid grid-cols-12 gap-4">
             <div
-              v-for="(d, i) of correlativeForm"
+              v-for="(d, i) of documents"
               :key="i"
               class="col-span-4 bg-white"
             >
@@ -659,9 +659,7 @@ export default {
         this.zones = zones.data.zones;
         this.sellers = sellers.data.sellers;
         this.payments = payment.data.paymentConditions;
-        this.correlativeForm = {
-          ...documents.data.documents,
-        };
+        this.documents = documents.data.documents;
         console.log(this.correlativeForm);
         this.loading = false;
       })
@@ -691,7 +689,7 @@ export default {
       zones: [],
       sellers: [],
       payments: [],
-      // documents: [],
+      documents: [],
       showNewZone: false,
       showNewSeller: false,
       showNewPayment: false,
@@ -731,10 +729,7 @@ export default {
     };
   },
   methods: {
-    submitCorrelativeForm(
-      formName,
-      { authorization, initial, final, current }
-    ) {
+    submitCorrelativeForm(formName) {
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -752,10 +747,16 @@ export default {
                 instance.confirmButtonText = "Procesando...";
                 this.$axios
                   .put("/invoices/documents", {
-                    authorization,
-                    initial,
-                    final,
-                    current,
+                    documents: this.documents.map((d) => {
+                      return {
+                        id: d.id,
+                        authorization: d.authorization,
+                        initial: d.initial,
+                        final: d.final,
+                        current: d.current,
+                        documentType: d.documentType.id,
+                      };
+                    }),
                   })
 
                   .then((res) => {
