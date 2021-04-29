@@ -319,7 +319,7 @@
             class="grid grid-cols-12 gap-4"
             v-if="
               customersEditForm.customerType == 1 ||
-              customersEditForm.customerTypeNatural == 2
+                customersEditForm.customerTypeNatural == 2
             "
           >
             <el-form-item
@@ -384,7 +384,7 @@
                 <el-option
                   v-for="a in filteredCatalog"
                   :key="a.id"
-                  :label="a.name"
+                  :label="`${a.code} - ${a.name}`"
                   :value="a.id"
                   :disabled="a.isParent == true"
                 >
@@ -465,13 +465,13 @@ export default {
         this.customerTypeNaturals = customerTypeNaturals.data.typeNaturals;
         this.customerTaxerTypes = customerTaxerTypes.data.taxerTypes;
         const customer = customerData.data.customer;
-        let branch = customer.customerBranches[0];
+        const branch = customer.customerBranches[0];
         this.customer = customer;
 
         this.countries = countries.data.countries;
         this.rawStates = states.data.states;
         this.rawCities = cities.data.cities;
-        this.filteredCatalog = catalog.data.accountingCatalog;
+        this.catalogs = catalog.data.accountingCatalog;
 
         const phone = branch.contactInfo.phones
           ? branch.contactInfo.phones[0]
@@ -480,13 +480,7 @@ export default {
           ? branch.contactInfo.emails[0]
           : branch.contactInfo.email;
         this.customersEditForm = {
-          name: customer.name,
-          shortName: customer.shortName,
-          isProvider: customer.isProvider,
-          dui: customer.dui,
-          nit: customer.nit,
-          nrc: customer.nrc,
-          giro: customer.giro,
+          ...customer,
           customerType:
             customer.customerType != null ? customer.customerType.id : null,
           customerTypeNatural:
@@ -497,33 +491,27 @@ export default {
             customer.customerTaxerType != null
               ? customer.customerTaxerType.id
               : null,
+
           contactName: branch.contactName,
-          address1: branch.address1,
-          address2: branch.address2,
           phone,
           email,
+          address1: branch.address1,
+          address2: branch.address2,
           country: branch.country.id,
           state: branch.state.id,
           city: branch.city.id,
           accountingCatalog: settingsIntegrations.data.integrations.catalog,
         };
-        /*   this.$axios
-          .get("/customers/setting/integrations")
-          .then((res) => {
-            console.log(res.data.integrations.catalog);
-            this.accountingCatalog = res.data.integrations.catalog;
-          })
-          .catch((err) => {
-            this.$notify.error({
-              title: "Error",
-              message: err.response.data.message,
-            });
-          });
- */
+
+        this.filteredCatalog = this.catalogs.filter(
+          (c) => c.id == settingsIntegrations.data.integrations.catalog
+        );
+
         this.loading = false;
       })
       .catch((err) => {
-        this.$message.error(err.response.data.message);
+        console.error(err);
+        this.$message.error(err.data.message);
         this.$router.push("/customers");
       })
       .then((alw) => (this.pageloading = false));
@@ -568,6 +556,7 @@ export default {
       customer: null,
       filteredCatalog: [],
       loadingAccount: false,
+      catalogs: [],
     };
   },
   methods: {
