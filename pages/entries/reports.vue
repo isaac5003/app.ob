@@ -10,7 +10,7 @@
     <Notification
       v-if="errorMessage"
       type="danger"
-      title="Error de comunicaciÃ³n"
+      title="Error de comunicaciÃƒÂ³n"
       :message="errorMessage"
       :action="{
         title: 'Intentar nuevamente',
@@ -210,12 +210,12 @@ export default {
         { name: "Balance general mensual", id: "balanceGeneral" },
         { name: "Estado de resultados anual", id: "estadoResultadosAnual" },
         { name: "Estado de resultados mensual", id: "estadoResultados" },
-        { name: "Balance de comprobaciÃ³n", id: "balanceComprobacion" },
+        { name: "Balance de comprobaciÃƒÂ³n", id: "balanceComprobacion" },
       ],
       auxiliarReports: [
         { name: "Libro diario mayor", id: "diarioMayor" },
         { name: "Libro de auxiliares", id: "libroAuxiliares" },
-        { name: "CatalÃ³go de cuentas", id: "catalogoCuentas" },
+        { name: "CatalÃƒÂ³go de cuentas", id: "catalogoCuentas" },
         //{ name: "Detalle de cuentas", id: "detalleCuentas" },
         { name: "Detalle de movimiento cuentas", id: "movimientoCuentas" },
       ],
@@ -336,7 +336,7 @@ export default {
               );
               const signature = signatures.data.signatures;
               const postTitle =
-                "(Expresado en dÃ³lares de los Estados Unidos de AmÃ©rica)";
+                "(Expresado en dÃƒÂ³lares de los Estados Unidos de AmÃƒÂ©rica)";
               const values = [];
               const emptyRow = [
                 {
@@ -556,7 +556,7 @@ export default {
               );
               const signature = signatures.data.signatures;
               const postTitle =
-                "(Expresado en dÃ³lares de los Estados Unidos de AmÃ©rica)";
+                "(Expresado en dÃƒÂ³lares de los Estados Unidos de AmÃƒÂ©rica)";
               const data = [];
               for (const er of estadoResultado) {
                 data.push([""]);
@@ -619,7 +619,7 @@ export default {
               const generales = settingsGeneral.data.general;
               const signature = signatures.data.signatures;
               const postTitle =
-                "(Expresado en dÃ³lares de los Estados Unidos de AmÃ©rica)";
+                "(Expresado en dÃƒÂ³lares de los Estados Unidos de AmÃƒÂ©rica)";
               this.$axios
                 .get("/entries/report/estado-resultados", {
                   params: {
@@ -856,7 +856,7 @@ export default {
               const generales = settingsGeneral.data.general;
               const signature = signatures.data.signatures;
               const postTitle =
-                "(Expresado en dÃ³lares de los Estados Unidos de AmÃ©rica)";
+                "(Expresado en dÃƒÂ³lares de los Estados Unidos de AmÃƒÂ©rica)";
               this.$axios
                 .get("/entries/report/estado-resultados", {
                   params: {
@@ -1069,7 +1069,7 @@ export default {
                     body: [
                       [
                         {
-                          text: "CÃ“DIGO\nDE LA CUENTA",
+                          text: "CÃƒâ€œDIGO\nDE LA CUENTA",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -1093,7 +1093,7 @@ export default {
                         {},
                         {
                           alignment: "center",
-                          text: "SALDO DEL\nPERÃODO",
+                          text: "SALDO DEL\nPERÃƒÂODO",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -1191,7 +1191,7 @@ export default {
               [reportTitleName, "", "", "", `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               [
-                "CÃ“D. DE LA CUENTA",
+                "CÃƒâ€œD. DE LA CUENTA",
                 "NOMBRE DE LA CUENTA",
                 "BALANCE INICIAL",
                 "MES ACTUAL",
@@ -1235,7 +1235,7 @@ export default {
             const { name, nit, nrc } = bussinesInfo.data.info;
             const { accountant, auditor, legal } = signatures.data.signatures;
             const postTitle =
-              "(Expresado en dÃ³lares de los Estados Unidos de AmÃ©rica)";
+              "(Expresado en dÃƒÂ³lares de los Estados Unidos de AmÃƒÂ©rica)";
             let activoValues = [];
             let pasivoValues = [];
             let patrimonioValues = [];
@@ -1548,7 +1548,7 @@ export default {
             const { accountant, auditor, legal } = signatures.data.signatures;
             const reportTitleName = general.data.name;
             const postTitle =
-              "(Expresado en dÃ³lares de los Estados Unidos de AmÃ©rica)";
+              "(Expresado en dÃƒÂ³lares de los Estados Unidos de AmÃƒÂ©rica)";
             let activoValues = [];
             let pasivoValues = [];
             let patrimonioValues = [];
@@ -1641,7 +1641,7 @@ export default {
               const startDate = periodStart;
               const endDate = peridoEnd;
               const postTitle =
-                "(Expresado en dÃ³lares de los Estados Unidos de AmÃ©rica)";
+                "(Expresado en dÃƒÂ³lares de los Estados Unidos de AmÃƒÂ©rica)";
 
               this.$axios
                 .get("/entries/report/balance-general", {
@@ -1974,7 +1974,7 @@ export default {
               const startDate = periodStart;
               const endDate = peridoEnd;
               const postTitle =
-                "(Expresado en dÃ³lares de los Estados Unidos de AmÃ©rica)";
+                "(Expresado en dÃƒÂ³lares de los Estados Unidos de AmÃƒÂ©rica)";
 
               this.$axios
                 .get("/entries/report/balance-general", {
@@ -2116,7 +2116,7 @@ export default {
                           style: "tableHeader",
                         },
                         {
-                          text: "DESCRIPCIÃ“N LA CUENTA",
+                          text: "DESCRIPCIÃƒâ€œN LA CUENTA",
                           style: "tableHeader",
                         },
                         {
@@ -2292,7 +2292,7 @@ export default {
                     body: [
                       [
                         {
-                          text: "CÃ“D. DE LA CUENTA",
+                          text: "CÃƒâ€œD. DE LA CUENTA",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -2316,7 +2316,7 @@ export default {
                         {},
                         {
                           alignment: "center",
-                          text: "SALDO DEL\nPERÃODO",
+                          text: "SALDO DEL\nPERÃƒÂODO",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -2394,7 +2394,7 @@ export default {
               [reportTitleName, "", "", "", `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               [
-                "CÃ“D. DE LA",
+                "CÃƒâ€œD. DE LA",
                 "NOMBRE DE LA CUENTA",
                 "FECHA DE",
                 "MES ACTUAL",
@@ -2541,7 +2541,7 @@ export default {
                     body: [
                       [
                         {
-                          text: "CÃ“D. DE LA CUENTA\nNÂ° DE PARTIDA",
+                          text: "CÃƒâ€œD. DE LA CUENTA\nNÃ‚Â° DE PARTIDA",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -2565,7 +2565,7 @@ export default {
                         {},
                         {
                           alignment: "center",
-                          text: "SALDO DEL\nPERÃODO",
+                          text: "SALDO DEL\nPERÃƒÂODO",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -2642,7 +2642,7 @@ export default {
               [reportTitleName, "", "", "", `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               [
-                "CÃ“D. DE LA CUENTA",
+                "CÃƒâ€œD. DE LA CUENTA",
                 "NOMBRE DE LA CUENTA",
                 "FECHA DE",
                 "MES ACTUAL",
@@ -2650,7 +2650,7 @@ export default {
                 "SALDO DEL",
               ],
               [
-                "NÂ° DE PARTIDA",
+                "NÃ‚Â° DE PARTIDA",
                 "CONCEPTO",
                 "PARTIDA",
                 "CARGOS",
@@ -2805,7 +2805,7 @@ export default {
                     body: [
                       [
                         {
-                          text: "CÃ“D. DE LA CUENTA\nNÂ° DE PARTIDA",
+                          text: "CÃƒâ€œD. DE LA CUENTA\nNÃ‚Â° DE PARTIDA",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -2829,7 +2829,7 @@ export default {
                         {},
                         {
                           alignment: "center",
-                          text: "SALDO DEL\nPERÃODO",
+                          text: "SALDO DEL\nPERÃƒÂODO",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -2912,7 +2912,7 @@ export default {
               ],
               [""],
               [
-                "CÃ“D. DE LA CUENTA",
+                "CÃƒâ€œD. DE LA CUENTA",
                 "NOMBRE DE LA CUENTA",
                 "FECHA DE",
                 "MES ACTUAL",
@@ -2920,7 +2920,7 @@ export default {
                 "SALDO DEL",
               ],
               [
-                "NÂ° DE PARTIDA",
+                "NÃ‚Â° DE PARTIDA",
                 "CONCEPTO",
                 "PARTIDA",
                 "CARGOS",
@@ -2950,11 +2950,15 @@ export default {
       this.pageLoading = false;
     },
     cancel() {
-      this.$confirm("Â¿EstÃ¡s seguro que deseas salir?", "ConfirmaciÃ³n", {
-        confirmButtonText: "Si, salir",
-        cancelButtonText: "Cancelar",
-        type: "warning",
-      }).then(() => {
+      this.$confirm(
+        "Ã‚Â¿EstÃƒÂ¡s seguro que deseas salir?",
+        "ConfirmaciÃƒÂ³n",
+        {
+          confirmButtonText: "Si, salir",
+          cancelButtonText: "Cancelar",
+          type: "warning",
+        }
+      ).then(() => {
         this.$router.push("/entries");
       });
     },
