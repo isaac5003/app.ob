@@ -36,7 +36,7 @@
               <el-option label="Inactivo" :value="false" />
             </el-select>
           </el-form-item>
-          <el-form-item class="col-span-2" label="Tipo de venta">
+          <el-form-item class="col-span-3" label="Tipo de venta">
             <el-select
               v-model="filter.type"
               placeholder="Seleccionar"
