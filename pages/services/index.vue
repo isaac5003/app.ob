@@ -126,24 +126,21 @@
           </template>
         </el-table-column>
         <el-table-column label width="70" align="center">
-          <!-- dropdpwn selecction -->
+          <!-- dropdpwn selection -->
           <template slot="header" v-if="multipleSelection.length > 0">
-            <el-dropdown slot="dropdown">
-              <el-button
-                trigger="click"
-                icon="el-icon-more"
-                type="primary"
-                size="small"
-              ></el-button>
+            <el-dropdown trigger="click" szie="mini">
+              <el-button icon="el-icon-more" size="mini" type="primary" />
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item>
-                  <i class="el-icon-view"></i>Vista previa
+                  <i class="el-icon-check"></i> Activar seleccionados
                 </el-dropdown-item>
                 <el-dropdown-item>
-                  <i class="el-icon-printer"></i>Imprimir documento
+                  <i class="el-icon-close"></i> Desactivar seleccionados
                 </el-dropdown-item>
-                <el-dropdown-item :divided="true">
-                  <i class="el-icon-refresh-left"></i> Revertir estados
+                <el-dropdown-item :divided="true" class="font-semibold">
+                  <span class="text-red-500">
+                    <i class="el-icon-delete"></i> Eliminar seleccionados
+                  </span>
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
