@@ -217,6 +217,7 @@ export default {
         },
         {
           always: false,
+<<<<<<< HEAD
           id: "53a36e54-bab2-4824-9e43-b40efab8bab9",
           path: "/taxes",
           name: "Iva",
@@ -237,6 +238,12 @@ export default {
           path: "/providers",
           name: "Proveedores",
           icon: getIcon("truck"),
+=======
+          id: "a98b98e6-b2d5-42a3-853d-9516f64eade8",
+          path: "/receivable",
+          name: "Cuentas por cobrar",
+          icon: getIcon("clipboard-list"),
+>>>>>>> 7e532de3b55a67361985df2d68d0b4f08dcadc43
           exact: false,
         },
       ],
