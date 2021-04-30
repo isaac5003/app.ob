@@ -5,6 +5,7 @@
       { name: 'Ventas', to: '/invoices' },
       { name: 'Configuraciones', to: null },
     ]"
+    v-loading="pageloading"
   >
     <el-tabs
       v-model="tab"
@@ -561,11 +562,18 @@
                     <el-form-item
                       label="N° Autorización"
                       :prop="`documents.${index}.authorization`"
-                      :rules="{
-                        required: true,
-                        message: 'Este campo es requerido',
-                        trigger: 'blur',
-                      }"
+                      :rules="
+                        correlative.active
+                          ? [
+                              {
+                                required: true,
+                                message: 'Este campo es requerido.',
+                                trigger: 'change',
+                              },
+                              ,
+                            ]
+                          : {}
+                      "
                     >
                       <el-input
                         class="w-full"
@@ -588,13 +596,23 @@
                     <el-form-item
                       label="Inicial"
                       :prop="`documents.${index}.initial`"
-                      :rules="{
-                        required: true,
-                        message: 'Este campo es requerido.',
-                        trigger: 'blur',
-                      }"
+                      :rules="
+                        correlative.active
+                          ? [
+                              {
+                                required: true,
+                                message: 'Este campo es requerido.',
+                                trigger: 'change',
+                              },
+                              {
+                                type: 'integer',
+                                message: 'Debe ser de tipo entero.',
+                              },
+                            ]
+                          : null
+                      "
                     >
-                      <el-input
+                      <el-input-number
                         class="w-full"
                         size="small"
                         :disabled="
@@ -605,20 +623,32 @@
                             : true
                         "
                         v-model="correlative.initial"
-                      ></el-input>
+                        style="width: 100%"
+                        :step="1"
+                      ></el-input-number>
                     </el-form-item>
                   </div>
                   <div class="col-span-6">
                     <el-form-item
                       label="Final"
                       :prop="`documents.${index}.final`"
-                      :rules="{
-                        required: true,
-                        message: 'Este campo es requerido.',
-                        trigger: 'blur',
-                      }"
+                      :rules="
+                        correlative.active
+                          ? [
+                              {
+                                required: true,
+                                message: 'Este campo es requerido.',
+                                trigger: 'change',
+                              },
+                              {
+                                type: 'integer',
+                                message: 'Debe ser de tipo entero.',
+                              },
+                            ]
+                          : null
+                      "
                     >
-                      <el-input
+                      <el-input-number
                         class="w-full"
                         size="small"
                         :disabled="
@@ -629,7 +659,9 @@
                             : true
                         "
                         v-model="correlative.final"
-                      ></el-input>
+                        style="width: 100%"
+                        :step="1"
+                      ></el-input-number>
                     </el-form-item>
                   </div>
                 </div>
@@ -639,13 +671,23 @@
                     <el-form-item
                       label="Actual"
                       :prop="`documents.${index}.current`"
-                      :rules="{
-                        required: true,
-                        message: 'Este campo es requerido.',
-                        trigger: 'blur',
-                      }"
+                      :rules="
+                        correlative.active
+                          ? [
+                              {
+                                required: true,
+                                message: 'Este campo es requerido.',
+                                trigger: 'change',
+                              },
+                              {
+                                type: 'integer',
+                                message: 'Debe ser de tipo entero.',
+                              },
+                            ]
+                          : null
+                      "
                     >
-                      <el-input
+                      <el-input-number
                         class="w-full"
                         size="small"
                         :disabled="
@@ -656,7 +698,9 @@
                             : true
                         "
                         v-model="correlative.current"
-                      ></el-input>
+                        style="width: 100%"
+                        :step="1"
+                      ></el-input-number>
                     </el-form-item>
                   </div>
                 </div>
@@ -669,7 +713,12 @@
           <el-button
             type="primary"
             size="small"
-            @click.native.prevent="submitCorrelativeForm('correlativeForm')"
+            @click="
+              submitCorrelativeForm(
+                'correlativeForm',
+                correlativeForm.documents.filter((c) => !c.used && c.active)
+              )
+            "
             >Guardar</el-button
           >
           <el-button size="small" @click="$router.push('/invoices')"
@@ -726,7 +775,7 @@ export default {
         this.payments = payment.data.paymentConditions;
         this.correlativeForm.documents = documents.data.documents;
 
-        this.loading = false;
+        this.pageloading = false;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
@@ -735,6 +784,7 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+      pageloading: true,
       tab: "zones-sellers",
       utab: "invoicing",
       integrations: [
@@ -1279,11 +1329,23 @@ export default {
     async fetchDocuments() {
       const { data } = await this.$axios.get("/invoices/documents");
       this.correlativeForm.documents = data.documents;
+      this.pageloading = false;
     },
     changeActiveCorrelative(formName, correlative, index) {
       if (!correlative.id) {
         if (this.$refs[formName] && !correlative.active) {
-          this.$refs[formName].resetFields();
+          this.$refs[formName].fields
+            .find((f) => f.prop == `documents.${index}.authorization`)
+            .resetField();
+          this.$refs[formName].fields
+            .find((f) => f.prop == `documents.${index}.initial`)
+            .resetField();
+          this.$refs[formName].fields
+            .find((f) => f.prop == `documents.${index}.final`)
+            .resetField();
+          this.$refs[formName].fields
+            .find((f) => f.prop == `documents.${index}.current`)
+            .resetField();
         }
         this.correlativeForm.documents[index].active = correlative.active;
       } else {
@@ -1337,11 +1399,12 @@ export default {
         });
       }
     },
-    submitCorrelativeForm(formName) {
+    submitCorrelativeForm(formName, correlatives) {
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
         }
+
         this.$confirm(
           "¿Estás seguro que deseas actualizar estos documentos?",
           "Confirmación",
@@ -1355,7 +1418,7 @@ export default {
                 instance.confirmButtonText = "Procesando...";
                 this.$axios
                   .put("/invoices/documents", {
-                    documents: this.correlativeForm.documents.map((d) => {
+                    documents: correlatives.map((d) => {
                       return {
                         id: d.id,
                         authorization: d.authorization,
@@ -1373,8 +1436,10 @@ export default {
                       message: res.data.message,
                     });
                     this.fetchDocuments();
+                    this.pageloading = true;
                   })
                   .catch((err) => {
+                    instance.confirmButtonLoading = false;
                     this.$notify.error({
                       title: "Error",
                       message: err.response.data.message,
@@ -1386,6 +1451,7 @@ export default {
                     done();
                   });
               } else {
+                instance.confirmButtonLoading = false;
                 done();
               }
             },
