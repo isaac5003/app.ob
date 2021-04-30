@@ -318,7 +318,7 @@
             class="grid grid-cols-12 gap-4"
             v-if="
               customersEditForm.customerType == 1 ||
-              customersEditForm.customerTypeNatural == 2
+                customersEditForm.customerTypeNatural == 2
             "
           >
             <el-form-item
@@ -355,16 +355,45 @@
             </el-form-item>
           </div>
         </el-tab-pane>
-        <!-- <el-tab-pane label="Integraciones" name="integrations">
+        <el-tab-pane
+          label="Integraciones"
+          name="integrations"
+          class="space-y-2"
+        >
           <Notification
             class="w-full"
             type="info"
             title="Integraciones"
-            message="En esta sección se muestran las configuraciones necesarias para poder integrar otros modulos del sistema cuando estos están disponibles."
+            message="En esta sección se realizan las configuraciones de integración con otros modulos de manera general. Estas configuraciones se aplicarán a todos los servicios que no tengan una configuración individual."
           />
-        </el-tab-pane> -->
+
+          <div class="grid grid-cols-12 gap-4">
+            <el-form-item label="Seleccione una cuenta" class="col-span-4">
+              <el-select
+                filterable
+                remote
+                v-model="customersEditForm.accountingCatalog"
+                placeholder="Seleccione una cuenta"
+                size="small"
+                clearable
+                class="w-full"
+                :remote-method="findAccount"
+                :loading="loadingAccount"
+              >
+                <el-option
+                  v-for="a in filteredCatalog"
+                  :key="a.id"
+                  :label="`${a.code} - ${a.name}`"
+                  :value="a.id"
+                  :disabled="a.isParent == true"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </div>
+        </el-tab-pane>
       </el-tabs>
-      <div class="flex justify-end" v-if="activeTab != 'integrations'">
+      <div class="flex justify-end">
         <el-button type="primary" size="small" native-type="submit"
           >Actualizar</el-button
         >
@@ -404,7 +433,9 @@ export default {
     const countries = () => this.$axios.get(`/others/countries`);
     const states = () => this.$axios.get(`/others/states`);
     const cities = () => this.$axios.get(`/others/cities`);
-
+    const settingsIntegrations = () =>
+      this.$axios.get(`/customers/${this.$route.query.ref}/integrations`);
+    const catalog = () => this.$axios.get("/entries/catalog");
     Promise.all([
       customerTypes(),
       customerTypeNaturals(),
@@ -413,13 +444,10 @@ export default {
       countries(),
       states(),
       cities(),
+      settingsIntegrations(),
+      catalog(),
     ])
       .then((res) => {
-        // Se ubica en el tab seleccionado
-        if (this.$route.query.tab) {
-          this.activeTab = this.$route.query.tab;
-        }
-
         const [
           customerTypes,
           customerTypeNaturals,
@@ -428,18 +456,21 @@ export default {
           countries,
           states,
           cities,
+          settingsIntegrations,
+          catalog,
         ] = res;
 
         this.customerTypes = customerTypes.data.types;
         this.customerTypeNaturals = customerTypeNaturals.data.typeNaturals;
         this.customerTaxerTypes = customerTaxerTypes.data.taxerTypes;
         const customer = customerData.data.customer;
-        let branch = customer.customerBranches[0];
+        const branch = customer.customerBranches[0];
         this.customer = customer;
 
         this.countries = countries.data.countries;
         this.rawStates = states.data.states;
         this.rawCities = cities.data.cities;
+        this.catalogs = catalog.data.accountingCatalog;
 
         const phone = branch.contactInfo.phones
           ? branch.contactInfo.phones[0]
@@ -448,13 +479,7 @@ export default {
           ? branch.contactInfo.emails[0]
           : branch.contactInfo.email;
         this.customersEditForm = {
-          name: customer.name,
-          shortName: customer.shortName,
-          isProvider: customer.isProvider,
-          dui: customer.dui,
-          nit: customer.nit,
-          nrc: customer.nrc,
-          giro: customer.giro,
+          ...customer,
           customerType:
             customer.customerType != null ? customer.customerType.id : null,
           customerTypeNatural:
@@ -465,21 +490,27 @@ export default {
             customer.customerTaxerType != null
               ? customer.customerTaxerType.id
               : null,
+
           contactName: branch.contactName,
-          address1: branch.address1,
-          address2: branch.address2,
           phone,
           email,
+          address1: branch.address1,
+          address2: branch.address2,
           country: branch.country.id,
           state: branch.state.id,
           city: branch.city.id,
+          accountingCatalog: settingsIntegrations.data.integrations.catalog,
         };
+
+        this.filteredCatalog = this.catalogs.filter(
+          (c) => c.id == settingsIntegrations.data.integrations.catalog
+        );
 
         this.loading = false;
       })
       .catch((err) => {
-        console.log(err);
-        this.$message.error(err.response.data.message);
+        console.error(err);
+        this.$message.error(err.data.message);
         this.$router.push("/customers");
       })
       .then((alw) => (this.pageloading = false));
@@ -519,8 +550,12 @@ export default {
         country: "",
         state: "",
         city: "",
+        accountingCatalog: "",
       },
       customer: null,
+      filteredCatalog: [],
+      loadingAccount: false,
+      catalogs: [],
     };
   },
   methods: {
@@ -556,8 +591,8 @@ export default {
               if (action === "confirm") {
                 instance.confirmButtonLoading = true;
                 instance.confirmButtonText = "Procesando...";
-                this.$axios
-                  .put(`/customers/${this.$route.query.ref}`, {
+                const customer = () =>
+                  this.$axios.put(`/customers/${this.$route.query.ref}`, {
                     name: formData.name,
                     shortName: formData.shortName,
                     isProvider: formData.isProvider,
@@ -590,11 +625,21 @@ export default {
                       state: formData.state,
                       city: formData.city,
                     },
-                  })
+                  });
+                const integration = () =>
+                  this.$axios.put(
+                    `/customers/${this.$route.query.ref}/integrations`,
+                    {
+                      accountingCatalog: formData.accountingCatalog,
+                    }
+                  );
+                Promise.all([customer(), integration()])
                   .then((res) => {
+                    const [customer, integration] = res;
+
                     this.$notify.success({
                       title: "Exito",
-                      message: res.data.message,
+                      message: `${customer.data.message} y ${integration.data.message}`,
                     });
                     setTimeout(() => {
                       this.$router.push("/customers");
@@ -619,6 +664,20 @@ export default {
           }
         );
       });
+    },
+    findAccount(query) {
+      if (query !== "") {
+        this.loadingAccount = true;
+        this.$axios
+          .get("/entries/catalog", { params: { search: query.toLowerCase() } })
+          .then((res) => {
+            this.filteredCatalog = res.data.accountingCatalog;
+            this.loadingAccount = false;
+          })
+          .catch((err) => (this.errorMessage = err.response.data.message));
+      } else {
+        this.filteredCatalog = [];
+      }
     },
   },
   computed: {
