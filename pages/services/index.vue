@@ -21,7 +21,7 @@
       />
       <el-form label-position="top">
         <div class="grid grid-cols-12 gap-4">
-          <el-form-item class="col-span-2" label="Estado">
+          <el-form-item class="col-span-3" label="Estado">
             <el-select
               v-model="filter.status"
               placeholder="Seleccionar"
