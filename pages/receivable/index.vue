@@ -55,10 +55,12 @@
           <el-button class="col-span-2 col-start-11" size="mini" type="primary"
             >Nuevo seguimiento</el-button
           >
+          <!-- Probando commit -->
         </div>
         <div class="grid grid-cols-12 gap-4">
-          <span class="col-span-4 flex flex-col">
+          <span class="col-span-4 flex flex-col bg-red-100">
             <span class="flex justify-between text-xs px-4 py-2 text-black">
+
             </span>
           </span>
           <span class="col-span-8 bg-pink-400">4</span>
