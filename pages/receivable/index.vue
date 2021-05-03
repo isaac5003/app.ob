@@ -56,6 +56,7 @@
             >Nuevo seguimiento</el-button
           >
           <!-- Probando commit -->
+          <!-- Hola provando commit desde linux -->
         </div>
         <div class="grid grid-cols-12 gap-4">
           <span class="col-span-4 flex flex-col bg-red-100">
