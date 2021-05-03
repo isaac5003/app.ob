@@ -55,13 +55,15 @@
           <el-button class="col-span-2 col-start-11" size="mini" type="primary"
             >Nuevo seguimiento</el-button
           >
+<<<<<<< HEAD
           <!-- Probando commit -->
           <!-- Hola provando commit desde linux -->
+=======
+>>>>>>> parent of 5718706... #!/bin/sh # # git prepare-commit-msg hook for automatically prepending an issue key # from the start of the current branch name to commit messages. # check if commit is merge commit or a commit ammend if [ $2 = "merge" ] || [ $2 = "commit" ]; then exit fi ISSUE_KEY=`git branch | grep -o "\* \(.*/\)*[A-Z]\{2,\}-[0-9]\+" | grep -o "[A-Z]\{2,\}-[0-9]\+"` if [ $? -ne 0 ]; then # no issue key in branch, use the default message exit fi # issue key matched from branch prefix, prepend to commit message TEMP=`mktemp /tmp/commitmsg-XXXXX` (echo "$ISSUE_KEY: $(cat  $1)") > $TEMP cat $TEMP > $1
         </div>
         <div class="grid grid-cols-12 gap-4">
-          <span class="col-span-4 flex flex-col bg-red-100">
+          <span class="col-span-4 flex flex-col">
             <span class="flex justify-between text-xs px-4 py-2 text-black">
-
             </span>
           </span>
           <span class="col-span-8 bg-pink-400">4</span>
