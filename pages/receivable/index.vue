@@ -58,7 +58,7 @@
 
           <!-- Probando commit -->
           <!-- Hola provando commit desde linux -->
-
+  <!-- esto ya funciona -->
         </div>
         <div class="grid grid-cols-12 gap-4">
           <span class="col-span-4 flex flex-col">
