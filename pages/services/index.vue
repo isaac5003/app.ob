@@ -128,16 +128,16 @@
         <el-table-column label width="70" align="center">
           <!-- dropdpwn selection -->
           <template slot="header" v-if="multipleSelection.length">
-            <el-dropdown trigger="click" szie="mini">
+            <el-dropdown trigger="click" size="mini">
               <el-button icon="el-icon-more" size="mini" type="primary" />
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item
-                  @click.native="updateSelected(multipleSelection)"
+                  @click.native="updateSelected(multipleSelection, true)"
                 >
                   <i class="el-icon-check"></i> Activar seleccionados
                 </el-dropdown-item>
                 <el-dropdown-item
-                  @click.native="updateSelected(multipleSelection)"
+                  @click.native="updateSelected(multipleSelection, false)"
                 >
                   <i class="el-icon-close"></i> Desactivar seleccionados
                 </el-dropdown-item>
@@ -412,10 +412,8 @@ export default {
         }
       );
     },
-    updateSelected(dataSelected) {
-      const ids = dataSelected.map((s) => {
-        return { id: s.id, active: s.active };
-      });
+    updateSelected(dataSelected, status) {
+      const ids = dataSelected.map((s) => s.id);
 
       this.$confirm(
         `¿Estás seguro que deseas eliminar los servicios selecionados?`,
@@ -431,6 +429,7 @@ export default {
               this.$axios
                 .put("/services/", {
                   ids,
+                  status,
                 })
                 .then((res) => {
                   this.$notify.success({
