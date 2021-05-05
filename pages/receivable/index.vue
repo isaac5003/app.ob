@@ -97,23 +97,80 @@
     </el-dialog>
     <!-- Nuevo seguimiento -->
     <el-dialog title="Nuevo seguimiento" :visible.sync="showReceivableFollowing" :append-to-body="true" width="1000px">
-      <div class="flex flex-col space-y-2">
-         <h1>Informacion de cuenta por cobrar</h1>
+      <div class="flex flex-col space-y-2 -mt-4">
+       
         <div class="grid grid-cols-12 gap-4">
-           
-          <span class="col-span-6 bg-red-400 ">
-            <div class="grid grid-cols-6 gap-4">
-              <span class="flex flex-col col-span-2 text-xs text-black">Nº de documento<span class="text-gray-300">16SD000F</span></span>
-              <span class="flex flex-col col-span-2 text-xs text-black">Fecha<span class="text-gray-300">23/04/2021</span></span>
-              <span class="flex flex-col col-span-2 text-xs text-black">Fecha<span class="text-gray-300">23/04/2021</span></span>
+          <span class="col-span-6 bg-red-d400 ">
+             <div class="grid grid-cols-6">
+               <span class="col-span-6 text-lg text-black">Informacion de cuenta por cobrar</span>
+             </div>
+            <div class="grid grid-cols-6 gap-4 mt-4">
+              <span class="flex flex-col col-span-2 text-xs text-black">Nº de documento<span class="text-gray-600">16SD000F</span></span>
+              <span class="flex flex-col col-span-2 text-xs text-black">Fecha<span class="text-gray-600">23/04/2021</span></span>
+              <span class="flex flex-col col-span-2 text-xs text-black">Fecha<span class="text-gray-600">23/04/2021</span></span>
             </div>
               <div class="grid grid-cols-6 gap-4 mt-3">
-              <span class="flex flex-col col-span-2 text-xs text-black">Tipo<span class="text-gray-300">Consumidor final</span></span>
-              <span class="flex flex-col col-span-2 text-xs text-black">Edad<span class="text-gray-300">45 ago</span></span>
+              <span class="flex flex-col col-span-2 text-xs text-black">Tipo<span class="text-gray-600">Consumidor final</span></span>
+              <span class="flex flex-col col-span-2 text-xs text-black">Edad<span class="text-gray-600">45 ago</span></span>
               <span class="flex flex-col col-span-2 text-xs text-black">Por pagar<span> <el-tag type="success" effect="dark" size="mini">$ 367.50</el-tag></span></span>
             </div>
+                <div class="grid grid-cols-6 mt-4">
+                   <span class="col-span-6 text-lg text-black">Datos de contacto</span>
+                </div>
+                   <div class="grid grid-cols-6 mt-4">
+                      <span class="flex flex-col col-span-3 text-xs text-black">Cliente<span class="text-gray-600">ORTIZ ROSALES, INES MARIA</span></span>
+                      <span class="flex flex-col col-span-3 text-xs text-black">Direccion<span class="text-gray-600">Avenida 4 de mayo, col Buenos aires #105</span></span>
+                       <span class="flex flex-col col-span-3 text-xs text-black">Telefono<span class="text-gray-600">+503 7856-5681</span></span>
+                         <span class="flex flex-col col-span-3 text-xs text-black">Correo<span class="text-gray-600">openBox@preuba.cloud</span></span>
+                   </div>
+                  <div class="grid grid-cols-6 mt-4">
+               <span class="col-span-6 text-lg text-black">Informacion de cuenta por cobrar</span>
+             </div>
+               <div class="grid grid-cols-6 mt-4 border">
+                 <span class="flex justify-between col-span-6 px-3 py-3">
+                        <span class="flex flex-col col-span-2 text-xs text-black">Tipo de documento<span class="text-gray-600">Credito fiscal</span></span>
+              <span class="flex flex-col col-span-2 text-xs text-black">Edad<span class="text-gray-600">45 ago</span></span>
+              
+                <span class="col-span-4"> <el-button type="primary" size="small">Ver</el-button></span> 
+                 </span>
+               </div>
+                    <div class="grid grid-cols-6 mt-4 border">
+                 <span class="flex justify-between col-span-6 px-3 py-3">
+                        <span class="flex flex-col col-span-2 text-xs text-black">Tipo de documento<span class="text-gray-600">Consumidor final</span></span>
+              <span class="flex flex-col col-span-2 text-xs text-black">Edad<span class="text-gray-600">45 ago</span></span>
+              
+                <span class="col-span-2"> <el-button type="primary" size="small">Ver</el-button></span> 
+                 </span>
+               </div>
           </span>
-          <span class="col-span-6 bg-orange-500">e</span>
+          
+                <span class="col-span-6 border">
+            <div class="grid grid-cols-6 px-6 py-4">
+              <span class="flex justify-between col-span-8 text-xs text-black">
+                <span class="col-span-2">Seguimiento #5</span>
+                <span class="col-span-2 flex flex-col text-sm">Fecha:
+                  <span class="text-gray-700 text-xs">23/03/2021</span></span>
+              </span>
+            </div>
+            <div class="grid grid-cols-6 mx-6 h-90 border">
+             
+              <p class="col-span-8 mx-4 mb-4 text-xs">
+                <br>
+                Resumen
+                <br>
+                <br>
+                Escriba un resumen del contacto de cliente... 
+              </p>
+            </div>
+          </span>
+      
+        </div>
+
+        <div class=" flex justify-end">
+          <el-button type="primary" size="small">
+            guardar
+          </el-button>
+          <el-button size="small">Cancelar</el-button>
         </div>
       </div>
     </el-dialog>
