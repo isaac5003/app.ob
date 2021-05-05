@@ -146,7 +146,7 @@
                 <el-option
                   v-for="c in filteredCatalog"
                   :key="c.id"
-                  :label="c.name"
+                  :label="`${c.code} - ${c.name}`"
                   :value="c.id"
                   :disabled="c.isParent == true"
                 >
@@ -203,7 +203,7 @@ export default {
     ])
       .then((res) => {
         const [sellingTypes, service, catalog, integrationCatalog] = res;
-        this.filteredCatalog = catalog.data.accountingCatalog;
+        this.catalogs = catalog.data.accountingCatalog;
         this.sellingTypes = sellingTypes.data.types;
 
         this.servicesEditForm = {
@@ -211,6 +211,9 @@ export default {
           sellingType: service.data.service.sellingType.id,
           accountingCatalog: integrationCatalog.data.integrations.catalog,
         };
+        this.filteredCatalog = this.catalogs.filter(
+          (c) => c.id == integrationCatalog.data.integrations.catalog
+        );
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
@@ -221,6 +224,7 @@ export default {
   data() {
     return {
       filteredCatalog: [],
+      catalogs: [],
       tab: "general-information",
       acountGeneral: "",
       loadingAccount: false,
