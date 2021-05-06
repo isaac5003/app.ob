@@ -1,44 +1,30 @@
 <template>
-  <layout-content
-    page-title="listado de cuentas por cobrar"
-    :breadcrumb="[
+  <layout-content page-title="listado de cuentas por cobrar" :breadcrumb="[
       { name: 'Cuentas por pagar', to: '/receivable' },
       { name: 'Listado', to: null },
-    ]"
-  >
+    ]">
     <!-- dialogo -->
-    <el-dialog
-      title="Bitácora"
-      :visible.sync="showReceivable"
-      width="1000px"
-      :append-to-body="true"
-      :modal-append-to-body="false"
-    >
+    <el-dialog title="Bitácora" :visible.sync="showReceivable" width="1000px" :append-to-body="true"
+      :modal-append-to-body="false">
       <div class="flex flex-col space-y-4 -mt-4">
         <div class="grid grid-cols-12 gap-4 text-xs">
           <span class="col-span-3 flex flex-col">
-            <span class="font-semibold ">Cliente</span
-            ><span>ORTIZ ROSALES, INES MARIA</span>
+            <span class="font-semibold ">Cliente</span><span>ORTIZ ROSALES, INES MARIA</span>
           </span>
           <span class="col-span-2 flex flex-col">
-            <span class="font-semibold ">Nº de documento</span
-            ><span>16SD000F-56</span>
+            <span class="font-semibold ">Nº de documento</span><span>16SD000F-56</span>
           </span>
           <span class="col-span-2 flex flex-col">
-            <span class="font-semibold ">Tipo</span
-            ><span>Consumidor Final</span>
+            <span class="font-semibold ">Tipo</span><span>Consumidor Final</span>
           </span>
           <span class="col-span-2 flex flex-col">
-            <span class="font-semibold ">Fecha</span
-            ><span>05/04/2021</span>
+            <span class="font-semibold ">Fecha</span><span>05/04/2021</span>
           </span>
           <span class="col-span-2 flex flex-col">
-            <span class="font-semibold ">Condicion de pago</span
-            ><span>Pago 90 dias</span>
+            <span class="font-semibold ">Condicion de pago</span><span>Pago 90 dias</span>
           </span>
           <span class="col-span-1 flex flex-col">
-            <span class="text-gray-700 font-bold">Edad</span
-            ><span>45 Años</span>
+            <span class="text-gray-700 font-bold">Edad</span><span>45 Años</span>
           </span>
         </div>
 
@@ -46,74 +32,31 @@
           <span class="col-span-4">
             <h1 class="text-lg text-black">Últimos seguimientos</h1>
           </span>
-          <span class="col-span-4 col-start-7 text-black text-xs"
-            >Por pagar:
-              <el-tag type="success" effect="dark" size="mini">$ 367.50</el-tag>
-            </span>
-          <el-button
-            class="col-span-2 col-start-11"
-            size="mini"
-            type="primary"
-            @click.native="showReceivableFollowing = true"
-            >Nuevo seguimiento</el-button
-          >
+          <span class="col-span-4 col-start-7 text-black text-xs">Por pagar:
+            <el-tag type="success" effect="dark" size="mini">$ 367.50</el-tag>
+          </span>
+          <el-button class="col-span-2 col-start-11" size="mini" type="primary"
+            @click.native="showReceivableFollowing = true">Nuevo seguimiento</el-button>
         </div>
         <div class="grid grid-cols-12 gap-4">
-          <span class="col-span-4 flex flex-col text-xs  space-y-4">
-            <span
-              class="flex justify-between px-4 py-3 text-black border"
-            >
-              <span>Seguimiento #5</span>
-              <span class="flex flex-col"
-                >Fecha: <span class="text-gray-700">28/03/2021</span></span
-              >
-            </span>
-            <span
-              class="flex justify-between text-xs px-4 py-2 text-black border"
-            >
-              <span>Seguimiento #4</span>
-              <span class="flex flex-col"
-                >Fecha: <span class="text-gray-700">23/03/2021</span></span
-              >
-            </span>
-            <span
-              class="flex justify-between px-4 py-2 text-black border"
-            >
-              <span>Seguimiento #3</span>
-              <span class="flex flex-col"
-                >Fecha: <span class="text-gray-700">21/03/2021</span></span
-              >
-            </span>
-            <span
-              class="flex justify-between px-4 py-2 text-black border"
-            >
-              <span>Seguimiento #2</span>
-              <span class="flex flex-col"
-                >Fecha: <span class="text-gray-700">12/03/2021</span></span
-              >
-            </span>
-            <span
-              class="flex justify-between px-4 py-2 text-black border"
-            >
-              <span>Seguimiento #1</span>
-              <span class="flex flex-col"
-                >Fecha: <span class="text-gray-700">28/02/2021</span></span
-              >
-            </span>
+          <span class="col-span-4 flex flex-col text-xs space-y-4">
+             <div v-for="item in following" :key="item.id" @click="getFollow(item.id)" class="flex justify-between px-4 py-2 text-black border">
+              
+              <span>{{item.follow}}</span>
+
+              <span class="flex flex-col">Fecha: <span class="text-gray-700">{{item.date}}</span></span>
+            
+          </div>
           </span>
           <span class="col-span-8 border">
             <div class="grid grid-cols-8 px-6 py-4">
-              <span class="flex justify-between col-span-8 text-sm text-black">
-                <span class="col-span-2">Seguimiento #5</span>
-                <span class="col-span-3 flex flex-col"
-                  >Seguimiento realizado por:
-                  <span class="text-gray-700 text-xs">Andres Blanco</span></span
-                >
-                <span class="col-span-2 flex flex-col"
-                  >Fecha:
-                  <span class="text-gray-700 text-xs">23/03/2021</span></span
-                >
-              </span>
+              <div v-for="items in indexFollow" :key="items.id" class="flex justify-between col-span-8 text-xs text-black">
+                <span class="col-span-2">{{items.follow}}</span>
+                <span class="col-span-3 flex flex-col">Seguimiento realizado por:
+                  <span class="text-gray-700 text-xs">{{items.name}}</span></span>
+                <span class="col-span-2 flex flex-col">Fecha:
+                  <span class="text-gray-700 text-xs">{{items.date}}</span></span>
+              </div>
             </div>
             <div class="grid grid-cols-8 mx-6 h-60 border text-xs">
               <br>
@@ -138,114 +81,69 @@
         </div>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="showReceivable = false" size="small"
-          >Cerrar</el-button
-        >
+        <el-button @click="showReceivable = false" size="small">Cerrar</el-button>
       </span>
     </el-dialog>
     <!-- Nuevo seguimiento -->
-    <el-dialog
-      title="Nuevo seguimiento"
-      :visible.sync="showReceivableFollowing"
-      :append-to-body="true"
-      width="1000px"
-    >
+    <el-dialog title="Nuevo seguimiento" :visible.sync="showReceivableFollowing" :append-to-body="true" width="1000px">
       <div class="flex flex-col space-y-2 -mt-4">
         <div class="grid grid-cols-12 gap-4">
-          <span class="col-span-6 bg-red-d400">
+          <span class="col-span-6 ">
             <div class="grid grid-cols-6">
-              <span class="col-span-6 text-lg text-black"
-                >Información de cuenta por cobrar</span
-              >
+              <span class="col-span-6 text-lg text-black">Información de cuenta por cobrar</span>
             </div>
             <div class="grid grid-cols-6 gap-4 mt-4 text-xs">
-              <span class="flex flex-col col-span-2 "
-                >Nº de documento<span
-                  >16SD000F</span
-                ></span
-              >
-              <span class="flex flex-col col-span-2 text-black"
-                >Fecha<span class="text-gray-700">23/04/2021</span></span
-              >
-              <span class="flex flex-col col-span-2  text-black"
-                >Fecha<span class="text-gray-700">23/04/2021</span></span
-              >
+              <span class="flex flex-col col-span-2 ">Nº de documento<span>16SD000F</span></span>
+              <span class="flex flex-col col-span-2 text-black">Fecha<span
+                  class="text-gray-700">23/04/2021</span></span>
+              <span class="flex flex-col col-span-2  text-black">Fecha<span
+                  class="text-gray-700">23/04/2021</span></span>
             </div>
             <div class="grid grid-cols-6 gap-4 mt-3">
-              <span class="flex flex-col col-span-2 text-xs text-black"
-                >Tipo<span class="text-gray-700">Consumidor final</span></span
-              >
-              <span class="flex flex-col col-span-2 text-xs text-black"
-                >Edad<span class="text-gray-700">45 ago</span></span
-              >
-              <span class="flex flex-col col-span-2 text-xs text-black"
-                >Por pagar<span>
-                  <el-tag type="success" effect="dark" size="mini"
-                    >$ 367.50</el-tag
-                  ></span
-                ></span
-              >
+              <span class="flex flex-col col-span-2 text-xs text-black">Tipo<span class="text-gray-700">Consumidor
+                  final</span></span>
+              <span class="flex flex-col col-span-2 text-xs text-black">Edad<span class="text-gray-700">45
+                  ago</span></span>
+              <span class="flex flex-col col-span-2 text-xs text-black">Por pagar<span>
+                  <el-tag type="success" effect="dark" size="mini">$ 367.50</el-tag>
+                </span></span>
             </div>
             <div class="grid grid-cols-6 mt-4">
-              <span class="col-span-6 text-lg text-black"
-                >Datos de contacto</span
-              >
+              <span class="col-span-6 text-lg text-black">Datos de contacto</span>
             </div>
             <div class="grid grid-cols-6 mt-4">
-              <span class="flex flex-col col-span-3 text-xs text-black"
-                >Cliente<span class="text-gray-700"
-                  >ORTIZ ROSALES, INES MARIA</span
-                ></span
-              >
-              <span class="flex flex-col col-span-3 text-xs text-black"
-                >Direccion<span class="text-gray-700"
-                  >Avenida 4 de mayo, col Buenos aires #105</span
-                ></span
-              >
-              <span class="flex flex-col col-span-3 text-xs text-black"
-                >Telefono<span class="text-gray-700">+503 7856-5681</span></span
-              >
-              <span class="flex flex-col col-span-3 text-xs text-black"
-                >Correo<span class="text-gray-700"
-                  >openBox@preuba.cloud</span
-                ></span
-              >
+              <span class="flex flex-col col-span-3 text-xs text-black">Cliente<span class="text-gray-700">ORTIZ
+                  ROSALES, INES MARIA</span></span>
+              <span class="flex flex-col col-span-3 text-xs text-black">Direccion<span class="text-gray-700">Avenida 4
+                  de mayo, col Buenos aires #105</span></span>
+              <span class="flex flex-col col-span-3 text-xs text-black">Telefono<span class="text-gray-700">+503
+                  7856-5681</span></span>
+              <span class="flex flex-col col-span-3 text-xs text-black">Correo<span
+                  class="text-gray-700">openBox@preuba.cloud</span></span>
             </div>
             <div class="grid grid-cols-6 mt-4">
-              <span class="col-span-6 text-lg text-black"
-                >Información  de cuenta por cobrar</span
-              >
+              <span class="col-span-6 text-lg text-black">Información de cuenta por cobrar</span>
             </div>
             <div class="grid grid-cols-6 mt-4 border">
               <span class="flex justify-between col-span-6 px-3 py-3 text-xs">
-                <span class="flex flex-col col-span-2  text-black"
-                  >Tipo de documento<span class="text-gray-700"
-                    >Credito fiscal</span
-                  ></span
-                >
-                <span class="flex flex-col col-span-2  text-black"
-                  >Edad<span class="text-gray-700">45 Años</span></span
-                >
+                <span class="flex flex-col col-span-2  text-black">Tipo de documento<span class="text-gray-700">Credito
+                    fiscal</span></span>
+                <span class="flex flex-col col-span-2  text-black">Edad<span class="text-gray-700">45 Años</span></span>
 
                 <span class="col-span-2">
-                  <el-button type="primary" size="small">Ver</el-button></span
-                >
+                  <el-button type="primary" size="small">Ver</el-button>
+                </span>
               </span>
             </div>
             <div class="grid grid-cols-6 mt-4 border">
               <span class="flex justify-between col-span-6 text-xs px-3 py-3">
-                <span class="flex flex-col col-span-2 text-black"
-                  >Tipo de documento<span class="text-gray-700"
-                    >Consumidor final</span
-                  ></span
-                >
-                <span class="flex flex-col col-span-2 text-black"
-                  >Edad<span class="text-gray-700">45 Años</span></span
-                >
+                <span class="flex flex-col col-span-2 text-black">Tipo de documento<span
+                    class="text-gray-700">Consumidor final</span></span>
+                <span class="flex flex-col col-span-2 text-black">Edad<span class="text-gray-700">45 Años</span></span>
 
                 <span class="col-span-2">
-                  <el-button type="primary" size="small">Ver</el-button></span
-                >
+                  <el-button type="primary" size="small">Ver</el-button>
+                </span>
               </span>
             </div>
           </span>
@@ -254,10 +152,8 @@
             <div class="grid grid-cols-6 px-6 py-4">
               <span class="flex justify-between col-span-8 text-xs text-black">
                 <span class="col-span-2">Seguimiento #5</span>
-                <span class="col-span-2 flex flex-col"
-                  >Fecha:
-                  <span class="text-gray-700">23/03/2021</span></span
-                >
+                <span class="col-span-2 flex flex-col">Fecha:
+                  <span class="text-gray-700">23/03/2021</span></span>
               </span>
             </div>
             <div class="grid grid-cols-6 mx-6 h-90 border">
@@ -274,11 +170,7 @@
 
         <div class="flex justify-end">
           <el-button type="primary" size="small"> Guardar </el-button>
-          <el-button
-            size="small"
-            @click.native="showReceivableFollowing = false"
-            >Cancelar</el-button
-          >
+          <el-button size="small" @click.native="showReceivableFollowing = false">Cancelar</el-button>
         </div>
       </div>
     </el-dialog>
@@ -302,76 +194,34 @@
             </el-select>
           </el-form-item>
           <el-form-item class="col-start-10 col-span-3 mt-3">
-            <el-input
-              suffix-icon="el-icon-search"
-              placeholder="Buscar..."
-              size="small"
-              clearable
-            />
+            <el-input suffix-icon="el-icon-search" placeholder="Buscar..." size="small" clearable />
           </el-form-item>
         </div>
       </el-form>
       <!-- tabla -->
-      <el-table
-        :data="tableData"
-        stripe
-        size="mini"
-        ref="multipleTable"
-        @selection-change="handleSelectionChange"
-      >
+      <el-table :data="tableData" stripe size="mini" ref="multipleTable" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="45" />
         <el-table-column prop="index" width="35" label=" #" />
-        <el-table-column
-          label="# Documento"
-          prop="documento"
-          width="130"
-          sortable="custom"
-        >
+        <el-table-column label="# Documento" prop="documento" width="130" sortable="custom">
           <template> </template>
         </el-table-column>
         <el-table-column label="Tipo" prop="tipo" width="130" sortable="custom">
           <template> </template>
         </el-table-column>
-        <el-table-column
-          label="Fecha"
-          prop="fecha"
-          width="90"
-          sortable="custom"
-        />
-        <el-table-column
-          label="Cliente"
-          prop="cliente"
-          min-width="240"
-          sortable="custom"
-        />
-        <el-table-column
-          label="Cond. de pago"
-          prop="pago"
-          width="140"
-          sortable="custom"
-        >
+        <el-table-column label="Fecha" prop="fecha" width="90" sortable="custom" />
+        <el-table-column label="Cliente" prop="cliente" min-width="240" sortable="custom" />
+        <el-table-column label="Cond. de pago" prop="pago" width="140" sortable="custom">
           <template> </template>
         </el-table-column>
-        <el-table-column
-          label="Total"
-          width="80"
-          align="right"
-          prop="total"
-          sortable="custom"
-        >
+        <el-table-column label="Total" width="80" align="right" prop="total" sortable="custom">
           <template> </template>
         </el-table-column>
         <el-table-column label width="70" align="center">
           <!-- dropdpwn selecction -->
           <template slot="header" v-if="multipleSelection.length > 0">
             <el-dropdown>
-              <el-button
-                trigger="click"
-                icon="el-icon-more"
-                type="primary"
-                size="mini"
-                class="transition ease-out duration-700"
-              ></el-button>
+              <el-button trigger="click" icon="el-icon-more" type="primary" size="mini"
+                class="transition ease-out duration-700"></el-button>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item>
                   <i class="el-icon-view"></i>Vista previa
@@ -392,17 +242,12 @@
               <el-button trigger="click" size="mini" icon="el-icon-more">
               </el-button>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item
-                  @click.native="openPreviewReceivable(scope.row)"
-                >
+                <el-dropdown-item @click.native="openPreviewReceivable(scope.row)">
                   <i class="el-icon-s-order"></i>Bitácora
                 </el-dropdown-item>
-                <el-dropdown-item
-                  @click.native="openPreviewReceivableFollowing(scope.row)"
-                >
+                <el-dropdown-item @click.native="openPreviewReceivableFollowing(scope.row)">
                   <i class="el-icon-document-add"></i>Nuevo
-                  seguimiento</el-dropdown-item
-                >
+                  seguimiento</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </template>
@@ -410,92 +255,124 @@
       </el-table>
       <!-- pagination  -->
       <div class="flex justify-end">
-        <el-pagination
-          :current-page.sync="page.page"
-          :page-sizes="[5, 10, 15, 25, 50, 100]"
-          :page-size="page.size"
-          layout="total, sizes, prev, pager, next"
-          :total="parseInt(receivable.count)"
-          :pager-count="5"
-        />
+        <el-pagination :current-page.sync="page.page" :page-sizes="[5, 10, 15, 25, 50, 100]" :page-size="page.size"
+          layout="total, sizes, prev, pager, next" :total="parseInt(receivable.count)" :pager-count="5" />
       </div>
     </div>
   </layout-content>
 </template>
 <script>
-import LayoutContent from "../../components/layout/Content";
-export default {
-  components: {
-    LayoutContent,
-  },
+  import LayoutContent from "../../components/layout/Content";
+  export default {
+    components: {
+      LayoutContent,
+    },
 
-  data() {
-    return {
-      showReceivable: false,
-      showReceivableFollowing: false,
-      receivablePreview: {},
-      multipleSelection: [],
-      tableData: [
-        {
-          index: 1,
-          documento: "16SD000C-0142",
-          tipo: "credito fiscal",
-          fecha: "2016/05/02",
-          cliente: "Gerson Aguirre OpenBox.cloud",
-          pago: "Pagos en 30 dias",
-          total: "$20,000",
+    data() {
+      return {
+        showReceivable: false,
+        showReceivableFollowing: false,
+        receivablePreview: {},
+        multipleSelection: [],
+        following: [{
+            id: 1,
+            follow: "Seguimiento #5",
+             date: "29/03/2021"
+          },
+          {
+            id: 2,
+            follow: "Seguimiento #4",
+            date: "21/03/2021"
+          },
+          {
+            id: 3,
+            follow: "Seguimiento #3",
+            date: "17/04/2021"
+          },
+          {
+            id: 4,
+            follow: "Seguimiento #2",
+            date: "10/03/2021"
+          },
+          {
+            id: 3,
+          follow: "Seguimiento #1",
+            date: "28/02/2021"
+          }
+        ],
+        indexFollow:[
+          {id:1, name:"Andres Blanco", follow: "Seguimiento #5", date: "29/03/2021"},
+           {id:2, name:"Alberto Suarez",    follow: "Seguimiento #4", date: "21/03/2021"},
+            {id:3, name:"Gerson Aguirre",    follow: "Seguimiento #3", date: "17/03/2021"}],
+        tableData: [{
+            index: 1,
+            documento: "16SD000C-0142",
+            tipo: "credito fiscal",
+            fecha: "2016/05/02",
+            cliente: "Gerson Aguirre OpenBox.cloud",
+            pago: "Pagos en 30 dias",
+            total: "$20,000",
+          },
+          {
+            index: 2,
+            documento: "16SD000C-0142",
+            tipo: "Consumidor fiscal",
+            fecha: "2016/05/02",
+            cliente: "Radio 100.5 Restauracion Elim central",
+            pago: "Pago en 45 dias",
+            total: "$20,000",
+          },
+          {
+            index: 3,
+            documento: "16SD000C-0142",
+            tipo: "Credito Fiscal",
+            fecha: "2016/05/02",
+            cliente: "GCA Telecom SV. CV",
+            pago: "pagos en 43 dias",
+            total: "$20,000",
+          },
+          {
+            index: 4,
+            documento: "16SD000C-0142",
+            tipo: "Consumidor Final",
+            fecha: "2016/05/02",
+            cliente: "Impresa respuesta EL Salvador",
+            pago: "pagos en 60 dias ",
+            total: "$20,000",
+          },
+        ],
+        showInvoicePreview: false,
+        page: {
+          limit: 10,
+          page: 1,
         },
-        {
-          index: 2,
-          documento: "16SD000C-0142",
-          tipo: "Consumidor fiscal",
-          fecha: "2016/05/02",
-          cliente: "Radio 100.5 Restauracion Elim central",
-          pago: "Pago en 45 dias",
-          total: "$20,000",
+        receivable: {
+          count: 0,
         },
-        {
-          index: 3,
-          documento: "16SD000C-0142",
-          tipo: "Credito Fiscal",
-          fecha: "2016/05/02",
-          cliente: "GCA Telecom SV. CV",
-          pago: "pagos en 43 dias",
-          total: "$20,000",
-        },
-        {
-          index: 4,
-          documento: "16SD000C-0142",
-          tipo: "Consumidor Final",
-          fecha: "2016/05/02",
-          cliente: "Impresa respuesta EL Salvador",
-          pago: "pagos en 60 dias ",
-          total: "$20,000",
-        },
-      ],
-      showInvoicePreview: false,
-      page: {
-        limit: 10,
-        page: 1,
-      },
-      receivable: {
-        count: 0,
-      },
-    };
-  },
+      };
+    },
 
-  methods: {
-    openPreviewReceivable(e) {
-      this.receivablePreview = e;
-      this.showReceivable = true;
+    methods: {
+        getFollow(e){
+          console.log(e)
+          this.indexFollow;
+          this.following;
+          const c = this.indexFollow.filter(x => x.id);
+          if(c){
+           
+          }
+        },
+      openPreviewReceivable(e) {
+        this.receivablePreview = e;
+        this.showReceivable = true;
+      },
+      openPreviewReceivableFollowing(e) {
+        this.receivablePreview = e;
+        this.showReceivableFollowing = true;
+      },
+      handleSelectionChange(val) {
+        this.multipleSelection = val;
+      },
     },
-    openPreviewReceivableFollowing(e) {
-      this.receivablePreview = e;
-      this.showReceivableFollowing = true;
-    },
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
-    },
-  },
-};
+  };
 </script>
