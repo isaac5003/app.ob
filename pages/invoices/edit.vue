@@ -749,7 +749,6 @@ export default {
               documentTypes,
               branches,
             ] = res;
-
             this.customers = customer.data.customers;
             this.documents = documentTypes.data.documentTypes;
             this.sellers = sellers.data.sellers;
@@ -759,12 +758,11 @@ export default {
               ...data.invoice,
               customer: data.invoice.customer.id,
               customerBranch: data.invoice.customerBranch.id,
-              invoicesPaymentsConditions:
+              invoicesPaymentsCondition:
                 data.invoice.invoicesPaymentsCondition.id,
               invoicesSellers: data.invoice.invoicesSeller.id,
               documentType: data.invoice.documentType.id,
             };
-
             this.tributary = {
               customerNrc: data.invoice.customerNrc,
               customerNit: data.invoice.customerNit,
@@ -1057,7 +1055,6 @@ export default {
       });
     },
     saveUpdateInvoice(formName, formData, details) {
-      console.log(formData);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -1080,7 +1077,6 @@ export default {
                       authorization: formData.authorization,
                       sequence: formData.sequence,
                       invoiceDate: formData.invoiceRawDate,
-
                       customer: formData.customer,
                       customerBranch: formData.customerBranch,
                       invoicesPaymentsCondition:
