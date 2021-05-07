@@ -652,14 +652,12 @@
                       @click="openEditDetail(scope.$index, scope.row)"
                       size="small"
                       icon="el-icon-edit"
-                      circle
                     ></el-button>
                     <el-button
                       type="danger"
                       @click="deleteDetail(scope.$index)"
                       size="small"
                       icon="el-icon-delete"
-                      circle
                     ></el-button>
                   </div>
                 </template>
@@ -778,6 +776,7 @@ export default {
   name: "InvoicesNew",
   components: { LayoutContent, Notification },
   fetch() {
+    this.loading = true;
     const sellers = () => {
       return this.$axios.get("/invoices/sellers", { params: { active: true } });
     };
@@ -798,22 +797,20 @@ export default {
     Promise.all([sellers(), paymentsConditions(), customers(), documents()])
       .then((res) => {
         const [sellers, paymentConditions, customers, documents] = res;
-
         this.sellers = sellers.data.sellers;
         this.paymentConditions = paymentConditions.data.paymentConditions;
         this.customers = customers.data.customers;
         this.documentTypes = documents.data.documents.map(
           (d) => d.documentType
         );
-        this.loading = false;
         this.salesNewForm.documentType = 1;
         this.validateDocumentType(
           this.salesNewForm.documentType,
           this.tributary
         );
+        this.loading = false;
       })
       .catch((err) => {
-        console.log(err);
         this.errorMessage = err.response.data.message;
       });
   },
@@ -980,7 +977,6 @@ export default {
             this.selectBranch(this.salesNewForm.customerBranch, this.branches);
           })
           .catch((err) => {
-            console.log(err);
             this.errorMessage = err.response.data.message;
           });
       } else {
@@ -1185,7 +1181,6 @@ export default {
     },
 
     calcUnitPrice(documentType, { unitPrice, incTax, sellingType }) {
-      console.log(unitPrice, incTax, sellingType);
       if (sellingType == 1 || sellingType == 2) {
         return unitPrice;
       } else {
