@@ -166,7 +166,7 @@
       >
         <el-table-column type="selection" width="50" />
         <el-table-column prop="index" width="50" label="#" />
-        <el-table-column label="Nombre" min-width="310" sortable="custom">
+        <el-table-column label="Nombre" min-width="310" prop="name" sortable="custom">
           <template slot-scope="scope">
             <div class="flex flex-col">
               <span class="font-semibold text-xs">
@@ -216,23 +216,21 @@
         <el-table-column label width="70" align="center">
           <!-- dropdpwn selecction -->
           <template slot="header" v-if="multipleSelection.length > 0">
-            <el-dropdown>
+            <el-dropdown  trigger="click" szie="mini">
               <el-button
-                trigger="click"
                 icon="el-icon-more"
                 type="primary"
                 size="mini"
-                class="transition ease-out duration-700"
               ></el-button>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item>
-                  <i class="el-icon-view"></i>Vista previa
+                  <i class="el-icon-check"></i>Activar seleccionados
                 </el-dropdown-item>
                 <el-dropdown-item>
-                  <i class="el-icon-printer"></i>Imprimir documento
+                  <i class="el-icon-close"></i>Desactivar seleccionados
                 </el-dropdown-item>
-                <el-dropdown-item :divided="true">
-                  <i class="el-icon-refresh-left"></i> Revertir estados
+                <el-dropdown-item :divided="true" class="font-semibold">
+                  <i class="el-icon-delete"></i> Eliminar seleccionados
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
