@@ -17,35 +17,33 @@
       <div class="flex flex-col space-y-4 -mt-4">
         <div class="grid grid-cols-12 gap-4 text-xs">
           <span class="col-span-3 flex flex-col">
-            <span class="font-semibold ">Cliente</span
+            <span class="font-semibold">Cliente</span
             ><span>ORTIZ ROSALES, INES MARIA</span>
           </span>
           <span class="col-span-2 flex flex-col">
-            <span class="font-semibold ">Nº de documento</span
+            <span class="font-semibold">Nº de documento</span
             ><span>16SD000F-56</span>
           </span>
           <span class="col-span-2 flex flex-col">
-            <span class="font-semibold ">Tipo</span
-            ><span>Consumidor Final</span>
+            <span class="font-semibold">Tipo</span><span>Consumidor Final</span>
           </span>
           <span class="col-span-2 flex flex-col">
-            <span class="font-semibold ">Fecha</span><span>05/04/2021</span>
+            <span class="font-semibold">Fecha</span><span>05/04/2021</span>
           </span>
           <span class="col-span-2 flex flex-col">
-            <span class="font-semibold ">Condicion de pago</span
+            <span class="font-semibold">Condicion de pago</span
             ><span>Pago 90 dias</span>
           </span>
           <span class="col-span-1 flex flex-col">
-            <span class="text-gray-700 font-bold">Edad</span
-            ><span>45 Años</span>
+            <span class="font-semibold">Edad</span><span>45 Años</span>
           </span>
         </div>
 
         <div class="grid grid-cols-12 gap-4">
           <span class="col-span-4">
-            <h1 class="text-lg text-black">Últimos seguimientos</h1>
+            <h1 class="text-lg font-semi-bold">Últimos seguimientos</h1>
           </span>
-          <span class="col-span-4 col-start-7 text-black text-xs"
+          <span class="col-span-4 col-start-7 font-semibold text-xs"
             >Por pagar:
             <el-tag type="success" effect="dark" size="mini">$ 367.50</el-tag>
           </span>
@@ -59,48 +57,47 @@
         </div>
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-4 flex flex-col text-xs space-y-4">
-            <div
+            <button
               v-for="item in following"
               :key="item.id"
               @click="getFollow(item.id)"
-              class="flex justify-between rounded-xl p-4 text-black border border-gray-400"
+              class="flex justify-between p-3 rounded-md focus:outline-none border focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:bg-blue-100 cursor-pointer"
             >
-              <div class="flex items-center justify-center">
-                {{ item.follow }}
-              </div>
+              <span class="flex items-center justify-center">
+                <span class="font-semibold">{{ item.follow }}</span>
+              </span>
 
-              <div class="flex flex-col">
-                Fecha:
-                <div class="text-gray-700">{{ item.date }}</div>
-              </div>
-            </div>
+              <span class="flex flex-col">
+                <span class="font-semibold"> Fecha:</span>
+                <span>{{ item.date }}</span>
+              </span>
+            </button>
           </div>
-          <span class="col-span-8 border">
+          <div class="col-span-8 border">
             <div class="grid grid-cols-8 px-6 py-4">
-              <div class="flex justify-between col-span-8 text-md">
-                <span class="col-span-2">{{ follow.followName }}</span>
+              <div class="flex justify-between col-span-8 text-xs">
+                <span class="col-span-2 text-base font-semibold">{{
+                  follow.followName
+                }}</span>
                 <span class="col-span-3 flex flex-col"
-                  >Seguimiento realizado por:
-                  <span class="text-gray-700 text-xs">{{
-                    follow.followerName
-                  }}</span></span
+                  ><span class="font-semibold">Seguimiento realizado por:</span>
+                  <span class="text-xs">{{ follow.followerName }}</span></span
                 >
                 <span class="col-span-2 flex flex-col"
-                  >Fecha:
-                  <span class="text-gray-700 text-xs">{{
-                    follow.date
-                  }}</span></span
+                  ><span class="font-semibold">Fecha:</span>
+                  <span>{{ follow.date }}</span></span
                 >
               </div>
             </div>
-            <div class="grid grid-cols-8 mx-6 h-60 border text-xs">
-              <br />
-              <p class="col-span-8 mx-4">Resumen</p>
-              <p class="col-span-8 mx-4 mb-4">
+            <div class="grid grid-cols-8 mx-6 h-80 border text-xs">
+              <p class="col-span-8 mx-4 mt-3">
+                Resumen
+                <br />
+                <br />
                 {{ follow.resume }}
               </p>
             </div>
-          </span>
+          </div>
         </div>
       </div>
       <span slot="footer" class="dialog-footer">
@@ -118,32 +115,38 @@
     >
       <div class="flex flex-col space-y-2 -mt-4">
         <div class="grid grid-cols-12 gap-4">
-          <span class="col-span-6 ">
+          <span class="col-span-6">
             <div class="grid grid-cols-6">
-              <span class="col-span-6 text-lg text-black"
+              <span class="col-span-6 text-lg"
                 >Información de cuenta por cobrar</span
               >
             </div>
             <div class="grid grid-cols-6 gap-4 mt-4 text-xs">
-              <span class="flex flex-col col-span-2 "
-                >Nº de documento<span>16SD000F</span></span
+              <span class="flex flex-col col-span-2"
+                ><span class="font-semibold">Nº de documento</span
+                ><span>16SD000F</span></span
               >
-              <span class="flex flex-col col-span-2 text-black"
-                >Fecha<span class="text-gray-700">23/04/2021</span></span
+              <span class="flex flex-col col-span-2">
+                <span class="font-semibold">Fecha</span>
+                <span>23/04/2021</span></span
               >
-              <span class="flex flex-col col-span-2  text-black"
-                >Fecha<span class="text-gray-700">23/04/2021</span></span
+              <span class="flex flex-col col-span-2"
+                ><span class="font-semibold">Condición de pago</span>
+                <span>23/04/2021</span></span
               >
             </div>
             <div class="grid grid-cols-6 gap-4 mt-3">
-              <span class="flex flex-col col-span-2 text-xs text-black"
-                >Tipo<span class="text-gray-700">Consumidor final</span></span
+              <span class="flex flex-col col-span-2 text-xs"
+                ><span class="font-semibold">Tipo</span
+                ><span>Consumidor final</span></span
               >
-              <span class="flex flex-col col-span-2 text-xs text-black"
-                >Edad<span class="text-gray-700">45 ago</span></span
+              <span class="flex flex-col col-span-2 text-xs"
+                ><span class="font-semibold">Edad</span
+                ><span>45 ago</span></span
               >
-              <span class="flex flex-col col-span-2 text-xs text-black"
-                >Por pagar<span>
+              <span class="flex flex-col col-span-2 text-xs">
+                <span class="font-semibold">Por pagar</span
+                ><span>
                   <el-tag type="success" effect="dark" size="mini"
                     >$ 367.50</el-tag
                   >
@@ -151,44 +154,40 @@
               >
             </div>
             <div class="grid grid-cols-6 mt-4">
-              <span class="col-span-6 text-lg text-black"
-                >Datos de contacto</span
+              <span class="col-span-6 text-lg">Datos de contacto</span>
+            </div>
+            <div class="grid grid-cols-6 mt-4">
+              <span class="flex flex-col col-span-3 text-xs"
+                ><span class="font-semibold">Cliente</span
+                ><span>ORTIZ ROSALES, INES MARIA</span></span
+              >
+              <span class="flex flex-col col-span-3 text-xs"
+                ><span class="font-semibold">Dirección</span
+                ><span>Avenida 4 de mayo, col Buenos aires #105</span></span
+              >
+              <span class="flex flex-col col-span-3 text-xs">
+                <span class="font-semibold">Teléfono</span
+                ><span class="">+503 7856-5681</span></span
+              >
+              <span class="flex flex-col col-span-3 text-xs"
+                ><span class="font-semibold"> Correo</span
+                ><span>openBox@preuba.cloud</span></span
               >
             </div>
             <div class="grid grid-cols-6 mt-4">
-              <span class="flex flex-col col-span-3 text-xs text-black"
-                >Cliente<span class="text-gray-700"
-                  >ORTIZ ROSALES, INES MARIA</span
-                ></span
-              >
-              <span class="flex flex-col col-span-3 text-xs text-black"
-                >Direccion<span class="text-gray-700"
-                  >Avenida 4 de mayo, col Buenos aires #105</span
-                ></span
-              >
-              <span class="flex flex-col col-span-3 text-xs text-black"
-                >Telefono<span class="text-gray-700">+503 7856-5681</span></span
-              >
-              <span class="flex flex-col col-span-3 text-xs text-black"
-                >Correo<span class="text-gray-700"
-                  >openBox@preuba.cloud</span
-                ></span
-              >
-            </div>
-            <div class="grid grid-cols-6 mt-4">
-              <span class="col-span-6 text-lg text-black"
+              <span class="col-span-6 text-lg"
                 >Información de cuenta por cobrar</span
               >
             </div>
             <div class="grid grid-cols-6 mt-4 border">
               <span class="flex justify-between col-span-6 px-3 py-3 text-xs">
-                <span class="flex flex-col col-span-2  text-black"
-                  >Tipo de documento<span class="text-gray-700"
-                    >Credito fiscal</span
-                  ></span
+                <span class="flex flex-col col-span-2"
+                  ><span class="font-semibold">Tipo de documento</span
+                  ><span>Credito fiscal</span></span
                 >
-                <span class="flex flex-col col-span-2  text-black"
-                  >Edad<span class="text-gray-700">45 Años</span></span
+                <span class="flex flex-col col-span-2"
+                  ><span class="font-semibold">Edad</span
+                  ><span>45 Años</span></span
                 >
 
                 <span class="col-span-2">
@@ -198,13 +197,13 @@
             </div>
             <div class="grid grid-cols-6 mt-4 border">
               <span class="flex justify-between col-span-6 text-xs px-3 py-3">
-                <span class="flex flex-col col-span-2 text-black"
-                  >Tipo de documento<span class="text-gray-700"
-                    >Consumidor final</span
-                  ></span
+                <span class="flex flex-col col-span-2"
+                  ><span class="font-semibold">Tipo de documento</span
+                  ><span>Consumidor final</span></span
                 >
-                <span class="flex flex-col col-span-2 text-black"
-                  >Edad<span class="text-gray-700">45 Años</span></span
+                <span class="flex flex-col col-span-2"
+                  ><span class="font-semibold">Edad</span
+                  ><span>45 Años</span></span
                 >
 
                 <span class="col-span-2">
@@ -216,10 +215,13 @@
 
           <span class="col-span-6 border">
             <div class="grid grid-cols-6 px-6 py-4">
-              <span class="flex justify-between col-span-8 text-xs text-black">
-                <span class="col-span-2">Seguimiento #5</span>
-                <span class="col-span-2 flex flex-col"
-                  >Fecha: <span class="text-gray-700">23/03/2021</span></span
+              <span class="flex justify-between col-span-8 text-xs">
+                <span class="col-span-2 font-semibold"
+                  >Añadir seguimiento #5</span
+                >
+                <span class="col-span-2"
+                  ><span class="font-semibold">Fecha: </span
+                  ><span>23/03/2021</span></span
                 >
               </span>
             </div>
@@ -228,8 +230,22 @@
                 <br />
                 Resumen
                 <br />
-                <br />
-                Escriba un resumen del contacto de cliente...
+                <el-form>
+                  <div class="grid grid-cols-6">
+                    <el-form-item class="col-span-6">
+                      <el-input
+                        type="textarea"
+                        :rows="5"
+                        placeholder="Escriba un resumen del contacto de cliente..."
+                        class="w-full"
+                        maxlength="500"
+                        minlength="5"
+                        show-word-limit
+                      >
+                      </el-input>
+                    </el-form-item>
+                  </div>
+                </el-form>
               </p>
             </div>
           </span>
@@ -290,10 +306,8 @@
           width="130"
           sortable="custom"
         >
-          <template> </template>
         </el-table-column>
         <el-table-column label="Tipo" prop="tipo" width="130" sortable="custom">
-          <template> </template>
         </el-table-column>
         <el-table-column
           label="Fecha"
@@ -313,7 +327,6 @@
           width="140"
           sortable="custom"
         >
-          <template> </template>
         </el-table-column>
         <el-table-column
           label="Total"
@@ -322,7 +335,6 @@
           prop="total"
           sortable="custom"
         >
-          <template> </template>
         </el-table-column>
         <el-table-column label width="70" align="center">
           <!-- dropdpwn selecction -->
@@ -424,7 +436,7 @@ export default {
           date: "10/03/2021",
         },
         {
-          id: 3,
+          id: 5,
           follow: "Seguimiento #1",
           date: "28/02/2021",
         },
@@ -450,9 +462,9 @@ export default {
         },
         {
           id: 2,
-          followerName: "Jorge Blanco",
+          followerName: "Bryan",
           followName: "Seguimiento #4",
-          date: "29/03/2021",
+          date: "21/03/2021",
           resume: `Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore
                 quo mollitia fugiat explicabo nesciunt totam placeat laboriosam
                 modi itaque consectetur vitae ab, eaque voluptatem id assumenda,
@@ -466,7 +478,54 @@ export default {
                 modi itaque consectetur vitae ab, eaque voluptatem id assumenda,
                 porro, provident aut iure.`,
         },
+        {
+          id: 3,
+          followerName: "Gerson Agurre",
+          followName: "Seguimiento #3",
+          date: "17/03/2021",
+          resume: `Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore
+                quo mollitia fugiat explicabo nesciunt totam placeat laboriosam
+                modi itaque consectetur vitae ab, eaque voluptatem id assumenda,
+                porro, provident aut iure.
+
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sequi,
+                corrupti laboriosam earum dolor fuga quibusdam quis veniam.
+
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore
+                quo mollitia fugiat explicabo nesciunt totam placeat laboriosam
+                modi itaque consectetur vitae ab, eaque voluptatem id assumenda,
+                porro, provident aut iure.`,
+        },
+        {
+          id: 4,
+          followerName: "Jorbe",
+          followName: "Seguimiento #2",
+          date: "10/03/2021",
+          resume: `Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore
+                quo mollitia fugiat explicabo nesciunt totam placeat laboriosam
+                modi itaque consectetur vitae ab, eaque voluptatem id assumenda,
+                porro, provident aut iure.
+              
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sequi,
+                corrupti laboriosam earum dolor fuga quibusdam quis veniam..`,
+        },
+        {
+          id: 5,
+          followerName: "Issac Cortez",
+          followName: "Seguimiento #1",
+          date: "28/02/2021",
+          resume: `Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore
+                quo mollitia fugiat explicabo nesciunt totam placeat laboriosam
+                modi itaque consectetur vitae ab, eaque voluptatem id assumenda,
+                porro, provident aut iure.
+
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sequi,
+                corrupti laboriosam earum dolor fuga quibusdam quis veniam.
+
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. `,
+        },
       ],
+
       follow: {
         id: "",
         followName: "",
