@@ -72,6 +72,14 @@
             >
             <el-tag
               size="small"
+              type="warning"
+              v-else-if="selectedInvoice && selectedInvoice.status.id === 5"
+            >
+              <i class="el-icon-question"></i
+              >{{ selectedInvoice.status.name }}</el-tag
+            >
+            <el-tag
+              size="small"
               type="danger"
               v-else-if="selectedInvoice && selectedInvoice.status.id === 3"
             >
@@ -586,9 +594,9 @@
             min-width="295"
             sortable="custom"
           />
-          <el-table-column
+         
+               <el-table-column
             label="Estado"
-            prop="status.id"
             width="110"
             sortable="custom"
           >
@@ -625,8 +633,17 @@
                 <i class="el-icon-question"></i>
                 {{ scope.row.status.name }}</el-tag
               >
+                  <el-tag
+                size="small"
+                type="warning"
+                v-else-if="scope.row.status.id == '5'"
+              >
+                <i class="el-icon-question"></i>
+                {{ scope.row.status.name }}</el-tag
+              >
             </template>
           </el-table-column>
+        
           <el-table-column
             label="Total"
             width="80"
