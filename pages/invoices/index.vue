@@ -595,8 +595,9 @@
             sortable="custom"
           />
          
-               <el-table-column
+             <el-table-column
             label="Estado"
+            prop="status.id"
             width="110"
             sortable="custom"
           >
