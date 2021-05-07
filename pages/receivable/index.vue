@@ -370,7 +370,7 @@
                 <el-dropdown-item
                   @click.native="openPreviewReceivable(scope.row)"
                 >
-                  <i class="el-icon-s-order"></i>Bitácora
+                  <i class="el-icon-notebook-1"></i>Bitácora
                 </el-dropdown-item>
                 <el-dropdown-item
                   @click.native="openPreviewReceivableFollowing(scope.row)"
