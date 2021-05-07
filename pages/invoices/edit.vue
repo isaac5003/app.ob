@@ -274,7 +274,12 @@
       :rules="salesEditFormRules"
       status-icon
       @submit.prevent.native="
-        saveUpdateInvoice('salesEditForm', salesEditForm, details)
+        saveUpdateInvoice(
+          'salesEditForm',
+          salesEditForm,
+          details,
+          paymentConditions
+        )
       "
       ref="salesEditForm"
     >
@@ -1052,6 +1057,7 @@ export default {
       });
     },
     saveUpdateInvoice(formName, formData, details) {
+      console.log(formData);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -1078,7 +1084,7 @@ export default {
                       customer: formData.customer,
                       customerBranch: formData.customerBranch,
                       invoicesPaymentsCondition:
-                        formData.invoicesPaymentsCondition.id,
+                        formData.invoicesPaymentsCondition,
                       invoicesSeller: formData.invoicesSellers,
                       sum:
                         formData.documentType == 1 ? this.sumasCF : this.sumas,
