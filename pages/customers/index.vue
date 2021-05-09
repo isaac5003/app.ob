@@ -223,13 +223,16 @@
                 size="mini"
               ></el-button>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item>
+                <el-dropdown-item
+                 @click.native="updateSelected(multipleSelection, true)">
                   <i class="el-icon-check"></i>Activar seleccionados
                 </el-dropdown-item>
-                <el-dropdown-item>
+                <el-dropdown-item   @click.native="updateSelected(multipleSelection, false)">
                   <i class="el-icon-close"></i>Desactivar seleccionados
                 </el-dropdown-item>
-                <el-dropdown-item :divided="true" class="font-semibold">
+                <el-dropdown-item 
+                @click.native="deleteSelected(multipleSelection)"
+                 :divided="true" class="font-semibold">
                   <i class="el-icon-delete"></i> Eliminar seleccionados
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -294,6 +297,7 @@
 </template>
 
 <script>
+import { id } from 'date-fns/locale';
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
 import { hasModule } from "../../tools/index.js";
@@ -346,6 +350,7 @@ export default {
   },
   methods: {
     handleSelectionChange(val) {
+      
       this.multipleSelection = val;
     },
     fetchCustomers() {
@@ -419,6 +424,7 @@ export default {
       );
     },
     deleteCustomer({ id }) {
+  
       this.$confirm(
         `¿Estás seguro que deseas eliminar este cliente?`,
         "Confirmación",
@@ -432,6 +438,49 @@ export default {
               instance.confirmButtonText = "Procesando...";
               this.$axios
                 .delete(`/customers/${id}`)
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchCustomers();
+                 
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, eliminar`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
+    },
+         
+      deleteSelected(dataSelected) {
+        const ids = dataSelected.map(x => x.id)
+      this.$confirm(
+        `¿Estás seguro que deseas eliminar este cliente?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, eliminar`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .post("/customers",{
+                 ids 
+                })
                 .then((res) => {
                   this.$notify.success({
                     title: "Éxito",
@@ -456,7 +505,49 @@ export default {
         }
       );
     },
-
+       updateSelected(dataSelected, status){
+         const ids = dataSelected.map(x => x.id)
+         console.log(ids)
+             this.$confirm(
+        `¿Estás seguro que deseas eliminar este cliente?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, eliminar`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .put("/customers",{
+                 ids,
+                 status, 
+                })
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchCustomers();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, eliminar`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
+       },
     async openCustomerPreview({ id }) {
       const { data } = await this.$axios.get(`/customers/${id}`);
       (this.selectedCustomer = data.customer),
