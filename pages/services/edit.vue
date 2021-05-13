@@ -167,7 +167,6 @@
     </el-form>
   </layout-content>
 </template>
-
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
@@ -219,6 +218,7 @@ export default {
         this.errorMessage = err.response.data.message;
       })
       .then((alw) => (this.pageloading = false));
+    checkBeforeEnter(this, storagekey, "servicesNewForm");
   },
   fetchOnServer: false,
   data() {
@@ -246,6 +246,7 @@ export default {
         description: inputValidation(false, 5),
         accountingCatalog: selectValidation(true),
       },
+      accountingCatalogs: [],
     };
   },
   methods: {
@@ -275,6 +276,7 @@ export default {
         accountingCatalog,
       }
     ) {
+      console.log(accountingCatalog);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
