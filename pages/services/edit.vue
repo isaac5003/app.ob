@@ -21,8 +21,8 @@
         @tab-click="
           $router
             .replace({
-              path: `/services/edit`,
-              query: { ref: $route.query.ref, tab },
+              path: `/services/edit?ref=${$route.query.ref}`,
+              query: { tab },
             })
             .catch(() => {})
         "
@@ -32,7 +32,7 @@
             <el-form-item
               label="Nombre del servicio"
               prop="name"
-              class="col-span-5"
+              class="col-span-8"
             >
               <el-input
                 ref="name"
@@ -57,6 +57,17 @@
                 style="width: 100%"
               />
             </el-form-item>
+            <el-form-item label=" " prop="incRenta" class="col-span-2 mt-4">
+              <el-checkbox
+                v-model="servicesEditForm.incRenta"
+                class="w-full"
+                border
+                size="small"
+                >Desc. 10% Renta</el-checkbox
+              >
+            </el-form-item>
+          </div>
+          <div class="grid grid-cols-12 gap-4">
             <el-form-item
               label="Tipo de venta"
               prop="sellingType"
@@ -80,6 +91,15 @@
                 </el-row>
               </el-radio-group>
             </el-form-item>
+            <el-form-item label=" " prop="incIva" class="col-span-2 mt-4">
+              <el-checkbox
+                v-model="servicesEditForm.incIva"
+                class="w-full"
+                border
+                size="small"
+                >Inc. IVA</el-checkbox
+              >
+            </el-form-item>
           </div>
           <el-form-item label="Descripción del servicio" prop="description">
             <el-input
@@ -98,46 +118,52 @@
         <el-tab-pane
           label="Integraciones"
           name="integrations"
-          class="space-y-4"
+          class="space-y-2"
         >
           <Notification
             class="w-full"
             type="info"
-            title="Información"
-            message="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+            title="Integraciones"
+            message="En esta sección se realizan las configuraciones de integración con otros modulos de manera general. Estas configuraciones se aplicarán a todos los servicios que no tengan una configuración individual."
           />
           <div class="grid grid-cols-12 gap-4">
-            <el-form-item label="Seleccione una cuenta" class="col-span-4">
+            <el-form-item
+              label="Seleccione una cuenta"
+              prop="accountingCatalog"
+              class="col-span-4"
+            >
               <el-select
                 v-model="servicesEditForm.accountingCatalog"
                 placeholder="Seleccione una cuenta"
                 size="small"
+                remote
                 clearable
                 filterable
                 class="w-full"
+                :loading="loadingAccount"
+                :remote-method="findAccount"
               >
                 <el-option
-                  v-for="a in accountingCatalogs"
-                  :key="a.id"
-                  :label="a.name"
-                  :value="a.id"
-                  :disabled="a.isParent == true"
+                  v-for="c in filteredCatalog"
+                  :key="c.id"
+                  :label="`${c.code} - ${c.name}`"
+                  :value="c.id"
+                  :disabled="c.isParent == true"
                 >
                 </el-option>
               </el-select>
             </el-form-item>
           </div>
         </el-tab-pane>
-
-        <div class="flex justify-end">
-          <el-button type="primary" size="small" native-type="submit"
-            >Guardar</el-button
-          >
-          <el-button size="small" @click="$router.push('/services')"
-            >Cancelar</el-button
-          >
-        </div>
       </el-tabs>
+      <div class="flex justify-end">
+        <el-button type="primary" size="small" native-type="submit"
+          >Guardar</el-button
+        >
+        <el-button size="small" @click="$router.push('/services')"
+          >Cancelar</el-button
+        >
+      </div>
     </el-form>
   </layout-content>
 </template>
@@ -165,34 +191,28 @@ export default {
     }
     const sellingTypes = () => this.$axios.get("/services/selling-types");
     const service = () => this.$axios.get(`/services/${this.$route.query.ref}`);
-    const catalogs = () => this.$axios.get("/entries/catalog");
-    const integrations = () =>
-      this.$axios.get("/services/setting/integrations");
-
-    Promise.all([sellingTypes(), service(), catalogs(), integrations()])
+    const catalog = () => this.$axios.get("/entries/catalog");
+    const integrationServiceAccount = () =>
+      this.$axios.get(`/services/${this.$route.query.ref}/integrations`);
+    Promise.all([
+      sellingTypes(),
+      service(),
+      catalog(),
+      integrationServiceAccount(),
+    ])
       .then((res) => {
-        const [sellingTypes, service, catalogs, integrations] = res;
-        this.accountingCatalogs = catalogs.data.accountingCatalog;
+        const [sellingTypes, service, catalog, integrationCatalog] = res;
+        this.catalogs = catalog.data.accountingCatalog;
         this.sellingTypes = sellingTypes.data.types;
+
         this.servicesEditForm = {
           ...service.data.service,
           sellingType: service.data.service.sellingType.id,
-          accountingCatalog: integrations.data.integrations.catalog,
+          accountingCatalog: integrationCatalog.data.integrations.catalog,
         };
-
-        this.$axios
-          .get("/services/setting/integrations")
-          .then((res) => {
-            console.log(res);
-            this.servicesEditForm.accountingCatalog =
-              res.data.integrations.catalog;
-          })
-          .catch((err) => {
-            this.$notify.error({
-              title: "Error",
-              message: err.response.data.message,
-            });
-          });
+        this.filteredCatalog = this.catalogs.filter(
+          (c) => c.id == integrationCatalog.data.integrations.catalog
+        );
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
@@ -201,19 +221,13 @@ export default {
     checkBeforeEnter(this, storagekey, "servicesNewForm");
   },
   fetchOnServer: false,
-  beforeRouteLeave(to, from, next) {
-    checkBeforeLeave(this, storagekey, next);
-  },
   data() {
     return {
+      filteredCatalog: [],
+      catalogs: [],
       tab: "general-information",
       acountGeneral: "",
-      acountInfo: [
-        {
-          id: 1,
-          name: "Jorge_vladimir@hotmail.com",
-        },
-      ],
+      loadingAccount: false,
       pageloading: true,
       sellingTypes: [],
       servicesEditForm: {
@@ -230,11 +244,26 @@ export default {
         cost: inputValidation(true, 0, null, "number"),
         sellingType: selectValidation(true),
         description: inputValidation(false, 5),
+        accountingCatalog: selectValidation(true),
       },
       accountingCatalogs: [],
     };
   },
   methods: {
+    findAccount(query) {
+      if (query !== "") {
+        this.loadingAccount = true;
+        this.$axios
+          .get("/entries/catalog", { params: { search: query.toLowerCase() } })
+          .then((res) => {
+            this.filteredCatalog = res.data.accountingCatalog;
+            this.loadingAccount = false;
+          })
+          .catch((err) => (this.errorMessage = err.response.data.message));
+      } else {
+        this.filteredCatalog = [];
+      }
+    },
     submitEditService(
       formName,
       {
@@ -264,7 +293,7 @@ export default {
               if (action === "confirm") {
                 instance.confirmButtonLoading = true;
                 instance.confirmButtonText = "Procesando...";
-                const services = () =>
+                const service = () =>
                   this.$axios.put(`/services/${this.$route.query.ref}`, {
                     name,
                     cost,
@@ -274,18 +303,22 @@ export default {
                     incRenta,
                   });
                 const integration = () =>
-                  this.$axios.put("/services/setting/integrations", {
-                    accountingCatalog,
-                  });
-                Promise.all([services(), integration()])
+                  this.$axios.put(
+                    `/services/${this.$route.query.ref}/integrations`,
+                    {
+                      accountingCatalog,
+                    }
+                  );
+                Promise.all([service(), integration()])
                   .then((res) => {
-                    const [services, integration] = res;
-                    console.log(services);
+                    const [service, integrationCatalog] = res;
                     this.$notify.success({
                       title: "Exito",
-                      message: `${services.data.message} y ${integration.data.message} `,
+                      message: `${service.data.message} y ${integrationCatalog.data.message}`,
                     });
-                    this.$router.push("/services");
+                    setTimeout(() => {
+                      this.$router.push("/services");
+                    }, 300);
                   })
                   .catch((err) => {
                     this.$notify.error({
