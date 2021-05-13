@@ -607,15 +607,14 @@
                 type="info"
                 v-if="scope.row.status.id == '1'"
               >
-                <i class="el-icon-warning"></i>
+                <i class="el-icon-circle-plus"></i>
                 {{ scope.row.status.name }}
               </el-tag>
               <el-tag
                 size="small"
-                type="success"
                 v-else-if="scope.row.status.id == '2'"
               >
-                <i class="el-icon-success"></i>
+                <i class="el-icon-warning"></i>
                 {{ scope.row.status.name }}</el-tag
               >
               <el-tag
@@ -636,10 +635,10 @@
               >
                   <el-tag
                 size="small"
-                type="warning"
+                type="success"
                 v-else-if="scope.row.status.id == '5'"
               >
-                <i class="el-icon-question"></i>
+                <i class="el-icon-success"></i>
                 {{ scope.row.status.name }}</el-tag
               >
             </template>
