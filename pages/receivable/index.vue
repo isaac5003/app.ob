@@ -55,7 +55,7 @@
           <div class="col-span-8 border">
             <div class="grid grid-cols-8 px-6 py-4">
               <div class="flex justify-between col-span-8 text-xs">
-                <span class="col-span-2 text-base font-semibold">{{
+                <span class="col-span-2 text-sm font-semibold">{{
                   follow.followName
                 }}</span>
                 <div class="col-span-3 flex flex-col"><span class="font-semibold">Seguimiento realizado por:</span>
@@ -149,7 +149,7 @@
             </div>
           </span>
 
-          <span class="col-span-6 border">
+          <div class="col-span-6 border">
             <div class="grid grid-cols-6 px-6 py-4">
               <span class="flex justify-between col-span-8 text-xs">
                 <span class="col-span-2 font-semibold">Añadir seguimiento #5</span>
@@ -172,7 +172,7 @@
                 </el-form>
               </p>
             </div>
-          </span>
+          </div>
         </div>
 
         <div class="flex justify-end">
