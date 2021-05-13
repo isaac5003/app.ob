@@ -615,14 +615,12 @@
                       @click="openEditDetail(scope.$index, scope.row)"
                       size="small"
                       icon="el-icon-edit"
-                      circle
                     ></el-button>
                     <el-button
                       type="danger"
                       @click="deleteDetail(scope.$index)"
                       size="small"
                       icon="el-icon-delete"
-                      circle
                     ></el-button>
                   </div>
                 </template>
