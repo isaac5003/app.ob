@@ -761,6 +761,8 @@ export default {
               invoicesSellers: data.invoice.invoicesSeller.id,
               documentType: data.invoice.documentType.id,
             };
+            console.log(data.invoice);
+            console.log(paymentConditions.data.paymentConditions);
             this.tributary = {
               customerNrc: data.invoice.customerNrc,
               customerNit: data.invoice.customerNit,
@@ -1053,6 +1055,7 @@ export default {
       });
     },
     saveUpdateInvoice(formName, formData, details) {
+      console.log(formData.invoicesPaymentsCondition);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
