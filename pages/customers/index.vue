@@ -227,6 +227,12 @@
                 >
                   <i class="el-icon-edit-outline"></i> Editar cliente
                 </el-dropdown-item>
+                  <el-dropdown-item
+                @click.native="
+                $router.push(`/customers/branchOffices?ref-${scope.row.id}`)"
+                >
+                    <i class="el-icon-map-location"></i> Sucursales
+                  </el-dropdown-item>
                 <el-dropdown-item @click.native="changeActive(scope.row)">
                   <span v-if="scope.row.isActiveCustomer">
                     <i class="el-icon-close"></i> Desactivar
@@ -234,12 +240,7 @@
                   <span v-else> <i class="el-icon-check"></i> Activar </span>
                   cliente
                 </el-dropdown-item>
-                <el-dropdown-item
-                @click.native="
-                $router.push(`/customers/branchOffices?ref-${scope.row.id}`)"
-                >
-                    <i class="el-icon-map-location"></i> Sucursales
-                  </el-dropdown-item>
+              
                   <!-- <el-dropdown-item>
                     <i class="el-icon-notebook-1"></i> Directorio
                 </el-dropdown-item> -->

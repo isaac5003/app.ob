@@ -8,254 +8,7 @@
   >
     <!-- vista previa -->
     <el-dialog></el-dialog>
-    <!-- Dialogo de sucursal adicional -->
-    <el-dialog
-      title="Agregar nueva sucursal"
-      :visible.sync="showAdditionalBranch"
-      :close-on-click-modal="false"
-      :append-to-body="true"
-      width="900px"
-    >
-      <div class="flex flex-col space-y-2">
-        <el-form>
-          <!-- Seleccion de pais,departamento y municipio -->
-          <div class="grid grid-cols-12 gap-4">
-            <el-form-item label="Pais" class="col-span-4">
-              <el-select
-                v-model="country"
-                class="w-full"
-                size="small"
-                filterable
-                clearable
-                default-first-option
-              >
-                <el-option
-                  v-for="p in paises"
-                  :key="p.id"
-                  :label="p.name"
-                  :value="p.id"
-                >
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="Departamento" class="col-span-4">
-              <el-select
-                class="w-full"
-                size="small"
-                filterable
-                clearable
-                default-first-option
-              >
-                <el-option v-for="a in b" :key="a"> </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="Municipio" class="col-span-4">
-              <el-select
-                class="w-full"
-                size="small"
-                filterable
-                clearable
-                default-first-option
-              >
-                <el-option v-for="a in b" :key="a"> </el-option>
-              </el-select>
-            </el-form-item>
-          </div>
-          <!-- Direcciones -->
-          <div class="grid grid-cols-12 gap-4 mt-3">
-            <el-form-item label="Dirección 1" class="col-span-4">
-              <el-input
-                v-model="text"
-                placeholder="Col, ciudad, pjs, pol, #casa"
-                class="w-full"
-                size="small"
-                maxlength="10"
-                show-word-limit
-              >
-                <el-option
-                  v-for="p in paises"
-                  :key="p.id"
-                  :label="p.name"
-                  :value="p.id"
-                >
-                </el-option>
-              </el-input>
-            </el-form-item>
-            <el-form-item label="Dirección 2" class="col-span-4">
-              <el-input
-                v-model="text"
-                type="text"
-                placeholder="Col, ciudad, pjs, pol, #casa"
-                class="w-full"
-                size="small"
-                maxlength="10"
-                show-word-limit
-              >
-                <el-option v-for="a in b" :key="a"> </el-option>
-              </el-input>
-            </el-form-item>
-          </div>
-          <!-- Contactos -->
-          <h1 class="text-blue-500">Contacto</h1>
-          <div class="grid grid-cols-12 gap-4 mt-3 border-b-2">
-            <el-form-item label="Teléfono" class="col-span-4">
-              <el-input
-                v-model="country"
-                placeholder="+503 0000-0000"
-                class="w-full"
-                size="small"
-              >
-                <el-option
-                  v-for="p in paises"
-                  :key="p.id"
-                  :label="p.name"
-                  :value="p.id"
-                >
-                </el-option>
-              </el-input>
-            </el-form-item>
-            <el-form-item label="Correo electronico" class="col-span-4">
-              <el-input
-                class="w-full"
-                placeholder="example@example.com"
-                size="small"
-              >
-                <el-option v-for="a in b" :key="a"> </el-option>
-              </el-input>
-            </el-form-item>
-          </div>
-          <!-- new branch Offices -->
-          <h1 class="text-lg text-black mt-3">Agregar nueva Sucursal</h1>
-          <div class="grid grid-cols-12 gap-4 mt-4">
-            <el-form-item label="Pais" class="col-span-4">
-              <el-select
-                v-model="country"
-                class="w-full"
-                size="small"
-                filterable
-                clearable
-                default-first-option
-              >
-                <el-option
-                  v-for="p in paises"
-                  :key="p.id"
-                  :label="p.name"
-                  :value="p.id"
-                >
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="Departamento" class="col-span-4">
-              <el-select
-                class="w-full"
-                size="small"
-                filterable
-                clearable
-                default-first-option
-              >
-                <el-option v-for="a in b" :key="a"> </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="Municipio" class="col-span-4">
-              <el-select
-                class="w-full"
-                size="small"
-                filterable
-                clearable
-                default-first-option
-              >
-                <el-option v-for="a in b" :key="a"> </el-option>
-              </el-select>
-            </el-form-item>
-          </div>
-          <!-- Direcciones -->
-          <div class="grid grid-cols-12 gap-4">
-            <el-form-item label="Dirección 1" class="col-span-4">
-              <el-input
-                v-model="text"
-                placeholder="Col, ciudad, pjs, pol, #casa"
-                class="w-full"
-                size="small"
-                maxlength="10"
-                show-word-limit
-              >
-                <el-option
-                  v-for="p in paises"
-                  :key="p.id"
-                  :label="p.name"
-                  :value="p.id"
-                >
-                </el-option>
-              </el-input>
-            </el-form-item>
-            <el-form-item label="Dirección 2" class="col-span-4">
-              <el-input
-                v-model="text"
-                type="text"
-                placeholder="Col, ciudad, pjs, pol, #casa"
-                class="w-full"
-                size="small"
-                maxlength="10"
-                show-word-limit
-              >
-                <el-option v-for="a in b" :key="a"> </el-option>
-              </el-input>
-            </el-form-item>
-          </div>
-          <!-- Contactos -->
-          <h1 class="text-blue-500">Contacto</h1>
-          <div class="grid grid-cols-12 gap-4 mt-3">
-            <el-form-item label="Teléfono" class="col-span-4">
-              <el-input
-                v-model="country"
-                placeholder="+503 0000-0000"
-                class="w-full"
-                size="small"
-              >
-                <el-option
-                  v-for="p in paises"
-                  :key="p.id"
-                  :label="p.name"
-                  :value="p.id"
-                >
-                </el-option>
-              </el-input>
-            </el-form-item>
-            <el-form-item label="Correo electronico" class="col-span-4">
-              <el-input
-                class="w-full"
-                placeholder="example@example.com"
-                size="small"
-              >
-                <el-option v-for="a in b" :key="a"> </el-option>
-              </el-input>
-            </el-form-item>
-          </div>
-          <div class="grid grid-cols-12">
-            <div class="col-span-3">
-              <el-button
-                size="small"
-                type="primary"
-                @click="showAdditionalBranch = 'true'"
-                >Sucursal adicional</el-button
-              >
-            </div>
-            <el-button
-              type="primary"
-              size="small"
-              class="col-span-2 col-start-9"
-              >Guardar</el-button
-            >
-            <el-button
-              size="small"
-              class="col-span-2 col-start-11"
-              @click="showAdditionalBranch = false"
-              >Cancelar</el-button
-            >
-          </div>
-        </el-form>
-      </div>
-    </el-dialog>
+
     <!-- Dialogo de nueva sucursal -->
     <el-dialog
       title="Agregar nueva sucursal"
@@ -263,136 +16,174 @@
       :close-on-click-modal="false"
       :append-to-body="true"
       width="900px"
+      @close="closeDialog"
     >
       <div class="flex flex-col space-y-2">
-        <el-form>
+        <el-form
+          :model="addOfficeForm"
+          status-icon
+          ref="addOfficeForm"
+        >
           <!-- Seleccion de pais,departamento y municipio -->
-          <div class="grid grid-cols-12 gap-4">
-            <el-form-item label="Pais" class="col-span-4">
-              <el-select
-                v-model="country"
-                class="w-full"
-                size="small"
-                filterable
-                clearable
-                default-first-option
-              >
-                <el-option
-                  v-for="p in paises"
-                  :key="p.id"
-                  :label="p.name"
-                  :value="p.id"
+          <div
+            class="space-y-4"
+            v-for="(item, i) in addOfficeForm.items"
+            :key="i"
+          >
+            <div class="grid grid-cols-12 mt-4">
+              <div class="col-span-12">
+                <div class="flex justify-between">
+                  <span class="text-lg font-semibold">
+                    Nueva sucursal {{ i + 1 }}
+                  </span>
+                  <el-button
+                    class="w-20"
+                    size="mini"
+                    type="danger"
+                    :disabled="addOfficeForm.items.length === 1"
+                    @click="removeOffice(i)"
+                    ><i class="el-icon-delete"></i
+                  ></el-button>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-12 gap-4">
+              <el-form-item label="Pais" class="col-span-4">
+                <el-select
+                  v-model="item.country"
+                  class="w-full"
+                  size="small"
+                  filterable
+                  clearable
+                  default-first-option
                 >
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="Departamento" class="col-span-4">
-              <el-select
-                class="w-full"
-                size="small"
-                filterable
-                clearable
-                default-first-option
-              >
-                <el-option v-for="a in b" :key="a"> </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="Municipio" class="col-span-4">
-              <el-select
-                class="w-full"
-                size="small"
-                filterable
-                clearable
-                default-first-option
-              >
-                <el-option v-for="a in b" :key="a"> </el-option>
-              </el-select>
-            </el-form-item>
-          </div>
-          <!-- Direcciones -->
-          <div class="grid grid-cols-12 gap-4">
-            <el-form-item label="Dirección 1" class="col-span-4">
-              <el-input
-                v-model="text"
-                placeholder="Col, ciudad, pjs, pol, #casa"
-                class="w-full"
-                size="small"
-                maxlength="10"
-                show-word-limit
-              >
-                <el-option
-                  v-for="p in paises"
-                  :key="p.id"
-                  :label="p.name"
-                  :value="p.id"
+                  <el-option
+                    v-for="c in countries"
+                    :key="c.id"
+                    :label="c.name"
+                    :value="c.id"
+                  >
+                  </el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="Departamento" class="col-span-4">
+                <el-select
+                  v-model="item.deparment"
+                  class="w-full"
+                  size="small"
+                  filterable
+                  clearable
+                  default-first-option
                 >
-                </el-option>
-              </el-input>
-            </el-form-item>
-            <el-form-item label="Dirección 2" class="col-span-4">
-              <el-input
-                v-model="text"
-                type="text"
-                placeholder="Col, ciudad, pjs, pol, #casa"
-                class="w-full"
-                size="small"
-                maxlength="10"
-                show-word-limit
-              >
-                <el-option v-for="a in b" :key="a"> </el-option>
-              </el-input>
-            </el-form-item>
+                  <el-option
+                    v-for="c in rawStates"
+                    :key="c.id"
+                    :label="c.name"
+                    :value="c.id"
+                  >
+                  </el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="Municipio" class="col-span-4">
+                <el-select
+                  v-model="item.municipio"
+                  class="w-full"
+                  size="small"
+                  filterable
+                  clearable
+                  default-first-option
+                >
+                  <el-option
+                    v-for="c in rawCities"
+                    :key="c.id"
+                    :label="c.name"
+                    :value="c.id"
+                  >
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </div>
+            <!-- Direcciones -->
+            <div class="grid grid-cols-12 gap-4">
+              <el-form-item label="Dirección 1" class="col-span-4">
+                <el-input
+                  v-model="item.address"
+                  placeholder="Col, ciudad, pjs, pol, #casa"
+                  class="w-full"
+                  size="small"
+                  maxlength="10"
+                  show-word-limit
+                >
+                  <el-option> </el-option>
+                </el-input>
+              </el-form-item>
+              <el-form-item label="Dirección 2" class="col-span-4">
+                <el-input
+                  v-model="item.address1"
+                  type="text"
+                  placeholder="Col, ciudad, pjs, pol, #casa"
+                  class="w-full"
+                  size="small"
+                  maxlength="10"
+                  show-word-limit
+                >
+                  <el-option v-for="a in b" :key="a"> </el-option>
+                </el-input>
+              </el-form-item>
+            </div>
+            <!-- Contactos -->
+            <h1 class="text-blue-500">Contacto</h1>
+            <div class="grid grid-cols-12 gap-4 mt-4 border-b-2">
+              <el-form-item label="Teléfono" class="col-span-4">
+                <el-input
+                  v-model="item.phone"
+                  placeholder="+503 0000-0000"
+                  class="w-full"
+                  size="small"
+                >
+                  <el-option
+                    v-for="p in paises"
+                    :key="p.id"
+                    :label="p.name"
+                    :value="p.id"
+                  >
+                  </el-option>
+                </el-input>
+              </el-form-item>
+              <el-form-item label="Correo electronico" class="col-span-4">
+                <el-input
+                  v-model="item.email"
+                  class="w-full"
+                  placeholder="example@example.com"
+                  size="small"
+                >
+                  <el-option v-for="a in b" :key="a"> </el-option>
+                </el-input>
+              </el-form-item>
+            </div>
           </div>
-          <!-- Contactos -->
-          <h1 class="text-blue-500">Contacto</h1>
           <div class="grid grid-cols-12 gap-4 mt-3">
-            <el-form-item label="Teléfono" class="col-span-4">
-              <el-input
-                v-model="country"
-                placeholder="+503 0000-0000"
-                class="w-full"
-                size="small"
-              >
-                <el-option
-                  v-for="p in paises"
-                  :key="p.id"
-                  :label="p.name"
-                  :value="p.id"
-                >
-                </el-option>
-              </el-input>
-            </el-form-item>
-            <el-form-item label="Correo electronico" class="col-span-4">
-              <el-input
-                class="w-full"
-                placeholder="example@example.com"
-                size="small"
-              >
-                <el-option v-for="a in b" :key="a"> </el-option>
-              </el-input>
-            </el-form-item>
-          </div>
-          <div class="grid grid-cols-12">
-            <div class="col-span-3">
+            <div class="col-span-6">
               <el-button
                 size="small"
                 type="primary"
-                @click="showAdditionalBranch = 'true'"
-                >Sucursal adicional</el-button
+                @click.native="officetAdd()"
+                >+ Sucursal adicional</el-button
               >
             </div>
-            <el-button
-              type="primary"
-              size="small"
-              class="col-span-2 col-start-9"
-              >Guardar</el-button
-            >
-            <el-button
-              size="small"
-              class="col-span-2 col-start-11"
-              @click="showBranchOffices = false"
-              >Cancelar</el-button
-            >
+            <div class="col-span-6">
+              <div class="flex justify-end">
+                <el-button type="primary" size="small" class="col-span-2"
+                  >Guardar</el-button
+                >
+                <el-button
+                  size="small"
+                  class="col-span-2"
+                  @click="showBranchOffices = false"
+                  >Cancelar
+                </el-button>
+              </div>
+            </div>
           </div>
         </el-form>
       </div>
@@ -443,41 +234,44 @@
         stripe
         size="mini"
       >
-        <el-table-column type="selection" width="45">
-        </el-table-column>
+        <el-table-column type="selection" width="45"> </el-table-column>
 
-        <el-table-column
-          label="#"
-          width="50"
-          prop="index"
-        ></el-table-column>
+        <el-table-column label="#" width="50" prop="index"></el-table-column>
         <el-table-column
           label="Nombre de la sucursal"
+          width="355"
           sortable="custom"
           prop="name"
         ></el-table-column>
-        <el-table-column label="Teléfono" sortable="custom" prop="phone" />
+        <el-table-column
+          label="Teléfono"
+          width="100"
+          sortable="custom"
+          prop="phone"
+        />
         <el-table-column
           label="Correo"
+          width="200"
           sortable="custom"
           prop="email"
         ></el-table-column>
         <el-table-column
           label="Pais"
+          width="100"
           sortable="custom"
           prop="country"
           show-overflow-tooltip
-        ></el-table-column>
-        <el-table-column label width="70" align="center">
-          <template slot="header" v-if="multipleSelection.length > 0" >
-            <el-dropdown>
-              <el-button
-                trigger="click"
-                icon="el-icon-more"
-                type="primary"
-                size="mini"
-               class="transition duration-500 ease-in  transform  hover:scale-110"
-              ></el-button>
+        >
+        </el-table-column>
+        <el-table-column label width="110" align="center">
+          <template slot="header" v-if="multipleSelection.length > 0">
+            <el-dropdown trigger="click" szie="mini">
+              <el-button type="primary" size="mini" class="group">
+                <span class="hidden group-hover:inline">
+                  {{ multipleSelection.length }} Filas</span
+                >
+                <i class="el-icon-more"
+              /></el-button>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item>
                   <i class="el-icon-edit"></i>Editar Sucursales
@@ -491,36 +285,25 @@
               </el-dropdown-menu>
             </el-dropdown>
           </template>
-          <template slot-scope="scope">
+          <template>
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item
-                  @click.native="openCustomerPreview(scope.row)"
-                >
+                <el-dropdown-item>
                   <i class="el-icon-view"></i> Vista previa
                 </el-dropdown-item>
-                <el-dropdown-item
-                  @click.native="
-                    $router.push(`/customers/edit?ref=${scope.row.id}`)
-                  "
-                >
+                <el-dropdown-item>
                   <i class="el-icon-edit-outline"></i> Editar
                 </el-dropdown-item>
-                <el-dropdown-item
-                  @click.native="
-                    $router.push(`/customers/branchOffices?ref-${scope.row.id}`)
-                  "
-                >
+                <el-dropdown-item>
                   <i class="el-icon-map-location"></i>Definir como principal
                 </el-dropdown-item>
 
                 <el-dropdown-item
                   :divided="true"
                   class="text-red-500 font-semibold"
-                  @click.native="deleteCustomer(scope.row)"
                 >
-                  <i class="el-icon-delete"></i> Eliminar cliente
+                  <i class="el-icon-delete"></i> Eliminar sucursal
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -542,21 +325,64 @@
     </div>
   </layout-content>
 </template>
- 
- <script>
+
+<script>
 import LayoutContent from "../../components/layout/Content";
+import {
+  inputValidation,
+  selectValidation,
+  checkBeforeLeave,
+  checkBeforeEnter,
+} from "../../tools";
 import Notification from "../../components/Notification";
 export default {
-  components: { LayoutContent, Notification },
+  components: {
+    LayoutContent,
+    Notification,
+  },
+  fetch() {
+    const countries = () => this.$axios.get(`/others/countries`);
+    const states = () => this.$axios.get(`/others/states`);
+    const cities = () => this.$axios.get(`/others/cities`);
 
+    Promise.all([countries(), states(), cities()])
+      .then((res) => {
+        const [countries, states, cities] = res;
+
+        this.countries = countries.data.countries;
+        this.rawStates = states.data.states;
+        this.rawCities = cities.data.cities;
+      })
+      .catch((err) => {
+        this.$message.error(err.response.data.message);
+        this.$router.push("/customers");
+      })
+      .then((alw) => (this.pageloading = false));
+  },
+  fetchOnServer: false,
   data() {
     return {
       multipleSelection: [],
+      countries: [],
+      rawStates: [],
+      rawCities: [],
       text: "",
       pageloading: true,
       showBranchOffices: false,
       showAdditionalBranch: false,
-
+      addOfficeForm: {
+        items: [
+          {
+            country: "",
+            deparment: "",
+            municipio: "",
+            address: "",
+            address1: "",
+            phone: "",
+            email: "",
+          },
+        ],
+      },
       BranchOffices: {
         BranchOffices: [],
         count: 0,
@@ -564,19 +390,19 @@ export default {
       tabla: [
         {
           index: 1,
-          name: "Siman Sv de CV",
+          name: "Grupo agropecuario de El Salvador S.A C.V",
           phone: "2332-3244",
           email: "example@example.com",
           country: "El Salvador",
         },
-         {
+        {
           index: 2,
-          name: "Siman Sv de CV",
+          name: "Impresa respuesto",
           phone: "2332-3244",
           email: "example@example.com",
           country: "El Salvador",
         },
-         {
+        {
           index: 3,
           name: "Siman Sv de CV",
           phone: "2332-3244",
@@ -594,7 +420,34 @@ export default {
   methods: {
     handleSelectionChange(val) {
       this.multipleSelection = val;
-      console.log(this.multipleSelection.length)
+      console.log(this.multipleSelection.length);
+    },
+    officetAdd() {
+      this.addOfficeForm.items.push({
+        country: "",
+        deparment: "",
+        municipio: "",
+        address: "",
+        address1: "",
+        phone: "",
+        email: "",
+      });
+    },
+    closeDialog() {
+      this.addOfficeForm.items = [
+        {
+          country: "",
+          deparment: "",
+          municipio: "",
+          address: "",
+          address1: "",
+          phone: "",
+          email: "",
+        },
+      ];
+    },
+    removeOffice(index) {
+      this.addOfficeForm.items.splice(index, 1);
     },
   },
 };
