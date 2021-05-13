@@ -414,12 +414,13 @@ export default {
     },
     updateSelected(dataSelected, status) {
       const ids = dataSelected.map((s) => s.id);
+      const message = status ? "activar" : "desactivar";
 
       this.$confirm(
-        `¿Estás seguro que deseas eliminar los servicios selecionados?`,
+        `¿Estás seguro que deseas ${message} los servicios selecionados?`,
         "Confirmación",
         {
-          confirmButtonText: `Si, eliminar`,
+          confirmButtonText: `Si, ${message}`,
           cancelButtonText: "Cancelar",
           type: "warning",
           beforeClose: (action, instance, done) => {
@@ -446,7 +447,7 @@ export default {
                 })
                 .then((alw) => {
                   instance.confirmButtonLoading = false;
-                  instance.confirmButtonText = `Si, eliminar`;
+                  instance.confirmButtonText = `Si, ${message}`;
                   done();
                 });
             }
