@@ -823,7 +823,7 @@ export default {
                 nit,
                 nrc,
                 [new Date(startDate), new Date(endDate)],
-                "DETALLE DE FACTURACIÓN ",
+                "DETALLE DE REPORTES ",
                 "period"
               ),
               footer: getFooter(),
@@ -952,7 +952,7 @@ export default {
             const document = [
               [name],
               [
-                `DETALLE DE FACTURACIÓN EN EL PERÍODO DEL ${startDate} AL ${endDate}`,
+                `DETALLE DE REPORTES EN EL PERÍODO DEL ${startDate} AL ${endDate}`,
                 "",
                 "",
                 "",
@@ -1141,7 +1141,7 @@ export default {
                 nit,
                 nrc,
                 [new Date(startDate), new Date(endDate)],
-                "DETALLE DE FACTURACIÓN ",
+                "DETALLE DE VENTAS ",
                 "period"
               ),
               footer: getFooter(),
@@ -1270,7 +1270,7 @@ export default {
             const document = [
               [name],
               [
-                `DETALLE DE FACTURACIÓN EN EL PERÍODO DEL ${startDate} AL ${endDate}`,
+                `DETALLE DE VENTAS EN EL PERÍODO DEL ${startDate} AL ${endDate}`,
                 "",
                 "",
                 "",
