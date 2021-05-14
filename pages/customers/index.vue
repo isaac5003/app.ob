@@ -229,7 +229,7 @@
                 </el-dropdown-item>
                   <el-dropdown-item
                 @click.native="
-                $router.push(`/customers/branchOffices?ref-${scope.row.id}`)"
+                $router.push(`/customers/branchOffices?ref=${scope.row.id}`)"
                 >
                     <i class="el-icon-map-location"></i> Sucursales
                   </el-dropdown-item>
