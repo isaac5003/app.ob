@@ -186,7 +186,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 1 &&
-                  selectedInvoice.documentType.id != 3
+                    selectedInvoice.documentType.id != 3
                 "
                 >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
               >
@@ -202,7 +202,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 2 &&
-                  selectedInvoice.documentType.id != 3
+                    selectedInvoice.documentType.id != 3
                 "
                 >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
               >
@@ -218,7 +218,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 3 ||
-                  selectedInvoice.documentType.id == 3
+                    selectedInvoice.documentType.id == 3
                 "
                 >{{
                   (selectedInvoice.documentType.id == 1
@@ -372,7 +372,7 @@
                     </div>
                   </el-option>
                 </el-option-group>
-                   <!-- toda esbien -->
+                <!-- toda esbien -->
                 <el-option-group key="INACTIVOS" label="INACTIVOS">
                   <el-option
                     style="height: 50px"
@@ -573,7 +573,7 @@
           <el-table-column
             label="Tipo"
             prop="documentType.id"
-            width="70"
+            width="75"
             sortable="custom"
           >
             <template slot-scope="scope">
@@ -591,11 +591,11 @@
           <el-table-column
             label="Cliente"
             prop="customerName"
-            min-width="295"
+            min-width="290"
             sortable="custom"
           />
-         
-             <el-table-column
+
+          <el-table-column
             label="Estado"
             prop="status.id"
             width="110"
@@ -610,10 +610,7 @@
                 <i class="el-icon-circle-plus"></i>
                 {{ scope.row.status.name }}
               </el-tag>
-              <el-tag
-                size="small"
-                v-else-if="scope.row.status.id == '2'"
-              >
+              <el-tag size="small" v-else-if="scope.row.status.id == '2'">
                 <i class="el-icon-warning"></i>
                 {{ scope.row.status.name }}</el-tag
               >
@@ -633,7 +630,7 @@
                 <i class="el-icon-question"></i>
                 {{ scope.row.status.name }}</el-tag
               >
-                  <el-tag
+              <el-tag
                 size="small"
                 type="success"
                 v-else-if="scope.row.status.id == '5'"
@@ -643,7 +640,7 @@
               >
             </template>
           </el-table-column>
-        
+
           <el-table-column
             label="Total"
             width="80"
@@ -728,11 +725,11 @@
                     class="font-semibold"
                     v-if="
                       scope.row.status.id == '1' &&
-                      !isLastInvoice(
-                        scope.row.sequence,
-                        scope.row.documentType.id,
-                        scope.row.authorization
-                      )
+                        !isLastInvoice(
+                          scope.row.sequence,
+                          scope.row.documentType.id,
+                          scope.row.authorization
+                        )
                     "
                     @click.native="deleteInvoice(scope.row)"
                   >
@@ -744,12 +741,12 @@
                     @click.native="voidDocument(scope.row)"
                     v-if="
                       scope.row.status.id === '2' ||
-                      (isLastInvoice(
-                        scope.row.sequence,
-                        scope.row.documentType.id,
-                        scope.row.authorization
-                      ) &&
-                        scope.row.status.id != '3')
+                        (isLastInvoice(
+                          scope.row.sequence,
+                          scope.row.documentType.id,
+                          scope.row.authorization
+                        ) &&
+                          scope.row.status.id != '3')
                     "
                   >
                     <i class="el-icon-circle-close"></i>
