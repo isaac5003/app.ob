@@ -166,7 +166,7 @@
       >
         <el-table-column type="selection" width="50" />
         <el-table-column prop="index" width="50" label="#" />
-        <el-table-column label="Nombre" min-width="310" prop="name" sortable="custom">
+        <el-table-column label="Nombre" min-width="270" prop="name" sortable="custom">
           <template slot-scope="scope">
             <div class="flex flex-col">
               <span class="font-semibold text-xs">
@@ -213,15 +213,19 @@
             >
           </template>
         </el-table-column>
-        <el-table-column label width="70" align="center">
+        <el-table-column label width="110" align="center">
           <!-- dropdpwn selecction -->
           <template slot="header" v-if="multipleSelection.length > 0">
-            <el-dropdown  trigger="click" szie="mini">
+            <el-dropdown  trigger="click" szie="mini" >
               <el-button
-                icon="el-icon-more"
                 type="primary"
                 size="mini"
-              ></el-button>
+                 class="group"
+              >
+                <span class="hidden group-hover:inline">
+                {{ multipleSelection.length }} Filas</span>
+                <i class="el-icon-more"></i>
+                </el-button>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item
                  @click.native="updateSelected(multipleSelection, true)">
