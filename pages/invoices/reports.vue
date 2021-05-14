@@ -131,7 +131,7 @@
                     </el-option-group>
                     <el-option-group key="INACTIVOS" label="INACTIVOS">
                       <el-option
-                        v-for="item in activeCustomers"
+                        v-for="item in inactiveCustomers"
                         :key="item.id"
                         :label="item.name"
                         :value="item.id"
@@ -212,11 +212,11 @@
                     clearable
                     filterable
                     default-first-option
-                    placeholder="Todos los clientes:"
+                    placeholder="Todos los vendedor:"
                     class="w-full"
                   >
                     <el-option-group key="ACTIVOS" label="ACTIVOS">
-                      <el-option label="Todos los clientes" value="" />
+                      <el-option label="Todos los vendedores" value="" />
                       <el-option
                         v-for="item in activeSellers"
                         :key="item.id"
@@ -364,7 +364,7 @@
                     </el-option-group>
                     <el-option-group key="INACTIVOS" label="INACTIVOS">
                       <el-option
-                        v-for="item in activeCustomers"
+                        v-for="item in inactiveCustomers"
                         :key="item.id"
                         :label="item.name"
                         :value="item.id"
@@ -507,6 +507,8 @@ export default {
         this.inactiveService = inactiveService.data.services;
         this.statuses = status.data.statuses;
         this.loading = false;
+        console.log(activeCustomers.data.customers);
+        console.log(inactiveCustomers.data.customers);
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message
@@ -543,7 +545,7 @@ export default {
         },
         {
           id: "listadoVentas",
-          name: "Listado de ventas",
+          name: "Detalle de ventas",
         },
       ],
       page: {
