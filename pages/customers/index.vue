@@ -65,8 +65,8 @@
           <template
             v-if="
               selectedCustomer &&
-              (!selectedCustomer.customerTypeNatural ||
-                selectedCustomer.customerTypeNatural.id == 2)
+                (!selectedCustomer.customerTypeNatural ||
+                  selectedCustomer.customerTypeNatural.id == 2)
             "
           >
             <div class="col-span-2 flex flex-col">
@@ -127,7 +127,7 @@
         }"
       />
       <el-form label-position="top" class="grid grid-cols-12 gap-4">
-        <el-form-item class="col-span-2" label="Estado">
+        <el-form-item class="col-span-3" label="Estado">
           <el-select
             v-model="status"
             placeholder="Seleccionar"
@@ -166,7 +166,12 @@
       >
         <el-table-column type="selection" width="50" />
         <el-table-column prop="index" width="50" label="#" />
-        <el-table-column label="Nombre" min-width="270" prop="name" sortable="custom">
+        <el-table-column
+          label="Nombre"
+          min-width="270"
+          prop="name"
+          sortable="custom"
+        >
           <template slot-scope="scope">
             <div class="flex flex-col">
               <span class="font-semibold text-xs">
@@ -216,27 +221,29 @@
         <el-table-column label width="110" align="center">
           <!-- dropdpwn selecction -->
           <template slot="header" v-if="multipleSelection.length > 0">
-            <el-dropdown  trigger="click" szie="mini" >
-              <el-button
-                type="primary"
-                size="mini"
-                 class="group"
-              >
+            <el-dropdown trigger="click" szie="mini">
+              <el-button type="primary" size="mini" class="group">
                 <span class="hidden group-hover:inline">
-                {{ multipleSelection.length }} Filas</span>
+                  {{ multipleSelection.length }} Filas</span
+                >
                 <i class="el-icon-more"></i>
-                </el-button>
+              </el-button>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item
-                 @click.native="updateSelected(multipleSelection, true)">
+                  @click.native="updateSelected(multipleSelection, true)"
+                >
                   <i class="el-icon-check"></i>Activar seleccionados
                 </el-dropdown-item>
-                <el-dropdown-item   @click.native="updateSelected(multipleSelection, false)">
+                <el-dropdown-item
+                  @click.native="updateSelected(multipleSelection, false)"
+                >
                   <i class="el-icon-close"></i>Desactivar seleccionados
                 </el-dropdown-item>
-                <el-dropdown-item 
-                @click.native="deleteSelected(multipleSelection)"
-                 :divided="true" class="font-semibold">
+                <el-dropdown-item
+                  @click.native="deleteSelected(multipleSelection)"
+                  :divided="true"
+                  class="font-semibold"
+                >
                   <i class="el-icon-delete"></i> Eliminar seleccionados
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -301,7 +308,7 @@
 </template>
 
 <script>
-import { id } from 'date-fns/locale';
+import { id } from "date-fns/locale";
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
 import { hasModule } from "../../tools/index.js";
@@ -354,7 +361,6 @@ export default {
   },
   methods: {
     handleSelectionChange(val) {
-      
       this.multipleSelection = val;
     },
     fetchCustomers() {
@@ -428,7 +434,6 @@ export default {
       );
     },
     deleteCustomer({ id }) {
-  
       this.$confirm(
         `¿Estás seguro que deseas eliminar este cliente?`,
         "Confirmación",
@@ -448,7 +453,6 @@ export default {
                     message: res.data.message,
                   });
                   this.fetchCustomers();
-                 
                 })
                 .catch((err) => {
                   this.$notify.error({
@@ -467,9 +471,9 @@ export default {
         }
       );
     },
-         
-      deleteSelected(dataSelected) {
-        const ids = dataSelected.map(x => x.id)
+
+    deleteSelected(dataSelected) {
+      const ids = dataSelected.map((x) => x.id);
       this.$confirm(
         `¿Estás seguro que deseas eliminar este cliente?`,
         "Confirmación",
@@ -482,8 +486,8 @@ export default {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
               this.$axios
-                .post("/customers",{
-                 ids 
+                .post("/customers", {
+                  ids,
                 })
                 .then((res) => {
                   this.$notify.success({
@@ -509,10 +513,10 @@ export default {
         }
       );
     },
-       updateSelected(dataSelected, status){
-         const ids = dataSelected.map(x => x.id)
-         console.log(ids)
-             this.$confirm(
+    updateSelected(dataSelected, status) {
+      const ids = dataSelected.map((x) => x.id);
+      console.log(ids);
+      this.$confirm(
         `¿Estás seguro que deseas eliminar este cliente?`,
         "Confirmación",
         {
@@ -524,9 +528,9 @@ export default {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
               this.$axios
-                .put("/customers",{
-                 ids,
-                 status, 
+                .put("/customers", {
+                  ids,
+                  status,
                 })
                 .then((res) => {
                   this.$notify.success({
@@ -551,7 +555,7 @@ export default {
           },
         }
       );
-       },
+    },
     async openCustomerPreview({ id }) {
       const { data } = await this.$axios.get(`/customers/${id}`);
       (this.selectedCustomer = data.customer),
