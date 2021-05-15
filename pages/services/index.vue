@@ -79,17 +79,17 @@
         ref="multipleTable"
         @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" width="50" />
-        <el-table-column prop="index" width="50" label="#" />
+        <el-table-column type="selection" width="45" />
+        <el-table-column prop="index" width="45" label="#" />
         <el-table-column
           label="Descripción"
           prop="description"
-          min-width="430"
+          min-width="420"
           sortable="custom"
         />
         <el-table-column
           label="Precio"
-          width="120"
+          width="105"
           align="right"
           sortable="custom"
           prop="cost"
@@ -125,11 +125,16 @@
             >
           </template>
         </el-table-column>
-        <el-table-column label width="70" align="center">
+        <el-table-column label width="100" align="center">
           <!-- dropdpwn selection -->
           <template slot="header" v-if="multipleSelection.length">
             <el-dropdown trigger="click" size="mini">
-              <el-button icon="el-icon-more" size="mini" type="primary" />
+              <el-button size="mini" type="primary" class="group">
+                <span class="hidden group-hover:inline">
+                  {{ multipleSelection.length }} Filas</span
+                >
+                <i class="el-icon-more" />
+              </el-button>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item
                   @click.native="updateSelected(multipleSelection, true)"
