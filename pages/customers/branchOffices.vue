@@ -219,11 +219,11 @@
       @close="closeDialog"
     >
       <div class="flex flex-col space-y-2">
-        <el-form :model="addOfficeForm" status-icon ref="addOfficeForm">
+        <el-form :model="addOfficeNewForm" status-icon ref="addOfficeNewForm">
           <!-- Seleccion de pais,departamento y municipio -->
           <div
             class="space-y-4"
-            v-for="(item, i) in addOfficeForm.items"
+            v-for="(item, i) in addOfficeNewForm.items"
             :key="i"
           >
             <div class="grid grid-cols-12 mt-4">
@@ -236,7 +236,7 @@
                     class="w-20"
                     size="mini"
                     type="danger"
-                    :disabled="addOfficeForm.items.length === 1"
+                    :disabled="addOfficeNewForm.items.length === 1"
                     @click="removeOffice(i)"
                     ><i class="el-icon-delete"></i
                   ></el-button>
@@ -246,13 +246,13 @@
             <div class="grid grid-cols-12 gap-4">
               <el-form-item label="Pais"  class="col-span-4">
                 <el-select
-                  v-model="addOfficeForm.items.country"
+                  v-model="item.country"
                   class="w-full"
                   size="small"
                   filterable
                   clearable
                   default-first-option
-                  @change="clearSelect('state')"
+                  @change="clearSelectOne('state')"
                 >
                   <el-option
                     v-for="c in countries"
@@ -265,16 +265,16 @@
               </el-form-item>
               <el-form-item label="Departamento"  prop="state" class="col-span-4">
                 <el-select
-                  v-model="addOfficeForm.items.state"
+                  v-model="item.state"
                   class="w-full"
                   size="small"
                   filterable
                   clearable
-                  @change="clearSelect('city')"
+                  @change="clearSelectOne('city')"
                   default-first-option
                 >
                   <el-option
-                    v-for="c in states"
+                    v-for="c in statesOne"
                     :key="c.id"
                     :label="c.name"
                     :value="c.id"
@@ -284,7 +284,7 @@
               </el-form-item>
               <el-form-item label="Municipio" class="col-span-4">
                 <el-select
-                  v-model="addOfficeForm.items.city"
+                  v-model="item.city"
                   class="w-full"
                   size="small"
                   filterable
@@ -292,7 +292,7 @@
                   default-first-option
                 >
                   <el-option
-                    v-for="c in cities"
+                    v-for="c in citiesOne"
                     :key="c.id"
                     :label="c.name"
                     :value="c.id"
@@ -573,7 +573,20 @@ export default {
       addOfficeForm: {
         items: [
           {
-            country:1,
+            country:"",
+            state: "",
+            city: "",
+            address: "",
+            address1: "",
+            phone: "",
+            email: "",
+          },
+        ],
+      },
+        addOfficeNewForm: {
+        items: [
+          {
+            country:"",
             state: "",
             city: "",
             address: "",
@@ -628,8 +641,20 @@ export default {
           this.addOfficeForm.items.city = "";
           break;
       }
-    
+      
     },
+     clearSelectOne(name){
+         switch (name){
+           case"state":
+          this.addOfficeNewForm.items.state = "";
+          this.addOfficeNewForm.items.city = "";
+         break;
+         case"city":
+          this.addOfficeNewForm.items.city = "";
+          break;
+
+         }
+       },
     openBranchPreview(id) {
       this.showViewPreview = true;
     },
@@ -641,7 +666,7 @@ export default {
       console.log(this.multipleSelection.length);
     },
     officetAdd() {
-      this.addOfficeForm.items.push({
+      this.addOfficeNewForm.items.push({
         country: "",
         state: "",
         city: "",
@@ -652,7 +677,7 @@ export default {
       });
     },
     closeDialog() {
-      this.addOfficeForm.items = [
+      this.addOfficeNewForm.items = [
         {
           country: "",
           state: "",
@@ -665,7 +690,7 @@ export default {
       ];
     },
     removeOffice(index) {
-      this.addOfficeForm.items.splice(index, 1);
+      this.addOfficeNewForm.items.splice(index, 1);
     },
   },
    computed: {
@@ -679,6 +704,8 @@ export default {
         (c) => c.state.id == this.addOfficeForm.items.state
       );
     },
+   
   },
+  
 };
 </script>
