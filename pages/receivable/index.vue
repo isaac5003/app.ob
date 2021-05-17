@@ -223,6 +223,7 @@
                     <el-input
                       v-model="text"
                       type="textarea"
+                      resize="none"
                       :rows="16"
                       placeholder="Escriba un resumen del contacto de cliente..."
                       class="w-full"
@@ -323,8 +324,12 @@
             </el-select>
           </el-form-item>
           <el-form-item label="Condiciones de pago" class="col-span-3">
-            <el-select class="w-full" size="small" clearable filterable>
-              <el-option></el-option>
+            <el-select v-model="filter.paymentCondition" class="w-full" size="small" clearable filterable>
+              <el-option v-for="p in paymentConditions"
+              :key="p.id"
+              :label="p.name"
+              :value="p.id"
+              ></el-option>
             </el-select>
           </el-form-item>
           <el-form-item class="col-start-10 col-span-3 mt-5">
@@ -454,12 +459,14 @@ export default {
     this.getFollow(this.indexFollow[0].id);
     const customers = () => this.$axios.get("/customers");
     const documentTypes = () => this.$axios.get("/invoices/document-types");
-
-    Promise.all([customers(), documentTypes()])
+    const paymentConditions =() => this.$axios.get("/invoices/payment-condition");
+    Promise.all([customers(), documentTypes(), paymentConditions()])
       .then((res) => {
-        const [customers, documentTypes] = res;
+        const [customers, documentTypes,  paymentConditions] = res;
         this.customers = customers.data.customers;
         this.documentTypes = documentTypes.data.documentTypes;
+        this.paymentConditions = paymentConditions.data.paymentConditions;
+        console.log(this.paymentConditions)
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message
@@ -477,10 +484,12 @@ export default {
       multipleSelection: [],
       customers: [],
       documentTypes: [],
+      paymentConditions:[],
       text: "",
       filter: {
         customer: [],
         documentType: [],
+        paymentCondition:[]
       },
       following: [
         {
