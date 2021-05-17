@@ -81,7 +81,7 @@
             <div class="grid grid-cols-12 gap-4">
               <el-form-item label="Pais" class="col-span-4">
                 <el-select
-                  v-model="item.country"
+                  v-model="addOfficeForm.items.country"
                   class="w-full"
                   size="small"
                   filterable
@@ -99,7 +99,7 @@
               </el-form-item>
               <el-form-item label="Departamento" class="col-span-4">
                 <el-select
-                  v-model="item.deparment"
+                  v-model="addOfficeForm.items.state"
                   class="w-full"
                   size="small"
                   filterable
@@ -107,7 +107,7 @@
                   default-first-option
                 >
                   <el-option
-                    v-for="c in rawStates"
+                    v-for="c in states"
                     :key="c.id"
                     :label="c.name"
                     :value="c.id"
@@ -117,7 +117,7 @@
               </el-form-item>
               <el-form-item label="Municipio" class="col-span-4">
                 <el-select
-                  v-model="item.municipio"
+                  v-model="addOfficeForm.items.city"
                   class="w-full"
                   size="small"
                   filterable
@@ -125,7 +125,7 @@
                   default-first-option
                 >
                   <el-option
-                    v-for="c in rawCities"
+                    v-for="c in cities"
                     :key="c.id"
                     :label="c.name"
                     :value="c.id"
@@ -158,7 +158,7 @@
                   maxlength="10"
                   show-word-limit
                 >
-                  <el-option v-for="a in b" :key="a"> </el-option>
+                  <el-option> </el-option>
                 </el-input>
               </el-form-item>
             </div>
@@ -173,10 +173,7 @@
                   size="small"
                 >
                   <el-option
-                    v-for="p in paises"
-                    :key="p.id"
-                    :label="p.name"
-                    :value="p.id"
+                   
                   >
                   </el-option>
                 </el-input>
@@ -188,7 +185,7 @@
                   placeholder="example@example.com"
                   size="small"
                 >
-                  <el-option v-for="a in b" :key="a"> </el-option>
+                  <el-option> </el-option>
                 </el-input>
               </el-form-item>
             </div>
@@ -247,14 +244,15 @@
               </div>
             </div>
             <div class="grid grid-cols-12 gap-4">
-              <el-form-item label="Pais" class="col-span-4">
+              <el-form-item label="Pais"  class="col-span-4">
                 <el-select
-                  v-model="item.country"
+                  v-model="addOfficeForm.items.country"
                   class="w-full"
                   size="small"
                   filterable
                   clearable
                   default-first-option
+                  @change="clearSelect('state')"
                 >
                   <el-option
                     v-for="c in countries"
@@ -265,17 +263,18 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="Departamento" class="col-span-4">
+              <el-form-item label="Departamento"  prop="state" class="col-span-4">
                 <el-select
-                  v-model="item.deparment"
+                  v-model="addOfficeForm.items.state"
                   class="w-full"
                   size="small"
                   filterable
                   clearable
+                  @change="clearSelect('city')"
                   default-first-option
                 >
                   <el-option
-                    v-for="c in rawStates"
+                    v-for="c in states"
                     :key="c.id"
                     :label="c.name"
                     :value="c.id"
@@ -285,7 +284,7 @@
               </el-form-item>
               <el-form-item label="Municipio" class="col-span-4">
                 <el-select
-                  v-model="item.municipio"
+                  v-model="addOfficeForm.items.city"
                   class="w-full"
                   size="small"
                   filterable
@@ -293,7 +292,7 @@
                   default-first-option
                 >
                   <el-option
-                    v-for="c in rawCities"
+                    v-for="c in cities"
                     :key="c.id"
                     :label="c.name"
                     :value="c.id"
@@ -326,7 +325,7 @@
                   maxlength="10"
                   show-word-limit
                 >
-                  <el-option v-for="a in b" :key="a"> </el-option>
+                  <el-option> </el-option>
                 </el-input>
               </el-form-item>
             </div>
@@ -335,28 +334,25 @@
             <div class="grid grid-cols-12 gap-4 mt-4 border-b-2">
               <el-form-item label="Teléfono" class="col-span-4">
                 <el-input
-                  v-model="item.phone"
+                  v-model="addOfficeForm.items.phone"
                   placeholder="+503 0000-0000"
                   class="w-full"
                   size="small"
                 >
                   <el-option
-                    v-for="p in paises"
-                    :key="p.id"
-                    :label="p.name"
-                    :value="p.id"
+                  
                   >
                   </el-option>
                 </el-input>
               </el-form-item>
               <el-form-item label="Correo electronico" class="col-span-4">
                 <el-input
-                  v-model="item.email"
+                  v-model="addOfficeForm.items.email"
                   class="w-full"
                   placeholder="example@example.com"
                   size="small"
                 >
-                  <el-option v-for="a in b" :key="a"> </el-option>
+                  <el-option > </el-option>
                 </el-input>
               </el-form-item>
             </div>
@@ -511,8 +507,7 @@
       </el-table>
       <div class="flex justify-end">
         <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="fetchBranchOffices"
+         
           :current-page.sync="page.page"
           :page-sizes="[5, 10, 15, 25, 50, 100]"
           :page-size="page.size"
@@ -578,9 +573,9 @@ export default {
       addOfficeForm: {
         items: [
           {
-            country: "",
-            deparment: "",
-            municipio: "",
+            country:1,
+            state: "",
+            city: "",
             address: "",
             address1: "",
             phone: "",
@@ -623,6 +618,18 @@ export default {
     };
   },
   methods: {
+     clearSelect(name) {
+      switch (name) {
+        case "state":
+          this.addOfficeForm.items.state = "";
+          this.addOfficeForm.items.city = "";
+          break;
+        case "city":
+          this.addOfficeForm.items.city = "";
+          break;
+      }
+    
+    },
     openBranchPreview(id) {
       this.showViewPreview = true;
     },
@@ -636,8 +643,8 @@ export default {
     officetAdd() {
       this.addOfficeForm.items.push({
         country: "",
-        deparment: "",
-        municipio: "",
+        state: "",
+        city: "",
         address: "",
         address1: "",
         phone: "",
@@ -648,8 +655,8 @@ export default {
       this.addOfficeForm.items = [
         {
           country: "",
-          deparment: "",
-          municipio: "",
+          state: "",
+          city: "",
           address: "",
           address1: "",
           phone: "",
@@ -659,6 +666,18 @@ export default {
     },
     removeOffice(index) {
       this.addOfficeForm.items.splice(index, 1);
+    },
+  },
+   computed: {
+    states() {
+      return this.rawStates.filter(
+        (s) => s.country.id == this.addOfficeForm.items.country
+      );
+    },
+    cities() {
+      return this.rawCities.filter(
+        (c) => c.state.id == this.addOfficeForm.items.state
+      );
     },
   },
 };
