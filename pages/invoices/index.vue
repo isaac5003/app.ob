@@ -591,7 +591,7 @@
           <el-table-column
             label="Cliente"
             prop="customerName"
-            min-width="265"
+            min-width="260"
             sortable="custom"
           />
 
