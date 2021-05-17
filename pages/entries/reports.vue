@@ -99,14 +99,17 @@
 
             <el-form-item label="Cuentas:" class="col-span-4" prop="accounts">
               <el-select
+                multiple
+                filterable
+                remote
+                default-first-option
+                clearable
                 v-model="reportForm.accounts"
                 placeholder="Seleccionar cuentas"
-                size="small"
-                clearable
-                filterable
-                multiple
-                default-first-option
+                :remote-method="findAccount"
+                :loading="loadingAccount"
                 class="w-full"
+                size="small"
                 @change="
                   generateRangeAccount(
                     reportForm.dateRanges,
@@ -115,16 +118,12 @@
                 "
               >
                 <el-option
-                  v-for="catalog in accountingCatalog"
+                  v-for="catalog in filteredCatalog"
                   :key="catalog.id"
-                  :label="catalog.code"
+                  :label="`${catalog.code} - ${catalog.name}`"
                   :value="catalog.id"
                   :disabled="catalog.isParent == true"
                 >
-                  <div class="flex flex-row justify-between">
-                    <span class="mr-5 text-sm">{{ catalog.name }}</span>
-                    <span class="text-gray-600">{{ catalog.code }}</span>
-                  </div>
                 </el-option>
               </el-select>
             </el-form-item>
@@ -210,17 +209,18 @@ export default {
         { name: "Balance general mensual", id: "balanceGeneral" },
         { name: "Estado de resultados anual", id: "estadoResultadosAnual" },
         { name: "Estado de resultados mensual", id: "estadoResultados" },
-        { name: "Balance de comprobaciÃƒÂ³n", id: "balanceComprobacion" },
+        { name: "Balance de comprobación", id: "balanceComprobacion" },
       ],
       auxiliarReports: [
         { name: "Libro diario mayor", id: "diarioMayor" },
         { name: "Libro de auxiliares", id: "libroAuxiliares" },
-        { name: "CatalÃƒÂ³go de cuentas", id: "catalogoCuentas" },
+        { name: "Catálogo de cuentas", id: "catalogoCuentas" },
         //{ name: "Detalle de cuentas", id: "detalleCuentas" },
         { name: "Detalle de movimiento cuentas", id: "movimientoCuentas" },
       ],
       requirementForm: null,
-      accountingCatalog: [],
+      filteredCatalog: [],
+      loadingAccount: false,
     };
   },
   methods: {
@@ -242,8 +242,6 @@ export default {
             break;
           case "movimientoCuentas":
             this.requirementForm = "extended";
-            this.pageLoading = true;
-            this.getCalogs();
             break;
           default:
             this.requirementForm = "none";
@@ -2944,10 +2942,19 @@ export default {
           break;
       }
     },
-    async getCalogs() {
-      const { data } = await this.$axios.get("/entries/catalog");
-      this.accountingCatalog = data.accountingCatalog;
-      this.pageLoading = false;
+    findAccount(query) {
+      if (query !== "") {
+        this.loadingAccount = true;
+        this.$axios
+          .get("/entries/catalog", { params: { search: query.toLowerCase() } })
+          .then((res) => {
+            this.filteredCatalog = res.data.accountingCatalog;
+            this.loadingAccount = false;
+          })
+          .catch((err) => (this.errorMessage = err.response.data.message));
+      } else {
+        this.filteredCatalog = [];
+      }
     },
     cancel() {
       this.$confirm(
