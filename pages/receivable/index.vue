@@ -173,7 +173,7 @@
                 >Información de cuenta por cobrar</span
               >
             </div>
-            <div class="grid grid-cols-6 mt-4 border">
+            <div class="grid grid-cols-6 mt-4 border border-gray-400">
               <div class="flex justify-between col-span-6 px-3 py-3 text-xs">
                 <div class="flex flex-col col-span-2">
                   <span class="font-semibold">Tipo de documento</span
@@ -188,7 +188,7 @@
                 </div>
               </div>
             </div>
-            <div class="grid grid-cols-6 mt-4 border">
+            <div class="grid grid-cols-6 mt-4 border border-gray-400">
               <div class="flex justify-between col-span-6 text-xs px-3 py-3">
                 <div class="flex flex-col col-span-2">
                   <span class="font-semibold">Tipo de documento</span
@@ -204,7 +204,7 @@
               </div>
             </div>
           </div>
-          <div class="col-span-6 border px-4 py-2">
+          <div class="col-span-6 border border-gray-400 px-4 py-2">
             <div class="flex justify-between py-2 text-xs">
               <span class="font-semibold">Añadir seguimiento #5</span>
               <div class="">
@@ -213,7 +213,7 @@
               </div>
             </div>
 
-            <div class="px-4 text-xs border">
+            <div class="px-4 text-xs border border-gray-400">
               <br />
               Resumen
               <br />
@@ -253,59 +253,72 @@
       <el-form label-position="top">
         <div class="grid grid-cols-12 gap-4">
           <el-form-item label="Cliente" class="col-span-3">
-            <el-select v-model="filter.customer" class="w-full" size="small" clearable filterable>
-              <el-option label="Todos los clientes" value=""/>
+            <el-select
+              v-model="filter.customer"
+              class="w-full"
+              size="small"
+              clearable
+              filterable
+            >
+              <el-option label="Todos los clientes" value="" />
 
               <el-option-group key="ACTIVOS" label="ACTIVOS">
-                 <el-option v-for =" c in activeCustomers"
-               :key="c.id"
-               :label="c.name"
-               :value="c.id"
-               
-              >
-                   <div
-                      class="flex flex-row justify-between items-end py-1 leading-normal"
-                    >
-                      <div class="flex flex-col">
-                        <span class="text-xs text-gray-500">{{
-                          c.shortName
-                        }}</span>
-                        <span>{{ c.name }}</span>
-                      </div>
-                      <span class="text-xs text-gray-500">{{ c.nrc }}</span>
-                    </div></el-option>
-              </el-option-group>
-               <el-option-group key="INACTIVOS" label="INACTIVOS">
-                  <el-option
-                    style="height: 50px"
-                    v-for="c in inactiveCustomers"
-                    :key="c.id"
-                    :label="c.name"
-                    :value="c.id"
+                <el-option
+                  v-for="c in activeCustomers"
+                  :key="c.id"
+                  :label="c.name"
+                  :value="c.id"
+                >
+                  <div
+                    class="flex flex-row justify-between items-end py-1 leading-normal"
                   >
-                    <div
-                      class="flex flex-row justify-between items-end py-1 leading-normal"
-                    >
-                      <div class="flex flex-col">
-                        <span class="text-xs text-gray-500">{{
-                          c.shortName
-                        }}</span>
-                        <span>{{ c.name }}</span>
-                      </div>
-                      <span class="text-xs text-gray-500">{{ c.nrc }}</span>
+                    <div class="flex flex-col">
+                      <span class="text-xs text-gray-500">{{
+                        c.shortName
+                      }}</span>
+                      <span>{{ c.name }}</span>
                     </div>
-                  </el-option>
-                </el-option-group>
+                    <span class="text-xs text-gray-500">{{ c.nrc }}</span>
+                  </div></el-option
+                >
+              </el-option-group>
+              <el-option-group key="INACTIVOS" label="INACTIVOS">
+                <el-option
+                  style="height: 50px"
+                  v-for="c in inactiveCustomers"
+                  :key="c.id"
+                  :label="c.name"
+                  :value="c.id"
+                >
+                  <div
+                    class="flex flex-row justify-between items-end py-1 leading-normal"
+                  >
+                    <div class="flex flex-col">
+                      <span class="text-xs text-gray-500">{{
+                        c.shortName
+                      }}</span>
+                      <span>{{ c.name }}</span>
+                    </div>
+                    <span class="text-xs text-gray-500">{{ c.nrc }}</span>
+                  </div>
+                </el-option>
+              </el-option-group>
             </el-select>
           </el-form-item>
           <el-form-item label="Tipo de documento" class="col-span-3">
-            <el-select v-model="filter.documentType" class="w-full" size="small" clearable filterable>
-              <el-option label="Todos los tipos" value=""/>
-              <el-option v-for="t in documentTypes"
-              :key="t.id"
-              :label="`${t.code}-${t.name}`"
-              :value="t.id"
-
+            <el-select
+              v-model="filter.documentType"
+              class="w-full"
+              size="small"
+              clearable
+              filterable
+            >
+              <el-option label="Todos los tipos" value="" />
+              <el-option
+                v-for="t in documentTypes"
+                :key="t.id"
+                :label="`${t.code}-${t.name}`"
+                :value="t.id"
               ></el-option>
             </el-select>
           </el-form-item>
@@ -440,39 +453,34 @@ export default {
   fetch() {
     this.getFollow(this.indexFollow[0].id);
     const customers = () => this.$axios.get("/customers");
-    const documentTypes = () => this.$axios.get("/invoices/document-types")
+    const documentTypes = () => this.$axios.get("/invoices/document-types");
 
-    Promise.all([
-      customers(),
-      documentTypes()
-    ])
-    .then((res) =>{
-      const [
-        customers,
-        documentTypes
-      ] = res;
-      this.customers = customers.data.customers;
-      this.documentTypes = documentTypes.data.documentTypes
-    })
-    .catch((err) => {
-      this.errorMessage = err.response.data.message ?
-      err.response.data.message : "Comunicate con el administrador del sistema"
-    })
-    .then((alw) =>(this.pageLoanding = false))
+    Promise.all([customers(), documentTypes()])
+      .then((res) => {
+        const [customers, documentTypes] = res;
+        this.customers = customers.data.customers;
+        this.documentTypes = documentTypes.data.documentTypes;
+      })
+      .catch((err) => {
+        this.errorMessage = err.response.data.message
+          ? err.response.data.message
+          : "Comunicate con el administrador del sistema";
+      })
+      .then((alw) => (this.pageLoanding = false));
   },
-  fetchOnserver:false,
+  fetchOnserver: false,
   data() {
     return {
       showReceivable: false,
       showReceivableFollowing: false,
       receivablePreview: {},
       multipleSelection: [],
-      customers:[],
-      documentTypes:[],
+      customers: [],
+      documentTypes: [],
       text: "",
-      filter:{
-        customer:[],
-        documentType:[]
+      filter: {
+        customer: [],
+        documentType: [],
       },
       following: [
         {
@@ -658,13 +666,13 @@ export default {
       this.multipleSelection = val;
     },
   },
-  computed:{
-    activeCustomers(){
-      return this.customers.filter((c) => c.isActiveCustomer)
+  computed: {
+    activeCustomers() {
+      return this.customers.filter((c) => c.isActiveCustomer);
     },
-    inactiveCustomers(){
-      return this.customers.filter((c) => !c.isActiveCustomer)
-    }
-  }
+    inactiveCustomers() {
+      return this.customers.filter((c) => !c.isActiveCustomer);
+    },
+  },
 };
 </script>
