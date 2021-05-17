@@ -372,7 +372,7 @@
                     </div>
                   </el-option>
                 </el-option-group>
-                   <!-- toda esbien -->
+                <!-- toda esbien -->
                 <el-option-group key="INACTIVOS" label="INACTIVOS">
                   <el-option
                     style="height: 50px"
@@ -591,11 +591,11 @@
           <el-table-column
             label="Cliente"
             prop="customerName"
-            min-width="295"
+            min-width="265"
             sortable="custom"
           />
-         
-             <el-table-column
+
+          <el-table-column
             label="Estado"
             prop="status.id"
             width="110"
@@ -610,10 +610,7 @@
                 <i class="el-icon-circle-plus"></i>
                 {{ scope.row.status.name }}
               </el-tag>
-              <el-tag
-                size="small"
-                v-else-if="scope.row.status.id == '2'"
-              >
+              <el-tag size="small" v-else-if="scope.row.status.id == '2'">
                 <i class="el-icon-warning"></i>
                 {{ scope.row.status.name }}</el-tag
               >
@@ -633,7 +630,7 @@
                 <i class="el-icon-question"></i>
                 {{ scope.row.status.name }}</el-tag
               >
-                  <el-tag
+              <el-tag
                 size="small"
                 type="success"
                 v-else-if="scope.row.status.id == '5'"
@@ -643,7 +640,7 @@
               >
             </template>
           </el-table-column>
-        
+
           <el-table-column
             label="Total"
             width="80"
@@ -655,17 +652,16 @@
               <span>{{ scope.row.ventaTotal | formatMoney }}</span>
             </template>
           </el-table-column>
-          <el-table-column label width="70" align="center">
+          <el-table-column label width="100" align="center">
             <!-- dropdpwn selecction -->
             <template slot="header" v-if="multipleSelection.length > 0">
-              <el-dropdown>
-                <el-button
-                  trigger="click"
-                  icon="el-icon-more"
-                  type="primary"
-                  size="mini"
-                  class="transition ease-out duration-700"
-                ></el-button>
+              <el-dropdown trigger="click" size="mini">
+                <el-button size="mini" type="primary" class="group">
+                  <span class="hidden group-hover:inline">
+                    {{ multipleSelection.length }} Filas</span
+                  >
+                  <i class="el-icon-more"
+                /></el-button>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item>
                     <i class="el-icon-view"></i>Vista previa
