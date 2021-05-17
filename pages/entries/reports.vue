@@ -2803,7 +2803,7 @@ export default {
                     body: [
                       [
                         {
-                          text: "CÃƒâ€œD. DE LA CUENTA\nNÃ‚Â° DE PARTIDA",
+                          text: "CÓD. DE LA CUENTA\nN° DE PARTIDA",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
@@ -2827,7 +2827,7 @@ export default {
                         {},
                         {
                           alignment: "center",
-                          text: "SALDO DEL\nPERÃƒÂODO",
+                          text: "SALDO DEL\nPERÍODO",
                           style: "tableHeader",
                           rowSpan: 2,
                         },
