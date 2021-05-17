@@ -13,6 +13,7 @@
       title="Nueva cuenta mayor"
       :visible.sync="showCreateCatalogDialog"
       :append-to-body="true"
+      :close-on-click-modal="false"
       width="900px"
     >
       <el-form :model="mayorAccountForm" status-icon ref="mayorAccountForm">
@@ -167,6 +168,7 @@
       title="Editar cuenta mayor"
       :visible.sync="showEditMayorDialog"
       :append-to-body="true"
+      :close-on-click-modal="false"
       width="900px"
     >
       <el-form
@@ -306,6 +308,7 @@
       title="Nueva cuenta contable"
       :visible.sync="showCreateAccountEntryDialog"
       :append-to-body="true"
+      :close-on-click-modal="false"
       width="900px"
     >
       <el-form :model="subAccountForm" status-icon ref="subAccountForm">
@@ -515,6 +518,7 @@
       title="Editar cuenta contable"
       :visible.sync="showEditAccount"
       :append-to-body="true"
+      :close-on-click-modal="false"
       width="900px"
     >
       <el-form
@@ -710,6 +714,7 @@
       :visible.sync="showAddAccount"
       width="500px"
       :append-to-body="true"
+      :close-on-click-modal="false"
       @open="selectedCatalog = []"
     >
       <div class="grid grid-cols-12">
@@ -755,6 +760,7 @@
       :visible.sync="showChangeDisplayName"
       width="500px"
       :append-to-body="true"
+      :close-on-click-modal="false"
       @open="newDisplayName = ''"
     >
       <div class="flex flex-col space-y-2">
@@ -783,6 +789,7 @@
       :visible.sync="showChangeDisplayName"
       width="550px"
       :append-to-body="true"
+      :close-on-click-modal="false"
     >
       <div class="flex flex-col space-y-2">
         <span>Cambiar de: {{ selectedParentAccount.name }}</span>
@@ -846,6 +853,7 @@
       :visible.sync="showAddAccountEstado"
       width="500px"
       :append-to-body="true"
+      :close-on-click-modal="false"
     >
       <div class="grid grid-cols-12">
         <div class="col-span-12">
@@ -893,6 +901,7 @@
       :visible.sync="showChangeDisplayNameEstado"
       width="550px"
       :append-to-body="true"
+      :close-on-click-modal="false"
     >
       <div class="flex flex-col space-y-2">
         <span>Cambiar de: {{ selectedParentAccountEstado.name }}</span>
