@@ -300,7 +300,7 @@
                 class="col-span-2"
                 v-if="
                   customersNewForm.customerType == 1 ||
-                  customersNewForm.customerTypeNatural == 2
+                    customersNewForm.customerTypeNatural == 2
                 "
               >
                 <el-form-item label="NRC" prop="nrc">
@@ -318,7 +318,7 @@
               class="grid grid-cols-12 gap-4"
               v-if="
                 customersNewForm.customerType == 1 ||
-                customersNewForm.customerTypeNatural == 2
+                  customersNewForm.customerTypeNatural == 2
               "
             >
               <div class="col-span-4">
@@ -464,7 +464,7 @@ export default {
         address2: "",
         phone: "",
         email: "",
-        country:1,
+        country: 1,
         state: "",
         city: "",
       },
