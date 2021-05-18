@@ -288,7 +288,7 @@
                   default-first-option
                 >
                   <el-option
-                    v-for="c in states"
+                    v-for="c in item.states"
                     :key="c.id"
                     :label="c.name"
                     :value="c.id"
@@ -633,6 +633,7 @@ export default {
             address1: "",
             phone: "",
             email: "",
+            states:[]
           },
         ],
       },
@@ -692,15 +693,15 @@ export default {
     clearSelect(name, index) {
       switch (name) {
         case "state":
-          this.addOfficeNewForm.items[index].state = [];
-          this.addOfficeNewForm.items[index].city = [];
-          this.states = this.rawStates.filter(
+          this.addOfficeNewForm.items[index].state ="";
+          this.addOfficeNewForm.items[index].city ="";
+          this.addOfficeNewForm.items[index].states = this.rawStates.filter(
             (s) => s.country.id == this.addOfficeNewForm.items[index].country
           );
-          
+           console.log( this.addOfficeNewForm.items.states )
           break;
         case "city":
-          this.addOfficeNewForm.items.city = [];
+          this.addOfficeNewForm.items.city = "";
           this.cities = this.rawCities.filter(
             (s) => s.state.id == this.addOfficeNewForm.items[index].state
           );
