@@ -515,7 +515,7 @@
     <!-- editar cuenta contable -->
     <el-dialog
       :id="activeAccount != null ? activeAccount.code : ''"
-      title="Editar cuenta contable"
+      title="Editar cuenta contable 2"
       :visible.sync="showEditAccount"
       :append-to-body="true"
       :close-on-click-modal="false"
