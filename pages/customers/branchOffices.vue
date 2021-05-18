@@ -55,7 +55,6 @@
         </div>
       </div>
     </el-dialog>
-
     <!-- Edit sucursal -->
     <el-dialog
       title="Editar sucursal "
@@ -205,7 +204,6 @@
         </el-form>
       </div>
     </el-dialog>
-
     <!-- Dialogo de nueva sucursal -->
     <el-dialog
       title="Agregar nueva sucursal"
@@ -234,7 +232,8 @@
                     size="mini"
                     type="danger"
                     :disabled="addOfficeNewForm.items.length === 1"
-                    @click="removeOffice(i)"
+                    @click="removeOffice(i);" 
+                    
                     ><i class="el-icon-delete"></i
                   ></el-button>
                 </div>
@@ -628,7 +627,7 @@ export default {
         items: [
           {
             country: "",
-            state: "",
+            state:"",
             city: "",
             address: "",
             address1: "",
@@ -693,14 +692,15 @@ export default {
     clearSelect(name, index) {
       switch (name) {
         case "state":
-          this.addOfficeNewForm.items[index].state = "";
-          this.addOfficeNewForm.items[index].city = "";
+          this.addOfficeNewForm.items[index].state = [];
+          this.addOfficeNewForm.items[index].city = [];
           this.states = this.rawStates.filter(
             (s) => s.country.id == this.addOfficeNewForm.items[index].country
           );
+          
           break;
         case "city":
-          this.addOfficeNewForm.items.city = "";
+          this.addOfficeNewForm.items.city = [];
           this.cities = this.rawCities.filter(
             (s) => s.state.id == this.addOfficeNewForm.items[index].state
           );
@@ -718,6 +718,7 @@ export default {
       this.multipleSelection = val;
       console.log(this.multipleSelection.length);
     },
+   
     officetAdd() {
       this.addOfficeNewForm.items.push({
         country: "",
