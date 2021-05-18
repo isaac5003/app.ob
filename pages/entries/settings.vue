@@ -524,7 +524,7 @@
       <el-form
         :model="activeAccount"
         status-icon
-        ref="accountFormEdit"
+        ref="activeAccount"
         class="space-y-4"
       >
         <notification
@@ -622,7 +622,11 @@
                 "
               />
             </el-form-item>
-            <el-form-item class="col-span-3" label="Descripción">
+            <el-form-item
+              class="col-span-3"
+              label="Descripción"
+              prop="description"
+            >
               <el-input
                 v-model="activeAccount.description"
                 size="small"
@@ -1764,7 +1768,7 @@ export default {
         callback();
       }
     };
-    const endDateValidateCompare = (rule, value, callback) => {
+    const newCargoValidateCompare = (rule, value, callback) => {
       const endDate = this.fiscalPeriodForm.endDate
         ? new Date(this.fiscalPeriodForm.endDate)
         : "";
