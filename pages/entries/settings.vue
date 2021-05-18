@@ -1731,61 +1731,6 @@ export default {
     checkBeforeLeave(this, storagekey, next);
   },
   data() {
-    const newCargoValidateCompare = (rule, value, callback) => {
-      const abono =
-        this.newEntryDetailForm.abono > 0
-          ? this.newEntryDetailForm.abono.toFixed(2)
-          : "";
-      const val = value > 0 ? value.toFixed(2) : "";
-      if (!abono) {
-        if (!val) {
-          callback(new Error("Este campo es requerido."));
-        } else {
-          callback();
-        }
-      } else if (abono && val) {
-        return callback(
-          new Error("No puedes agregar cargo y abono al mismo tiempo")
-        );
-      } else {
-        callback();
-      }
-    };
-    const startDateValidateCompare = (rule, value, callback) => {
-      const startDate = this.fiscalPeriodForm.startDate
-        ? new Date(this.fiscalPeriodForm.startDate)
-        : "";
-      const val = value ? new Date(value) : "";
-      if (!startDate) {
-        if (!val) {
-          callback(new Error("Este campo es requerido."));
-        } else {
-          callback();
-        }
-      } else if (startDate > val) {
-        return callback(new Error("La fecha inicial no puede ser mayor"));
-      } else {
-        callback();
-      }
-    };
-    const newCargoValidateCompare = (rule, value, callback) => {
-      const endDate = this.fiscalPeriodForm.endDate
-        ? new Date(this.fiscalPeriodForm.endDate)
-        : "";
-      const val = value ? new Date(value) : "";
-      if (!endDate) {
-        if (!val) {
-          callback(new Error("Este campo es requerido."));
-        } else {
-          callback();
-        }
-      } else if (endDate < val) {
-        return callback(new Error("La fecha final no puede ser menor"));
-      } else {
-        callback();
-      }
-    };
-
     return {
       pageloading: true,
       tableloading: false,
