@@ -2282,7 +2282,7 @@ export default {
                   layout: "noBorders",
                   table: {
                     headerRows: 2,
-                    widths: ["12%", "auto", "10%", "9%", "9%", "10%"],
+                    widths: ["12%", "50%", "10%", "9%", "9%", "10%"],
                     heights: -5,
                     body: [
                       [
@@ -2531,7 +2531,7 @@ export default {
                   layout: "noBorders",
                   table: {
                     headerRows: 2,
-                    widths: ["12%", "auto", "10%", "9%", "9%", "10%"],
+                    widths: ["12%", "50%", "10%", "9%", "9%", "10%"],
                     heights: -5,
                     body: [
                       [
