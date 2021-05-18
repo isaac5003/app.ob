@@ -274,7 +274,12 @@
       :rules="salesEditFormRules"
       status-icon
       @submit.prevent.native="
-        saveUpdateInvoice('salesEditForm', salesEditForm, details)
+        saveUpdateInvoice(
+          'salesEditForm',
+          salesEditForm,
+          details,
+          paymentConditions
+        )
       "
       ref="salesEditForm"
     >
@@ -610,14 +615,12 @@
                       @click="openEditDetail(scope.$index, scope.row)"
                       size="small"
                       icon="el-icon-edit"
-                      circle
                     ></el-button>
                     <el-button
                       type="danger"
                       @click="deleteDetail(scope.$index)"
                       size="small"
                       icon="el-icon-delete"
-                      circle
                     ></el-button>
                   </div>
                 </template>
@@ -744,7 +747,6 @@ export default {
               documentTypes,
               branches,
             ] = res;
-
             this.customers = customer.data.customers;
             this.documents = documentTypes.data.documentTypes;
             this.sellers = sellers.data.sellers;
@@ -754,12 +756,11 @@ export default {
               ...data.invoice,
               customer: data.invoice.customer.id,
               customerBranch: data.invoice.customerBranch.id,
-              invoicesPaymentsConditions:
+              invoicesPaymentsCondition:
                 data.invoice.invoicesPaymentsCondition.id,
               invoicesSellers: data.invoice.invoicesSeller.id,
               documentType: data.invoice.documentType.id,
             };
-
             this.tributary = {
               customerNrc: data.invoice.customerNrc,
               customerNit: data.invoice.customerNit,
@@ -1074,11 +1075,10 @@ export default {
                       authorization: formData.authorization,
                       sequence: formData.sequence,
                       invoiceDate: formData.invoiceRawDate,
-
                       customer: formData.customer,
                       customerBranch: formData.customerBranch,
                       invoicesPaymentsCondition:
-                        formData.invoicesPaymentsCondition.id,
+                        formData.invoicesPaymentsCondition,
                       invoicesSeller: formData.invoicesSellers,
                       sum:
                         formData.documentType == 1 ? this.sumasCF : this.sumas,
