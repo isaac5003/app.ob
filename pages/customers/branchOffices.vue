@@ -73,7 +73,6 @@
           ref="editOfficeForm"
         >
           <!-- Seleccion de pais,departamento y municipio -->
-          <div class="grid grid-cols-12 mt-4"></div>
           <div class="grid grid-cols-12 gap-4">
             <el-form-item label="Pais" class="col-span-4" prop="country">
               <el-select
@@ -111,7 +110,7 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="Municipio" class="col-span-4">
+            <el-form-item label="Municipio" class="col-span-4" prop="city">
               <el-select
                 v-model="editOfficeForm.city"
                 class="w-full"
@@ -132,7 +131,7 @@
           </div>
           <!-- Direcciones -->
           <div class="grid grid-cols-12 gap-4">
-            <el-form-item label="Dirección 1" class="col-span-4">
+            <el-form-item label="Dirección 1" class="col-span-4" prop="address">
               <el-input
                 v-model="editOfficeForm.address"
                 placeholder="Col, ciudad, pjs, pol, #casa"
@@ -144,7 +143,7 @@
                 <el-option> </el-option>
               </el-input>
             </el-form-item>
-            <el-form-item label="Dirección 2" class="col-span-4">
+            <el-form-item label="Dirección 2" class="col-span-4" prop="address1">
               <el-input
                 v-model="editOfficeForm.address1"
                 type="text"
@@ -161,12 +160,13 @@
           <!-- Contactos -->
           <h1 class="text-blue-500">Contacto</h1>
           <div class="grid grid-cols-12 gap-4 mt-4 border-b-2">
-            <el-form-item label="Teléfono" class="col-span-4">
+            <el-form-item label="Teléfono" class="col-span-4" prop="phone">
               <el-input
                 v-model="editOfficeForm.phone"
-                placeholder="+503 0000-0000"
+                placeholder="0000-0000"
                 class="w-full"
                 size="small"
+                v-mask="'####-####'"
               >
                 <el-option> </el-option>
               </el-input>
@@ -216,7 +216,7 @@
       @close="closeDialog('addOfficeNewForm', 'new')"
     >
       <div class="flex flex-col space-y-2">
-        <el-form :model="addOfficeNewForm" status-icon ref="addOfficeNewForm">
+        <el-form :model="addOfficeNewForm"   :rules="editOfficeFormRules" status-icon ref="addOfficeNewForm">
           <!-- Seleccion de pais,departamento y municipio -->
           <div
             class="space-y-4"
@@ -271,8 +271,13 @@
               </el-form-item>
               <el-form-item
                 label="Departamento"
-                prop="state"
+                :prop="`items.${i}.state`"
                 class="col-span-4"
+                   :rules="{
+                  required: true,
+                  message: 'Requerido',
+                  trigger: 'change',
+                }"
               >
                 <el-select
                   v-model="item.state"
@@ -292,7 +297,16 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="Municipio" class="col-span-4">
+              <el-form-item 
+            label="Municipio"
+             class="col-span-4"
+             :prop="`items.${i}.city`"
+             :rules="{
+               required:true,
+               message:'Requerido',
+               trigger:'change'
+             }"
+             >
                 <el-select
                   v-model="item.city"
                   class="w-full"
@@ -313,7 +327,16 @@
             </div>
             <!-- Direcciones -->
             <div class="grid grid-cols-12 gap-4">
-              <el-form-item label="Dirección 1" class="col-span-4">
+              <el-form-item 
+              label="Dirección 1" 
+              class="col-span-4"
+              :prop="`items.${i}.address`"
+              :rules="{
+                required:true,
+                message:'Requerido',
+                trigger: 'change'
+              }"
+              >
                 <el-input
                   v-model="item.address"
                   placeholder="Col, ciudad, pjs, pol, #casa"
@@ -325,7 +348,16 @@
                   <el-option> </el-option>
                 </el-input>
               </el-form-item>
-              <el-form-item label="Dirección 2" class="col-span-4">
+              <el-form-item 
+              label="Dirección 2"
+               class="col-span-4"
+               :prop="`items.${i}.address1`"
+               :rules="{
+                 required:true,
+                 message:'Requerido',
+                 trigger: 'change'
+               }"
+               >
                 <el-input
                   v-model="item.address1"
                   type="text"
@@ -342,7 +374,16 @@
             <!-- Contactos -->
             <h1 class="text-blue-500">Contacto</h1>
             <div class="grid grid-cols-12 gap-4 mt-4 border-b-2">
-              <el-form-item label="Teléfono" class="col-span-4">
+              <el-form-item 
+              label="Teléfono"
+               class="col-span-4"
+               :prop="`items.${i}.phone`"
+               :rules="{
+                 required:true,
+                 message:'Requerido',
+                 trigger:'change'
+               }"
+               >
                 <el-input
                   v-model="item.phone"
                   placeholder="0000-0000"
@@ -353,7 +394,10 @@
                   <el-option> </el-option>
                 </el-input>
               </el-form-item>
-              <el-form-item label="Correo electronico" class="col-span-4">
+              <el-form-item label="Correo electronico"
+               class="col-span-4"
+                prop="email"
+               >
                 <el-input
                   v-model="item.email"
                   class="w-full"
@@ -604,6 +648,11 @@ export default {
       },
       editOfficeFormRules: {
         country: selectValidation(true),
+        state: selectValidation(true),
+        city: selectValidation(true),
+        address: inputValidation(true),
+        address1: inputValidation(true),
+        phone: inputValidation(true),
         email: inputValidation(true, null, null, "email"),
       },
       BranchOffices: {
