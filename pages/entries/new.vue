@@ -22,23 +22,26 @@
         ref="newEntryDetailForm"
       >
         <el-form-item label="Cuenta contable" prop="accountingCatalog">
-          <el-select
-            v-model="newEntryDetailForm.accountingCatalog"
-            clearable
+           <el-select
+            multiple
             filterable
+            remote
             default-first-option
-            size="small"
+            clearable
+            v-model="newEntryDetailForm.accountingCatalog"
+            placeholder="Escribe el numero o nombre de la cuenta"
+            :remote-method="findAccount"
+            :loading="loadingAccount"
             class="w-full"
-            placeholder="Seleccionar"
+            size="small"
+            @focus="filterCatalog = []"
           >
             <el-option
-              v-for="a in accountingCatalog"
-              :key="a.id"
-              :label="`${a.code} - ${a.name}`"
-              :value="a.id"
-              :disabled="a.isParent == true"
-            >
-            </el-option>
+              v-for="item in filteredCatalog"
+              :key="item.id"
+              :label="`${item.code} - ${item.name}`"
+              :value="item.id"
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="Concepto" prop="concept">
@@ -472,6 +475,8 @@ export default {
       loading: false,
       entryTypes: [],
       accountingCatalog: [],
+      filteredCatalog:[],
+       loadingAccount: false,
       newEntryForm: {
         entryType: "",
         date: this.$dateFns.format(new Date(), "yyyy-MM-dd"),
@@ -492,6 +497,7 @@ export default {
         concept: "",
         cargo: "",
         abono: "",
+        code:"",
       },
       newEntryDetailFormRules: {
         accountingCatalog: selectValidation(true),
@@ -579,16 +585,17 @@ export default {
       });
       return resutls;
     },
-    addToEntryDetails(formName, data) {
+    addToEntryDetails(formName, data,) {
+      console.log(data);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
         }
         this.accountingEntryDetails.push({
           ...data,
-          catalogCode: this.accountingCatalog.find(
-            (c) => c.id == data.accountingCatalog
-          ).code,
+          catalogCode: this.filteredCatalog.find(
+            (c) => c.id == data.accountingCatalog.code
+          )
         });
         this.showNewEntryDetail = false;
         this.checkEntry();
@@ -624,22 +631,37 @@ export default {
         this.accountingEntryDetails.splice(index, 1);
       });
     },
-    async getAccountingCatalog() {
-      try {
-        const { data } = await this.$axios.get("/entries/catalog");
-        this.accountingCatalog = data.accountingCatalog;
-      } catch (error) {
-        this.errorMessage = err.response.data.message;
-      }
-    },
+    // async getAccountingCatalog() {
+    //   try {
+    //     const { data } = await this.$axios.get("/entries/catalog");
+    //     this.accountingCatalog = data.accountingCatalog;
+    //   } catch (error) {
+    //     this.errorMessage = err.response.data.message;
+    //   }
+    // },
     openNewEntryDetail() {
-      this.getAccountingCatalog();
+      
       this.showNewEntryDetail = true;
       if (this.$refs["newEntryDetailForm"]) {
         this.$refs["newEntryDetailForm"].resetFields();
+        this.filteredCatalog = []
       }
     },
-
+    findAccount(query){
+      if(query !=""){
+        this.loadingAccount =true;
+       this.$axios.get("/entries/catalog", { params: { search: query.toLowerCase() } })
+       .then((res) =>{
+         this.filteredCatalog = res.data.accountingCatalog;
+         console.log(this.filteredCatalog)
+        this.loadingAccount = false;
+      })
+         .catch((err) => (this.errorMessage = err.response.data.message));
+      } else {
+        this.filteredCatalog = [];
+      }
+      },
+   
     openEditEntryDetail(index, details) {
       this.getAccountingCatalog();
       this.editingEntryDetail = index;
@@ -660,7 +682,7 @@ export default {
             (c) => c.id == form.accountingCatalog
           ).code,
         });
-        console.log(this.accountingEntryDetails);
+         (this.accountingEntryDetails);
 
         this.showEditEntryDetail = false;
         this.checkEntry();
