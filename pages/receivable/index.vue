@@ -212,30 +212,26 @@
                 ><span>23/03/2021</span>
               </div>
             </div>
-
-            <div class="px-4 text-xs border border-gray-400">
-              <br />
-              Resumen
-              <br />
               <el-form label-position="top">
                 <div class="grid grid-cols-6">
-                  <el-form-item class="col-span-6">
+                  <el-form-item class="col-span-6" label="Resumen">
+                
                     <el-input
                       v-model="text"
                       type="textarea"
                       resize="none"
-                      :rows="16"
+                      :rows="17"
                       placeholder="Escriba un resumen del contacto de cliente..."
                       class="w-full"
-                      maxlength="500"
-                      minlength="5"
+                     
                       show-word-limit
                     >
-                    </el-input>
+                   </el-input>
+                  
                   </el-form-item>
                 </div>
               </el-form>
-            </div>
+         
           </div>
         </div>
 
