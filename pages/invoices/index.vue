@@ -545,9 +545,11 @@
           stripe
           size="mini"
           v-loading="tableloading"
+          ref="multipleTable"
+          @selection-change="handleSelectionChange"
         >
-          <!-- column 1 -->
-          <el-table-column prop="index" width="50" label="#" />
+          <el-table-column type="selection" width="45" />
+          <el-table-column prop="index" width="50" label=" #" />
           <el-table-column
             label="# Documento"
             prop="sequence"
@@ -581,7 +583,7 @@
           <el-table-column
             label="Cliente"
             prop="customerName"
-            min-width="340"
+            min-width="295"
             sortable="custom"
           />
           <el-table-column
@@ -637,6 +639,30 @@
             </template>
           </el-table-column>
           <el-table-column label width="70" align="center">
+            <!-- dropdpwn selecction -->
+            <template slot="header" v-if="multipleSelection.length > 0">
+              <el-dropdown>
+                <el-button
+                  trigger="click"
+                  icon="el-icon-more"
+                  type="primary"
+                  size="mini"
+                  class="transition ease-out duration-700"
+                ></el-button>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item>
+                    <i class="el-icon-view"></i>Vista previa
+                  </el-dropdown-item>
+                  <el-dropdown-item>
+                    <i class="el-icon-printer"></i>Imprimir documento
+                  </el-dropdown-item>
+                  <el-dropdown-item :divided="true">
+                    <i class="el-icon-refresh-left"></i> Revertir estados
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </template>
+            <!-- dropdown 1 -->
             <template slot-scope="scope">
               <el-dropdown trigger="click" szie="mini">
                 <el-button icon="el-icon-more" size="mini" />
@@ -788,6 +814,7 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+      multipleSelection: [],
       errorMessage: "",
       pageloading: true,
       tableloading: false,
@@ -824,6 +851,9 @@ export default {
     };
   },
   methods: {
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
     sortBy({ column, prop, order }) {
       this.filter.prop = prop;
       this.filter.order = order;

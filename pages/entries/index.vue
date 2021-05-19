@@ -226,8 +226,17 @@
         :data="entries.entries"
         stripe
         size="mini"
+        ref="multipleTable"
+        @selection-change="handleSelectionChange"
       >
-        <el-table-column label="#" prop="index" width="50" align="center" />
+        <el-table-column type="selection" width="45" />
+        <el-table-column
+          type="index"
+          label="#"
+          prop="index"
+          width="50"
+          align="center"
+        />
         <el-table-column
           sortable="custom"
           label="Serie"
@@ -239,12 +248,8 @@
             <span>{{ scope.row.date }}</span>
           </template>
         </el-table-column>
-        <el-table-column
-          sortable="custom"
-          label="Titulo"
-          prop="title"
-          min-width="360"
-        />
+        <el-table-column sortable="custom" label="Titulo" prop="title" <<<<<<<
+        HEAD min-width="315" ======= min-width="360" >>>>>>> master />
         <el-table-column
           label="Cargo"
           width="110"
@@ -290,6 +295,30 @@
           </template>
         </el-table-column>
         <el-table-column label width="70" align="center">
+          <!-- dropdpwn selecction -->
+          <template slot="header" v-if="multipleSelection.length > 0">
+            <el-dropdown>
+              <el-button
+                trigger="click"
+                icon="el-icon-more"
+                type="primary"
+                size="mini"
+                class="transition ease-out duration-700"
+              ></el-button>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>
+                  <i class="el-icon-view"></i>Vista previa
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <i class="el-icon-printer"></i>Imprimir documento
+                </el-dropdown-item>
+                <el-dropdown-item :divided="true">
+                  <i class="el-icon-refresh-left"></i> Revertir estados
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </template>
+          <!-- dropdown 1 -->
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />
@@ -364,6 +393,7 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+      multipleSelection: [],
       page: {
         limit: 10,
         page: 1,
@@ -392,6 +422,9 @@ export default {
     };
   },
   methods: {
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
     fetchEntries() {
       let params = this.page;
       if (this.filterBy.dateRange !== null) {

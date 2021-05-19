@@ -713,16 +713,6 @@
     >
       <!--  tab generales -->
       <el-tab-pane label="Generales" name="general">
-        <!-- <div class="grid grid-cols-12">
-          <div class="col-span-12">
-            <Notification
-              class="mb-4 w-full"
-              type="info"
-              title="Información"
-              
-            />
-          </div>
-        </div> -->
         <el-form
           :model="fiscalPeriodForm"
           :rules="fiscalPeriodFormRules"
@@ -771,24 +761,12 @@
               "
               >Guardar</el-button
             >
-            <el-button size="small" @click="$router.push('/entries')">
-              Cancelar
-            </el-button>
+            <el-button size="small" @click="cancel()"> Cancelar </el-button>
           </div>
         </el-form>
       </el-tab-pane>
       <!-- Firmantes -->
       <el-tab-pane label="Firmantes" name="signatures">
-        <!-- <div class="grid grid-cols-12">
-          <div class="col-span-12">
-            <Notification
-              class="mb-4 w-full"
-              type="info"
-              title="Información"
-              
-            />
-          </div>
-        </div> -->
         <el-form
           :model="firmantesForm"
           :rules="firmantesFormRules"
@@ -863,9 +841,7 @@
               "
               >Guardar</el-button
             >
-            <el-button size="small" @click="$router.push('/entries')"
-              >Cancelar</el-button
-            >
+            <el-button size="small" @click="cancel()">Cancelar</el-button>
           </div>
         </el-form>
       </el-tab-pane>
@@ -978,7 +954,6 @@
             />
           </div>
         </div>
-
         <el-form>
           <div class="grid grid-cols-12 gap-4">
             <div class="col-span-3">
@@ -1063,7 +1038,6 @@
             </div>
           </div>
         </el-form>
-
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-12">
             <el-table
@@ -1110,7 +1084,7 @@
                     v-if="scope.row.showAdd"
                     class="item"
                     effect="dark"
-                    content="Agregar nueva cuenta"
+                    content="Agregar nueva cuenta11"
                     placement="top"
                   >
                     <el-button
@@ -1140,7 +1114,6 @@
             </el-table>
           </div>
         </div>
-
         <div class="flex justify-end mt-4">
           <el-button
             type="primary"
@@ -1154,7 +1127,7 @@
             "
             >Guardar</el-button
           >
-          <el-button size="small">Cancelar</el-button>
+          <el-button size="small" @click="cancel()">Cancelar</el-button>
         </div>
       </el-tab-pane>
 
@@ -1286,11 +1259,70 @@
             @click.native="submitResults(tablesData)"
             >Guardar</el-button
           >
-          <el-button size="small">Cancelar</el-button>
+          <el-button size="small" @click="cancel()">Cancelar</el-button>
         </div>
       </el-tab-pane>
 
-      <!--  tab de firmante -->
+      <!--  tab de Integraciones  -->
+      <el-tab-pane label="Integraciones" name="integraciones">
+        <div class="grid grid-cols-12">
+          <div class="col-span-12">
+            <Notification class="mb-4 w-full" type="info" title="Información" />
+          </div>
+        </div>
+
+        <div class="flex flex-col space-y-2">
+          <el-form>
+            <div class="grid grid-cols-12 gap-4">
+              <el-form-item
+                label="Cuenta contable para pagos de contado"
+                class="col-span-4"
+              >
+                <el-select
+                  class="w-full"
+                  size="small"
+                  clearable
+                  filterable
+                ></el-select>
+              </el-form-item>
+              <el-form-item
+                prop=""
+                label="Tipo de integración contable"
+                class="col-span-5"
+              >
+                <el-radio-group class="w-full">
+                  <el-row :gutter="15">
+                    <el-col :span="8">
+                      <el-radio
+                        border
+                        label="Automatico"
+                        size="small"
+                        class="w-full"
+                        >Automático</el-radio
+                      >
+                    </el-col>
+                    <el-col :span="8">
+                      <el-radio
+                        border
+                        label="Manual"
+                        size="small"
+                        class="w-full"
+                        >Manual</el-radio
+                      >
+                    </el-col>
+                  </el-row>
+                </el-radio-group>
+              </el-form-item>
+            </div>
+            <div class="flex justify-end">
+              <el-button type="primary" size="small">Guardar</el-button>
+              <el-button size="small" @click="$router.push('/entries')"
+                >Cancelar</el-button
+              >
+            </div>
+          </el-form>
+        </div>
+      </el-tab-pane>
       <!-- tab integraciones -->
       <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
         <Notification
@@ -1341,13 +1373,8 @@
 import { endOfMonth, format, startOfMonth, differenceInMonths } from "date-fns";
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import { getIcon, hasModule } from "../../tools";
-import {
-  inputValidation,
-  selectValidation,
-  checkBeforeLeave,
-  checkBeforeEnter,
-} from "../../tools";
+import { getIcon } from "../../tools";
+import { inputValidation, selectValidation } from "../../tools";
 
 export default {
   name: "EntriesSettings",
@@ -2181,6 +2208,14 @@ export default {
       addTo = addTo.children.find((c) => c.id == selected.id);
       for (const code of list) {
         const account = this.catalogs.find((c) => c.id == code);
+
+        if (addTo.children.filter((c) => c.id == account.code).length > 0) {
+          this.$notify.error({
+            title: "Error",
+            message: "No se puede agregar una cuenta que ya existe.",
+          });
+          return false;
+        }
         addTo.children.push({
           id: account.code,
           name: account.name,
