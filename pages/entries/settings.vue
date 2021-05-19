@@ -996,17 +996,7 @@
                 placeholder="Fecha inicial"
                 style="width: 100%"
                 value-format="yyyy-MM-dd"
-                @change="
-                  setStorage(
-                    fiscalPeriodForm,
-                    firmantesForm,
-                    mayorAccountForm,
-                    subAccountForm,
-                    activeAccount,
-                    newDisplayName,
-                    newDisplayNameEstado
-                  )
-                "
+                @change="setStorage('fiscalPeriodForm', fiscalPeriodForm)"
               >
               </el-date-picker>
             </el-form-item>
@@ -1019,17 +1009,7 @@
                 format="MMM-yyyy"
                 placeholder="Fecha final"
                 style="width: 100%"
-                @change="
-                  setStorage(
-                    fiscalPeriodForm,
-                    firmantesForm,
-                    mayorAccountForm,
-                    subAccountForm,
-                    activeAccount,
-                    newDisplayName,
-                    newDisplayNameEstado
-                  )
-                "
+                @change="setStorage('fiscalPeriodForm', fiscalPeriodForm)"
               >
               </el-date-picker>
             </el-form-item>
@@ -1076,17 +1056,7 @@
                 show-word-limit
                 clearable
                 placeholder=""
-                @change="
-                  setStorage(
-                    fiscalPeriodForm,
-                    firmantesForm,
-                    mayorAccountForm,
-                    subAccountForm,
-                    activeAccount,
-                    newDisplayName,
-                    newDisplayNameEstado
-                  )
-                "
+                @change="setStorage('firmantesForm', firmantesForm)"
               >
               </el-input>
             </el-form-item>
@@ -1106,17 +1076,7 @@
                 filterable
                 clearable
                 placeholder=""
-                @change="
-                  setStorage(
-                    fiscalPeriodForm,
-                    firmantesForm,
-                    mayorAccountForm,
-                    subAccountForm,
-                    activeAccount,
-                    newDisplayName,
-                    newDisplayNameEstado
-                  )
-                "
+                @change="setStorage(firmantesForm)"
               >
               </el-input>
             </el-form-item>
@@ -1133,17 +1093,7 @@
                 filterable
                 clearable
                 placeholder=""
-                @change="
-                  setStorage(
-                    fiscalPeriodForm,
-                    firmantesForm,
-                    mayorAccountForm,
-                    subAccountForm,
-                    activeAccount,
-                    newDisplayName,
-                    newDisplayNameEstado
-                  )
-                "
+                @change="setStorage(firmantesForm)"
               >
               </el-input>
             </el-form-item>
@@ -1656,6 +1606,12 @@ export default {
   name: "EntriesSettings",
   components: { LayoutContent, Notification },
   fetch() {
+    const name = Object.keys(localStorage).find((k) =>
+      k.startsWith(storagekey)
+    );
+    console.log(name);
+    const value = JSON.parse(localStorage.getItem(name));
+    console.log(value);
     // Se ubica en el tab correcto
     if (this.$route.query.tab) {
       this.tab = this.$route.query.tab;
@@ -1715,16 +1671,7 @@ export default {
       })
       .then((alw) => (this.pageloading = false));
 
-    checkBeforeEnter(this, storagekey, [
-      "fiscalPeriodForm",
-      "firmantesForm",
-      "mayorAccountForm",
-      "subAccountForm",
-      "activeAccount",
-      "newDisplayName",
-      "specialAccounts",
-      "newDisplayNameEstado",
-    ]);
+    checkBeforeEnter(this, name, value, name.replace(`${storagekey}-`, ""));
   },
   fetchOnServer: false,
   beforeRouteLeave(to, from, next) {
@@ -2080,28 +2027,16 @@ export default {
     };
   },
   methods: {
-    setStorage(
-      fiscalPeriodForm,
-      firmantesForm,
-      mayorAccountForm,
-      subAccountForm,
-      activeAccount,
-      newDisplayName,
-      specialAccounts,
-      newDisplayNameEstado
-    ) {
+    setStorage(formName, formData) {
+      const list = Object.keys(localStorage).filter((k) =>
+        k.startsWith(storagekey)
+      );
+      for (const k of list) {
+        localStorage.removeItem(k);
+      }
       localStorage.setItem(
-        storagekey,
-        JSON.stringify({
-          fiscalPeriodForm,
-          firmantesForm,
-          mayorAccountForm,
-          subAccountForm,
-          activeAccount,
-          newDisplayName,
-          specialAccounts,
-          newDisplayNameEstado,
-        })
+        `${storagekey}-${formName}`,
+        JSON.stringify(formData)
       );
     },
     //general

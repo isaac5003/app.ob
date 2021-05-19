@@ -375,7 +375,7 @@ function checkBeforeLeave(self, storagekey, next) {
  * @param {string} storagekey Nombre de la llave a usar en el LocalStorage
  * @param {string} form Name of the object where to store
  */
-function checkBeforeEnter(self, storagekey, form) {
+function checkBeforeEnter(self, storagekey, form, formName = false) {
   const stored = localStorage.getItem(storagekey);
   if (stored) {
     self
@@ -397,7 +397,8 @@ function checkBeforeEnter(self, storagekey, form) {
             self[arr] = value[arr];
           }
         } else {
-          self[form] = value
+          const name = formName ? formName : form;
+          self[name] = value
         }
 
       })
