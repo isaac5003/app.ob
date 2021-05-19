@@ -315,7 +315,7 @@
                   default-first-option
                 >
                   <el-option
-                    v-for="c in cities"
+                    v-for="c in item.cities"
                     :key="c.id"
                     :label="c.name"
                     :value="c.id"
@@ -450,26 +450,26 @@
       <div class="grid grid-cols-12 gap-4 text-xs">
         <div class="col-span-3">
           <div class="flex flex-col">
-            <span class="font-semibold">Cliente</span>
-            <span>{{ customer ? customer.name : "" }} </span>
+            <span>CLIENTE</span>
+            <span class="text-gray-700">{{ customer ? customer.name : "" }} </span>
           </div>
         </div>
         <div class="col-span-2">
           <div class="flex flex-col">
-            <span class="font-semibold">NIT</span>
-            <span>{{ customer ? customer.nit : "" }} </span>
+            <span>NIT</span>
+            <span class="text-gray-700">{{ customer ? customer.nit : "" }} </span>
           </div>
         </div>
         <div class="col-span-1">
           <div class="flex flex-col">
-            <span class="font-semibold">NRC</span>
-            <span>{{ customer ? customer.nrc : "" }} </span>
+            <span>NRC</span>
+            <span class="text-gray-700">{{ customer ? customer.nrc : "" }} </span>
           </div>
         </div>
         <div class="col-span-3">
           <div class="flex flex-col">
-            <span class="font-semibold">Giro</span>
-            <span>{{ customer ? customer.giro : "" }} </span>
+            <span>Giro</span>
+            <span class="text-gray-700">{{ customer ? customer.giro : "" }} </span>
           </div>
         </div>
       </div>
@@ -540,7 +540,7 @@
                   <i class="el-icon-view"></i> Vista previa
                 </el-dropdown-item>
                 <el-dropdown-item @click.native="openEditPreview(scope.row)">
-                  <i class="el-icon-edit-outline"></i> Editar
+                  <i class="el-icon-edit-outline"></i> Editar Sucursales
                 </el-dropdown-item>
                 <el-dropdown-item>
                   <i class="el-icon-map-location"></i>Definir como principal
@@ -633,7 +633,8 @@ export default {
             address1: "",
             phone: "",
             email: "",
-            states:[]
+            states:[],
+            cities:[]
           },
         ],
       },
@@ -698,11 +699,10 @@ export default {
           this.addOfficeNewForm.items[index].states = this.rawStates.filter(
             (s) => s.country.id == this.addOfficeNewForm.items[index].country
           );
-           console.log( this.addOfficeNewForm.items.states )
           break;
         case "city":
           this.addOfficeNewForm.items.city = "";
-          this.cities = this.rawCities.filter(
+          this.addOfficeNewForm.items[index].cities = this.rawCities.filter(
             (s) => s.state.id == this.addOfficeNewForm.items[index].state
           );
           break;
