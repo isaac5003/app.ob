@@ -7,6 +7,354 @@
     ]"
     v-loading="pageloading"
   >
+    <!-- TODORealizar funcionamiento de agregar autorizacion. -->
+    <!-- <el-dialog
+      title="Nueva Autorización"
+      :visible.sync="showAuthorization"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      width="400px"
+    >
+      <div class=" flex flex-col space-y-2">
+        <el-form>
+          <div class="grid grid-cols-12 gap-4">
+            <el-form-item label="N° Autorización" class="col-span-12">
+              <el-input
+                placeholder="N° Autorización"
+                class="w-full"
+                size="small"
+                v-model="d"
+              />
+            </el-form-item>
+          </div>
+
+          <div class="grid grid-cols-12 gap-4">
+            <el-form-item label="Inicial" class="col-span-6">
+              <el-input-number
+                placeholder="Inicial"
+                style="width:100%;"
+                size="small"
+                v-model="d"
+              />
+            </el-form-item>
+            <el-form-item label="Final" class="col-span-6">
+              <el-input-number
+                placeholder="Final"
+                style="width:100%;"
+                size="small"
+                v-model="d"
+              />
+            </el-form-item>
+          </div>
+
+          <div class="flex flex-rows justify-end">
+            <el-button size="small" type="primary">Guardar</el-button>
+            <el-button size="small" @click="showAuthorization = false">
+              Cancelar
+            </el-button>
+          </div>
+        </el-form>
+      </div>
+    </el-dialog> -->
+
+    <!-- dialogo zonas -->
+    <el-dialog
+      :append-to-body="true"
+      title="Nueva zona"
+      :visible.sync="showNewZone"
+      width="30%"
+      @close="closeDialog('newZoneForm')"
+    >
+      <el-form
+        :model="newZoneForm"
+        :rules="newzoneRules"
+        status-icon
+        ref="newZoneForm"
+        @submit.prevent.native="submitZone('newZoneForm', newZoneForm)"
+      >
+        <div class="grid grid-cols-12 gap-4">
+          <el-form-item
+            label="Nombre de la zona"
+            prop="name"
+            class="col-span-12"
+          >
+            <el-input
+              v-model="newZoneForm.name"
+              clearable
+              type="text"
+              maxlength="100"
+              minlength="5"
+              show-word-limit
+            ></el-input>
+          </el-form-item>
+        </div>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button
+          type="primary"
+          size="small"
+          @click.native="submitZone('newZoneForm', newZoneForm)"
+          >Guardar</el-button
+        >
+        <el-button @click="showNewZone = false" size="small"
+          >Cancelar</el-button
+        >
+      </span>
+    </el-dialog>
+    <!-- dialogo para editar zona -->
+    <el-dialog
+      :append-to-body="true"
+      title="Editar zona zona"
+      :visible.sync="showEditZone"
+      width="30%"
+      @close="closeDialog('editZoneForm')"
+    >
+      <el-form
+        :model="editZoneForm"
+        :rules="newzoneRules"
+        status-icon
+        ref="editZoneForm"
+        @submit.prevent.native="submitZone('editZoneForm', editZoneForm)"
+      >
+        <div class=" grid grid-cols-12 gap-4">
+          <el-form-item
+            label="Nombre de la zona"
+            prop="name"
+            class="col-span-12"
+          >
+            <el-input
+              v-model="editZoneForm.name"
+              clearable
+              type="text"
+              maxlength="100"
+              minlength="5"
+              show-word-limit
+            ></el-input>
+          </el-form-item>
+        </div>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button
+          type="primary"
+          size="small"
+          @click.native="submitZone('editZoneForm', editZoneForm)"
+          >Guardar</el-button
+        >
+        <el-button @click="showEditZone = false" size="small"
+          >Cancelar</el-button
+        >
+      </span>
+    </el-dialog>
+    <!-- dialogo nuevo vendedor -->
+    <el-dialog
+      :append-to-body="true"
+      title="Nuevo vendedor"
+      :visible.sync="showNewSeller"
+      width="30%"
+      @close="closeDialog('newSellerForm')"
+    >
+      <el-form
+        :model="newSellerForm"
+        :rules="newzoneRules"
+        status-icon
+        ref="newSellerForm"
+        @submit.prevent.native="submitSeller('newSellerForm', newSellerForm)"
+      >
+        <div>
+          <el-form-item label="Nombre del vendedor" prop="name">
+            <el-input
+              clearable
+              v-model="newSellerForm.name"
+              size="small"
+              auto-complete="off"
+            />
+          </el-form-item>
+
+          <el-form-item label="Zona asignada" prop="invoicesZone">
+            <el-select
+              v-model="newSellerForm.invoicesZone"
+              placeholder="Selecionar"
+              size="small"
+              class="w-full"
+              clearable
+              default-first-option
+            >
+              <el-option
+                v-for="z in activeZones"
+                :key="z.id"
+                :label="z.name"
+                :value="z.id"
+                class="w-full"
+              />
+            </el-select>
+          </el-form-item>
+        </div>
+      </el-form>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button
+          type="primary"
+          size="small"
+          @click.native="
+            submitEditSeller('editSellerForm', sellerId, editSellerForm)
+          "
+          >Guardar</el-button
+        >
+        <el-button @click="showEditSeller = false" size="small"
+          >Cancelar</el-button
+        >
+      </span>
+    </el-dialog>
+    <!-- dialogo editar vendedores -->
+    <el-dialog
+      :append-to-body="true"
+      title="Editar vendedor"
+      :visible.sync="showEditSeller"
+      width="30%"
+      @close="closeDialog('editSellerForm')"
+    >
+      <el-form
+        :model="editSellerForm"
+        :rules="newzoneRules"
+        status-icon
+        ref="editSellerForm"
+        @submit.prevent.native="
+          submitEditSeller('editSellerForm', sellerId, editSellerForm)
+        "
+      >
+        <div>
+          <el-row :gutter="15">
+            <el-col :span="15">
+              <el-form-item label="Nombre del vendedor" prop="name">
+                <el-input
+                  clearable
+                  v-model="editSellerForm.name"
+                  size="small"
+                  auto-complete="off"
+                />
+              </el-form-item>
+            </el-col>
+            <el-col :span="9">
+              <el-form-item label="Zona asignada" prop="invoicesZone">
+                <el-select
+                  v-model="editSellerForm.invoicesZone"
+                  placeholder="Selecionar"
+                  size="small"
+                  class="w-full"
+                  clearable
+                  default-first-option
+                >
+                  <el-option
+                    v-for="z in activeZones"
+                    :key="z.id"
+                    :label="z.name"
+                    :value="z.id"
+                    class="w-full"
+                  />
+                </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </div>
+      </el-form>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button
+          type="primary"
+          size="small"
+          @click.native="
+            submitEditSeller('editSellerForm', sellerId, editSellerForm)
+          "
+          >Guardar</el-button
+        >
+        <el-button @click="showEditSeller = false" size="small"
+          >Cancelar</el-button
+        >
+      </span>
+    </el-dialog>
+
+    <!-- Dialogo para agregar nueva condicion de pago -->
+    <el-dialog
+      :append-to-body="true"
+      title="Nueva condición de pago"
+      :visible.sync="showNewPayment"
+      width="30%"
+      @close="closeDialog('newPaymentForm')"
+    >
+      <el-form
+        :model="newPaymentForm"
+        :rules="newzoneRules"
+        status-icon
+        ref="newPaymentForm"
+        @submit.prevent.native="submitPayment('newPaymentForm', newPaymentForm)"
+      >
+        <div>
+          <el-form-item label="Nombre de la condición de pago" prop="name">
+            <el-input
+              v-model="newPaymentForm.name"
+              clearable
+              type="text"
+              maxlength="100"
+              minlength="5"
+              show-word-limit
+            ></el-input>
+          </el-form-item>
+        </div>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button
+          type="primary"
+          size="small"
+          @click.native="submitPayment('newPaymentForm', newPaymentForm)"
+          >Guardar</el-button
+        >
+        <el-button @click="showNewPayment = false" size="small"
+          >Cancelar</el-button
+        >
+      </span>
+    </el-dialog>
+
+    <!-- Dialogo para editar condicion de pago -->
+    <el-dialog
+      :append-to-body="true"
+      title="Editar condición de pago"
+      :visible.sync="showEditPayment"
+      width="30%"
+      @close="closeDialog('editPaymentForm')"
+    >
+      <el-form
+        :model="editPaymentForm"
+        :rules="newzoneRules"
+        status-icon
+        ref="editPaymentForm"
+        @submit.prevent.native="
+          submitPayment('editPaymentForm', editPaymentForm)
+        "
+      >
+        <el-form-item label="Nombre la condición de pago" prop="name">
+          <el-input
+            v-model="editPaymentForm.name"
+            clearable
+            type="text"
+            maxlength="100"
+            minlength="5"
+            show-word-limit
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button
+          type="primary"
+          size="small"
+          @click.native="submitPayment('editPaymentForm', editPaymentForm)"
+          >Guardar</el-button
+        >
+        <el-button @click="showEditPayment = false" size="small"
+          >Cancelar</el-button
+        >
+      </span>
+    </el-dialog>
+
     <el-tabs
       v-model="tab"
       @tab-click="
@@ -18,273 +366,7 @@
           .catch(() => {})
       "
     >
-      <el-dialog
-        title="Nueva Autorización"
-        :visible.sync="showAuthorization"
-        :append-to-body="true"
-        :close-on-click-modal="false"
-        width="400px"
-      >
-        <div class=" flex flex-col space-y-2">
-          <el-form>
-            <!-- Autorización -->
-            <div class="grid grid-cols-12 gap-4">
-              <div class="col-span-12">
-                <el-form-item label="N° Autorización">
-                  <el-input
-                    placeholder="N° Autorización"
-                    class="w-full"
-                    size="small"
-                    v-model="d"
-                  ></el-input>
-                </el-form-item>
-              </div>
-            </div>
-            <!-- Inicial, Final -->
-            <div class="grid grid-cols-12 gap-4">
-              <div class="col-span-6">
-                <el-form-item label="Inicial">
-                  <el-input
-                    placeholder="Inicial"
-                    class="w-full"
-                    size="small"
-                    v-model="d"
-                  ></el-input>
-                </el-form-item>
-              </div>
-              <div class="col-span-6">
-                <el-form-item label="Final">
-                  <el-input
-                    placeholder="Final"
-                    class="w-full"
-                    size="small"
-                    v-model="d"
-                  ></el-input>
-                </el-form-item>
-              </div>
-            </div>
-
-            <div class="flex flex-rows justify-end">
-              <el-button size="small" type="primary">Guardar</el-button>
-              <el-button size="small" @click="showAuthorization = false">
-                Cancelar
-              </el-button>
-            </div>
-          </el-form>
-        </div>
-      </el-dialog>
       <el-tab-pane label="Zonas y vendedores" name="zones-sellers">
-        <!-- dialogo zonas -->
-        <el-dialog
-          :append-to-body="true"
-          title="Nueva zona"
-          :visible.sync="showNewZone"
-          width="30%"
-          @close="closeDialog('newZoneForm')"
-        >
-          <el-form
-            :model="newZoneForm"
-            :rules="newzoneRules"
-            status-icon
-            ref="newZoneForm"
-            @submit.prevent.native="submitZone('newZoneForm', newZoneForm)"
-          >
-            <div>
-              <el-form-item label="Nombre de la zona" prop="name">
-                <el-input
-                  v-model="newZoneForm.name"
-                  clearable
-                  type="text"
-                  maxlength="100"
-                  minlength="5"
-                  show-word-limit
-                ></el-input>
-              </el-form-item>
-            </div>
-          </el-form>
-          <span slot="footer" class="dialog-footer">
-            <el-button
-              type="primary"
-              size="small"
-              @click.native="submitZone('newZoneForm', newZoneForm)"
-              >Guardar</el-button
-            >
-            <el-button @click="showNewZone = false" size="small"
-              >Cancelar</el-button
-            >
-          </span>
-        </el-dialog>
-        <!-- dialogo para editar zona -->
-        <el-dialog
-          :append-to-body="true"
-          title="Editar zona zona"
-          :visible.sync="showEditZone"
-          width="30%"
-          @close="closeDialog('editZoneForm')"
-        >
-          <el-form
-            :model="editZoneForm"
-            :rules="newzoneRules"
-            status-icon
-            ref="editZoneForm"
-            @submit.prevent.native="submitZone('editZoneForm', editZoneForm)"
-          >
-            <div>
-              <el-form-item label="Nombre de la zona" prop="name">
-                <el-input
-                  v-model="editZoneForm.name"
-                  clearable
-                  type="text"
-                  maxlength="100"
-                  minlength="5"
-                  show-word-limit
-                ></el-input>
-              </el-form-item>
-            </div>
-          </el-form>
-          <span slot="footer" class="dialog-footer">
-            <el-button
-              type="primary"
-              size="small"
-              @click.native="submitZone('editZoneForm', editZoneForm)"
-              >Guardar</el-button
-            >
-            <el-button @click="showEditZone = false" size="small"
-              >Cancelar</el-button
-            >
-          </span>
-        </el-dialog>
-        <!-- dialogo nuevo vendedor -->
-        <el-dialog
-          :append-to-body="true"
-          title="Nuevo vendedor"
-          :visible.sync="showNewSeller"
-          width="30%"
-          @close="closeDialog('newSellerForm')"
-        >
-          <el-form
-            :model="newSellerForm"
-            :rules="newzoneRules"
-            status-icon
-            ref="newSellerForm"
-            @submit.prevent.native="
-              submitSeller('newSellerForm', newSellerForm)
-            "
-          >
-            <div>
-              <el-row :gutter="15">
-                <el-col :span="15">
-                  <el-form-item label="Nombre del vendedor" prop="name">
-                    <el-input
-                      clearable
-                      v-model="newSellerForm.name"
-                      size="small"
-                      auto-complete="off"
-                    />
-                  </el-form-item>
-                </el-col>
-                <el-col :span="9">
-                  <el-form-item label="Zona asignada" prop="invoicesZone">
-                    <el-select
-                      v-model="newSellerForm.invoicesZone"
-                      placeholder="Seleccionar"
-                      size="small"
-                      class="w-full"
-                      clearable
-                      default-first-option
-                    >
-                      <el-option
-                        v-for="z in activeZones"
-                        :key="z.id"
-                        :label="z.name"
-                        :value="z.id"
-                        class="w.full"
-                      />
-                    </el-select>
-                  </el-form-item>
-                </el-col>
-              </el-row>
-            </div>
-          </el-form>
-          <span slot="footer" class="dialog-footer">
-            <el-button
-              type="primary"
-              size="small"
-              @click.native="submitSeller('newSellerForm', newSellerForm)"
-              >Guardar</el-button
-            >
-            <el-button @click="showNewSeller = false" size="small"
-              >Cancelar</el-button
-            >
-          </span>
-        </el-dialog>
-        <!-- dialogo editar vendedores -->
-        <el-dialog
-          :append-to-body="true"
-          title="Editar vendedor"
-          :visible.sync="showEditSeller"
-          width="30%"
-          @close="closeDialog('editSellerForm')"
-        >
-          <el-form
-            :model="editSellerForm"
-            :rules="newzoneRules"
-            status-icon
-            ref="editSellerForm"
-            @submit.prevent.native="
-              submitEditSeller('editSellerForm', sellerId, editSellerForm)
-            "
-          >
-            <div>
-              <el-row :gutter="15">
-                <el-col :span="15">
-                  <el-form-item label="Nombre del vendedor" prop="name">
-                    <el-input
-                      clearable
-                      v-model="editSellerForm.name"
-                      size="small"
-                      auto-complete="off"
-                    />
-                  </el-form-item>
-                </el-col>
-                <el-col :span="9">
-                  <el-form-item label="Zona asignada" prop="invoicesZone">
-                    <el-select
-                      v-model="editSellerForm.invoicesZone"
-                      placeholder="Selecionar"
-                      size="small"
-                      class="w-full"
-                      clearable
-                      default-first-option
-                    >
-                      <el-option
-                        v-for="z in activeZones"
-                        :key="z.id"
-                        :label="z.name"
-                        :value="z.id"
-                        class="w.full"
-                      />
-                    </el-select>
-                  </el-form-item>
-                </el-col>
-              </el-row>
-            </div>
-          </el-form>
-
-          <span slot="footer" class="dialog-footer">
-            <el-button
-              type="primary"
-              size="small"
-              @click.native="
-                submitEditSeller('editSellerForm', sellerId, editSellerForm)
-              "
-              >Guardar</el-button
-            >
-            <el-button @click="showEditSeller = false" size="small"
-              >Cancelar</el-button
-            >
-          </span>
-        </el-dialog>
         <!-- Inicio de tablas zonas y vendedores -->
         <div class="grid grid-cols-12 gap-4">
           <!-- tabla de zonas -->
@@ -417,90 +499,6 @@
 
       <!-- Tabla de condiciones de pago -->
       <el-tab-pane label="Condiciones de pago" name="payment-conditions">
-        <!-- Dialogo para agregar nueva condicion de pago -->
-        <el-dialog
-          :append-to-body="true"
-          title="Nueva condición de pago"
-          :visible.sync="showNewPayment"
-          width="30%"
-          @close="closeDialog('newPaymentForm')"
-        >
-          <el-form
-            :model="newPaymentForm"
-            :rules="newzoneRules"
-            status-icon
-            ref="newPaymentForm"
-            @submit.prevent.native="
-              submitPayment('newPaymentForm', newPaymentForm)
-            "
-          >
-            <div>
-              <el-form-item label="Nombre de la condición de pago" prop="name">
-                <el-input
-                  v-model="newPaymentForm.name"
-                  clearable
-                  type="text"
-                  maxlength="100"
-                  minlength="5"
-                  show-word-limit
-                ></el-input>
-              </el-form-item>
-            </div>
-          </el-form>
-          <span slot="footer" class="dialog-footer">
-            <el-button
-              type="primary"
-              size="small"
-              @click.native="submitPayment('newPaymentForm', newPaymentForm)"
-              >Guardar</el-button
-            >
-            <el-button @click="showNewPayment = false" size="small"
-              >Cancelar</el-button
-            >
-          </span>
-        </el-dialog>
-
-        <!-- Dialogo para editar condicion de pago -->
-        <el-dialog
-          :append-to-body="true"
-          title="Editar condición de pago"
-          :visible.sync="showEditPayment"
-          width="30%"
-          @close="closeDialog('editPaymentForm')"
-        >
-          <el-form
-            :model="editPaymentForm"
-            :rules="newzoneRules"
-            status-icon
-            ref="editPaymentForm"
-            @submit.prevent.native="
-              submitPayment('editPaymentForm', editPaymentForm)
-            "
-          >
-            <el-form-item label="Nombre la condición de pago" prop="name">
-              <el-input
-                v-model="editPaymentForm.name"
-                clearable
-                type="text"
-                maxlength="100"
-                minlength="5"
-                show-word-limit
-              ></el-input>
-            </el-form-item>
-          </el-form>
-          <span slot="footer" class="dialog-footer">
-            <el-button
-              type="primary"
-              size="small"
-              @click.native="submitPayment('editPaymentForm', editPaymentForm)"
-              >Guardar</el-button
-            >
-            <el-button @click="showEditPayment = false" size="small"
-              >Cancelar</el-button
-            >
-          </span>
-        </el-dialog>
-
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-6 flex flex-col space-y-4">
             <div class="flex justify-between items-center">
@@ -580,11 +578,13 @@
                 <!-- Consumidor final, Switch y Button -->
                 <div class="grid grid-cols-12 gap-4">
                   <div class="col-span-8">
-                    <el-form-item class="font-semibold text-blue-800">{{
-                      correlative.documentType
-                        ? correlative.documentType.name
-                        : ""
-                    }}</el-form-item>
+                    <el-form-item label="" class="font-semibold text-blue-800"
+                      ><span>{{
+                        correlative.documentType
+                          ? correlative.documentType.name
+                          : ""
+                      }}</span></el-form-item
+                    >
                   </div>
                   <div class="col-span-2">
                     <el-form-item>
@@ -848,6 +848,7 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+      d: "hola",
       pageloading: true,
       tab: "zones-sellers",
       utab: "invoicing",
