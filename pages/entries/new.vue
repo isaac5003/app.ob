@@ -9,6 +9,7 @@
   >
     <!-- dialogo agregar detalle partida-->
     <el-dialog
+      @close="closeDialog('newEntryDetailForm')"
       title="Agregar detalle de partida"
       :visible.sync="showNewEntryDetail"
       width="550px"
@@ -22,8 +23,7 @@
         ref="newEntryDetailForm"
       >
         <el-form-item label="Cuenta contable" prop="accountingCatalog">
-           <el-select
-            multiple
+          <el-select
             filterable
             remote
             default-first-option
@@ -101,6 +101,7 @@
 
     <!-- dialogo editdetalledepartida-->
     <el-dialog
+      @close="closeDialog('editEntryDetailForm')"
       title="Editar detalle de partida"
       :visible.sync="showEditEntryDetail"
       width="550px"
@@ -118,15 +119,19 @@
             <el-form-item label="Cuenta contable" prop="accountingCatalog">
               <el-select
                 v-model="editEntryDetailForm.accountingCatalog"
-                clearable
                 filterable
+                remote
                 default-first-option
-                size="small"
+                clearable
+                placeholder="Escribe el numero o nombre de la cuenta"
+                :remote-method="findAccount"
+                :loading="loadingAccount"
                 class="w-full"
-                placeholder="Seleccionar"
+                size="small"
+                @focus="filterCatalog = []"
               >
                 <el-option
-                  v-for="aC in accountingCatalog"
+                  v-for="aC in filteredCatalog"
                   :key="aC.id"
                   :label="`${aC.code} - ${aC.name}`"
                   :value="aC.id"
@@ -375,11 +380,12 @@ export default {
   components: { LayoutContent, Notification },
   fetch() {
     const entryTypes = () => this.$axios.get("/entries/types");
-
-    Promise.all([entryTypes()])
+    const accountingCatalog = () => this.$axios.get("/entries/catalog");
+    Promise.all([entryTypes(), accountingCatalog()])
       .then((res) => {
-        const [entryTypes] = res;
+        const [entryTypes, catalog] = res;
         this.entryTypes = entryTypes.data.entryTypes;
+        this.accountingCatalog = catalog.data.accountingCatalog;
         this.loading = false;
       })
       .catch((err) => {
@@ -475,8 +481,8 @@ export default {
       loading: false,
       entryTypes: [],
       accountingCatalog: [],
-      filteredCatalog:[],
-       loadingAccount: false,
+      filteredCatalog: [],
+      loadingAccount: false,
       newEntryForm: {
         entryType: "",
         date: this.$dateFns.format(new Date(), "yyyy-MM-dd"),
@@ -497,7 +503,6 @@ export default {
         concept: "",
         cargo: "",
         abono: "",
-        code:"",
       },
       newEntryDetailFormRules: {
         accountingCatalog: selectValidation(true),
@@ -585,17 +590,15 @@ export default {
       });
       return resutls;
     },
-    addToEntryDetails(formName, data,) {
-      console.log(data);
+    addToEntryDetails(formName, data) {
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
         }
         this.accountingEntryDetails.push({
           ...data,
-          catalogCode: this.filteredCatalog.find(
-            (c) => c.id == data.accountingCatalog.code
-          )
+          code: this.filteredCatalog.find((c) => c.id == data.accountingCatalog)
+            .code,
         });
         this.showNewEntryDetail = false;
         this.checkEntry();
@@ -631,45 +634,38 @@ export default {
         this.accountingEntryDetails.splice(index, 1);
       });
     },
-    // async getAccountingCatalog() {
-    //   try {
-    //     const { data } = await this.$axios.get("/entries/catalog");
-    //     this.accountingCatalog = data.accountingCatalog;
-    //   } catch (error) {
-    //     this.errorMessage = err.response.data.message;
-    //   }
-    // },
-    openNewEntryDetail() {
-      
-      this.showNewEntryDetail = true;
-      if (this.$refs["newEntryDetailForm"]) {
-        this.$refs["newEntryDetailForm"].resetFields();
-        this.filteredCatalog = []
+    closeDialog(formName) {
+      if (this.$refs[formName]) {
+        this.$refs[formName].resetFields();
+        this.filteredCatalog = [];
       }
     },
-    findAccount(query){
-      if(query !=""){
-        this.loadingAccount =true;
-       this.$axios.get("/entries/catalog", { params: { search: query.toLowerCase() } })
-       .then((res) =>{
-         this.filteredCatalog = res.data.accountingCatalog;
-         console.log(this.filteredCatalog)
-        this.loadingAccount = false;
-      })
-         .catch((err) => (this.errorMessage = err.response.data.message));
+    openNewEntryDetail() {
+      this.showNewEntryDetail = true;
+    },
+    findAccount(query) {
+      if (query != "") {
+        this.loadingAccount = true;
+        this.$axios
+          .get("/entries/catalog", { params: { search: query.toLowerCase() } })
+          .then((res) => {
+            this.filteredCatalog = res.data.accountingCatalog;
+            console.log(this.filteredCatalog);
+            this.loadingAccount = false;
+          })
+          .catch((err) => (this.errorMessage = err.response.data.message));
       } else {
         this.filteredCatalog = [];
       }
-      },
-   
+    },
+
     openEditEntryDetail(index, details) {
-      this.getAccountingCatalog();
       this.editingEntryDetail = index;
       this.editEntryDetailForm = { ...details };
+      this.filteredCatalog = this.accountingCatalog.filter(
+        (ac) => ac.id == details.accountingCatalog
+      );
       this.showEditEntryDetail = true;
-      if (this.$refs["editEntryDetailForm"]) {
-        this.$refs["editEntryDetailForm"].resetFields();
-      }
     },
     updateDetail(index, formName, form) {
       this.$refs[formName].validate(async (valid) => {
@@ -678,11 +674,10 @@ export default {
         }
         this.accountingEntryDetails.splice(index, 1, {
           ...form,
-          code: this.accountingCatalog.find(
-            (c) => c.id == form.accountingCatalog
-          ).code,
+          code: this.filteredCatalog.find((c) => c.id == form.accountingCatalog)
+            .code,
         });
-         (this.accountingEntryDetails);
+        this.accountingEntryDetails;
 
         this.showEditEntryDetail = false;
         this.checkEntry();
