@@ -248,8 +248,12 @@
             <span>{{ scope.row.date }}</span>
           </template>
         </el-table-column>
-        <el-table-column sortable="custom" label="Titulo" prop="title" <<<<<<<
-        HEAD min-width="315" ======= min-width="360" >>>>>>> master />
+        <el-table-column
+          sortable="custom"
+          label="Titulo"
+          prop="title"
+          min-width="300"
+        />
         <el-table-column
           label="Cargo"
           width="110"
@@ -650,7 +654,7 @@ export default {
                         layout: "noBorders",
                         table: {
                           headerRows: 1,
-                          widths: ["11%", "auto", "auto", "10%", "10%"],
+                          widths: ["10%", "30%", "20%", "20%", "20%"],
                           heights: -5,
                           body: [
                             [
