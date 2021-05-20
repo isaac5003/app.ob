@@ -599,7 +599,9 @@ export default {
           ...data,
           code: this.filteredCatalog.find((c) => c.id == data.accountingCatalog)
             .code,
-        });
+            
+            });
+         console.log(this.accountingEntryDetails)
         this.showNewEntryDetail = false;
         this.checkEntry();
       });
@@ -650,7 +652,7 @@ export default {
           .get("/entries/catalog", { params: { search: query.toLowerCase() } })
           .then((res) => {
             this.filteredCatalog = res.data.accountingCatalog;
-            console.log(this.filteredCatalog);
+         
             this.loadingAccount = false;
           })
           .catch((err) => (this.errorMessage = err.response.data.message));
