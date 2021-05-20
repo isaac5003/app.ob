@@ -44,17 +44,19 @@
             <el-form-item label="Seleccione una cuenta" class="col-span-4">
               <el-select
                 v-model="integrationSettingForm.accountingCatalog"
-                placeholder="Seleccione una cuenta"
+                placeholder="Ingrese el codigo o nombre de la cuenta"
                 size="small"
                 clearable
                 filterable
+                remote
                 class="w-full"
                 default-first-option
+                :remote-method="findAccount"
               >
                 <el-option
-                  v-for="c in catalogs"
+                  v-for="c in filteredCatalog"
                   :key="c.id"
-                  :label="c.name"
+                  :label="`${c.code}-${c.name}`"
                   :value="c.id"
                   :disabled="c.isParent == true"
                 >
@@ -85,16 +87,21 @@ export default {
   name: "CustomerSettings",
   components: { LayoutContent, Notification },
   fetch() {
-    this.$axios.get("/customers/setting/integrations").then(({ data }) => {
       const catalog = () => this.$axios.get("/entries/catalog");
-      Promise.all([catalog()]).then((res) => {
-        const [catalog] = res;
+      const settingIntegration = () => this.$axios.get("/customers/setting/integrations")
+      Promise.all([catalog(), settingIntegration()]).then((res) => {
+        const [catalog, settingIntegration] = res;
         this.catalogs = catalog.data.accountingCatalog;
         this.integrationSettingForm.accountingCatalog =
-          data.integrations.catalog;
+          settingIntegration.data.integrations.catalog;
+          this.filteredCatalog = this.catalogs.filter(c => c.id == this.integrationSettingForm.accountingCatalog);
         this.pageloading = false;
+      })
+      .catch((err) => {
+        this.errorMessage = err.response.data.message
+          ? err.response.message
+          : "Comunicate con el adminstrador del Sistema";
       });
-    });
   },
   fetchOnServer: false,
   data() {
@@ -102,6 +109,7 @@ export default {
       pageloading: true,
       cogInfo: "",
       catalogs: [],
+      filteredCatalog:[],
       tab: "integrations",
       integrationSettingForm: {
         accountingCatalog: "",
@@ -110,10 +118,22 @@ export default {
   },
   methods: {
     async fetchSettingCustumerIntegration() {
-      const { data } = await this.$axios.get("/entries/catalog");
+      const { data } = await this.$axios.get("/customers/setting/integrations");
       this.pageloading = false;
       this.integrationSettingForm.accountingCatalog =
-        data.integrations.accountingCatalog;
+        data.integrations.catalog;
+    },
+    findAccount(query){
+      if(query !==""){
+        this.$axios.get("entries/catalog",{params: {search: query.toLowerCase()}})
+        .then((res) =>{
+          this.filteredCatalog = res.data.accountingCatalog;
+        })
+          .catch((err) => (this.errorMessage = err.response.data.message));
+        
+      }else{
+        this.filteredCatalog =[];
+      }
     },
     submitSettingsIntegrations(formName, { accountingCatalog }) {
       this.$refs[formName].validate(async (valid) => {
@@ -142,7 +162,9 @@ export default {
                       message: res.data.message,
                     });
                     this.pageloading = true;
+                    this.filteredCatalog=[];
                     this.fetchSettingCustumerIntegration();
+
                   })
                   .catch((err) => {
                     this.$notify.error({
