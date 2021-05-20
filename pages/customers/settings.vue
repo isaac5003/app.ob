@@ -87,14 +87,18 @@ export default {
   name: "CustomerSettings",
   components: { LayoutContent, Notification },
   fetch() {
-      const catalog = () => this.$axios.get("/entries/catalog");
-      const settingIntegration = () => this.$axios.get("/customers/setting/integrations")
-      Promise.all([catalog(), settingIntegration()]).then((res) => {
+    const catalog = () => this.$axios.get("/entries/catalog");
+    const settingIntegration = () =>
+      this.$axios.get("/customers/setting/integrations");
+    Promise.all([catalog(), settingIntegration()])
+      .then((res) => {
         const [catalog, settingIntegration] = res;
         this.catalogs = catalog.data.accountingCatalog;
         this.integrationSettingForm.accountingCatalog =
           settingIntegration.data.integrations.catalog;
-          this.filteredCatalog = this.catalogs.filter(c => c.id == this.integrationSettingForm.accountingCatalog);
+        this.filteredCatalog = this.catalogs.filter(
+          (c) => c.id == this.integrationSettingForm.accountingCatalog
+        );
         this.pageloading = false;
       })
       .catch((err) => {
@@ -109,7 +113,7 @@ export default {
       pageloading: true,
       cogInfo: "",
       catalogs: [],
-      filteredCatalog:[],
+      filteredCatalog: [],
       tab: "integrations",
       integrationSettingForm: {
         accountingCatalog: "",
@@ -120,19 +124,18 @@ export default {
     async fetchSettingCustumerIntegration() {
       const { data } = await this.$axios.get("/customers/setting/integrations");
       this.pageloading = false;
-      this.integrationSettingForm.accountingCatalog =
-        data.integrations.catalog;
+      this.integrationSettingForm.accountingCatalog = data.integrations.catalog;
     },
-    findAccount(query){
-      if(query !==""){
-        this.$axios.get("entries/catalog",{params: {search: query.toLowerCase()}})
-        .then((res) =>{
-          this.filteredCatalog = res.data.accountingCatalog;
-        })
+    findAccount(query) {
+      if (query !== "") {
+        this.$axios
+          .get("entries/catalog", { params: { search: query.toLowerCase() } })
+          .then((res) => {
+            this.filteredCatalog = res.data.accountingCatalog;
+          })
           .catch((err) => (this.errorMessage = err.response.data.message));
-        
-      }else{
-        this.filteredCatalog =[];
+      } else {
+        this.filteredCatalog = [];
       }
     },
     submitSettingsIntegrations(formName, { accountingCatalog }) {
@@ -162,9 +165,8 @@ export default {
                       message: res.data.message,
                     });
                     this.pageloading = true;
-                    this.filteredCatalog=[];
+                    this.filteredCatalog = [];
                     this.fetchSettingCustumerIntegration();
-
                   })
                   .catch((err) => {
                     this.$notify.error({
