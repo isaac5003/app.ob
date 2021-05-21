@@ -29,7 +29,8 @@
             default-first-option
             clearable
             v-model="newEntryDetailForm.accountingCatalog"
-            placeholder="Escribe el numero o nombre de la cuenta"
+            placeholder="Escribe el 
+número o nombre de la cuenta"
             :remote-method="findAccount"
             :loading="loadingAccount"
             class="w-full"
@@ -591,6 +592,7 @@ export default {
       return resutls;
     },
     addToEntryDetails(formName, data) {
+      
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -599,9 +601,8 @@ export default {
           ...data,
           code: this.filteredCatalog.find((c) => c.id == data.accountingCatalog)
             .code,
-            
             });
-         console.log(this.accountingEntryDetails)
+       
         this.showNewEntryDetail = false;
         this.checkEntry();
       });
@@ -662,6 +663,7 @@ export default {
     },
 
     openEditEntryDetail(index, details) {
+      
       this.editingEntryDetail = index;
       this.editEntryDetailForm = { ...details };
       this.filteredCatalog = this.accountingCatalog.filter(
