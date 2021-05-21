@@ -1118,6 +1118,8 @@
                   clearable
                   v-model="specialAccounts.curre_lost"
                   placeholder="Escribe el numero o nombre de la cuenta"
+                  class="w-full"
+                  size="small"
                   :remote-method="findAccount"
                   :loading="loadingAccount"
                   @focus="filteredCatalog = []"
@@ -1383,9 +1385,9 @@ export default {
     const name = Object.keys(localStorage).find((k) =>
       k.startsWith(storagekey)
     );
-    console.log(name);
+
     const value = JSON.parse(localStorage.getItem(name));
-    console.log(value);
+
     // Se ubica en el tab correcto
     if (this.$route.query.tab) {
       this.tab = this.$route.query.tab;
@@ -1439,6 +1441,14 @@ export default {
           }
           return obj;
         });
+
+        this.filteredCatalog = this.catalogs.filter(
+          (ac) =>
+            ac.id == this.specialAccounts.accum_gain ||
+            ac.id == this.specialAccounts.accum_lost ||
+            ac.id == this.specialAccounts.curre_gain ||
+            ac.id == this.specialAccounts.curre_lost
+        );
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
