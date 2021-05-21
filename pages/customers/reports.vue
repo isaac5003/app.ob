@@ -205,7 +205,6 @@ export default {
             const { name, nit, nrc } = bussinesInfo.data.info;
             const values = [];
             const emptyRow = [{}, {}, {}, {}, {}];
-            console.log(customersData);
 
             for (const c of customersData) {
               values.push(emptyRow);

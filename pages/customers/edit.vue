@@ -510,7 +510,7 @@ export default {
       })
       .catch((err) => {
         console.error(err);
-        this.$message.error(err.data.message);
+        this.$message.error(err.response.data.message);
         this.$router.push("/customers");
       })
       .then((alw) => (this.pageloading = false));
