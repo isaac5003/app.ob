@@ -53,6 +53,14 @@
             <span>example@axample.com</span>
           </div>
         </div>
+        <div class="flex justify-end">
+          <el-button
+            size="small"
+            @click="showViewPreview = false"
+          >
+            Cerrar
+          </el-button>
+        </div>
       </div>
     </el-dialog>
     <!-- Edit sucursal -->
@@ -441,7 +449,7 @@
           <el-button
             type="primary"
             size="small"
-            @click="showBranchOffices = 'true'"
+            @click="showBranchOffices = true"
           >
             Nueva sucursal
           </el-button>
@@ -451,25 +459,25 @@
         <div class="col-span-3">
           <div class="flex flex-col">
             <span>CLIENTE</span>
-            <span class="text-gray-700">{{ customer ? customer.name : "" }} </span>
+            <span>{{ customer ? customer.name : "" }} </span>
           </div>
         </div>
         <div class="col-span-2">
           <div class="flex flex-col">
             <span>NIT</span>
-            <span class="text-gray-700">{{ customer ? customer.nit : "" }} </span>
+            <span >{{ customer ? customer.nit : "" }} </span>
           </div>
         </div>
         <div class="col-span-1">
           <div class="flex flex-col">
             <span>NRC</span>
-            <span class="text-gray-700">{{ customer ? customer.nrc : "" }} </span>
+            <span>{{ customer ? customer.nrc : "" }} </span>
           </div>
         </div>
         <div class="col-span-3">
           <div class="flex flex-col">
-            <span>Giro</span>
-            <span class="text-gray-700">{{ customer ? customer.giro : "" }} </span>
+            <span>GIRO</span>
+            <span>{{ customer ? customer.giro : "" }} </span>
           </div>
         </div>
       </div>
