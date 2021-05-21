@@ -1442,13 +1442,7 @@ export default {
           return obj;
         });
 
-        this.filteredCatalog = this.catalogs.filter(
-          (ac) =>
-            ac.id == this.specialAccounts.accum_gain ||
-            ac.id == this.specialAccounts.accum_lost ||
-            ac.id == this.specialAccounts.curre_gain ||
-            ac.id == this.specialAccounts.curre_lost
-        );
+        this.filteredCatalog = this.catalogs;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
