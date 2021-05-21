@@ -418,11 +418,12 @@ export default {
   fetch() {
     const entryTypes = () => this.$axios.get(`/entries/types`);
     const entry = () => this.$axios.get(`/entries/${this.$route.query.ref}`);
-
-    Promise.all([entryTypes(), entry()])
+    const accountingCatalog = () => this.$axios.get("/entries/catalog");
+    Promise.all([entryTypes(), entry(), accountingCatalog()])
       .then((res) => {
-        const [entryTypes, entry] = res;
+        const [entryTypes, entry, accountingCatalog] = res;
         this.accountingEntryTypes = entryTypes.data.entryTypes;
+        this.accountingCatalog = accountingCatalog.data.accountingCatalog;
         this.editEntryForm = {
           ...entry.data.entry,
           accountingEntryType: entry.data.entry.accountingEntryType.id,
@@ -665,18 +666,8 @@ export default {
       });
       return result;
     },
-    async getAccountingCatalog() {
-      await this.$axios
-        .get("/entries/catalog")
-        .then((res) => {
-          this.accountingCatalog = res.data.accountingCatalog;
-        })
-        .catch((err) => {
-          this.errorMessage = err.response.data.message;
-        });
-    },
+
     openAddEntryDetail() {
-      this.getAccountingCatalog();
       this.showAddEntryDetail = true;
     },
     resetForm(formName) {
@@ -685,7 +676,6 @@ export default {
       }
     },
     openEditEntryDetail(index, details) {
-      this.getAccountingCatalog();
       this.editingEntryDetail = index;
       this.editEntryDetailForm = { ...details };
       this.filteredCatalog = this.accountingCatalog.filter(
@@ -703,8 +693,7 @@ export default {
           ...data,
           code: this.filteredCatalog.find((c) => c.id == data.accountingCatalog)
             .code,
-            
-            });
+        });
         this.showAddEntryDetail = false;
         this.checkEntry();
       });
@@ -875,7 +864,6 @@ export default {
         this.$router.push("/entries");
       });
     },
-  
   },
   computed: {},
 };
