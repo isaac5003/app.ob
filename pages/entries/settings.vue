@@ -35,18 +35,7 @@
               :min="1"
               size="small"
               autocomplete="off"
-              @change="
-                setStorage(
-                  fiscalPeriodForm,
-                  firmantesForm,
-                  mayorAccountForm,
-                  subAccountForm,
-                  activeAccount,
-                  newDisplayName,
-                  specialAccounts,
-                  newDisplayNameEstado
-                )
-              "
+              @change="setStorage('mayorAccountForm', mayorAccountForm)"
             />
           </el-form-item>
           <el-form-item
@@ -63,18 +52,7 @@
               maxlength="100"
               minlength="3"
               show-word-limit
-              @change="
-                setStorage(
-                  fiscalPeriodForm,
-                  firmantesForm,
-                  mayorAccountForm,
-                  subAccountForm,
-                  activeAccount,
-                  newDisplayName,
-                  specialAccounts,
-                  newDisplayNameEstado
-                )
-              "
+              @change="setStorage('mayorAccountForm', mayorAccountForm)"
             />
           </el-form-item>
           <el-form-item class="col-span-2">
@@ -84,18 +62,7 @@
               class="mt-5"
               style="width: 100%"
               v-model="item.isAcreedora"
-              @change="
-                setStorage(
-                  fiscalPeriodForm,
-                  firmantesForm,
-                  mayorAccountForm,
-                  subAccountForm,
-                  activeAccount,
-                  newDisplayName,
-                  specialAccounts,
-                  newDisplayNameEstado
-                )
-              "
+              @change="setStorage('mayorAccountForm', mayorAccountForm)"
             >
               Acreedora
             </el-checkbox>
@@ -107,18 +74,7 @@
               class="mt-5"
               style="width: 100%"
               v-model="item.isBalance"
-              @change="
-                setStorage(
-                  fiscalPeriodForm,
-                  firmantesForm,
-                  mayorAccountForm,
-                  subAccountForm,
-                  activeAccount,
-                  newDisplayName,
-                  specialAccounts,
-                  newDisplayNameEstado
-                )
-              "
+              @change="setStorage('mayorAccountForm', mayorAccountForm)"
             >
               Balance
             </el-checkbox>
@@ -196,18 +152,7 @@
               type="number"
               :min="1"
               size="small"
-              @change="
-                setStorage(
-                  fiscalPeriodForm,
-                  firmantesForm,
-                  mayorAccountForm,
-                  subAccountForm,
-                  activeAccount,
-                  newDisplayName,
-                  specialAccounts,
-                  newDisplayNameEstado
-                )
-              "
+              @change="setStorage('activeAccount', activeAccount)"
             />
           </el-form-item>
           <el-form-item
@@ -230,18 +175,7 @@
             <el-input
               v-model="activeAccount.name"
               size="small"
-              @change="
-                setStorage(
-                  fiscalPeriodForm,
-                  firmantesForm,
-                  mayorAccountForm,
-                  subAccountForm,
-                  activeAccount,
-                  newDisplayName,
-                  specialAccounts,
-                  newDisplayNameEstado
-                )
-              "
+              @change="setStorage('activeAccount', activeAccount)"
             />
           </el-form-item>
           <el-form-item prop="service" class="col-span-2">
@@ -251,18 +185,7 @@
               size="small"
               border
               class="w-full mt-5"
-              @change="
-                setStorage(
-                  fiscalPeriodForm,
-                  firmantesForm,
-                  mayorAccountForm,
-                  subAccountForm,
-                  activeAccount,
-                  newDisplayName,
-                  specialAccounts,
-                  newDisplayNameEstado
-                )
-              "
+              @change="setStorage('activeAccount', activeAccount)"
             />
           </el-form-item>
           <el-form-item prop="service" class="col-span-2">
@@ -272,18 +195,7 @@
               size="small"
               border
               class="w-full mt-5"
-              @change="
-                setStorage(
-                  fiscalPeriodForm,
-                  firmantesForm,
-                  mayorAccountForm,
-                  subAccountForm,
-                  activeAccount,
-                  newDisplayName,
-                  specialAccounts,
-                  newDisplayNameEstado
-                )
-              "
+              @change="setStorage('activeAccount', activeAccount)"
             />
           </el-form-item>
         </div>
@@ -347,18 +259,7 @@
                   :min="1"
                   size="small"
                   autocomplete="off"
-                  @change="
-                    setStorage(
-                      fiscalPeriodForm,
-                      firmantesForm,
-                      mayorAccountForm,
-                      subAccountForm,
-                      activeAccount,
-                      newDisplayName,
-                      specialAccounts,
-                      newDisplayNameEstado
-                    )
-                  "
+                  @change="setStorage('subAccountForm', subAccountForm)"
                 />
               </el-form-item>
               <div class="col-span-5">
@@ -381,18 +282,7 @@
                       maxlength="100"
                       minlength="3"
                       show-word-limit
-                      @change="
-                        setStorage(
-                          fiscalPeriodForm,
-                          firmantesForm,
-                          mayorAccountForm,
-                          subAccountForm,
-                          activeAccount,
-                          newDisplayName,
-                          specialAccounts,
-                          newDisplayNameEstado
-                        )
-                      "
+                      @change="setStorage('subAccountForm', subAccountForm)"
                     />
                   </el-form-item>
                   <el-form-item class="col-span-6" label="Descripción">
@@ -404,18 +294,7 @@
                       maxlength="100"
                       minlength="3"
                       show-word-limit
-                      @change="
-                        setStorage(
-                          fiscalPeriodForm,
-                          firmantesForm,
-                          mayorAccountForm,
-                          subAccountForm,
-                          activeAccount,
-                          newDisplayName,
-                          specialAccounts,
-                          newDisplayNameEstado
-                        )
-                      "
+                      @change="setStorage('subAccountForm', subAccountForm)"
                     />
                   </el-form-item>
                 </div>
@@ -427,18 +306,7 @@
                   class="mt-5"
                   style="width: 100%"
                   v-model="item.isAcreedora"
-                  @change="
-                    setStorage(
-                      fiscalPeriodForm,
-                      firmantesForm,
-                      mayorAccountForm,
-                      subAccountForm,
-                      activeAccount,
-                      newDisplayName,
-                      specialAccounts,
-                      newDisplayNameEstado
-                    )
-                  "
+                  @change="setStorage('subAccountForm', subAccountForm)"
                 >
                   Acreedora
                 </el-checkbox>
@@ -450,18 +318,7 @@
                   class="mt-5"
                   style="width: 100%"
                   v-model="subAccountForm.items[i].isBalance"
-                  @change="
-                    setStorage(
-                      fiscalPeriodForm,
-                      firmantesForm,
-                      mayorAccountForm,
-                      subAccountForm,
-                      activeAccount,
-                      newDisplayName,
-                      specialAccounts,
-                      newDisplayNameEstado
-                    )
-                  "
+                  @change="setStorage('subAccountForm', subAccountForm)"
                 >
                   Balance
                 </el-checkbox>
@@ -574,18 +431,7 @@
                 :min="1"
                 size="small"
                 :disabled="activeAccount.subAccounts"
-                @change="
-                  setStorage(
-                    fiscalPeriodForm,
-                    firmantesForm,
-                    mayorAccountForm,
-                    subAccountForm,
-                    activeAccount,
-                    newDisplayName,
-                    specialAccounts,
-                    newDisplayNameEstado
-                  )
-                "
+                @change="setStorage('activeAccount', activeAccount)"
               />
             </el-form-item>
             <el-form-item
@@ -608,18 +454,7 @@
               <el-input
                 v-model="activeAccount.name"
                 size="small"
-                @change="
-                  setStorage(
-                    fiscalPeriodForm,
-                    firmantesForm,
-                    mayorAccountForm,
-                    subAccountForm,
-                    activeAccount,
-                    newDisplayName,
-                    specialAccounts,
-                    newDisplayNameEstado
-                  )
-                "
+                @change="setStorage('activeAccount', activeAccount)"
               />
             </el-form-item>
             <el-form-item
@@ -630,18 +465,7 @@
               <el-input
                 v-model="activeAccount.description"
                 size="small"
-                @change="
-                  setStorage(
-                    fiscalPeriodForm,
-                    firmantesForm,
-                    mayorAccountForm,
-                    subAccountForm,
-                    activeAccount,
-                    newDisplayName,
-                    specialAccounts,
-                    newDisplayNameEstado
-                  )
-                "
+                @change="setStorage('activeAccount', activeAccount)"
               />
             </el-form-item>
             <el-form-item class="col-span-2">
@@ -651,18 +475,7 @@
                 size="small"
                 border
                 class="w-full mt-5"
-                @change="
-                  setStorage(
-                    fiscalPeriodForm,
-                    firmantesForm,
-                    mayorAccountForm,
-                    subAccountForm,
-                    activeAccount,
-                    newDisplayName,
-                    specialAccounts,
-                    newDisplayNameEstado
-                  )
-                "
+                @change="setStorage('activeAccount', activeAccount)"
               />
             </el-form-item>
             <el-form-item class="col-span-2">
@@ -672,18 +485,7 @@
                 size="small"
                 border
                 class="w-full mt-5"
-                @change="
-                  setStorage(
-                    fiscalPeriodForm,
-                    firmantesForm,
-                    mayorAccountForm,
-                    subAccountForm,
-                    activeAccount,
-                    newDisplayName,
-                    specialAccounts,
-                    newDisplayNameEstado
-                  )
-                "
+                @change="setStorage('activeAccount', activeAccount)"
               />
             </el-form-item>
           </div>
@@ -714,7 +516,7 @@
     <!-- BALANCE General
     ADDaccount -->
     <el-dialog
-      :title="`Agregar cuenta a: ${selectedParentAccount.name}`"
+      :title="`Agregar cuenta a1: ${selectedParentAccount.name}`"
       :visible.sync="showAddAccount"
       width="500px"
       :append-to-body="true"
@@ -736,6 +538,7 @@
             class="w-full"
             size="small"
             @focus="filterCatalog = []"
+            @change="setStorage('selectedCatalog', selectedCatalog)"
           >
             <el-option
               v-for="item in filteredCatalog"
@@ -873,6 +676,7 @@
             :loading="loadingAccount"
             class="w-full"
             size="small"
+            @change="setStorage('selectedCatalogEstado', selectedCatalogEstado)"
           >
             <el-option
               v-for="item in filteredCatalog"
@@ -1076,7 +880,7 @@
                 filterable
                 clearable
                 placeholder=""
-                @change="setStorage(firmantesForm)"
+                @change="setStorage('firmantesForm', firmantesForm)"
               >
               </el-input>
             </el-form-item>
@@ -1093,7 +897,7 @@
                 filterable
                 clearable
                 placeholder=""
-                @change="setStorage(firmantesForm)"
+                @change="setStorage('firmantesForm', firmantesForm)"
               >
               </el-input>
             </el-form-item>
@@ -1234,27 +1038,20 @@
               <el-form-item label="Utilidad ejercicios anteriores">
                 <el-select
                   filterable
+                  remote
                   default-first-option
                   clearable
                   v-model="specialAccounts.accum_gain"
                   placeholder="Escribe el numero o nombre de la cuenta"
+                  :remote-method="findAccount"
+                  :loading="loadingAccount"
                   class="w-full"
                   size="small"
-                  @change="
-                    setStorage(
-                      fiscalPeriodForm,
-                      firmantesForm,
-                      mayorAccountForm,
-                      subAccountForm,
-                      activeAccount,
-                      newDisplayName,
-                      specialAccounts,
-                      newDisplayNameEstado
-                    )
-                  "
+                  @focus="filteredCatalog = []"
+                  @change="setStorage('specialAccounts', specialAccounts)"
                 >
                   <el-option
-                    v-for="item in catalogs"
+                    v-for="item in filteredCatalog"
                     :key="item.id"
                     :label="`${item.code} - ${item.name}`"
                     :value="item.id"
@@ -1265,6 +1062,7 @@
             <div class="col-span-3">
               <el-form-item label="Perdida ejercicios anteriores">
                 <el-select
+                  remote
                   filterable
                   default-first-option
                   clearable
@@ -1272,21 +1070,13 @@
                   placeholder="Escribe el numero o nombre de la cuenta"
                   class="w-full"
                   size="small"
-                  @change="
-                    setStorage(
-                      fiscalPeriodForm,
-                      firmantesForm,
-                      mayorAccountForm,
-                      subAccountForm,
-                      activeAccount,
-                      newDisplayName,
-                      specialAccounts,
-                      newDisplayNameEstado
-                    )
-                  "
+                  :remote-method="findAccount"
+                  :loading="loadingAccount"
+                  @focus="filteredCatalog = []"
+                  @change="setStorage('specialAccounts', specialAccounts)"
                 >
                   <el-option
-                    v-for="item in catalogs"
+                    v-for="item in filteredCatalog"
                     :key="item.id"
                     :label="`${item.code} - ${item.name}`"
                     :value="item.id"
@@ -1297,6 +1087,7 @@
             <div class="col-span-3">
               <el-form-item label="Utilidad presente ejercicio">
                 <el-select
+                  remote
                   filterable
                   default-first-option
                   clearable
@@ -1304,21 +1095,13 @@
                   placeholder="Escribe el numero o nombre de la cuenta"
                   class="w-full"
                   size="small"
-                  @change="
-                    setStorage(
-                      fiscalPeriodForm,
-                      firmantesForm,
-                      mayorAccountForm,
-                      subAccountForm,
-                      activeAccount,
-                      newDisplayName,
-                      specialAccounts,
-                      newDisplayNameEstado
-                    )
-                  "
+                  :remote-method="findAccount"
+                  :loading="loadingAccount"
+                  @focus="filteredCatalog = []"
+                  @change="setStorage('specialAccounts', specialAccounts)"
                 >
                   <el-option
-                    v-for="item in catalogs"
+                    v-for="item in filteredCatalog"
                     :key="item.id"
                     :label="`${item.code} - ${item.name}`"
                     :value="item.id"
@@ -1329,28 +1112,19 @@
             <div class="col-span-3">
               <el-form-item label="Perdida presente ejercicio">
                 <el-select
+                  remote
                   filterable
                   default-first-option
                   clearable
                   v-model="specialAccounts.curre_lost"
                   placeholder="Escribe el numero o nombre de la cuenta"
-                  class="w-full"
-                  size="small"
-                  @change="
-                    setStorage(
-                      fiscalPeriodForm,
-                      firmantesForm,
-                      mayorAccountForm,
-                      subAccountForm,
-                      activeAccount,
-                      newDisplayName,
-                      specialAccounts,
-                      newDisplayNameEstado
-                    )
-                  "
+                  :remote-method="findAccount"
+                  :loading="loadingAccount"
+                  @focus="filteredCatalog = []"
+                  @change="setStorage('specialAccounts', specialAccounts)"
                 >
                   <el-option
-                    v-for="item in catalogs"
+                    v-for="item in filteredCatalog"
                     :key="item.id"
                     :label="`${item.code} - ${item.name}`"
                     :value="item.id"
