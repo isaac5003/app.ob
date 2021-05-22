@@ -592,7 +592,6 @@ export default {
       return resutls;
     },
     addToEntryDetails(formName, data) {
-      
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -601,8 +600,8 @@ export default {
           ...data,
           code: this.filteredCatalog.find((c) => c.id == data.accountingCatalog)
             .code,
-            });
-       
+        });
+
         this.showNewEntryDetail = false;
         this.checkEntry();
       });
@@ -653,7 +652,7 @@ export default {
           .get("/entries/catalog", { params: { search: query.toLowerCase() } })
           .then((res) => {
             this.filteredCatalog = res.data.accountingCatalog;
-         
+
             this.loadingAccount = false;
           })
           .catch((err) => (this.errorMessage = err.response.data.message));
@@ -663,7 +662,6 @@ export default {
     },
 
     openEditEntryDetail(index, details) {
-      
       this.editingEntryDetail = index;
       this.editEntryDetailForm = { ...details };
       this.filteredCatalog = this.accountingCatalog.filter(
@@ -681,7 +679,6 @@ export default {
           code: this.filteredCatalog.find((c) => c.id == form.accountingCatalog)
             .code,
         });
-        this.accountingEntryDetails;
 
         this.showEditEntryDetail = false;
         this.checkEntry();

@@ -1,6 +1,6 @@
 <template>
   <div class="flex">
-    <layout-submenu page-name="IVA" :menu="menu" icon="duplicate" />
+    <layout-submenu page-name="IVA" :menu="menu" icon="receipt-tax" />
     <nuxt-child />
   </div>
 </template>
@@ -30,11 +30,11 @@ export default {
           path: "/taxes",
           epath: ["/taxes/edit"],
         },
-         {
-          name: "Reportes",
-          icon: getIcon("document-text"),
-          path: "/taxes/reports",
-        }, 
+        //  {
+        //   name: "Reportes",
+        //   icon: getIcon("document-text"),
+        //   path: "/taxes/reports",
+        // }, 
       ],
     };
   },
