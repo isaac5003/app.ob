@@ -507,8 +507,6 @@ export default {
         this.inactiveService = inactiveService.data.services;
         this.statuses = status.data.statuses;
         this.loading = false;
-        console.log(activeCustomers.data.customers);
-        console.log(inactiveCustomers.data.customers);
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message
@@ -655,7 +653,6 @@ export default {
             break;
           case "listadoVentas":
             this.sellignReports(customer, dateRange, invoiceType, radioType);
-            console.log("DDDDDD", customer, dateRange, invoiceType, radioType);
             break;
         }
       });
@@ -992,7 +989,6 @@ export default {
       }
     },
     sellignReports(customer, dateRange, invoiceType, radioType) {
-      console.log(customer, dateRange, invoiceType, radioType);
       const startDate = dateRange[0];
       const endDate = dateRange[1];
 
@@ -1012,10 +1008,9 @@ export default {
             const [bussinesInfo, generales] = res;
             const { name, nit, nrc } = bussinesInfo.data.info;
             const general = generales.data.report;
-            console.log(general);
 
             const values = [];
-            const emptyRow = [{}, {}, {}, {}, {}, {}, {}, {}, {}];
+            const emptyRow = [{}, {}, {}, {}, {}];
 
             for (const r of general) {
               values.push(emptyRow);
@@ -1028,52 +1023,21 @@ export default {
                 {},
                 {},
                 {},
-                {},
-                {},
-                {},
-                {},
               ]);
               for (const d of r.documents) {
                 values.push([
+                  {},
                   {
                     bold: false,
                     text: d.customer,
                   },
-
                   {
                     bold: false,
                     text: d.date,
-                    alignment: "right",
                   },
                   {
                     bold: false,
                     text: d.documentNumber,
-                    alignment: "right",
-                  },
-                  {
-                    bold: false,
-                    text: this.$options.filters.formatMoney(d.vGravada),
-                    alignment: "right",
-                  },
-                  {
-                    bold: false,
-                    text: this.$options.filters.formatMoney(d.vNSujeta),
-                    alignment: "right",
-                  },
-                  {
-                    bold: false,
-                    text: this.$options.filters.formatMoney(d.vExenta),
-                    alignment: "right",
-                  },
-                  {
-                    bold: false,
-                    text: this.$options.filters.formatMoney(d.iva),
-                    alignment: "right",
-                  },
-                  {
-                    bold: false,
-                    text: this.$options.filters.formatMoney(d.ivaRetenido),
-                    alignment: "right",
                   },
                   {
                     bold: false,
@@ -1083,44 +1047,6 @@ export default {
                 ]);
               }
               values.push(emptyRow);
-              values.push([
-                {
-                  bold: true,
-                  text: r.count + ` Registros para ` + r.code,
-                },
-                {},
-                {},
-                {
-                  bold: true,
-                  text: this.$options.filters.formatMoney(r.vGravadaTotal),
-                  alignment: "right",
-                },
-                {
-                  bold: true,
-                  text: this.$options.filters.formatMoney(r.vNSujetaTotal),
-                  alignment: "right",
-                },
-                {
-                  bold: true,
-                  text: this.$options.filters.formatMoney(r.vExentaTotal),
-                  alignment: "right",
-                },
-                {
-                  bold: true,
-                  text: this.$options.filters.formatMoney(r.ivaTotal),
-                  alignment: "right",
-                },
-                {
-                  bold: true,
-                  text: this.$options.filters.formatMoney(r.ivaRetenidoTotal),
-                  alignment: "right",
-                },
-                {
-                  bold: true,
-                  text: this.$options.filters.formatMoney(r.totalTotal),
-                  alignment: "right",
-                },
-              ]);
             }
 
             const docDefinition = {
@@ -1151,20 +1077,14 @@ export default {
                   layout: "noBorders",
                   table: {
                     headerRows: 1,
-                    widths: [
-                      "38%",
-                      "7%",
-                      "10%",
-                      "9%",
-                      "6%",
-                      "6%",
-                      "7.5%",
-                      "7.5%",
-                      "9%",
-                    ],
+                    widths: ["15%", "40%", "15%", "15%", "15%"],
                     heights: -5,
                     body: [
                       [
+                        {
+                          text: "TIPO",
+                          style: "tableHeader",
+                        },
                         {
                           text: "CLIENTE",
                           style: "tableHeader",
@@ -1175,31 +1095,6 @@ export default {
                         },
                         {
                           text: "DOC. N°",
-                          style: "tableHeader",
-                        },
-                        {
-                          alignment: "right",
-                          text: "V. GRAV.",
-                          style: "tableHeader",
-                        },
-                        {
-                          alignment: "right",
-                          text: "V. SUJ.",
-                          style: "tableHeader",
-                        },
-                        {
-                          alignment: "right",
-                          text: "V. EXEN.",
-                          style: "tableHeader",
-                        },
-                        {
-                          alignment: "right",
-                          text: "13% IVA",
-                          style: "tableHeader",
-                        },
-                        {
-                          alignment: "right",
-                          text: "IVA RET.",
                           style: "tableHeader",
                         },
                         {
