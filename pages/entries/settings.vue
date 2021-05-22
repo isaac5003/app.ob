@@ -1449,12 +1449,12 @@ export default {
       })
       .then((alw) => (this.pageloading = false));
 
-    checkBeforeEnter(this, name, value, name.replace(`${storagekey}-`, ""));
+    //checkBeforeEnter(this, name, value, name.replace(`${storagekey}-`, ""));
   },
   fetchOnServer: false,
-  beforeRouteLeave(to, from, next) {
+  /* beforeRouteLeave(to, from, next) {
     checkBeforeLeave(this, storagekey, next);
-  },
+  }, */
   data() {
     return {
       pageloading: true,
