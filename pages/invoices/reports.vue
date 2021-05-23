@@ -1014,19 +1014,12 @@ export default {
 
             for (const r of general) {
               values.push(emptyRow);
-              values.push([
-                {
-                  bold: true,
-                  text: r.code,
-                },
-                {},
-                {},
-                {},
-                {},
-              ]);
               for (const d of r.documents) {
                 values.push([
-                  {},
+                  {
+                    bold: true,
+                    text: r.code,
+                  },
                   {
                     bold: false,
                     text: d.customer,
@@ -1132,35 +1125,16 @@ export default {
 
             for (const r of general) {
               data.push([""]);
-              data.push([r.code, "", "", "", "", "", "", "", ""]);
               for (const d of r.documents) {
                 data.push([
+                  r.code,
                   d.customer,
-
                   d.date,
-
                   d.documentNumber,
-                  d.vGravada,
-                  d.vNSujeta,
-                  d.vExenta,
-                  d.iva,
-                  d.ivaRetenido,
                   d.total,
                 ]);
               }
               data.push([""]);
-              data.push([
-                r.count + ` Registros para ` + r.code,
-
-                "",
-                "",
-                r.vGravadaTotal,
-                r.vNSujetaTotal,
-                r.vExentaTotal,
-                r.ivaTotal,
-                r.ivaRetenidoTotal,
-                r.totalTotal,
-              ]);
             }
             const document = [
               [name],
@@ -1176,17 +1150,7 @@ export default {
                 `NRC: ${nrc}`,
               ],
               [""],
-              [
-                "CLIENTE",
-                "FECHA",
-                "DOC N°",
-                "V. GRAV.",
-                "V. SUJ.",
-                "V. EXEN.",
-                "13% IVA",
-                "IVA RET.",
-                "V. TOTAL",
-              ],
+              ["TIPO", "CLIENTE", "FECHA", "DOC N°", "V. TOTAL"],
 
               ...data,
             ];
