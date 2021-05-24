@@ -77,7 +77,9 @@
           </div>
           <div class="col-span-8 border border-gray-400 rounded-md text-xs">
             <div class="flex justify-between items-center px-6 py-3">
-              <span class="text-sm font-semibold">{{ follow.followName }}</span>
+              <span class="text-sm font-semibold"
+                >{{ follow.followName }}5555</span
+              >
               <div class="flex flex-col">
                 <span class="font-semibold">Seguimiento realizado por:</span>
                 <span>{{ follow.followerName }}</span>

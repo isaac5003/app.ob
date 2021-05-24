@@ -24,7 +24,7 @@ export default {
       menu: [
         {
           name: "Listados de cuentas por cobrar",
-          icon: getIcon("plus"),
+          icon: getIcon("menu"),
           path: "/receivable",
         },
         {
