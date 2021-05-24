@@ -541,7 +541,7 @@
               /></el-button>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item>
-                  <i class="el-icon-edit"></i>Editar Sucursales
+                  <i class="el-icon-edit"></i>Editar sucursales
                 </el-dropdown-item>
                 <el-dropdown-item>
                   <i class="el-icon-close"></i>Desactivar sucursales
@@ -560,7 +560,7 @@
                   <i class="el-icon-view"></i> Vista previa
                 </el-dropdown-item>
                 <el-dropdown-item @click.native="openEditPreview(scope.row)">
-                  <i class="el-icon-edit-outline"></i> Editar Sucursales
+                  <i class="el-icon-edit-outline"></i> Editar sucursal
                 </el-dropdown-item>
                 <el-dropdown-item>
                   <i class="el-icon-map-location"></i>Definir como principal
