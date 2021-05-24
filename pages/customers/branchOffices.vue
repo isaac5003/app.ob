@@ -14,50 +14,47 @@
       :append-to-body="true"
       width="900px"
     >
-      <div class=" flex flex-col space-y-6">
+      <div class="flex flex-col space-y-6">
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-5 flex flex-col">
-            <span class=" font-semibold">Nombre de sucursal</span>
+            <span class="font-semibold">Nombre de sucursal</span>
             <span>Grupo agropecuario de El Salvador S.A C.V</span>
           </div>
           <div class="col-span-2 flex flex-col">
-            <span class=" font-semibold">Pais</span>
+            <span class="font-semibold">Pais</span>
             <span>El Salvador</span>
           </div>
           <div class="col-span-2 flex flex-col">
-            <span class=" font-semibold">Deparmento</span>
+            <span class="font-semibold">Deparmento</span>
             <span>San Salvador</span>
           </div>
           <div class="col-span-2 flex flex-col">
-            <span class=" font-semibold">Municipio</span>
+            <span class="font-semibold">Municipio</span>
             <span>Cuscatancingo</span>
           </div>
         </div>
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-3 flex flex-col">
-            <span class=" font-semibold">Dirección 1</span>
+            <span class="font-semibold">Dirección 1</span>
             <span>Avenida los naranjo</span>
           </div>
           <div class="col-span-3 flex flex-col">
-            <span class=" font-semibold">Dirección 2</span>
+            <span class="font-semibold">Dirección 2</span>
             <span>calle wascoran</span>
           </div>
         </div>
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-3 flex flex-col">
-            <span class=" font-semibold">Teléfono</span>
+            <span class="font-semibold">Teléfono</span>
             <span>+503 0000-0000</span>
           </div>
           <div class="col-span-3 flex flex-col">
-            <span class=" font-semibold">Correo</span>
+            <span class="font-semibold">Correo</span>
             <span>example@axample.com</span>
           </div>
         </div>
         <div class="flex justify-end">
-          <el-button
-            size="small"
-            @click="showViewPreview = false"
-          >
+          <el-button size="small" @click="showViewPreview = false">
             Cerrar
           </el-button>
         </div>
@@ -150,7 +147,11 @@
                 <el-option> </el-option>
               </el-input>
             </el-form-item>
-            <el-form-item label="Dirección 2" class="col-span-4" prop="address1">
+            <el-form-item
+              label="Dirección 2"
+              class="col-span-4"
+              prop="address1"
+            >
               <el-input
                 v-model="editOfficeForm.address1"
                 type="text"
@@ -222,7 +223,12 @@
       @close="closeDialog('addOfficeNewForm', 'new')"
     >
       <div class="flex flex-col space-y-2">
-        <el-form :model="addOfficeNewForm"   :rules="editOfficeFormRules" status-icon ref="addOfficeNewForm">
+        <el-form
+          :model="addOfficeNewForm"
+          :rules="editOfficeFormRules"
+          status-icon
+          ref="addOfficeNewForm"
+        >
           <!-- Seleccion de pais,departamento y municipio -->
           <div
             class="space-y-4"
@@ -232,7 +238,7 @@
             <div class="grid grid-cols-12 mt-4">
               <div class="col-span-12">
                 <div class="flex justify-between">
-                  <span class="text-lg font-semibold">
+                  <span class="text-lg text-gray-900">
                     Nueva sucursal {{ i + 1 }}
                   </span>
                   <el-button
@@ -240,8 +246,7 @@
                     size="mini"
                     type="danger"
                     :disabled="addOfficeNewForm.items.length === 1"
-                    @click="removeOffice(i);" 
-                    
+                    @click="removeOffice(i)"
                     ><i class="el-icon-delete"></i
                   ></el-button>
                 </div>
@@ -280,7 +285,7 @@
                 label="Departamento"
                 :prop="`items.${i}.state`"
                 class="col-span-4"
-                   :rules="{
+                :rules="{
                   required: true,
                   message: 'Requerido',
                   trigger: 'change',
@@ -304,16 +309,16 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item 
-            label="Municipio"
-             class="col-span-4"
-             :prop="`items.${i}.city`"
-             :rules="{
-               required:true,
-               message:'Requerido',
-               trigger:'change'
-             }"
-             >
+              <el-form-item
+                label="Municipio"
+                class="col-span-4"
+                :prop="`items.${i}.city`"
+                :rules="{
+                  required: true,
+                  message: 'Requerido',
+                  trigger: 'change',
+                }"
+              >
                 <el-select
                   v-model="item.city"
                   class="w-full"
@@ -334,15 +339,15 @@
             </div>
             <!-- Direcciones -->
             <div class="grid grid-cols-12 gap-4">
-              <el-form-item 
-              label="Dirección 1" 
-              class="col-span-4"
-              :prop="`items.${i}.address`"
-              :rules="{
-                required:true,
-                message:'Requerido',
-                trigger: 'change'
-              }"
+              <el-form-item
+                label="Dirección 1"
+                class="col-span-4"
+                :prop="`items.${i}.address`"
+                :rules="{
+                  required: true,
+                  message: 'Requerido',
+                  trigger: 'change',
+                }"
               >
                 <el-input
                   v-model="item.address"
@@ -355,16 +360,16 @@
                   <el-option> </el-option>
                 </el-input>
               </el-form-item>
-              <el-form-item 
-              label="Dirección 2"
-               class="col-span-4"
-               :prop="`items.${i}.address1`"
-               :rules="{
-                 required:true,
-                 message:'Requerido',
-                 trigger: 'change'
-               }"
-               >
+              <el-form-item
+                label="Dirección 2"
+                class="col-span-4"
+                :prop="`items.${i}.address1`"
+                :rules="{
+                  required: true,
+                  message: 'Requerido',
+                  trigger: 'change',
+                }"
+              >
                 <el-input
                   v-model="item.address1"
                   type="text"
@@ -379,18 +384,18 @@
               </el-form-item>
             </div>
             <!-- Contactos -->
-            <h1 class="text-blue-500">Contacto</h1>
+            <h1 class="text-blue-700">Contacto</h1>
             <div class="grid grid-cols-12 gap-4 mt-4 border-b-2">
-              <el-form-item 
-              label="Teléfono"
-               class="col-span-4"
-               :prop="`items.${i}.phone`"
-               :rules="{
-                 required:true,
-                 message:'Requerido',
-                 trigger:'change'
-               }"
-               >
+              <el-form-item
+                label="Teléfono"
+                class="col-span-4"
+                :prop="`items.${i}.phone`"
+                :rules="{
+                  required: true,
+                  message: 'Requerido',
+                  trigger: 'change',
+                }"
+              >
                 <el-input
                   v-model="item.phone"
                   placeholder="0000-0000"
@@ -401,10 +406,11 @@
                   <el-option> </el-option>
                 </el-input>
               </el-form-item>
-              <el-form-item label="Correo electronico"
-               class="col-span-4"
+              <el-form-item
+                label="Correo electronico"
+                class="col-span-4"
                 prop="email"
-               >
+              >
                 <el-input
                   v-model="item.email"
                   class="w-full"
@@ -455,32 +461,38 @@
           </el-button>
         </div>
       </div>
-      <div class="grid grid-cols-12 gap-4 text-xs">
-        <div class="col-span-3">
-          <div class="flex flex-col">
-            <span>CLIENTE</span>
-            <span>{{ customer ? customer.name : "" }} </span>
+      <el-form>
+        <div class="grid grid-cols-12 gap-4 text-xs">
+          <div class="col-span-3">
+            <div class="flex flex-col">
+              <span>CLIENTE</span>
+              <el-form-item :label="`${customer ? customer.name : ''}`">
+              </el-form-item>
+            </div>
+          </div>
+          <div class="col-span-2">
+            <div class="flex flex-col">
+              <span>NIT</span>
+              <el-form-item :label="`${customer ? customer.nit : ''}`">
+              </el-form-item>
+            </div>
+          </div>
+          <div class="col-span-1">
+            <div class="flex flex-col">
+              <span>NRC</span>
+              <el-form-item :label="`${customer ? customer.nrc : ''}`">
+              </el-form-item>
+            </div>
+          </div>
+          <div class="col-span-3">
+            <div class="flex flex-col">
+              <span>GIRO</span>
+              <el-form-item :label="`${customer ? customer.giro : ''}`">
+              </el-form-item>
+            </div>
           </div>
         </div>
-        <div class="col-span-2">
-          <div class="flex flex-col">
-            <span>NIT</span>
-            <span >{{ customer ? customer.nit : "" }} </span>
-          </div>
-        </div>
-        <div class="col-span-1">
-          <div class="flex flex-col">
-            <span>NRC</span>
-            <span>{{ customer ? customer.nrc : "" }} </span>
-          </div>
-        </div>
-        <div class="col-span-3">
-          <div class="flex flex-col">
-            <span>GIRO</span>
-            <span>{{ customer ? customer.giro : "" }} </span>
-          </div>
-        </div>
-      </div>
+      </el-form>
 
       <el-table
         :data="tabla"
@@ -635,14 +647,14 @@ export default {
         items: [
           {
             country: "",
-            state:"",
+            state: "",
             city: "",
             address: "",
             address1: "",
             phone: "",
             email: "",
-            states:[],
-            cities:[]
+            states: [],
+            cities: [],
           },
         ],
       },
@@ -702,8 +714,8 @@ export default {
     clearSelect(name, index) {
       switch (name) {
         case "state":
-          this.addOfficeNewForm.items[index].state ="";
-          this.addOfficeNewForm.items[index].city ="";
+          this.addOfficeNewForm.items[index].state = "";
+          this.addOfficeNewForm.items[index].city = "";
           this.addOfficeNewForm.items[index].states = this.rawStates.filter(
             (s) => s.country.id == this.addOfficeNewForm.items[index].country
           );
@@ -727,7 +739,7 @@ export default {
       this.multipleSelection = val;
       console.log(this.multipleSelection.length);
     },
-   
+
     officetAdd() {
       this.addOfficeNewForm.items.push({
         country: "",
