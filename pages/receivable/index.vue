@@ -113,12 +113,14 @@
       :visible.sync="showReceivableFollowing"
       :append-to-body="true"
       :close-on-click-modal="false"
-      width="900px"
+      width="908px"
     >
       <div class="flex flex-col space-y-2">
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-6">
-            <span class="text-lg">Información de cuenta por cobrar</span>
+            <span class="text-base font-semibold"
+              >Información de cuenta por cobrar</span
+            >
             <div class="grid grid-cols-6 gap-4 mt-4 text-xs">
               <div class="flex flex-col col-span-2">
                 <span class="font-semibold">Nº de documento</span>
@@ -151,7 +153,9 @@
               </div>
             </div>
             <div class="grid grid-cols-6 mt-4">
-              <span class="col-span-6 text-lg">Datos de contacto</span>
+              <span class="col-span-6 text-base font-semibold"
+                >Datos de contacto</span
+              >
             </div>
             <div class="grid grid-cols-6 mt-4 text-xs">
               <div class="flex flex-col col-span-3">
@@ -172,8 +176,8 @@
               </div>
             </div>
             <div class="grid grid-cols-6 mt-4">
-              <span class="col-span-6 text-lg"
-                >Información de cuenta por cobrar</span
+              <span class="col-span-6 text-base font-semibold"
+                >Cuentas Pendientes Por Pagar</span
               >
             </div>
             <div class="grid grid-cols-6 mt-4 border border-gray-400">
