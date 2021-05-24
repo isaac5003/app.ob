@@ -299,7 +299,7 @@ export default {
           Promise.all([bussinesInfo(), services()]).then((res) => {
             const [bussinesInfo, services] = res;
             const bussines = bussinesInfo.data.company;
-            const service = services.data.services;
+            const service = services.data.data;
             this.reportForm.sellingType = "";
             this.reportForm.status = "";
             this.reportForm.initialCost = "";
@@ -389,7 +389,7 @@ export default {
           Promise.all([bussinesInfo(), services()]).then((res) => {
             const [bussinesInfo, services] = res;
             const bussines = bussinesInfo.data.company;
-            const service = services.data.services;
+            const service = services.data.data;
             this.reportForm.sellingType = "";
             this.reportForm.status = "";
             this.reportForm.initialCost = "";
