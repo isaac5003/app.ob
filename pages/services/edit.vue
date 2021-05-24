@@ -136,10 +136,10 @@ export default {
     Promise.all([sellingTypes(), service()])
       .then((res) => {
         const [sellingTypes, service] = res;
-        this.sellingTypes = sellingTypes.data.types;
+        this.sellingTypes = sellingTypes.data.data;
         this.servicesEditForm = {
-          ...service.data.service,
-          sellingType: service.data.service.sellingType.id,
+          ...service.data.data,
+          sellingType: service.data.data.sellingType.id,
         };
       })
       .catch((err) => {
