@@ -65,8 +65,8 @@
           <template
             v-if="
               selectedCustomer &&
-                (!selectedCustomer.customerTypeNatural ||
-                  selectedCustomer.customerTypeNatural.id == 2)
+              (!selectedCustomer.customerTypeNatural ||
+                selectedCustomer.customerTypeNatural.id == 2)
             "
           >
             <div class="col-span-2 flex flex-col">
@@ -157,7 +157,7 @@
       </el-form>
       <el-table
         @sort-change="sortBy"
-        :data="customers.customers"
+        :data="customers.data"
         stripe
         size="mini"
         v-loading="tableloading"
@@ -343,7 +343,7 @@ export default {
       status: "",
       sellingTypes: [],
       customers: {
-        customers: [],
+        data: [],
         count: 0,
       },
       filter: {

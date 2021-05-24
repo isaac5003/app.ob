@@ -201,8 +201,8 @@ export default {
         case "pdf":
           Promise.all([customers(), bussinesInfo()]).then((res) => {
             const [customers, bussinesInfo] = res;
-            const customersData = customers.data.customers;
-            const { name, nit, nrc } = bussinesInfo.data.info;
+            const customersData = customers.data.data;
+            const { name, nit, nrc } = bussinesInfo.data.data;
             const values = [];
             const emptyRow = [{}, {}, {}, {}, {}];
 
@@ -282,8 +282,8 @@ export default {
         case "excel":
           Promise.all([customers(), bussinesInfo()]).then((res) => {
             const [customers, bussinesInfo] = res;
-            const { name, nit, nrc } = bussinesInfo.data.info;
-            const customersData = customers.data.customers;
+            const { name, nit, nrc } = bussinesInfo.data.data;
+            const customersData = customers.data.data;
             const values = [];
             for (const c of customersData) {
               values.push([
@@ -322,9 +322,9 @@ export default {
           Promise.all([bussinesInfo(), customer(), branches()])
             .then((res) => {
               const [bussinesInfo, customer, branch] = res;
-              const { name, nit, nrc } = bussinesInfo.data.info;
-              const customerData = customer.data.customer;
-              const branches = branch.data.branches;
+              const { name, nit, nrc } = bussinesInfo.data.data;
+              const customerData = customer.data.data;
+              const branches = branch.data.data;
               const values = [];
               const valuesTable = [];
               const valuesGeneral = [];
@@ -649,9 +649,9 @@ export default {
             .then((res) => {
               const [bussinesInfo, customer, branch] = res;
 
-              const { name, nit, nrc } = bussinesInfo.data.info;
-              const customerData = customer.data.customer;
-              const branches = branch.data.branches;
+              const { name, nit, nrc } = bussinesInfo.data.data;
+              const customerData = customer.data.data;
+              const branches = branch.data.data;
               const values = [];
               const valuesTable = [];
               const valuesGeneral = [];

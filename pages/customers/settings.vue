@@ -93,9 +93,9 @@ export default {
     Promise.all([catalog(), settingIntegration()])
       .then((res) => {
         const [catalog, settingIntegration] = res;
-        this.catalogs = catalog.data.accountingCatalog;
-        this.integrationSettingForm.accountingCatalog =
-          settingIntegration.data.integrations.catalog;
+        this.catalogs = catalog.data.data;
+        this.integrationSettingForm.data =
+          settingIntegration.data.integrations.data;
         this.filteredCatalog = this.catalogs.filter(
           (c) => c.id == this.integrationSettingForm.accountingCatalog
         );
@@ -124,7 +124,7 @@ export default {
     async fetchSettingCustumerIntegration() {
       const { data } = await this.$axios.get("/customers/setting/integrations");
       this.pageloading = false;
-      this.integrationSettingForm.accountingCatalog = data.integrations.catalog;
+      this.integrationSettingForm.accountingCatalog = data.integrations.data;
     },
     findAccount(query) {
       if (query !== "") {

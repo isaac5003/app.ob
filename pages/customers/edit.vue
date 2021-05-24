@@ -318,7 +318,7 @@
             class="grid grid-cols-12 gap-4"
             v-if="
               customersEditForm.customerType == 1 ||
-                customersEditForm.customerTypeNatural == 2
+              customersEditForm.customerTypeNatural == 2
             "
           >
             <el-form-item
@@ -460,24 +460,24 @@ export default {
           catalog,
         ] = res;
 
-        this.customerTypes = customerTypes.data.types;
-        this.customerTypeNaturals = customerTypeNaturals.data.typeNaturals;
-        this.customerTaxerTypes = customerTaxerTypes.data.taxerTypes;
-        const customer = customerData.data.customer;
+        this.customerTypes = customerTypes.data.data;
+        this.customerTypeNaturals = customerTypeNaturals.data.data;
+        this.customerTaxerTypes = customerTaxerTypes.data.data;
+        const customer = customerData.data.data;
         const branch = customer.customerBranches[0];
         this.customer = customer;
 
-        this.countries = countries.data.countries;
-        this.rawStates = states.data.states;
-        this.rawCities = cities.data.cities;
-        this.catalogs = catalog.data.accountingCatalog;
+        this.countries = countries.data.data;
+        this.rawStates = states.data.data;
+        this.rawCities = cities.data.data;
+        this.catalogs = catalog.data.data;
 
-        const phone = branch.contactInfo.phones
-          ? branch.contactInfo.phones[0]
-          : branch.contactInfo.cellphone;
-        const email = branch.contactInfo.emails
-          ? branch.contactInfo.emails[0]
-          : branch.contactInfo.email;
+        const phone = branch.contactInfo.data
+          ? branch.contactInfo.data[0]
+          : branch.contactInfo.data;
+        const email = branch.contactInfo.data
+          ? branch.contactInfo.data[0]
+          : branch.contactInfo.data;
         this.customersEditForm = {
           ...customer,
           customerType:
