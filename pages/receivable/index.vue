@@ -6,11 +6,11 @@
       { name: 'Listado', to: null },
     ]"
   >
-    <!-- dialogo -->
+    <!-- Bítacora -->
     <el-dialog
       title="Bitácora"
       :visible.sync="showReceivable"
-      width="900px"
+      width="908px"
       :append-to-body="true"
       :close-on-click-modal="false"
     >
@@ -38,21 +38,22 @@
             <span class="font-semibold">Edad</span><span>45 Años</span>
           </div>
         </div>
-
-        <div class="flex justify-between">
-          <h1 class="text-base font-semi-bold">Últimos seguimientos</h1>
-
-          <div class="font-semibold text-xs">
-            Por pagar:
-            <el-tag type="success" effect="dark" size="mini">$ 367.50</el-tag>
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-3 flex flex-col">
+            <span class="font-semibold text-base">Últimos seguimientos</span>
           </div>
-          <el-button
-            class="w-1/6"
-            size="mini"
-            type="primary"
-            @click.native="showReceivableFollowing = true"
-            >Nuevo seguimiento</el-button
-          >
+          <div class="col-span-3 col-start-7 flex flex-row gap-1">
+            <div>Por pagar:</div>
+            <div>
+              <el-tag type="success" effect="dark" size="mini">$ 367.50</el-tag>
+            </div>
+          </div>
+
+          <div class="col-span-3 col-start-11 flex flex-col">
+            <el-button type="primary" size="small" class="text-sm"
+              >Nuevo seguimiento</el-button
+            >
+          </div>
         </div>
         <div class="grid grid-cols-12 gap-4">
           <div
@@ -212,26 +213,22 @@
                 ><span>23/03/2021</span>
               </div>
             </div>
-              <el-form label-position="top">
-                <div class="grid grid-cols-6">
-                  <el-form-item class="col-span-6" label="Resumen">
-                
-                    <el-input
-                      v-model="text"
-                      type="textarea"
-                      resize="none"
-                      :rows="17"
-                      placeholder="Escriba un resumen del contacto de cliente..."
-                      class="w-full"
-                     
-                      show-word-limit
-                    >
-                   </el-input>
-                  
-                  </el-form-item>
-                </div>
-              </el-form>
-         
+            <el-form label-position="top">
+              <div class="grid grid-cols-6">
+                <el-form-item class="col-span-6" label="Resumen">
+                  <el-input
+                    v-model="text"
+                    type="textarea"
+                    resize="none"
+                    :rows="17"
+                    placeholder="Escriba un resumen del contacto de cliente..."
+                    class="w-full"
+                    show-word-limit
+                  >
+                  </el-input>
+                </el-form-item>
+              </div>
+            </el-form>
           </div>
         </div>
 
@@ -320,11 +317,18 @@
             </el-select>
           </el-form-item>
           <el-form-item label="Condiciones de pago" class="col-span-3">
-            <el-select v-model="filter.paymentCondition" class="w-full" size="small" clearable filterable>
-              <el-option v-for="p in paymentConditions"
-              :key="p.id"
-              :label="p.name"
-              :value="p.id"
+            <el-select
+              v-model="filter.paymentCondition"
+              class="w-full"
+              size="small"
+              clearable
+              filterable
+            >
+              <el-option
+                v-for="p in paymentConditions"
+                :key="p.id"
+                :label="p.name"
+                :value="p.id"
               ></el-option>
             </el-select>
           </el-form-item>
@@ -455,14 +459,14 @@ export default {
     this.getFollow(this.indexFollow[0].id);
     const customers = () => this.$axios.get("/customers");
     const documentTypes = () => this.$axios.get("/invoices/document-types");
-    const paymentConditions =() => this.$axios.get("/invoices/payment-condition");
+    const paymentConditions = () =>
+      this.$axios.get("/invoices/payment-condition");
     Promise.all([customers(), documentTypes(), paymentConditions()])
       .then((res) => {
-        const [customers, documentTypes,  paymentConditions] = res;
+        const [customers, documentTypes, paymentConditions] = res;
         this.customers = customers.data.customers;
         this.documentTypes = documentTypes.data.documentTypes;
         this.paymentConditions = paymentConditions.data.paymentConditions;
-        console.log(this.paymentConditions)
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message
@@ -480,12 +484,12 @@ export default {
       multipleSelection: [],
       customers: [],
       documentTypes: [],
-      paymentConditions:[],
+      paymentConditions: [],
       text: "",
       filter: {
         customer: [],
         documentType: [],
-        paymentCondition:[]
+        paymentCondition: [],
       },
       following: [
         {
