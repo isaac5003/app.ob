@@ -40,7 +40,7 @@ export default {
             this.$router.push("/auth/login");
           }, 500);
         } catch (error) {
-          console.log(error);
+          console.error(error);
         }
       });
     },

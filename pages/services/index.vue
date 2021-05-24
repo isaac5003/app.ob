@@ -21,7 +21,7 @@
       />
       <el-form label-position="top">
         <div class="grid grid-cols-12 gap-4">
-          <el-form-item class="col-span-2" label="Estado">
+          <el-form-item class="col-span-3" label="Estado">
             <el-select
               v-model="filter.status"
               placeholder="Seleccionar"
@@ -36,7 +36,7 @@
               <el-option label="Inactivo" :value="false" />
             </el-select>
           </el-form-item>
-          <el-form-item class="col-span-2" label="Tipo de venta">
+          <el-form-item class="col-span-3" label="Tipo de venta">
             <el-select
               v-model="filter.type"
               placeholder="Seleccionar"
@@ -69,24 +69,27 @@
           </el-form-item>
         </div>
       </el-form>
+
       <el-table
         @sort-change="sortBy"
         v-loading="tableloading"
         :data="services.services"
         stripe
         size="mini"
+        ref="multipleTable"
+        @selection-change="handleSelectionChange"
       >
-        <!-- column 1 -->
-        <el-table-column prop="index" width="50" label="#" />
+        <el-table-column type="selection" width="45" />
+        <el-table-column prop="index" width="45" label="#" />
         <el-table-column
           label="Descripción"
           prop="description"
-          min-width="480"
+          min-width="420"
           sortable="custom"
         />
         <el-table-column
           label="Precio"
-          width="120"
+          width="105"
           align="right"
           sortable="custom"
           prop="cost"
@@ -122,7 +125,40 @@
             >
           </template>
         </el-table-column>
-        <el-table-column label width="70" align="center">
+        <el-table-column label width="100" align="center">
+          <!-- dropdpwn selection -->
+          <template slot="header" v-if="multipleSelection.length">
+            <el-dropdown trigger="click" size="mini">
+              <el-button size="mini" type="primary" class="group">
+                <span class="hidden group-hover:inline">
+                  {{ multipleSelection.length }} Filas</span
+                >
+                <i class="el-icon-more" />
+              </el-button>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item
+                  @click.native="updateSelected(multipleSelection, true)"
+                >
+                  <i class="el-icon-check"></i> Activar seleccionados
+                </el-dropdown-item>
+                <el-dropdown-item
+                  @click.native="updateSelected(multipleSelection, false)"
+                >
+                  <i class="el-icon-close"></i> Desactivar seleccionados
+                </el-dropdown-item>
+                <el-dropdown-item
+                  :divided="true"
+                  class="font-semibold"
+                  @click.native="deleteSelected(multipleSelection)"
+                >
+                  <span class="text-red-500">
+                    <i class="el-icon-delete"></i> Eliminar seleccionados
+                  </span>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </template>
+          <!-- dropdown 1 -->
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />
@@ -198,6 +234,7 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+      multipleSelection: [],
       pageloading: true,
       tableloading: false,
       errorMessage: "",
@@ -220,6 +257,9 @@ export default {
     };
   },
   methods: {
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
     fetchServices() {
       this.tableloading = true;
       let params = this.page;
@@ -277,7 +317,6 @@ export default {
                   this.fetchServices();
                 })
                 .catch((err) => {
-                  console.log(err);
                   this.$notify.error({
                     title: "Error",
                     message: err.response.data.message,
@@ -336,6 +375,91 @@ export default {
       this.filter.prop = prop;
       this.filter.order = order;
       this.fetchServices();
+    },
+    deleteSelected(dataSelected) {
+      const ids = dataSelected.map((s) => s.id);
+      this.$confirm(
+        `¿Estás seguro que deseas eliminar los servicios selecionados?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, eliminar`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .delete("/services/", {
+                  ids,
+                })
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchServices();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, eliminar`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
+    },
+    updateSelected(dataSelected, status) {
+      const ids = dataSelected.map((s) => s.id);
+      const message = status ? "activar" : "desactivar";
+
+      this.$confirm(
+        `¿Estás seguro que deseas ${message} los servicios selecionados?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, ${message}`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .put("/services/", {
+                  ids,
+                  status,
+                })
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchServices();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, ${message}`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
     },
   },
 };

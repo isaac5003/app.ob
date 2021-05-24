@@ -87,7 +87,7 @@
                 <el-checkbox
                   v-if="
                     newServiceForm.sellingType == 3 &&
-                    salesNewForm.documentType != 3
+                      salesNewForm.documentType != 3
                   "
                   border
                   v-model="newServiceForm.incTax"
@@ -218,7 +218,7 @@
                   border
                   v-if="
                     editServiceForm.sellingType == 3 &&
-                    salesNewForm.documentType != 3
+                      salesNewForm.documentType != 3
                   "
                   v-model="editServiceForm.incTax"
                   size="small"
@@ -577,7 +577,10 @@
               <el-table-column
                 prop="vnosujeta"
                 :label="
-                  this.salesNewForm.documentType != 3 ? 'V. No sujeta' : ''
+                  this.salesNewForm.documentType != 3 &&
+                  this.salesNewForm.documentType != 6
+                    ? 'V. No sujeta'
+                    : ''
                 "
                 min-width="75"
                 align="right"
@@ -586,7 +589,8 @@
                   <span
                     v-if="
                       scope.row.sellingType == 1 &&
-                      salesNewForm.documentType != 3
+                        salesNewForm.documentType != 3 &&
+                        salesNewForm.documentType != 6
                     "
                     >{{
                       calcSujeta(salesNewForm.documentType, scope.row)
@@ -597,7 +601,12 @@
               </el-table-column>
               <el-table-column
                 prop="vexenta"
-                :label="this.salesNewForm.documentType != 3 ? 'V. Exenta' : ''"
+                :label="
+                  this.salesNewForm.documentType != 3 &&
+                  this.salesNewForm.documentType != 6
+                    ? 'V. Exenta'
+                    : ''
+                "
                 min-width="75"
                 align="right"
               >
@@ -605,7 +614,8 @@
                   <span
                     v-if="
                       scope.row.sellingType == 2 &&
-                      salesNewForm.documentType != 3
+                        salesNewForm.documentType != 3 &&
+                        salesNewForm.documentType != 6
                     "
                     >{{
                       calcExenta(salesNewForm.documentType, scope.row)
@@ -624,7 +634,8 @@
                   <span
                     v-if="
                       scope.row.sellingType == 3 ||
-                      salesNewForm.documentType == 3
+                        salesNewForm.documentType == 3 ||
+                        salesNewForm.documentType == 6
                     "
                     >{{
                       calcGravada(salesNewForm.documentType, scope.row)
@@ -641,14 +652,12 @@
                       @click="openEditDetail(scope.$index, scope.row)"
                       size="small"
                       icon="el-icon-edit"
-                      circle
                     ></el-button>
                     <el-button
                       type="danger"
                       @click="deleteDetail(scope.$index)"
                       size="small"
                       icon="el-icon-delete"
-                      circle
                     ></el-button>
                   </div>
                 </template>
@@ -659,7 +668,12 @@
         <!-- sumas -->
         <table class="flex justify-end">
           <tbody class="text-sm divide-y divide-gray-300">
-            <tr class="flex space-x-16" v-if="salesNewForm.documentType != 3">
+            <tr
+              class="flex space-x-16"
+              v-if="
+                salesNewForm.documentType != 3 && salesNewForm.documentType != 6
+              "
+            >
               <td align="right" class="text-blue-900 w-50">SUMAS:</td>
               <td align="right" class="text-gray-800">
                 {{ sumas | formatMoney }}
@@ -671,25 +685,45 @@
                 {{ taxes | formatMoney }}
               </td>
             </tr>
-            <tr class="flex space-x-16" v-if="salesNewForm.documentType != 3">
+            <tr
+              class="flex space-x-16"
+              v-if="
+                salesNewForm.documentType != 3 && salesNewForm.documentType != 6
+              "
+            >
               <td align="right" class="text-blue-900 w-50">Subtotal:</td>
               <td align="right" class="text-gray-800">
                 {{ subtotal | formatMoney }}
               </td>
             </tr>
-            <tr class="flex space-x-16" v-if="salesNewForm.documentType != 3">
+            <tr
+              class="flex space-x-16"
+              v-if="
+                salesNewForm.documentType != 3 && salesNewForm.documentType != 6
+              "
+            >
               <td align="right" class="text-blue-900 w-50">Iva retenido:</td>
               <td align="right" class="text-gray-800">
                 {{ ivaRetenido | formatMoney }}
               </td>
             </tr>
-            <tr class="flex space-x-16" v-if="salesNewForm.documentType != 3">
+            <tr
+              class="flex space-x-16"
+              v-if="
+                salesNewForm.documentType != 3 && salesNewForm.documentType != 6
+              "
+            >
               <td align="right" class="text-blue-900 w-50">Ventas exentas:</td>
               <td align="right" class="text-gray-800">
                 {{ ventasExentas | formatMoney }}
               </td>
             </tr>
-            <tr class="flex space-x-16" v-if="salesNewForm.documentType != 3">
+            <tr
+              class="flex space-x-16"
+              v-if="
+                salesNewForm.documentType != 3 && salesNewForm.documentType != 6
+              "
+            >
               <td align="right" class="text-blue-900 w-50">
                 Ventas no sujetas:
               </td>
@@ -742,6 +776,7 @@ export default {
   name: "InvoicesNew",
   components: { LayoutContent, Notification },
   fetch() {
+    this.loading = true;
     const sellers = () => {
       return this.$axios.get("/invoices/sellers", { params: { active: true } });
     };
@@ -762,22 +797,21 @@ export default {
     Promise.all([sellers(), paymentsConditions(), customers(), documents()])
       .then((res) => {
         const [sellers, paymentConditions, customers, documents] = res;
-
         this.sellers = sellers.data.sellers;
         this.paymentConditions = paymentConditions.data.paymentConditions;
         this.customers = customers.data.customers;
-        this.documentTypes = documents.data.documents.map(
-          (d) => d.documentType
-        );
+        this.documentTypes = documents.data.documents
+          .filter((d) => d.active == true)
+          .map((d) => d.documentType);
         this.loading = false;
         this.salesNewForm.documentType = 1;
         this.validateDocumentType(
           this.salesNewForm.documentType,
           this.tributary
         );
+        this.loading = false;
       })
       .catch((err) => {
-        console.log(err);
         this.errorMessage = err.response.data.message;
       });
   },
@@ -944,7 +978,6 @@ export default {
             this.selectBranch(this.salesNewForm.customerBranch, this.branches);
           })
           .catch((err) => {
-            console.log(err);
             this.errorMessage = err.response.data.message;
           });
       } else {
@@ -1161,6 +1194,8 @@ export default {
               return unitPrice / (incTax ? 1.13 : 1);
 
             case 3:
+            case 4:
+            case 6:
               return unitPrice;
           }
         }
@@ -1187,6 +1222,7 @@ export default {
           return (unitPrice / (incTax ? 1.13 : 1)) * quantity;
 
         case 3:
+        case 6:
           switch (sellingType) {
             case 1:
               return unitPrice * quantity;
@@ -1206,6 +1242,7 @@ export default {
           return unitPrice * quantity;
 
         case 3:
+        case 6:
           return 0;
       }
     },
@@ -1235,6 +1272,7 @@ export default {
             }
             break;
           case 3:
+          case 6:
             for (const d of this.details) {
               sumas += parseFloat(d.quantity) * parseFloat(d.unitPrice);
             }
