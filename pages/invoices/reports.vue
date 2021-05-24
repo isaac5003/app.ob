@@ -429,8 +429,8 @@ export default {
     generateReport(formData) {
       if (formData.dateRange) {
         let params = {
-          startDate: fixDate(formData.dateRange[0]),
-          endDate: fixDate(formData.dateRange[1]),
+          startDate: formData.dateRange[0],
+          endDate: formData.dateRange[1],
         };
         if (formData.customer != "") {
           params = { ...params, customer: formData.customer };
@@ -454,18 +454,19 @@ export default {
         const generales = () =>
           this.$axios.get("/invoices/report/general", {
             params: { ...params },
+            
           });
+
         switch (formData.radioType) {
           case "pdf":
             Promise.all([bussinesInfo(), generales()]).then((res) => {
               const [bussinesInfo, generales] = res;
               const { name, nit, nrc } = bussinesInfo.data.info;
-              const general = generales.data.report;
-
+              const general= generales.data.report;
               const values = [];
               const emptyRow = [{}, {}, {}, {}, {}, {}, {}, {}, {}];
-
-              for (const r of general) {
+              const f = general.filter(x => x.count > 0)
+              for (const r of f) {
                 values.push(emptyRow);
                 values.push([
                   {
@@ -486,47 +487,56 @@ export default {
                     {
                       bold: false,
                       text: d.customer,
+                     decoration: d.status.id == 3 ? 'lineThrough' : false
                     },
 
                     {
                       bold: false,
                       text: d.date,
                       alignment: "right",
+                      decoration: d.status.id == 3 ? 'lineThrough' : false
                     },
                     {
                       bold: false,
                       text: d.documentNumber,
-                      alignment: "right",
+                      alignment: "left",
+                     decoration: d.status.id == 3 ? 'lineThrough' : false
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.vGravada),
                       alignment: "right",
+                       decoration: d.status.id == 3 ? 'lineThrough' : false
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.vNSujeta),
                       alignment: "right",
+                     decoration: d.status.id == 3 ? 'lineThrough' : false
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.vExenta),
                       alignment: "right",
+                      decoration: d.status.id == 3 ? 'lineThrough' : false
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.iva),
                       alignment: "right",
+                      decoration: d.status.id == 3 ? 'lineThrough' : false
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.ivaRetenido),
                       alignment: "right",
+                       decoration: d.status.id == 3 ? 'lineThrough' : false
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.total),
                       alignment: "right",
+                       decoration: d.status.id == 3 ? 'lineThrough' : false
                     },
                   ]);
                 }
@@ -534,7 +544,7 @@ export default {
                 values.push([
                   {
                     bold: true,
-                    text: r.count + ` Registros para ` + r.code,
+                    text: r.count + ` Registros para ` + r.code  
                   },
                   {},
                   {},
@@ -566,7 +576,7 @@ export default {
                   {
                     bold: true,
                     text: this.$options.filters.formatMoney(r.totalTotal),
-                    alignment: "right",
+                    alignment:"right",
                   },
                 ]);
               }
@@ -603,7 +613,7 @@ export default {
                     table: {
                       headerRows: 1,
                       widths: [
-                        "38%",
+                        "38%", 
                         "7%",
                         "10%",
                         "9%",
@@ -688,13 +698,11 @@ export default {
 
               for (const r of general) {
                 data.push([""]);
-                data.push([r.code, "", "", "", "", "", "", "", ""]);
+                data.push([r.code, "", "", "", "", "", "", "", "",""])
                 for (const d of r.documents) {
                   data.push([
                     d.customer,
-
                     d.date,
-
                     d.documentNumber,
                     d.vGravada,
                     d.vNSujeta,
@@ -702,8 +710,10 @@ export default {
                     d.iva,
                     d.ivaRetenido,
                     d.total,
+                    d.status.name,
                   ]);
                 }
+            
                 data.push([""]);
                 data.push([
                   r.count + ` Registros para ` + r.code,

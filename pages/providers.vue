@@ -1,6 +1,6 @@
 <template>
   <div class="flex">
-    <layout-submenu page-name="Clientes" :menu="menu" icon="users" />
+    <layout-submenu page-name="Proveedores" :menu="menu" icon="truck" />
     <nuxt-child />
   </div>
 </template>
@@ -9,35 +9,30 @@
 import LayoutSubmenu from "../components/layout/Submenu";
 import { getIcon } from "../tools";
 export default {
-  name: "Customers",
-  middleware: "access",
-  meta: {
-    id: "9ff0b6f4-9c58-475b-b2dd-5eea6d7b66aa",
-  },
+  name: "Providers",
   components: { LayoutSubmenu },
   data() {
     return {
       menu: [
         {
-          name: "Nuevo cliente",
+          name: "Nuevo proveedor",
           icon: getIcon("plus"),
-          path: "/customers/new",
+          path: "/providers/new",
         },
         {
-          name: "Listado de clientes",
+          name: "Listado de proveedores",
           icon: getIcon("menu"),
-          path: "/customers",
-          epath: ["/customers/edit"],
+          path: "/providers",
         },
         {
           name: "Reportes",
           icon: getIcon("document-text"),
-          path: "/customers/reports",
+          path: "/providers/reports",
         },
         {
           name: "Configuraciones",
           icon: getIcon("cog"),
-          path: "/customers/settings",
+          path: "/providers/settings",
         },
       ],
     };

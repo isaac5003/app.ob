@@ -147,13 +147,10 @@
             prop="code"
             :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
           >
-            <el-input
-              v-model="activeAccount.code"
-              type="number"
-              :min="1"
-              size="small"
-              @change="setStorage('activeAccount', activeAccount)"
-            />
+            <el-input v-model="activeAccount.code" type="number" :min="1"
+            size="small" <<<<<<< HEAD @change="setStorage('activeAccount',
+            activeAccount)" ======= :disabled="activeAccount.isParent &&
+            activeAccount.subAccounts" >>>>>>> development />
           </el-form-item>
           <el-form-item
             class="col-span-6"
@@ -206,7 +203,9 @@
           <el-button
             type="primary"
             size="small"
-            @click.native="submitEditedCatalog(activeAccount, 'activeAccount')"
+            @click.native="
+              submitEditedCatalog(accounts, 'activeAccount', activeAccount)
+            "
             >Guardar</el-button
           >
           <el-button @click="showEditMayorDialog = false" size="small"
@@ -498,11 +497,7 @@
             type="primary"
             size="small"
             @click.native="
-              submitEditedCatalog(
-                activeAccount,
-                'accountFormEdit',
-                activeAccount.parentCatalog
-              )
+              submitEditedCatalog(accounts, 'accountFormEdit', activeAccount)
             "
             >Guardar</el-button
           >
@@ -512,7 +507,6 @@
         </div>
       </span>
     </el-dialog>
-
     <!-- BALANCE General
     ADDaccount -->
     <el-dialog
@@ -831,9 +825,7 @@
               "
               >Guardar</el-button
             >
-            <el-button size="small" @click="$router.push('/entries')">
-              Cancelar
-            </el-button>
+            <el-button size="small" @click="cancel()"> Cancelar </el-button>
           </div>
         </el-form>
       </el-tab-pane>
@@ -916,9 +908,7 @@
               "
               >Guardar</el-button
             >
-            <el-button size="small" @click="$router.push('/entries')"
-              >Cancelar</el-button
-            >
+            <el-button size="small" @click="cancel()">Cancelar</el-button>
           </div>
         </el-form>
       </el-tab-pane>
@@ -1031,7 +1021,6 @@
             />
           </div>
         </div>
-
         <el-form>
           <div class="grid grid-cols-12 gap-4">
             <div class="col-span-3">
@@ -1136,7 +1125,6 @@
             </div>
           </div>
         </el-form>
-
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-12">
             <el-table
@@ -1183,7 +1171,7 @@
                     v-if="scope.row.showAdd"
                     class="item"
                     effect="dark"
-                    content="Agregar nueva cuenta"
+                    content="Agregar nueva cuenta11"
                     placement="top"
                   >
                     <el-button
@@ -1213,7 +1201,6 @@
             </el-table>
           </div>
         </div>
-
         <div class="flex justify-end mt-4">
           <el-button
             type="primary"
@@ -1227,7 +1214,7 @@
             "
             >Guardar</el-button
           >
-          <el-button size="small">Cancelar</el-button>
+          <el-button size="small" @click="cancel()">Cancelar</el-button>
         </div>
       </el-tab-pane>
 
@@ -1359,9 +1346,114 @@
             @click.native="submitResults(tablesData)"
             >Guardar</el-button
           >
-          <el-button size="small">Cancelar</el-button>
+          <el-button size="small" @click="cancel()">Cancelar</el-button>
         </div>
       </el-tab-pane>
+      <<<<<<< HEAD =======
+
+      <!--  tab de Integraciones  -->
+      <el-tab-pane label="Integraciones" name="integraciones">
+        <div class="grid grid-cols-12">
+          <div class="col-span-12">
+            <Notification class="mb-4 w-full" type="info" title="Información" />
+          </div>
+        </div>
+
+        <div class="flex flex-col space-y-2">
+          <el-form>
+            <div class="grid grid-cols-12 gap-4">
+              <el-form-item
+                label="Cuenta contable para pagos de contado"
+                class="col-span-4"
+              >
+                <el-select
+                  class="w-full"
+                  size="small"
+                  clearable
+                  filterable
+                ></el-select>
+              </el-form-item>
+              <el-form-item
+                prop=""
+                label="Tipo de integración contable"
+                class="col-span-5"
+              >
+                <el-radio-group class="w-full">
+                  <el-row :gutter="15">
+                    <el-col :span="8">
+                      <el-radio
+                        border
+                        label="Automatico"
+                        size="small"
+                        class="w-full"
+                        >Automático</el-radio
+                      >
+                    </el-col>
+                    <el-col :span="8">
+                      <el-radio
+                        border
+                        label="Manual"
+                        size="small"
+                        class="w-full"
+                        >Manual</el-radio
+                      >
+                    </el-col>
+                  </el-row>
+                </el-radio-group>
+              </el-form-item>
+            </div>
+            <div class="flex justify-end">
+              <el-button type="primary" size="small">Guardar</el-button>
+              <el-button size="small" @click="$router.push('/entries')"
+                >Cancelar</el-button
+              >
+            </div>
+          </el-form>
+        </div>
+      </el-tab-pane>
+      <!-- tab integraciones -->
+      <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
+        <Notification
+          class="w-full"
+          type="info"
+          title="Integraciones"
+          message="En esta sección se realizan las configuraciones de integración con otros modulos de manera general. Estas configuraciones se aplicarán a todos los clientes que no tengan una configuración individual."
+        />
+        <el-tabs
+          tab-position="left"
+          v-model="utab"
+          @tab-click="
+            $router
+              .replace({
+                path: `/invoices/settings`,
+                query: { tab, utab },
+              })
+              .catch(() => {})
+          "
+        >
+          <el-tab-pane
+            v-for="(integration, k) of filteredIntegrations"
+            :key="k"
+            :name="integration.id"
+          >
+            <span slot="label" class="flex items-center justify-between"
+              ><svg
+                class="w-5 h-5 mr-2"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                v-html="integration.icon"
+              />
+              {{ integration.name }}</span
+            >
+            {{ integration.name }}
+          </el-tab-pane>
+        </el-tabs>
+      </el-tab-pane> -->
+      >>>>>>> development
     </el-tabs>
   </layout-content>
 </template>
@@ -1420,6 +1512,35 @@ export default {
           signatures,
           general,
         ] = res;
+        if (balance.data.balanceGeneral) {
+          this.tableData = balance.data.balanceGeneral.report;
+          this.specialAccounts = { ...balance.data.balanceGeneral.special };
+        }
+        if (general.data.general) {
+          this.fiscalPeriodForm.startDate = general.data.general.periodStart;
+          this.fiscalPeriodForm.endDate = general.data.general.peridoEnd;
+        }
+
+        if (signatures.data.signatures) {
+          this.firmantesForm = signatures.data.signatures;
+        }
+
+        if (results.data.estadoResultados) {
+          this.tablesData = results.data.estadoResultados.map((r) => {
+            const obj = { ...r };
+            if (r.children) {
+              const children = r.children.map((ch) => {
+                return {
+                  ...ch,
+                  code: ch.id,
+                };
+              });
+              obj["children"] = children;
+            }
+            return obj;
+          });
+        }
+
         this.accounts = accountCatalogs.data.accountingCatalog;
         this.accountsCount = accountCatalogs.data.count;
         this.catalogs = accounts.data.accountingCatalog;
@@ -2009,15 +2130,14 @@ export default {
       this.fetchCatalog();
     },
     openEditAccount(account) {
-      if (account.code.length == 1) {
+      if (account.isParent) {
         this.showEditMayorDialog = true;
         this.activeAccount = { ...account };
       } else {
         this.showEditAccount = true;
-
         this.activeAccount = {
           ...account,
-          code: `0${account.code.slice(-1)}`,
+          code: account.code.slice(account.parentCatalog.code.length),
         };
       }
     },
@@ -2067,15 +2187,12 @@ export default {
         }
 
         // Genera el codigo real a guardar
-        const realCode =
-          Object.keys(activeAccount).length > 0
-            ? `${activeAccount.code}${accounts.code}`
-            : `${accounts.code}`;
+        const realCode = `${activeAccount.parentCatalog.code}${activeAccount.code}`;
 
         // Verifica si los codigos nuevos y los guardados estan duplicados entre ellos.
         // const catalog = this.accounts.map((a) => a.code);
         const catalog = this.accounts
-          .filter((a) => a.id != accounts.id)
+          .filter((a) => a.id !== activeAccount.id)
           .map((a) => a.code);
 
         if (catalog.includes(realCode)) {
@@ -2099,8 +2216,8 @@ export default {
                 instance.confirmButtonText = "Procesando...";
 
                 this.$axios
-                  .put(`/entries/catalog/${accounts.id}`, {
-                    ...accounts,
+                  .put(`/entries/catalog/${activeAccount.id}`, {
+                    ...activeAccount,
                     code: realCode,
                   })
                   .then((res) => {
@@ -2173,6 +2290,14 @@ export default {
       addTo = addTo.children.find((c) => c.id == selected.id);
       for (const code of list) {
         const account = this.catalogs.find((c) => c.id == code);
+
+        if (addTo.children.filter((c) => c.id == account.code).length > 0) {
+          this.$notify.error({
+            title: "Error",
+            message: "No se puede agregar una cuenta que ya existe.",
+          });
+          return false;
+        }
         addTo.children.push({
           id: account.code,
           name: account.name,
@@ -2514,6 +2639,5 @@ export default {
       );
     },
   },
-  computed: {},
 };
 </script>
