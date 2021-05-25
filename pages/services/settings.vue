@@ -88,7 +88,6 @@ import { getIcon, hasModule, selectValidation } from "../../tools";
 export default {
   name: "ServiceSettings",
   components: { LayoutContent, Notification },
-
   fetch() {
     const catalog = () => this.$axios.get("/entries/catalog");
     const settingIntegration = () =>
