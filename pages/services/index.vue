@@ -223,7 +223,7 @@ export default {
     Promise.all([sellingTypes(), services()])
       .then((res) => {
         const [sellingTypes, services] = res;
-        this.sellingTypes = sellingTypes.data.data;
+        this.sellingTypes = sellingTypes.data.type;
         this.services = services.data;
       })
       .catch((err) => {
