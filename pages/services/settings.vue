@@ -89,7 +89,7 @@ export default {
       const catalog = () => this.$axios.get("/entries/catalog");
       Promise.all([catalog()]).then((res) => {
         const [catalog] = res;
-        this.catalogs = catalog.data.accountingCatalog;
+        this.catalogs = catalog.data.data;
         this.integrationSettingForm.accountingCatalog =
           data.integrations.catalog;
         this.pageloading = false;
