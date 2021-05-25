@@ -429,9 +429,9 @@ export default {
         case "pdf":
           Promise.all([report()]).then((res) => {
             const [report] = res;
-            const { company, report } = report.data.data;
+            const { company, reportData } = report.data.data;
             const nameReport = report.data.name;
-            const values = report.map((s) => {
+            const values = reportData.map((s) => {
               return [
                 { bold: false, text: s.index },
                 { bold: false, text: s.name },
@@ -508,9 +508,9 @@ export default {
         case "excel":
           Promise.all([report()]).then((res) => {
             const [report] = res;
-            const { company, report } = report.data.data;
+            const { company, reportData } = report.data.data;
 
-            const data = report.map((s) => {
+            const data = reportData.map((s) => {
               return [
                 s.index,
                 s.name,
