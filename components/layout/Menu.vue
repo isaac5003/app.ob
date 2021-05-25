@@ -217,6 +217,27 @@ export default {
         },
         {
           always: false,
+          id: "53a36e54-bab2-4824-9e43-b40efab8bab9",
+          path: "/taxes",
+          name: "Iva",
+          icon: getIcon("receipt-tax"),
+          exact: false,
+        },
+        {
+          always: false,
+          id: "09a5c668-ab54-441e-9fb2-d24b36ae202e",
+          path: "/echarges",
+          name: "Cobros electrónicos",
+          icon: getIcon("collection"),
+          exact: false,
+        },
+        {
+          always: false,
+          id: "f6000cbb-1e6d-4f7d-a7cc-cadd78d23076",
+          path: "/providers",
+          name: "Proveedores",
+          icon: getIcon("truck"),
+
           id: "a98b98e6-b2d5-42a3-853d-9516f64eade8",
           path: "/receivable",
           name: "Cuentas por cobrar",

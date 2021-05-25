@@ -23,6 +23,11 @@ export default {
     return {
       menu: [
         {
+          name: "Listados de cuentas por cobrar",
+          icon: getIcon("menu"),
+          path: "/receivable",
+        },
+        {
           name: "Configuraciones",
           icon: getIcon("cog"),
           path: "/receivable/settings",
