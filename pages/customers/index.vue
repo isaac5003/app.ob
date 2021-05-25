@@ -556,7 +556,7 @@ export default {
       );
     },
     async openCustomerPreview({ id }) {
-      const { data } = await this.$axios.get(`/customers/${id}`);
+      const data = await this.$axios.get(`/customers/${id}`);
       (this.selectedCustomer = data.data), (this.showCustomerPreview = true);
     },
     hasModule() {
