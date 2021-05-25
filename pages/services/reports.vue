@@ -237,7 +237,7 @@ export default {
           case "seller":
             this.requirementForm = "seller";
             this.$axios.get("/services/selling-types").then((res) => {
-              this.sellingTypes = res.data.types;
+              this.sellingTypes = res.data.data;
             });
             break;
           case "status":
@@ -296,14 +296,16 @@ export default {
         case "pdf":
           Promise.all([bussinesInfo(), services()]).then((res) => {
             const [bussinesInfo, services] = res;
-            const bussines = bussinesInfo.data.company;
-            const service = services.data.services;
+            const bussines = bussinesInfo.data.info;
+            const service = services.data.data;
             this.reportForm.sellingType = "";
             this.reportForm.status = "";
             this.reportForm.initialCost = "";
             this.reportForm.finalCost = "";
 
-            // const name = this.reports.find((r)=> this.reportForm.reportType == r.id).name
+            const name = this.reports.find(
+              (r) => this.reportForm.reportType == r.id
+            ).name;
             const values = service.map((s) => {
               return [
                 { bold: false, text: s.index },
@@ -386,8 +388,8 @@ export default {
         case "excel":
           Promise.all([bussinesInfo(), services()]).then((res) => {
             const [bussinesInfo, services] = res;
-            const bussines = bussinesInfo.data.company;
-            const service = services.data.services;
+            const bussines = bussinesInfo.data.info;
+            const service = services.data.data;
             this.reportForm.sellingType = "";
             this.reportForm.status = "";
             this.reportForm.initialCost = "";
@@ -435,8 +437,8 @@ export default {
         case "pdf":
           Promise.all([report()]).then((res) => {
             const [report] = res;
-            const { company, reportData } = report.data.data;
-            const nameReport = report.data.name;
+            const { company, reportData } = report.data;
+
             const values = reportData.map((s) => {
               return [
                 { bold: false, text: s.index },
