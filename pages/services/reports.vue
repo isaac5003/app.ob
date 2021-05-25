@@ -290,21 +290,21 @@ export default {
       });
     },
     generateEspecialService(params, fileType) {
-      const report = () => this.$axios.get("/services/report/general");
+      const bussinesInfo = () => this.$axios.get("/services/report/general");
+      const services = () => this.$axios.get("/services", { params });
       switch (fileType) {
         case "pdf":
-          Promise.all([report()]).then((res) => {
-            const [report] = res;
-            const reportData = report.data.data;
-            const { name, nit, nrc } = report.data.company;
-            const nameReport = report.data.name;
+          Promise.all([bussinesInfo(), services()]).then((res) => {
+            const [bussinesInfo, services] = res;
+            const bussines = bussinesInfo.data.company;
+            const service = services.data.services;
             this.reportForm.sellingType = "";
             this.reportForm.status = "";
             this.reportForm.initialCost = "";
             this.reportForm.finalCost = "";
 
             // const name = this.reports.find((r)=> this.reportForm.reportType == r.id).name
-            const values = reportData.map((s) => {
+            const values = service.map((s) => {
               return [
                 { bold: false, text: s.index },
                 { bold: false, text: s.name },
@@ -322,7 +322,13 @@ export default {
               pageSize: "LETTER",
               pageOrientation: "portrait",
               pageMargins: [20, 60, 20, 40],
-              header: getHeader(name, nit, nrc, null, nameReport.toUpperCase()),
+              header: getHeader(
+                bussines.name,
+                bussines.nit,
+                bussines.nrc,
+                null,
+                name.toUpperCase()
+              ),
               footer: getFooter(),
               content: [
                 {
@@ -378,16 +384,16 @@ export default {
           });
           break;
         case "excel":
-          Promise.all([report]).then((res) => {
-            const [report] = res;
-            const reportData = report.data.data;
-            const { name, nit, nrc } = report.data.company;
+          Promise.all([bussinesInfo(), services()]).then((res) => {
+            const [bussinesInfo, services] = res;
+            const bussines = bussinesInfo.data.company;
+            const service = services.data.services;
             this.reportForm.sellingType = "";
             this.reportForm.status = "";
             this.reportForm.initialCost = "";
             this.reportForm.finalCost = "";
             //  const name = this.reports.find((r)=> this.reportForm.reportType == r.id).name
-            const data = reportData.map((s) => {
+            const data = service.map((s) => {
               return [
                 s.index,
                 s.name,
@@ -399,8 +405,8 @@ export default {
             });
 
             const document = [
-              [name],
-              [name, "", "", `NIT: ${nit}`, `NRC: ${nrc}`],
+              [bussines.name],
+              [name, "", "", `NIT: ${bussines.nit}`, `NRC: ${bussines.nrc}`],
               [""],
               [
                 "#",
