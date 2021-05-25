@@ -72,6 +72,14 @@
             >
             <el-tag
               size="small"
+              type="warning"
+              v-else-if="selectedInvoice && selectedInvoice.status.id === 5"
+            >
+              <i class="el-icon-question"></i
+              >{{ selectedInvoice.status.name }}</el-tag
+            >
+            <el-tag
+              size="small"
               type="danger"
               v-else-if="selectedInvoice && selectedInvoice.status.id === 3"
             >
@@ -351,38 +359,39 @@
                     :label="item.name"
                     :value="item.id"
                   >
-                   <div
-                        class="flex flex-row justify-between items-end py-1 leading-normal"
-                      >
-                        <div class="flex flex-col">
-                          <span class="text-xs text-gray-500">{{
-                            item.shortName
-                          }}</span>
-                          <span>{{ item.name }}</span>
-                        </div>
-                        <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                    <div
+                      class="flex flex-row justify-between items-end py-1 leading-normal"
+                    >
+                      <div class="flex flex-col">
+                        <span class="text-xs text-gray-500">{{
+                          item.shortName
+                        }}</span>
+                        <span>{{ item.name }}</span>
                       </div>
+                      <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                    </div>
                   </el-option>
                 </el-option-group>
+                <!-- toda esbien -->
                 <el-option-group key="INACTIVOS" label="INACTIVOS">
                   <el-option
-                   style="height:50px;"
-                    v-for="item in activeCustomers"
+                    style="height: 50px"
+                    v-for="item in inactiveCustomers"
                     :key="item.id"
                     :label="item.name"
                     :value="item.id"
                   >
-               <div
-                        class="flex flex-row justify-between items-end py-1 leading-normal"
-                      >
-                        <div class="flex flex-col">
-                          <span class="text-xs text-gray-500">{{
-                            item.shortName
-                          }}</span>
-                          <span>{{ item.name }}</span>
-                        </div>
-                        <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                    <div
+                      class="flex flex-row justify-between items-end py-1 leading-normal"
+                    >
+                      <div class="flex flex-col">
+                        <span class="text-xs text-gray-500">{{
+                          item.shortName
+                        }}</span>
+                        <span>{{ item.name }}</span>
                       </div>
+                      <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                    </div>
                   </el-option>
                 </el-option-group>
               </el-select>
@@ -544,8 +553,11 @@
           stripe
           size="mini"
           v-loading="tableloading"
+          ref="multipleTable"
+          @selection-change="handleSelectionChange"
         >
-          <el-table-column prop="index" width="40" />
+          <el-table-column type="selection" width="45" />
+          <el-table-column prop="index" width="50" label=" #" />
           <el-table-column
             label="# Documento"
             prop="sequence"
@@ -561,7 +573,7 @@
           <el-table-column
             label="Tipo"
             prop="documentType.id"
-            width="70"
+            width="75"
             sortable="custom"
           >
             <template slot-scope="scope">
@@ -579,9 +591,10 @@
           <el-table-column
             label="Cliente"
             prop="customerName"
-            min-width="350"
+            min-width="260"
             sortable="custom"
           />
+
           <el-table-column
             label="Estado"
             prop="status.id"
@@ -594,15 +607,11 @@
                 type="info"
                 v-if="scope.row.status.id == '1'"
               >
-                <i class="el-icon-warning"></i>
+                <i class="el-icon-circle-plus"></i>
                 {{ scope.row.status.name }}
               </el-tag>
-              <el-tag
-                size="small"
-                type="success"
-                v-else-if="scope.row.status.id == '2'"
-              >
-                <i class="el-icon-success"></i>
+              <el-tag size="small" v-else-if="scope.row.status.id == '2'">
+                <i class="el-icon-warning"></i>
                 {{ scope.row.status.name }}</el-tag
               >
               <el-tag
@@ -621,8 +630,17 @@
                 <i class="el-icon-question"></i>
                 {{ scope.row.status.name }}</el-tag
               >
+              <el-tag
+                size="small"
+                type="success"
+                v-else-if="scope.row.status.id == '5'"
+              >
+                <i class="el-icon-success"></i>
+                {{ scope.row.status.name }}</el-tag
+              >
             </template>
           </el-table-column>
+
           <el-table-column
             label="Total"
             width="80"
@@ -634,7 +652,30 @@
               <span>{{ scope.row.ventaTotal | formatMoney }}</span>
             </template>
           </el-table-column>
-          <el-table-column label width="70" align="center">
+          <el-table-column label width="100" align="center">
+            <!-- dropdpwn selecction -->
+            <template slot="header" v-if="multipleSelection.length > 0">
+              <el-dropdown trigger="click" size="mini">
+                <el-button size="mini" type="primary" class="group">
+                  <span class="hidden group-hover:inline">
+                    {{ multipleSelection.length }} Filas</span
+                  >
+                  <i class="el-icon-more"
+                /></el-button>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item>
+                    <i class="el-icon-view"></i>Vista previa
+                  </el-dropdown-item>
+                  <el-dropdown-item>
+                    <i class="el-icon-printer"></i>Imprimir documento
+                  </el-dropdown-item>
+                  <el-dropdown-item :divided="true">
+                    <i class="el-icon-refresh-left"></i> Revertir estados
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </template>
+            <!-- dropdown 1 -->
             <template slot-scope="scope">
               <el-dropdown trigger="click" szie="mini">
                 <el-button icon="el-icon-more" size="mini" />
@@ -786,6 +827,7 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+      multipleSelection: [],
       errorMessage: "",
       pageloading: true,
       tableloading: false,
@@ -822,6 +864,9 @@ export default {
     };
   },
   methods: {
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
     sortBy({ column, prop, order }) {
       this.filter.prop = prop;
       this.filter.order = order;

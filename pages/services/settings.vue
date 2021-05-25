@@ -17,7 +17,7 @@
           .catch(() => {})
       "
     >
-      <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
+      <el-tab-pane label="Integraciones" name="integrations" class="space-y-2">
         <Notification
           class="w-full"
           type="info"
