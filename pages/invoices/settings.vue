@@ -5,7 +5,356 @@
       { name: 'Ventas', to: '/invoices' },
       { name: 'Configuraciones', to: null },
     ]"
+    v-loading="pageloading"
   >
+    <!-- TODORealizar funcionamiento de agregar autorizacion. -->
+    <!-- <el-dialog
+      title="Nueva Autorización"
+      :visible.sync="showAuthorization"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      width="400px"
+    >
+      <div class=" flex flex-col space-y-2">
+        <el-form>
+          <div class="grid grid-cols-12 gap-4">
+            <el-form-item label="N° Autorización" class="col-span-12">
+              <el-input
+                placeholder="N° Autorización"
+                class="w-full"
+                size="small"
+                v-model="d"
+              />
+            </el-form-item>
+          </div>
+
+          <div class="grid grid-cols-12 gap-4">
+            <el-form-item label="Inicial" class="col-span-6">
+              <el-input-number
+                placeholder="Inicial"
+                style="width:100%;"
+                size="small"
+                v-model="d"
+              />
+            </el-form-item>
+            <el-form-item label="Final" class="col-span-6">
+              <el-input-number
+                placeholder="Final"
+                style="width:100%;"
+                size="small"
+                v-model="d"
+              />
+            </el-form-item>
+          </div>
+
+          <div class="flex flex-rows justify-end">
+            <el-button size="small" type="primary">Guardar</el-button>
+            <el-button size="small" @click="showAuthorization = false">
+              Cancelar
+            </el-button>
+          </div>
+        </el-form>
+      </div>
+    </el-dialog> -->
+
+    <!-- dialogo zonas -->
+    <el-dialog
+      :append-to-body="true"
+      title="Nueva zona"
+      :visible.sync="showNewZone"
+      width="30%"
+      @close="closeDialog('newZoneForm')"
+    >
+      <el-form
+        :model="newZoneForm"
+        :rules="newzoneRules"
+        status-icon
+        ref="newZoneForm"
+        @submit.prevent.native="submitZone('newZoneForm', newZoneForm)"
+      >
+        <div class="grid grid-cols-12 gap-4">
+          <el-form-item
+            label="Nombre de la zona"
+            prop="name"
+            class="col-span-12"
+          >
+            <el-input
+              v-model="newZoneForm.name"
+              clearable
+              type="text"
+              maxlength="100"
+              minlength="5"
+              show-word-limit
+            ></el-input>
+          </el-form-item>
+        </div>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button
+          type="primary"
+          size="small"
+          @click.native="submitZone('newZoneForm', newZoneForm)"
+          >Guardar</el-button
+        >
+        <el-button @click="showNewZone = false" size="small"
+          >Cancelar</el-button
+        >
+      </span>
+    </el-dialog>
+    <!-- dialogo para editar zona -->
+    <el-dialog
+      :append-to-body="true"
+      title="Editar zona zona"
+      :visible.sync="showEditZone"
+      width="30%"
+      @close="closeDialog('editZoneForm')"
+    >
+      <el-form
+        :model="editZoneForm"
+        :rules="newzoneRules"
+        status-icon
+        ref="editZoneForm"
+        @submit.prevent.native="submitZone('editZoneForm', editZoneForm)"
+      >
+        <div class=" grid grid-cols-12 gap-4">
+          <el-form-item
+            label="Nombre de la zona"
+            prop="name"
+            class="col-span-12"
+          >
+            <el-input
+              v-model="editZoneForm.name"
+              clearable
+              type="text"
+              maxlength="100"
+              minlength="5"
+              show-word-limit
+            ></el-input>
+          </el-form-item>
+        </div>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button
+          type="primary"
+          size="small"
+          @click.native="submitZone('editZoneForm', editZoneForm)"
+          >Guardar</el-button
+        >
+        <el-button @click="showEditZone = false" size="small"
+          >Cancelar</el-button
+        >
+      </span>
+    </el-dialog>
+    <!-- dialogo nuevo vendedor -->
+    <el-dialog
+      :append-to-body="true"
+      title="Nuevo vendedor"
+      :visible.sync="showNewSeller"
+      width="30%"
+      @close="closeDialog('newSellerForm')"
+    >
+      <el-form
+        :model="newSellerForm"
+        :rules="newzoneRules"
+        status-icon
+        ref="newSellerForm"
+        @submit.prevent.native="submitSeller('newSellerForm', newSellerForm)"
+      >
+        <div>
+          <el-form-item label="Nombre del vendedor" prop="name">
+            <el-input
+              clearable
+              v-model="newSellerForm.name"
+              size="small"
+              auto-complete="off"
+            />
+          </el-form-item>
+
+          <el-form-item label="Zona asignada" prop="invoicesZone">
+            <el-select
+              v-model="newSellerForm.invoicesZone"
+              placeholder="Selecionar"
+              size="small"
+              class="w-full"
+              clearable
+              default-first-option
+            >
+              <el-option
+                v-for="z in activeZones"
+                :key="z.id"
+                :label="z.name"
+                :value="z.id"
+                class="w-full"
+              />
+            </el-select>
+          </el-form-item>
+        </div>
+      </el-form>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button
+          type="primary"
+          size="small"
+          @click.native="
+            submitEditSeller('editSellerForm', sellerId, editSellerForm)
+          "
+          >Guardar</el-button
+        >
+        <el-button @click="showEditSeller = false" size="small"
+          >Cancelar</el-button
+        >
+      </span>
+    </el-dialog>
+    <!-- dialogo editar vendedores -->
+    <el-dialog
+      :append-to-body="true"
+      title="Editar vendedor"
+      :visible.sync="showEditSeller"
+      width="30%"
+      @close="closeDialog('editSellerForm')"
+    >
+      <el-form
+        :model="editSellerForm"
+        :rules="newzoneRules"
+        status-icon
+        ref="editSellerForm"
+        @submit.prevent.native="
+          submitEditSeller('editSellerForm', sellerId, editSellerForm)
+        "
+      >
+        <div>
+          <el-row :gutter="15">
+            <el-col :span="15">
+              <el-form-item label="Nombre del vendedor" prop="name">
+                <el-input
+                  clearable
+                  v-model="editSellerForm.name"
+                  size="small"
+                  auto-complete="off"
+                />
+              </el-form-item>
+            </el-col>
+            <el-col :span="9">
+              <el-form-item label="Zona asignada" prop="invoicesZone">
+                <el-select
+                  v-model="editSellerForm.invoicesZone"
+                  placeholder="Selecionar"
+                  size="small"
+                  class="w-full"
+                  clearable
+                  default-first-option
+                >
+                  <el-option
+                    v-for="z in activeZones"
+                    :key="z.id"
+                    :label="z.name"
+                    :value="z.id"
+                    class="w-full"
+                  />
+                </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </div>
+      </el-form>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button
+          type="primary"
+          size="small"
+          @click.native="
+            submitEditSeller('editSellerForm', sellerId, editSellerForm)
+          "
+          >Guardar</el-button
+        >
+        <el-button @click="showEditSeller = false" size="small"
+          >Cancelar</el-button
+        >
+      </span>
+    </el-dialog>
+
+    <!-- Dialogo para agregar nueva condicion de pago -->
+    <el-dialog
+      :append-to-body="true"
+      title="Nueva condición de pago"
+      :visible.sync="showNewPayment"
+      width="30%"
+      @close="closeDialog('newPaymentForm')"
+    >
+      <el-form
+        :model="newPaymentForm"
+        :rules="newzoneRules"
+        status-icon
+        ref="newPaymentForm"
+        @submit.prevent.native="submitPayment('newPaymentForm', newPaymentForm)"
+      >
+        <div>
+          <el-form-item label="Nombre de la condición de pago" prop="name">
+            <el-input
+              v-model="newPaymentForm.name"
+              clearable
+              type="text"
+              maxlength="100"
+              minlength="5"
+              show-word-limit
+            ></el-input>
+          </el-form-item>
+        </div>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button
+          type="primary"
+          size="small"
+          @click.native="submitPayment('newPaymentForm', newPaymentForm)"
+          >Guardar</el-button
+        >
+        <el-button @click="showNewPayment = false" size="small"
+          >Cancelar</el-button
+        >
+      </span>
+    </el-dialog>
+
+    <!-- Dialogo para editar condicion de pago -->
+    <el-dialog
+      :append-to-body="true"
+      title="Editar condición de pago"
+      :visible.sync="showEditPayment"
+      width="30%"
+      @close="closeDialog('editPaymentForm')"
+    >
+      <el-form
+        :model="editPaymentForm"
+        :rules="newzoneRules"
+        status-icon
+        ref="editPaymentForm"
+        @submit.prevent.native="
+          submitPayment('editPaymentForm', editPaymentForm)
+        "
+      >
+        <el-form-item label="Nombre la condición de pago" prop="name">
+          <el-input
+            v-model="editPaymentForm.name"
+            clearable
+            type="text"
+            maxlength="100"
+            minlength="5"
+            show-word-limit
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button
+          type="primary"
+          size="small"
+          @click.native="submitPayment('editPaymentForm', editPaymentForm)"
+          >Guardar</el-button
+        >
+        <el-button @click="showEditPayment = false" size="small"
+          >Cancelar</el-button
+        >
+      </span>
+    </el-dialog>
+
     <el-tabs
       v-model="tab"
       @tab-click="
@@ -18,217 +367,6 @@
       "
     >
       <el-tab-pane label="Zonas y vendedores" name="zones-sellers">
-        <!-- dialogo zonas -->
-        <el-dialog
-          :append-to-body="true"
-          title="Nueva zona"
-          :visible.sync="showNewZone"
-          width="30%"
-          @close="closeDialog('newZoneForm')"
-        >
-          <el-form
-            :model="newZoneForm"
-            :rules="newzoneRules"
-            status-icon
-            ref="newZoneForm"
-            @submit.prevent.native="submitZone('newZoneForm', newZoneForm)"
-          >
-            <div>
-              <el-form-item label="Nombre de la zona" prop="name">
-                <el-input
-                  v-model="newZoneForm.name"
-                  clearable
-                  type="text"
-                  maxlength="100"
-                  minlength="5"
-                  show-word-limit
-                ></el-input>
-              </el-form-item>
-            </div>
-          </el-form>
-          <span slot="footer" class="dialog-footer">
-            <el-button
-              type="primary"
-              size="small"
-              @click.native="submitZone('newZoneForm', newZoneForm)"
-              >Guardar</el-button
-            >
-            <el-button @click="showNewZone = false" size="small"
-              >Cancelar</el-button
-            >
-          </span>
-        </el-dialog>
-        <!-- dialogo para editar zona -->
-        <el-dialog
-          :append-to-body="true"
-          title="Editar zona zona"
-          :visible.sync="showEditZone"
-          width="30%"
-          @close="closeDialog('editZoneForm')"
-        >
-          <el-form
-            :model="editZoneForm"
-            :rules="newzoneRules"
-            status-icon
-            ref="editZoneForm"
-            @submit.prevent.native="submitZone('editZoneForm', editZoneForm)"
-          >
-            <div>
-              <el-form-item label="Nombre de la zona" prop="name">
-                <el-input
-                  v-model="editZoneForm.name"
-                  clearable
-                  type="text"
-                  maxlength="100"
-                  minlength="5"
-                  show-word-limit
-                ></el-input>
-              </el-form-item>
-            </div>
-          </el-form>
-          <span slot="footer" class="dialog-footer">
-            <el-button
-              type="primary"
-              size="small"
-              @click.native="submitZone('editZoneForm', editZoneForm)"
-              >Guardar</el-button
-            >
-            <el-button @click="showEditZone = false" size="small"
-              >Cancelar</el-button
-            >
-          </span>
-        </el-dialog>
-        <!-- dialogo nuevo vendedor -->
-        <el-dialog
-          :append-to-body="true"
-          title="Nuevo vendedor"
-          :visible.sync="showNewSeller"
-          width="30%"
-          @close="closeDialog('newSellerForm')"
-        >
-          <el-form
-            :model="newSellerForm"
-            :rules="newzoneRules"
-            status-icon
-            ref="newSellerForm"
-            @submit.prevent.native="
-              submitSeller('newSellerForm', newSellerForm)
-            "
-          >
-            <div>
-              <el-row :gutter="15">
-                <el-col :span="15">
-                  <el-form-item label="Nombre del vendedor" prop="name">
-                    <el-input
-                      clearable
-                      v-model="newSellerForm.name"
-                      size="small"
-                      auto-complete="off"
-                    />
-                  </el-form-item>
-                </el-col>
-                <el-col :span="9">
-                  <el-form-item label="Zona asignada" prop="invoicesZone">
-                    <el-select
-                      v-model="newSellerForm.invoicesZone"
-                      placeholder="Seleccionar"
-                      size="small"
-                      class="w-full"
-                      clearable
-                      default-first-option
-                    >
-                      <el-option
-                        v-for="z in activeZones"
-                        :key="z.id"
-                        :label="z.name"
-                        :value="z.id"
-                        class="w.full"
-                      />
-                    </el-select>
-                  </el-form-item>
-                </el-col>
-              </el-row>
-            </div>
-          </el-form>
-          <span slot="footer" class="dialog-footer">
-            <el-button
-              type="primary"
-              size="small"
-              @click.native="submitSeller('newSellerForm', newSellerForm)"
-              >Guardar</el-button
-            >
-            <el-button @click="showNewSeller = false" size="small"
-              >Cancelar</el-button
-            >
-          </span>
-        </el-dialog>
-        <!-- dialogo editar vendedores -->
-        <el-dialog
-          :append-to-body="true"
-          title="Editar vendedor"
-          :visible.sync="showEditSeller"
-          width="30%"
-          @close="closeDialog('editSellerForm')"
-        >
-          <el-form
-            :model="editSellerForm"
-            :rules="newzoneRules"
-            status-icon
-            ref="editSellerForm"
-            @submit.prevent.native="
-              submitEditSeller('editSellerForm', sellerId, editSellerForm)
-            "
-          >
-            <div>
-              <el-row :gutter="15">
-                <el-col :span="15">
-                  <el-form-item label="Nombre del vendedor" prop="name">
-                    <el-input
-                      clearable
-                      v-model="editSellerForm.name"
-                      size="small"
-                      auto-complete="off"
-                    />
-                  </el-form-item>
-                </el-col>
-                <el-col :span="9">
-                  <el-form-item label="Zona asignada" prop="invoicesZone">
-                    <el-select
-                      v-model="editSellerForm.invoicesZone"
-                      placeholder="Selecionar"
-                      size="small"
-                      class="w-full"
-                      clearable
-                      default-first-option
-                    >
-                      <el-option
-                        v-for="z in activeZones"
-                        :key="z.id"
-                        :label="z.name"
-                        :value="z.id"
-                        class="w.full"
-                      />
-                    </el-select>
-                  </el-form-item>
-                </el-col>
-              </el-row>
-            </div>
-          </el-form>
-
-          <span slot="footer" class="dialog-footer">
-            <el-button
-              type="primary"
-              size="small"
-              @click.native="
-                submitEditSeller('editSellerForm', sellerId, editSellerForm)
-              "
-              >Guardar</el-button
-            >
-            <el-button @click="showEditSeller = false" size="small"
-              >Cancelar</el-button
-            >
-          </span>
-        </el-dialog>
         <!-- Inicio de tablas zonas y vendedores -->
         <div class="grid grid-cols-12 gap-4">
           <!-- tabla de zonas -->
@@ -361,90 +499,6 @@
 
       <!-- Tabla de condiciones de pago -->
       <el-tab-pane label="Condiciones de pago" name="payment-conditions">
-        <!-- Dialogo para agregar nueva condicion de pago -->
-        <el-dialog
-          :append-to-body="true"
-          title="Nueva condición de pago"
-          :visible.sync="showNewPayment"
-          width="30%"
-          @close="closeDialog('newPaymentForm')"
-        >
-          <el-form
-            :model="newPaymentForm"
-            :rules="newzoneRules"
-            status-icon
-            ref="newPaymentForm"
-            @submit.prevent.native="
-              submitPayment('newPaymentForm', newPaymentForm)
-            "
-          >
-            <div>
-              <el-form-item label="Nombre de la condición de pago" prop="name">
-                <el-input
-                  v-model="newPaymentForm.name"
-                  clearable
-                  type="text"
-                  maxlength="100"
-                  minlength="5"
-                  show-word-limit
-                ></el-input>
-              </el-form-item>
-            </div>
-          </el-form>
-          <span slot="footer" class="dialog-footer">
-            <el-button
-              type="primary"
-              size="small"
-              @click.native="submitPayment('newPaymentForm', newPaymentForm)"
-              >Guardar</el-button
-            >
-            <el-button @click="showNewPayment = false" size="small"
-              >Cancelar</el-button
-            >
-          </span>
-        </el-dialog>
-
-        <!-- Dialogo para editar condicion de pago -->
-        <el-dialog
-          :append-to-body="true"
-          title="Editar condición de pago"
-          :visible.sync="showEditPayment"
-          width="30%"
-          @close="closeDialog('editPaymentForm')"
-        >
-          <el-form
-            :model="editPaymentForm"
-            :rules="newzoneRules"
-            status-icon
-            ref="editPaymentForm"
-            @submit.prevent.native="
-              submitPayment('editPaymentForm', editPaymentForm)
-            "
-          >
-            <el-form-item label="Nombre la condición de pago" prop="name">
-              <el-input
-                v-model="editPaymentForm.name"
-                clearable
-                type="text"
-                maxlength="100"
-                minlength="5"
-                show-word-limit
-              ></el-input>
-            </el-form-item>
-          </el-form>
-          <span slot="footer" class="dialog-footer">
-            <el-button
-              type="primary"
-              size="small"
-              @click.native="submitPayment('editPaymentForm', editPaymentForm)"
-              >Guardar</el-button
-            >
-            <el-button @click="showEditPayment = false" size="small"
-              >Cancelar</el-button
-            >
-          </span>
-        </el-dialog>
-
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-6 flex flex-col space-y-4">
             <div class="flex justify-between items-center">
@@ -512,25 +566,38 @@
         </div>
       </el-tab-pane>
 
-      <el-tab-pane label="Correlativos">
-        <el-form v-model="documents">
+      <el-tab-pane label="Correlativos" name="correlatives">
+        <el-form :model="correlativeForm" ref="correlativeForm">
           <div class="grid grid-cols-12 gap-4">
             <div
-              v-for="(d, i) of documents"
-              :key="i"
+              v-for="(correlative, index) of correlativeForm.documents"
+              :key="index"
               class="col-span-4 bg-white"
             >
               <div class="border-2 p-5 border-blue-800 rounded-md">
                 <!-- Consumidor final, Switch y Button -->
                 <div class="grid grid-cols-12 gap-4">
                   <div class="col-span-8">
-                    <el-form-item class="font-semibold text-blue-800">{{
-                      d.documentType ? d.documentType.name : ""
-                    }}</el-form-item>
+                    <el-form-item label="" class="font-semibold text-blue-800"
+                      ><span>{{
+                        correlative.documentType
+                          ? correlative.documentType.name
+                          : ""
+                      }}</span></el-form-item
+                    >
                   </div>
                   <div class="col-span-2">
                     <el-form-item>
-                      <el-switch v-model="d.active"></el-switch>
+                      <el-switch
+                        v-model="correlative.active"
+                        @change="
+                          changeActiveCorrelative(
+                            'correlativeForm',
+                            correlative,
+                            index
+                          )
+                        "
+                      ></el-switch>
                     </el-form-item>
                   </div>
                   <div class="col-span-2">
@@ -539,7 +606,7 @@
                         type="primary"
                         icon="el-icon-plus"
                         size="mini"
-                        :disabled="true"
+                        @click="showAuthorization = true"
                       ></el-button>
                     </el-form-item>
                   </div>
@@ -547,12 +614,33 @@
                 <!-- Autorización -->
                 <div class="grid grid-cols-12 gap-4">
                   <div class="col-span-12">
-                    <el-form-item label="N° Autorización">
+                    <el-form-item
+                      label="N° Autorización"
+                      :prop="`documents.${index}.authorization`"
+                      :rules="
+                        correlative.active
+                          ? [
+                              {
+                                required: true,
+                                message: 'Este campo es requerido.',
+                                trigger: 'change',
+                              },
+                              ,
+                            ]
+                          : {}
+                      "
+                    >
                       <el-input
                         class="w-full"
                         size="small"
-                        :disabled="true"
-                        v-model="d.authorization"
+                        :disabled="
+                          correlative.active
+                            ? correlative.used
+                              ? true
+                              : false
+                            : true
+                        "
+                        v-model="correlative.authorization"
                       ></el-input>
                     </el-form-item>
                   </div>
@@ -560,36 +648,114 @@
                 <!-- Inicial, Final -->
                 <div class="grid grid-cols-12 gap-4">
                   <div class="col-span-6">
-                    <el-form-item label="Inicial">
-                      <el-input
+                    <el-form-item
+                      label="Inicial"
+                      :prop="`documents.${index}.initial`"
+                      :rules="
+                        correlative.active
+                          ? [
+                              {
+                                required: true,
+                                message: 'Este campo es requerido.',
+                                trigger: 'change',
+                              },
+                              {
+                                type: 'integer',
+                                message: 'Debe ser de tipo entero.',
+                              },
+                            ]
+                          : null
+                      "
+                    >
+                      <el-input-number
                         class="w-full"
                         size="small"
-                        :disabled="true"
-                        v-model="d.initial"
-                      ></el-input>
+                        :disabled="
+                          correlative.active
+                            ? correlative.used
+                              ? true
+                              : false
+                            : true
+                        "
+                        v-model="correlative.initial"
+                        style="width: 100%"
+                        :step="1"
+                      ></el-input-number>
                     </el-form-item>
                   </div>
                   <div class="col-span-6">
-                    <el-form-item label="Final">
-                      <el-input
+                    <el-form-item
+                      label="Final"
+                      :prop="`documents.${index}.final`"
+                      :rules="
+                        correlative.active
+                          ? [
+                              {
+                                required: true,
+                                message: 'Este campo es requerido.',
+                                trigger: 'change',
+                              },
+                              {
+                                type: 'integer',
+                                message: 'Debe ser de tipo entero.',
+                              },
+                            ]
+                          : null
+                      "
+                    >
+                      <el-input-number
                         class="w-full"
                         size="small"
-                        :disabled="true"
-                        v-model="d.final"
-                      ></el-input>
+                        :disabled="
+                          correlative.active
+                            ? correlative.used
+                              ? true
+                              : false
+                            : true
+                        "
+                        v-model="correlative.final"
+                        style="width: 100%"
+                        :step="1"
+                      ></el-input-number>
                     </el-form-item>
                   </div>
                 </div>
                 <!-- Actual -->
                 <div class="grid grid-cols-12 gap-4">
                   <div class="col-span-12">
-                    <el-form-item label="Actual">
-                      <el-input
+                    <el-form-item
+                      label="Actual"
+                      :prop="`documents.${index}.current`"
+                      :rules="
+                        correlative.active
+                          ? [
+                              {
+                                required: true,
+                                message: 'Este campo es requerido.',
+                                trigger: 'change',
+                              },
+                              {
+                                type: 'integer',
+                                message: 'Debe ser de tipo entero.',
+                              },
+                            ]
+                          : null
+                      "
+                    >
+                      <el-input-number
                         class="w-full"
                         size="small"
-                        :disabled="true"
-                        v-model="d.current"
-                      ></el-input>
+                        :disabled="
+                          correlative.active
+                            ? correlative.used
+                              ? true
+                              : false
+                            : true
+                        "
+                        v-model="correlative.current"
+                        style="width: 100%"
+                        :step="1"
+                      ></el-input-number>
                     </el-form-item>
                   </div>
                 </div>
@@ -599,7 +765,17 @@
         </el-form>
         <!-- Botones Guardar y Cancelar -->
         <div class="flex justify-end dialog-footer mt-4">
-          <el-button type="primary" size="small">Guardar</el-button>
+          <el-button
+            type="primary"
+            size="small"
+            @click="
+              submitCorrelativeForm(
+                'correlativeForm',
+                correlativeForm.documents.filter((c) => !c.used && c.active)
+              )
+            "
+            >Guardar</el-button
+          >
           <el-button size="small" @click="$router.push('/invoices')"
             >Cancelar</el-button
           >
@@ -645,15 +821,25 @@ export default {
     const documents = () => {
       return this.$axios.get("/invoices/documents");
     };
+    const showAuthorization = () => {
+      return this.$axios.get("/invoices/documents");
+    };
     // promesa que recibe los métodos con las peticiones http
-    Promise.all([zones(), sellers(), payment(), documents()])
+    Promise.all([
+      zones(),
+      sellers(),
+      payment(),
+      documents(),
+      showAuthorization(),
+    ])
       .then((res) => {
         const [zones, sellers, payment, documents] = res;
         this.zones = zones.data.zones;
         this.sellers = sellers.data.sellers;
         this.payments = payment.data.paymentConditions;
-        this.documents = documents.data.documents;
-        this.loading = false;
+        this.correlativeForm.documents = documents.data.documents;
+
+        this.pageloading = false;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
@@ -662,6 +848,8 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+      d: "hola",
+      pageloading: true,
       tab: "zones-sellers",
       utab: "invoicing",
       integrations: [
@@ -682,12 +870,18 @@ export default {
       sellers: [],
       payments: [],
       documents: [],
+
       showNewZone: false,
       showNewSeller: false,
       showNewPayment: false,
       showEditPayment: false,
       showEditZone: false,
       showEditSeller: false,
+      correlativeForm: {
+        documents: [{ authorization: "", initial: "", final: "", current: "" }],
+      },
+      showAuthorization: false,
+
       newZoneForm: {
         name: "",
       },
@@ -1038,7 +1232,6 @@ export default {
       });
     },
     submitSeller(formName, { name, invoicesZone }) {
-      console.log(name, invoicesZone);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -1093,7 +1286,6 @@ export default {
       this.showEditSeller = true;
     },
     submitEditSeller(formName, sellerId, { name, invoicesZone }) {
-      console.log(name, invoicesZone);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -1202,10 +1394,145 @@ export default {
       this.editZoneForm = { ...zone };
       this.showEditZone = true;
     },
+    async fetchDocuments() {
+      const { data } = await this.$axios.get("/invoices/documents");
+      this.correlativeForm.documents = data.documents;
+      this.pageloading = false;
+    },
+    changeActiveCorrelative(formName, correlative, index) {
+      if (!correlative.id) {
+        if (this.$refs[formName] && !correlative.active) {
+          this.$refs[formName].fields
+            .find((f) => f.prop == `documents.${index}.authorization`)
+            .resetField();
+          this.$refs[formName].fields
+            .find((f) => f.prop == `documents.${index}.initial`)
+            .resetField();
+          this.$refs[formName].fields
+            .find((f) => f.prop == `documents.${index}.final`)
+            .resetField();
+          this.$refs[formName].fields
+            .find((f) => f.prop == `documents.${index}.current`)
+            .resetField();
+        }
+        this.correlativeForm.documents[index].active = correlative.active;
+      } else {
+        this.$confirm(
+          `¿Estás seguro que deseas ${
+            correlative.active ? "activar" : "desactivar"
+          } este documento?`,
+          "Confirmación",
+          {
+            confirmButtonText: `Si, ${
+              correlative.active ? "activar" : "desactivar"
+            }`,
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                this.$axios
+                  .put(`/invoices/documents/status/${correlative.id}`, {
+                    status: correlative.active,
+                  })
+
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Exito",
+                      message: res.data.message,
+                    });
+                    this.fetchDocuments();
+                  })
+                  .catch((err) => {
+                    this.$notify.error({
+                      title: "Error",
+                      message: err.response.data.message,
+                    });
+                  })
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = `Si, ${
+                      correlative.active ? "activar" : "desactivar"
+                    }`;
+                    done();
+                  });
+              } else {
+                done();
+              }
+            },
+          }
+        ).catch(() => {
+          this.correlativeForm.documents[index].active = !correlative.active;
+        });
+      }
+    },
+    submitCorrelativeForm(formName, correlatives) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+
+        this.$confirm(
+          "¿Estás seguro que deseas actualizar estos documentos?",
+          "Confirmación",
+          {
+            confirmButtonText: "Si, actualizar",
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                this.$axios
+                  .put("/invoices/documents", {
+                    documents: correlatives.map((d) => {
+                      return {
+                        id: d.id,
+                        authorization: d.authorization,
+                        initial: d.initial,
+                        final: d.final,
+                        current: d.current,
+                        documentType: d.documentType.id,
+                      };
+                    }),
+                  })
+
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Exito",
+                      message: res.data.message,
+                    });
+                    this.fetchDocuments();
+                    this.pageloading = true;
+                  })
+                  .catch((err) => {
+                    instance.confirmButtonLoading = false;
+                    this.$notify.error({
+                      title: "Error",
+                      message: err.response.data.message,
+                    });
+                  })
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = "Si, actualizar";
+                    done();
+                  });
+              } else {
+                instance.confirmButtonLoading = false;
+                done();
+              }
+            },
+          }
+        );
+      });
+    },
   },
   computed: {
     filteredIntegrations() {
-      return this.integrations.filter((i) => hasModule(i.ref, this.$auth.user));
+      return this.integrations.filter((index) =>
+        hasModule(i.ref, this.$auth.user)
+      );
     },
     activeZones() {
       return this.zones.filter((zone) => zone.active);

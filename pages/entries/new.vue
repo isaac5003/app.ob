@@ -9,6 +9,7 @@
   >
     <!-- dialogo agregar detalle partida-->
     <el-dialog
+      @close="closeDialog('newEntryDetailForm')"
       title="Agregar detalle de partida"
       :visible.sync="showNewEntryDetail"
       width="550px"
@@ -23,22 +24,25 @@
       >
         <el-form-item label="Cuenta contable" prop="accountingCatalog">
           <el-select
-            v-model="newEntryDetailForm.accountingCatalog"
-            clearable
             filterable
+            remote
             default-first-option
-            size="small"
+            clearable
+            v-model="newEntryDetailForm.accountingCatalog"
+            placeholder="Escribe el 
+número o nombre de la cuenta"
+            :remote-method="findAccount"
+            :loading="loadingAccount"
             class="w-full"
-            placeholder="Seleccionar"
+            size="small"
+            @focus="filterCatalog = []"
           >
             <el-option
-              v-for="a in accountingCatalog"
-              :key="a.id"
-              :label="`${a.code} - ${a.name}`"
-              :value="a.id"
-              :disabled="a.isParent == true"
-            >
-            </el-option>
+              v-for="item in filteredCatalog"
+              :key="item.id"
+              :label="`${item.code} - ${item.name}`"
+              :value="item.id"
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="Concepto" prop="concept">
@@ -98,6 +102,7 @@
 
     <!-- dialogo editdetalledepartida-->
     <el-dialog
+      @close="closeDialog('editEntryDetailForm')"
       title="Editar detalle de partida"
       :visible.sync="showEditEntryDetail"
       width="550px"
@@ -115,15 +120,19 @@
             <el-form-item label="Cuenta contable" prop="accountingCatalog">
               <el-select
                 v-model="editEntryDetailForm.accountingCatalog"
-                clearable
                 filterable
+                remote
                 default-first-option
-                size="small"
+                clearable
+                placeholder="Escribe el numero o nombre de la cuenta"
+                :remote-method="findAccount"
+                :loading="loadingAccount"
                 class="w-full"
-                placeholder="Seleccionar"
+                size="small"
+                @focus="filterCatalog = []"
               >
                 <el-option
-                  v-for="aC in accountingCatalog"
+                  v-for="aC in filteredCatalog"
                   :key="aC.id"
                   :label="`${aC.code} - ${aC.name}`"
                   :value="aC.id"
@@ -372,11 +381,12 @@ export default {
   components: { LayoutContent, Notification },
   fetch() {
     const entryTypes = () => this.$axios.get("/entries/types");
-
-    Promise.all([entryTypes()])
+    const accountingCatalog = () => this.$axios.get("/entries/catalog");
+    Promise.all([entryTypes(), accountingCatalog()])
       .then((res) => {
-        const [entryTypes] = res;
+        const [entryTypes, catalog] = res;
         this.entryTypes = entryTypes.data.entryTypes;
+        this.accountingCatalog = catalog.data.accountingCatalog;
         this.loading = false;
       })
       .catch((err) => {
@@ -394,6 +404,7 @@ export default {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.newEntryDetailForm.abono = 0;
           callback();
         }
       } else if (abono && val) {
@@ -414,6 +425,7 @@ export default {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.newEntryDetailForm.cargo = 0;
           callback();
         }
       } else if (cargo && val) {
@@ -434,6 +446,7 @@ export default {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.editEntryDetailForm.abono = 0;
           callback();
         }
       } else if (abono && val) {
@@ -454,6 +467,7 @@ export default {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.editEntryDetailForm.cargo = 0;
           callback();
         }
       } else if (cargo && val) {
@@ -468,6 +482,8 @@ export default {
       loading: false,
       entryTypes: [],
       accountingCatalog: [],
+      filteredCatalog: [],
+      loadingAccount: false,
       newEntryForm: {
         entryType: "",
         date: this.$dateFns.format(new Date(), "yyyy-MM-dd"),
@@ -495,13 +511,13 @@ export default {
         cargo: [
           {
             validator: newCargoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
         abono: [
           {
             validator: newAbonoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
       },
@@ -517,13 +533,13 @@ export default {
         cargo: [
           {
             validator: editCargoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
         abono: [
           {
             validator: editAbonoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
       },
@@ -582,10 +598,10 @@ export default {
         }
         this.accountingEntryDetails.push({
           ...data,
-          catalogCode: this.accountingCatalog.find(
-            (c) => c.id == data.accountingCatalog
-          ).code,
+          code: this.filteredCatalog.find((c) => c.id == data.accountingCatalog)
+            .code,
         });
+
         this.showNewEntryDetail = false;
         this.checkEntry();
       });
@@ -620,30 +636,38 @@ export default {
         this.accountingEntryDetails.splice(index, 1);
       });
     },
-    async getAccountingCatalog() {
-      try {
-        const { data } = await this.$axios.get("/entries/catalog");
-        this.accountingCatalog = data.accountingCatalog;
-      } catch (error) {
-        this.errorMessage = err.response.data.message;
+    closeDialog(formName) {
+      if (this.$refs[formName]) {
+        this.$refs[formName].resetFields();
+        this.filteredCatalog = [];
       }
     },
     openNewEntryDetail() {
-      this.getAccountingCatalog();
       this.showNewEntryDetail = true;
-      if (this.$refs["newEntryDetailForm"]) {
-        this.$refs["newEntryDetailForm"].resetFields();
+    },
+    findAccount(query) {
+      if (query != "") {
+        this.loadingAccount = true;
+        this.$axios
+          .get("/entries/catalog", { params: { search: query.toLowerCase() } })
+          .then((res) => {
+            this.filteredCatalog = res.data.accountingCatalog;
+
+            this.loadingAccount = false;
+          })
+          .catch((err) => (this.errorMessage = err.response.data.message));
+      } else {
+        this.filteredCatalog = [];
       }
     },
 
     openEditEntryDetail(index, details) {
-      this.getAccountingCatalog();
       this.editingEntryDetail = index;
       this.editEntryDetailForm = { ...details };
+      this.filteredCatalog = this.accountingCatalog.filter(
+        (ac) => ac.id == details.accountingCatalog
+      );
       this.showEditEntryDetail = true;
-      if (this.$refs["editEntryDetailForm"]) {
-        this.$refs["editEntryDetailForm"].resetFields();
-      }
     },
     updateDetail(index, formName, form) {
       this.$refs[formName].validate(async (valid) => {
@@ -652,11 +676,9 @@ export default {
         }
         this.accountingEntryDetails.splice(index, 1, {
           ...form,
-          code: this.accountingCatalog.find(
-            (c) => c.id == form.accountingCatalog
-          ).code,
+          code: this.filteredCatalog.find((c) => c.id == form.accountingCatalog)
+            .code,
         });
-        console.log(this.accountingEntryDetails);
 
         this.showEditEntryDetail = false;
         this.checkEntry();

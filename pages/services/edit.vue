@@ -20,7 +20,7 @@
         <el-form-item
           label="Nombre del servicio"
           prop="name"
-          class="col-span-5"
+          class="col-span-8"
         >
           <el-input
             ref="name"
@@ -45,6 +45,17 @@
             style="width: 100%"
           />
         </el-form-item>
+        <el-form-item class="col-span-2 pt-4" prop="incRenta">
+          <el-checkbox
+            v-model="servicesEditForm.incRenta"
+            size="small"
+            class="w-full"
+            label="Desc. 10% Renta"
+            border
+          />
+        </el-form-item>
+      </div>
+      <div class="grid grid-cols-12 gap-4">
         <el-form-item
           label="Tipo de venta"
           prop="sellingType"
@@ -54,6 +65,7 @@
             ref="sellingType"
             v-model="servicesEditForm.sellingType"
             class="w-full"
+            @change="changeIva(servicesEditForm.sellingType)"
           >
             <el-row :gutter="15">
               <el-col :span="8" v-for="(s, k) in sellingTypes" :key="k">
@@ -63,6 +75,16 @@
               </el-col>
             </el-row>
           </el-radio-group>
+        </el-form-item>
+        <el-form-item class="col-span-2 pt-4" prop="incIva">
+          <el-checkbox
+            size="small"
+            class="w-full"
+            label="Inc. IVA"
+            border
+            v-model="servicesEditForm.incIva"
+            :disabled="servicesEditForm.sellingType !== 3"
+          />
         </el-form-item>
       </div>
       <el-form-item label="Descripción del servicio" prop="description">
@@ -88,6 +110,7 @@
     </el-form>
   </layout-content>
 </template>
+
 
 <script>
 import LayoutContent from "../../components/layout/Content";
@@ -139,6 +162,8 @@ export default {
         cost: "",
         sellingType: "",
         description: "",
+        incIva: false,
+        incRenta: false,
       },
       servicesEditFormRules: {
         name: inputValidation(true, 5, 60),
@@ -149,7 +174,10 @@ export default {
     };
   },
   methods: {
-    submitEditService(formName, { name, cost, sellingType, description }) {
+    submitEditService(
+      formName,
+      { name, cost, sellingType, description, incIva, incRenta }
+    ) {
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
@@ -172,6 +200,8 @@ export default {
                     cost,
                     sellingType,
                     description,
+                    incIva,
+                    incRenta,
                   })
                   .then((res) => {
                     this.$notify.success({
@@ -198,6 +228,13 @@ export default {
           }
         );
       });
+    },
+    changeIva(sellingTypeValue) {
+      if (sellingTypeValue !== 3) {
+        this.servicesEditForm.incIva = false;
+      } else {
+        this.servicesEditForm.incIva = false;
+      }
     },
   },
 };

@@ -9,12 +9,12 @@
   >
     <!-- dialogo adddetalledepartida-->
     <el-dialog
+      @close="closeDialog('newEntryDetailForm')"
       title="Agregar detalle de partida"
       :visible.sync="showAddEntryDetail"
       width="550px"
       :close-on-click-modal="false"
       :append-to-body="true"
-      @open="resetForm('newEntryDetailForm')"
     >
       <el-form
         :model="newEntryDetailForm"
@@ -31,13 +31,17 @@
                 v-model="newEntryDetailForm.accountingCatalog"
                 clearable
                 filterable
+                remote
                 default-first-option
                 size="small"
                 class="w-full"
-                placeholder="Seleccionar"
+                placeholder="Escribe el número o nombre de la cuenta"
+                :remote-method="findAccount"
+                :loading="loadingAccount"
+                @focus="filterCatalog = []"
               >
                 <el-option
-                  v-for="aC in accountingCatalog"
+                  v-for="aC in filteredCatalog"
                   :key="aC.id"
                   :label="`${aC.code} - ${aC.name}`"
                   :value="aC.id"
@@ -113,6 +117,7 @@
     </el-dialog>
     <!-- dialogo editdetalledepartida-->
     <el-dialog
+      @close="closeDialog('editEntryDetailForm')"
       title="Editar detalle de partida"
       :visible.sync="showEditEntryDetail"
       width="550px"
@@ -132,15 +137,19 @@
             <el-form-item label="Cuenta contable" prop="accountingCatalog">
               <el-select
                 v-model="editEntryDetailForm.accountingCatalog"
-                clearable
                 filterable
+                remote
                 default-first-option
-                size="small"
+                clearable
+                placeholder="Escribe el numero o nombre de la cuenta"
+                :remote-method="findAccount"
+                :loading="loadingAccount"
                 class="w-full"
-                placeholder="Seleccionar"
+                size="small"
+                @focus="filterCatalog = []"
               >
                 <el-option
-                  v-for="aC in accountingCatalog"
+                  v-for="aC in filteredCatalog"
                   :key="aC.id"
                   :label="`${aC.code} - ${aC.name}`"
                   :value="aC.id"
@@ -393,7 +402,6 @@
     </div>
   </layout-content>
 </template>
-
 <script>
 import LayoutContent from "../../components/layout/Content";
 import {
@@ -410,11 +418,12 @@ export default {
   fetch() {
     const entryTypes = () => this.$axios.get(`/entries/types`);
     const entry = () => this.$axios.get(`/entries/${this.$route.query.ref}`);
-
-    Promise.all([entryTypes(), entry()])
+    const accountingCatalog = () => this.$axios.get("/entries/catalog");
+    Promise.all([entryTypes(), entry(), accountingCatalog()])
       .then((res) => {
-        const [entryTypes, entry] = res;
+        const [entryTypes, entry, accountingCatalog] = res;
         this.accountingEntryTypes = entryTypes.data.entryTypes;
+        this.accountingCatalog = accountingCatalog.data.accountingCatalog;
         this.editEntryForm = {
           ...entry.data.entry,
           accountingEntryType: entry.data.entry.accountingEntryType.id,
@@ -450,6 +459,7 @@ export default {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.newEntryDetailForm.abono = 0;
           callback();
         }
       } else if (abono && val) {
@@ -470,6 +480,7 @@ export default {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.newEntryDetailForm.cargo = 0;
           callback();
         }
       } else if (cargo && val) {
@@ -490,6 +501,7 @@ export default {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.editEntryDetailForm.abono = 0;
           callback();
         }
       } else if (abono && val) {
@@ -510,6 +522,7 @@ export default {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.editEntryDetailForm.cargo = 0;
           callback();
         }
       } else if (cargo && val) {
@@ -524,6 +537,7 @@ export default {
       showEditEntryDetail: false,
       showAddEntryDetail: false,
       loading: false,
+      loadingAccount: false,
       editEntryForm: {
         accountingEntryType: "",
         title: "",
@@ -555,13 +569,13 @@ export default {
         cargo: [
           {
             validator: editCargoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
         abono: [
           {
             validator: editAbonoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
       },
@@ -571,13 +585,13 @@ export default {
         cargo: [
           {
             validator: newCargoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
         abono: [
           {
             validator: newAbonoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
       },
@@ -608,6 +622,7 @@ export default {
           },
         ],
       },
+      filteredCatalog: [],
       accountingEntryTypes: [],
       accountingEntryDetails: [],
       editingEntryDetail: "",
@@ -651,18 +666,8 @@ export default {
       });
       return result;
     },
-    async getAccountingCatalog() {
-      await this.$axios
-        .get("/entries/catalog")
-        .then((res) => {
-          this.accountingCatalog = res.data.accountingCatalog;
-        })
-        .catch((err) => {
-          this.errorMessage = err.response.data.message;
-        });
-    },
+
     openAddEntryDetail() {
-      this.getAccountingCatalog();
       this.showAddEntryDetail = true;
     },
     resetForm(formName) {
@@ -671,27 +676,48 @@ export default {
       }
     },
     openEditEntryDetail(index, details) {
-      this.getAccountingCatalog();
       this.editingEntryDetail = index;
       this.editEntryDetailForm = { ...details };
+      this.filteredCatalog = this.accountingCatalog.filter(
+        (ac) => ac.id == details.accountingCatalog
+      );
       this.showEditEntryDetail = true;
     },
     addToEntryDetails(formName, data) {
+      console.log(data);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
         }
-
         this.accountingEntryDetails.push({
           ...data,
-
-          code: this.accountingCatalog.find(
-            (c) => c.id == this.newEntryDetailForm.accountingCatalog
-          ).code,
+          code: this.filteredCatalog.find((c) => c.id == data.accountingCatalog)
+            .code,
         });
         this.showAddEntryDetail = false;
         this.checkEntry();
       });
+    },
+    closeDialog(formName) {
+      if (this.$refs[formName]) {
+        this.$refs[formName].resetFields();
+        this.filteredCatalog = [];
+      }
+    },
+    findAccount(query) {
+      if (query != "") {
+        this.loadingAccount = true;
+        this.$axios
+          .get("/entries/catalog", { params: { search: query.toLowerCase() } })
+          .then((res) => {
+            this.filteredCatalog = res.data.accountingCatalog;
+
+            this.loadingAccount = false;
+          })
+          .catch((err) => (this.errorMessage = err.response.data.message));
+      } else {
+        this.filteredCatalog = [];
+      }
     },
     updateDetail(index, formName, form) {
       this.$refs[formName].validate(async (valid) => {
@@ -701,10 +727,10 @@ export default {
 
         this.accountingEntryDetails.splice(index, 1, {
           ...form,
-          code: this.accountingCatalog.find(
-            (c) => c.id == form.accountingCatalog
-          ).code,
+          code: this.filteredCatalog.find((c) => c.id == form.accountingCatalog)
+            .code,
         });
+        this.accountingEntryDetails;
         this.showEditEntryDetail = false;
         this.checkEntry();
       });
