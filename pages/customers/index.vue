@@ -326,7 +326,7 @@ export default {
     Promise.all([customers()])
       .then((res) => {
         const [customers] = res;
-        this.customers = customers.data;
+        this.customers = customers.data.data;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
@@ -383,7 +383,7 @@ export default {
       this.$axios
         .get("/customers", { params })
         .then((res) => {
-          this.customers = res.data;
+          this.customers = res.data.data;
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
@@ -557,8 +557,7 @@ export default {
     },
     async openCustomerPreview({ id }) {
       const { data } = await this.$axios.get(`/customers/${id}`);
-      (this.selectedCustomer = data.customer),
-        (this.showCustomerPreview = true);
+      (this.selectedCustomer = data.data), (this.showCustomerPreview = true);
     },
     hasModule() {
       return hasModule("f6000cbb-1e6d-4f7d-a7cc-cadd78d23076", this.$auth.user);

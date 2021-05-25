@@ -671,7 +671,7 @@ export default {
         this.$axios
           .get("/entries/catalog", { params: { search: query.toLowerCase() } })
           .then((res) => {
-            this.filteredCatalog = res.data.accountingCatalog;
+            this.filteredCatalog = res.data.data;
             this.loadingAccount = false;
           })
           .catch((err) => (this.errorMessage = err.response.data.message));
