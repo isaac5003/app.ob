@@ -149,7 +149,6 @@
         <el-button size="small" @click="$router.push('/services')"
           >Cancelar</el-button
         >
-        </div>
       </div>
     </el-form>
   </layout-content>
@@ -176,7 +175,6 @@ const storagekey = "report";
 export default {
   name: "CustomerSettings",
   components: { LayoutContent, Notification },
-  fetch() {},
   fetchOnServer: false,
   beforeRouteLeave(to, from, next) {
     checkBeforeLeave(this, storagekey, next);
@@ -292,21 +290,21 @@ export default {
       });
     },
     generateEspecialService(params, fileType) {
-      const bussinesInfo = () => this.$axios.get("/services/report/general");
-      const services = () => this.$axios.get("/services", { params });
+      const report = () => this.$axios.get("/services/report/general");
       switch (fileType) {
         case "pdf":
-          Promise.all([bussinesInfo(), services()]).then((res) => {
-            const [bussinesInfo, services] = res;
-            const bussines = bussinesInfo.data.company;
-            const service = services.data.data;
+          Promise.all([report()]).then((res) => {
+            const [report] = res;
+            const reportData = report.data.data;
+            const { name, nit, nrc } = report.data.company;
+            const nameReport = report.data.name;
             this.reportForm.sellingType = "";
             this.reportForm.status = "";
             this.reportForm.initialCost = "";
             this.reportForm.finalCost = "";
 
             // const name = this.reports.find((r)=> this.reportForm.reportType == r.id).name
-            const values = service.map((s) => {
+            const values = reportData.map((s) => {
               return [
                 { bold: false, text: s.index },
                 { bold: false, text: s.name },
@@ -324,13 +322,7 @@ export default {
               pageSize: "LETTER",
               pageOrientation: "portrait",
               pageMargins: [20, 60, 20, 40],
-              header: getHeader(
-                bussines.name,
-                bussines.nit,
-                bussines.nrc,
-                null,
-                name.toUpperCase()
-              ),
+              header: getHeader(name, nit, nrc, null, nameReport.toUpperCase()),
               footer: getFooter(),
               content: [
                 {
@@ -386,16 +378,16 @@ export default {
           });
           break;
         case "excel":
-          Promise.all([bussinesInfo(), services()]).then((res) => {
-            const [bussinesInfo, services] = res;
-            const bussines = bussinesInfo.data.company;
-            const service = services.data.data;
+          Promise.all([report]).then((res) => {
+            const [report] = res;
+            const reportData = report.data.data;
+            const { name, nit, nrc } = report.data.company;
             this.reportForm.sellingType = "";
             this.reportForm.status = "";
             this.reportForm.initialCost = "";
             this.reportForm.finalCost = "";
             //  const name = this.reports.find((r)=> this.reportForm.reportType == r.id).name
-            const data = service.map((s) => {
+            const data = reportData.map((s) => {
               return [
                 s.index,
                 s.name,
@@ -407,8 +399,8 @@ export default {
             });
 
             const document = [
-              [bussines.name],
-              [name, "", "", `NIT: ${bussines.nit}`, `NRC: ${bussines.nrc}`],
+              [name],
+              [name, "", "", `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               [
                 "#",
@@ -432,13 +424,14 @@ export default {
       }
     },
     generateServiceReport(fileType) {
-      const service = () => this.$axios.get("/services/report/general");
+      const report = () => this.$axios.get("/services/report/general");
       switch (fileType) {
         case "pdf":
-          Promise.all([service()]).then((res) => {
-            const [service] = res;
-            const { company, services } = service.data;
-            const values = services.map((s) => {
+          Promise.all([report()]).then((res) => {
+            const [report] = res;
+            const { company, report } = report.data.data;
+            const nameReport = report.data.name;
+            const values = report.map((s) => {
               return [
                 { bold: false, text: s.index },
                 { bold: false, text: s.name },
@@ -460,7 +453,7 @@ export default {
                 company.nit,
                 company.nrc,
                 null,
-                "REPORTE GENERAL DE SERVICIOS"
+                nameReport
               ),
               footer: getFooter(),
               content: [
@@ -513,11 +506,11 @@ export default {
           });
           break;
         case "excel":
-          Promise.all([service()]).then((res) => {
-            const [service] = res;
-            const { company, services } = service.data;
+          Promise.all([report()]).then((res) => {
+            const [report] = res;
+            const { company, report } = report.data.data;
 
-            const data = services.map((s) => {
+            const data = report.map((s) => {
               return [
                 s.index,
                 s.name,
@@ -552,6 +545,5 @@ export default {
       }
     },
   },
-  computed: {},
 };
 </script>
