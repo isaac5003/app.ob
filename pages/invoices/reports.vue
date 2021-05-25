@@ -539,17 +539,13 @@ export default {
       reports: [
         {
           id: "detalleReportes",
-          name: "Detalle de reportes",
+          name: "Detalle de ventas",
         },
         {
           id: "listadoVentas",
-          name: "Detalle de ventas",
+          name: "Listado de ventas",
         },
       ],
-      page: {
-        limit: 10,
-        page: 1,
-      },
     };
   },
   activeCustomers: [],
