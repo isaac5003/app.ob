@@ -472,12 +472,12 @@ export default {
         this.rawCities = cities.data.data;
         this.catalogs = catalog.data.data;
 
-        const phone = branch.contactInfo.data
-          ? branch.contactInfo.data[0]
-          : branch.contactInfo.data;
-        const email = branch.contactInfo.data
-          ? branch.contactInfo.data[0]
-          : branch.contactInfo.data;
+        const phone = branch.contactInfo.phone
+          ? branch.contactInfo.phone[0]
+          : branch.contactInfo.cellphone;
+        const email = branch.contactInfo.emails
+          ? branch.contactInfo.emails[0]
+          : branch.contactInfo.emails;
         this.customersEditForm = {
           ...customer,
           customerType:

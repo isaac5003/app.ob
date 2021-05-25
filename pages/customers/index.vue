@@ -515,7 +515,6 @@ export default {
     },
     updateSelected(dataSelected, status) {
       const ids = dataSelected.map((x) => x.id);
-      console.log(ids);
       this.$confirm(
         `¿Estás seguro que deseas eliminar este cliente?`,
         "Confirmación",
