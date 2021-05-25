@@ -50,7 +50,11 @@
           </div>
 
           <div class="col-span-3 col-start-11 flex flex-col">
-            <el-button type="primary" size="small" class="text-sm"
+            <el-button
+              type="primary"
+              size="small"
+              class="text-sm"
+              @click="showReceivableFollowing = true"
               >Nuevo seguimiento</el-button
             >
           </div>
