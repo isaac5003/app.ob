@@ -432,14 +432,13 @@ export default {
       }
     },
     generateServiceReport(fileType) {
-      const report = () => this.$axios.get("/services/report/general");
+      const service = () => this.$axios.get("/services/report/general");
       switch (fileType) {
         case "pdf":
-          Promise.all([report()]).then((res) => {
-            const [report] = res;
-            const { company, reportData } = report.data;
-
-            const values = reportData.map((s) => {
+          Promise.all([service()]).then((res) => {
+            const [service] = res;
+            const { company, services } = service.data;
+            const values = services.map((s) => {
               return [
                 { bold: false, text: s.index },
                 { bold: false, text: s.name },
@@ -461,7 +460,7 @@ export default {
                 company.nit,
                 company.nrc,
                 null,
-                nameReport
+                "REPORTE GENERAL DE SERVICIOS"
               ),
               footer: getFooter(),
               content: [
@@ -514,11 +513,11 @@ export default {
           });
           break;
         case "excel":
-          Promise.all([report()]).then((res) => {
-            const [report] = res;
-            const { company, reportData } = report.data.data;
+          Promise.all([service()]).then((res) => {
+            const [service] = res;
+            const { company, services } = service.data;
 
-            const data = reportData.map((s) => {
+            const data = services.map((s) => {
               return [
                 s.index,
                 s.name,
