@@ -195,18 +195,19 @@ export default {
       });
     },
     reportCustomers(fileType) {
-      const customers = () => this.$axios.get("/customers");
-      const bussinesInfo = () => this.$axios.get("/business/info");
+      const report = () => this.$axios.get("/customers/report/general");
+      // const bussinesInfo = () => this.$axios.get("/business/info");
       switch (fileType) {
         case "pdf":
-          Promise.all([customers(), bussinesInfo()]).then((res) => {
-            const [customers, bussinesInfo] = res;
-            const customersData = customers.data.data;
-            const { name, nit, nrc } = bussinesInfo.data.data;
+          Promise.all([report()]).then((res) => {
+            const [report] = res;
+            const reportData = report.data;
+            const { name, nrc, nit } = report.data.company;
+
             const values = [];
             const emptyRow = [{}, {}, {}, {}, {}];
 
-            for (const c of customersData) {
+            for (const c of reportData.customers) {
               values.push(emptyRow);
               values.push([
                 {
@@ -280,9 +281,9 @@ export default {
           });
           break;
         case "excel":
-          Promise.all([customers(), bussinesInfo()]).then((res) => {
+          Promise.all([customers()]).then((res) => {
             const [customers, bussinesInfo] = res;
-            const { name, nit, nrc } = bussinesInfo.data.data;
+            // const { name, nit, nrc } = bussinesInfo.data.data;
             const customersData = customers.data.data;
             const values = [];
             for (const c of customersData) {
@@ -313,16 +314,15 @@ export default {
       }
     },
     reportCustomer(customerId, fileType) {
-      const customer = () => this.$axios.get(`/customers/${customerId}`);
+      const customer = () => this.$axios.get(`/customers/report/${customerId}`);
       const branches = () =>
         this.$axios.get(`/customers/${customerId}/branches`);
-      const bussinesInfo = () => this.$axios.get("/business/info");
+      // const bussinesInfo = () => this.$axios.get("/business/info");
       switch (fileType) {
         case "pdf":
-          Promise.all([bussinesInfo(), customer(), branches()])
+          Promise.all([customer(), branches()])
             .then((res) => {
-              const [bussinesInfo, customer, branch] = res;
-              const { name, nit, nrc } = bussinesInfo.data.data;
+              const [customer, branch] = res;
               const customerData = customer.data.data;
               const branches = branch.data.data;
               const values = [];
