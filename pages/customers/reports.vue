@@ -166,7 +166,7 @@ export default {
             this.$axios
               .get("/customers")
               .then((res) => {
-                this.customers = res.data.customers;
+                this.customers = res.data.data;
                 this.requirementForm = "clientes";
               })
               .catch((err) => err.data.errorMessage);
@@ -201,13 +201,13 @@ export default {
         case "pdf":
           Promise.all([report()]).then((res) => {
             const [report] = res;
-            const reportData = report.data;
+            const customersData = report.data.customers;
             const { name, nrc, nit } = report.data.company;
-
+            const nameReport = report.data.name;
             const values = [];
             const emptyRow = [{}, {}, {}, {}, {}];
 
-            for (const c of reportData.customers) {
+            for (const c of customersData) {
               values.push(emptyRow);
               values.push([
                 {
@@ -231,7 +231,7 @@ export default {
               pageSize: "LETTER",
               pageOrientation: "portrait",
               pageMargins: [20, 60, 20, 40],
-              header: getHeader(name, nit, nrc, null, "REPORTE CLIENTES"),
+              header: getHeader(name, nit, nrc, null, nameReport),
               footer: getFooter(),
               content: [
                 {
@@ -281,10 +281,10 @@ export default {
           });
           break;
         case "excel":
-          Promise.all([customers()]).then((res) => {
-            const [customers, bussinesInfo] = res;
-            // const { name, nit, nrc } = bussinesInfo.data.data;
-            const customersData = customers.data.data;
+          Promise.all([report()]).then((res) => {
+            const [report] = res;
+            const { name, nit, nrc } = report.data.company;
+            const customersData = report.data.customers;
             const values = [];
             for (const c of customersData) {
               values.push([
@@ -297,7 +297,7 @@ export default {
             }
             const document = [
               [name],
-              ["REPORTE CLIENTES", `NIT: ${nit}`, `NRC: ${nrc}`],
+              [nameReport, `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               ["NOMBRE", "TIPO", "NIT", "NRC", "ESTADO"],
               ...values,
@@ -314,17 +314,16 @@ export default {
       }
     },
     reportCustomer(customerId, fileType) {
-      const customer = () => this.$axios.get(`/customers/report/${customerId}`);
-      const branches = () =>
-        this.$axios.get(`/customers/${customerId}/branches`);
-      // const bussinesInfo = () => this.$axios.get("/business/info");
+      const report = () => this.$axios.get(`/customers/report/${customerId}`);
       switch (fileType) {
         case "pdf":
-          Promise.all([customer(), branches()])
+          Promise.all([report()])
             .then((res) => {
-              const [customer, branch] = res;
-              const customerData = customer.data.data;
-              const branches = branch.data.data;
+              const [report] = res;
+              const customerData = report.data.customer;
+              const branches = report.data.customer.customerBranches;
+              const { name, nrc, nit } = report.data.company;
+              const nameReport = report.data.name;
               const values = [];
               const valuesTable = [];
               const valuesGeneral = [];
@@ -369,8 +368,8 @@ export default {
                   text: "Telefono: ",
                 },
                 {
-                  text: customerData.customerBranches[0].contactInfo.phones
-                    ? customerData.customerBranches[0].contactInfo.phones
+                  text: customerData.constactPhone
+                    ? customerData.constactPhone
                     : "--------",
                 },
                 {
@@ -379,8 +378,8 @@ export default {
                   text: "Correo: ",
                 },
                 {
-                  text: customerData.customerBranches[0].contactInfo.emails
-                    ? customerData.customerBranches[0].contactInfo.emails
+                  text: customerData.contactEmail
+                    ? customerData.contactEmail
                     : "-------",
                 },
               ]);
@@ -515,7 +514,7 @@ export default {
                 pageSize: "LETTER",
                 pageOrientation: "portrait",
                 pageMargins: [20, 60, 20, 40],
-                header: getHeader(name, nit, nrc, null, `PERFIL DE CLIENTE`),
+                header: getHeader(name, nit, nrc, null, nameReport),
                 footer: getFooter(),
                 content: [
                   {
@@ -639,6 +638,7 @@ export default {
               pdfMake.createPdf(docDefinition).open();
             })
             .catch((err) => {
+              console.error(err);
               this.errorMessage =
                 "Error al generar el PDF, contacta con tu administrador";
             });
@@ -647,11 +647,11 @@ export default {
         case "excel":
           Promise.all([bussinesInfo(), customer(), branches()])
             .then((res) => {
-              const [bussinesInfo, customer, branch] = res;
-
-              const { name, nit, nrc } = bussinesInfo.data.data;
-              const customerData = customer.data.data;
-              const branches = branch.data.data;
+              const [report] = res;
+              const customerData = report.data.customer;
+              const branches = report.data.customer.customerBranches;
+              const { name, nrc, nit } = report.data.company;
+              const nameReport = report.data.name;
               const values = [];
               const valuesTable = [];
               const valuesGeneral = [];
@@ -718,7 +718,7 @@ export default {
 
               const document = [
                 [name],
-                [`PERFIL DE CLIENTE`, `NIT: ${nit}`, `NRC: ${nrc}`],
+                [nameReport, `NIT: ${nit}`, `NRC: ${nrc}`],
                 [""],
                 ["INFORMACIÓN GENERAL"],
                 ...valuesGeneral,
