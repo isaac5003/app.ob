@@ -9,6 +9,7 @@
   >
     <!-- dialogo agregar detalle partida-->
     <el-dialog
+      @close="closeDialog('newEntryDetailForm')"
       title="Agregar detalle de partida"
       :visible.sync="showNewEntryDetail"
       width="550px"
@@ -23,22 +24,25 @@
       >
         <el-form-item label="Cuenta contable" prop="accountingCatalog">
           <el-select
-            v-model="newEntryDetailForm.accountingCatalog"
-            clearable
             filterable
+            remote
             default-first-option
-            size="small"
+            clearable
+            v-model="newEntryDetailForm.accountingCatalog"
+            placeholder="Escribe el 
+número o nombre de la cuenta"
+            :remote-method="findAccount"
+            :loading="loadingAccount"
             class="w-full"
-            placeholder="Seleccionar"
+            size="small"
+            @focus="filterCatalog = []"
           >
             <el-option
-              v-for="a in accountingCatalog"
-              :key="a.id"
-              :label="`${a.code} - ${a.name}`"
-              :value="a.id"
-              :disabled="a.isParent == true"
-            >
-            </el-option>
+              v-for="item in filteredCatalog"
+              :key="item.id"
+              :label="`${item.code} - ${item.name}`"
+              :value="item.id"
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="Concepto" prop="concept">
@@ -89,7 +93,7 @@
             "
             >Guardar</el-button
           >
-          <el-button @click="showEditEntryDetail = false" size="small"
+          <el-button @click="showNewEntryDetail = false" size="small"
             >Cancelar</el-button
           >
         </div>
@@ -98,6 +102,7 @@
 
     <!-- dialogo editdetalledepartida-->
     <el-dialog
+      @close="closeDialog('editEntryDetailForm')"
       title="Editar detalle de partida"
       :visible.sync="showEditEntryDetail"
       width="550px"
@@ -115,15 +120,19 @@
             <el-form-item label="Cuenta contable" prop="accountingCatalog">
               <el-select
                 v-model="editEntryDetailForm.accountingCatalog"
-                clearable
                 filterable
+                remote
                 default-first-option
-                size="small"
+                clearable
+                placeholder="Escribe el numero o nombre de la cuenta"
+                :remote-method="findAccount"
+                :loading="loadingAccount"
                 class="w-full"
-                placeholder="Seleccionar"
+                size="small"
+                @focus="filterCatalog = []"
               >
                 <el-option
-                  v-for="aC in accountingCatalog"
+                  v-for="aC in filteredCatalog"
                   :key="aC.id"
                   :label="`${aC.code} - ${aC.name}`"
                   :value="aC.id"
@@ -263,9 +272,9 @@
               </el-form-item>
             </div>
             <div class="col-span-2">
-              <el-form-item label="Opciones de partida" prop="scuared">
+              <el-form-item label="Opciones de partida" prop="squared">
                 <el-checkbox
-                  v-model="newEntryForm.scuared"
+                  v-model="newEntryForm.squared"
                   disabled
                   border
                   size="small"
@@ -304,13 +313,13 @@
           :data="accountingEntryDetails"
           stripe
           size="mini"
-          :summary-method="getSummaries"
           show-summary
+          :summary-method="getSummaries"
         >
           <el-table-column type="index" label="#" min-width="70" />
           <el-table-column
             label="Cuenta contable"
-            prop="catalogCode"
+            prop="code"
             min-width="150"
           />
           <el-table-column label="Concepto" prop="concept" min-width="425" />
@@ -372,11 +381,12 @@ export default {
   components: { LayoutContent, Notification },
   fetch() {
     const entryTypes = () => this.$axios.get("/entries/types");
-
-    Promise.all([entryTypes()])
+    const accountingCatalog = () => this.$axios.get("/entries/catalog");
+    Promise.all([entryTypes(), accountingCatalog()])
       .then((res) => {
-        const [entryTypes] = res;
+        const [entryTypes, catalog] = res;
         this.entryTypes = entryTypes.data.entryTypes;
+        this.accountingCatalog = catalog.data.accountingCatalog;
         this.loading = false;
       })
       .catch((err) => {
@@ -394,6 +404,7 @@ export default {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.newEntryDetailForm.abono = 0;
           callback();
         }
       } else if (abono && val) {
@@ -402,7 +413,7 @@ export default {
         );
       } else {
         callback();
-      } 
+      }
     };
     const newAbonoValidateCompare = (rule, value, callback) => {
       const cargo =
@@ -414,6 +425,7 @@ export default {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.newEntryDetailForm.cargo = 0;
           callback();
         }
       } else if (cargo && val) {
@@ -428,12 +440,13 @@ export default {
       const abono =
         this.editEntryDetailForm.abono > 0
           ? this.editEntryDetailForm.abono.toFixed(2)
-          : "";
-      const val = value > 0 ? value.toFixed(2) : "";
+          : 0;
+      const val = value > 0 ? value.toFixed(2) : 0;
       if (!abono) {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.editEntryDetailForm.abono = 0;
           callback();
         }
       } else if (abono && val) {
@@ -448,12 +461,13 @@ export default {
       const cargo =
         this.editEntryDetailForm.cargo > 0
           ? this.editEntryDetailForm.cargo.toFixed(2)
-          : "";
-      const val = value > 0 ? value.toFixed(2) : "";
+          : 0;
+      const val = value > 0 ? value.toFixed(2) : 0;
       if (!cargo) {
         if (!val) {
           callback(new Error("Este campo es requerido."));
         } else {
+          this.editEntryDetailForm.cargo = 0;
           callback();
         }
       } else if (cargo && val) {
@@ -468,11 +482,13 @@ export default {
       loading: false,
       entryTypes: [],
       accountingCatalog: [],
+      filteredCatalog: [],
+      loadingAccount: false,
       newEntryForm: {
         entryType: "",
         date: this.$dateFns.format(new Date(), "yyyy-MM-dd"),
         serie: "",
-        scuared: "",
+        squared: "",
         accounted: "",
         title: "",
       },
@@ -495,13 +511,13 @@ export default {
         cargo: [
           {
             validator: newCargoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
         abono: [
           {
             validator: newAbonoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
       },
@@ -517,13 +533,13 @@ export default {
         cargo: [
           {
             validator: editCargoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
         abono: [
           {
             validator: editAbonoValidateCompare,
-            trigger: ["blur", "change"],
+            trigger: ["blur"],
           },
         ],
       },
@@ -582,17 +598,15 @@ export default {
         }
         this.accountingEntryDetails.push({
           ...data,
-          catalogCode: this.accountingCatalog.find(
-            (c) => c.id == data.accountingCatalog
-          ).code,
-     
+          code: this.filteredCatalog.find((c) => c.id == data.accountingCatalog)
+            .code,
         });
+
         this.showNewEntryDetail = false;
         this.checkEntry();
       });
     },
     changeEntryType({ entryType, date }) {
-      // console.log(`ENTRY TYPE :::${entryType} FECHA ::: ${date}`);
       if (entryType && date) {
         this.$axios
           .get("/entries/serie", {
@@ -602,7 +616,6 @@ export default {
             },
           })
           .then(({ data }) => {
-            console.log(data);
             this.newEntryForm.serie = data.nextSerie;
           })
           .catch((err) => {
@@ -623,51 +636,65 @@ export default {
         this.accountingEntryDetails.splice(index, 1);
       });
     },
-    async getAccountingCatalog() {
-      try {
-        const { data } = await this.$axios.get("/entries/catalog");
-        this.accountingCatalog = data.accountingCatalog;
-      } catch (error) {
-        this.errorMessage = err.response.data.message;
+    closeDialog(formName) {
+      if (this.$refs[formName]) {
+        this.$refs[formName].resetFields();
+        this.filteredCatalog = [];
       }
     },
     openNewEntryDetail() {
-      this.getAccountingCatalog();
       this.showNewEntryDetail = true;
-      if (this.$refs["newEntryDetailForm"]) {
-        this.$refs["newEntryDetailForm"].resetFields();
+    },
+    findAccount(query) {
+      if (query != "") {
+        this.loadingAccount = true;
+        this.$axios
+          .get("/entries/catalog", { params: { search: query.toLowerCase() } })
+          .then((res) => {
+            this.filteredCatalog = res.data.accountingCatalog;
+
+            this.loadingAccount = false;
+          })
+          .catch((err) => (this.errorMessage = err.response.data.message));
+      } else {
+        this.filteredCatalog = [];
       }
     },
+
     openEditEntryDetail(index, details) {
-      this.getAccountingCatalog();
       this.editingEntryDetail = index;
       this.editEntryDetailForm = { ...details };
+      this.filteredCatalog = this.accountingCatalog.filter(
+        (ac) => ac.id == details.accountingCatalog
+      );
       this.showEditEntryDetail = true;
-      if (this.$refs["editEntryDetailForm"]) {
-        this.$refs["editEntryDetailForm"].resetFields();
-      }
     },
     updateDetail(index, formName, form) {
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
         }
-        this.accountingEntryDetails.splice(index, 1, { ...form });
+        this.accountingEntryDetails.splice(index, 1, {
+          ...form,
+          code: this.filteredCatalog.find((c) => c.id == form.accountingCatalog)
+            .code,
+        });
+
         this.showEditEntryDetail = false;
         this.checkEntry();
       });
     },
     checkEntry() {
-      let totalCargo = this.accountingEntryDetails.reduce(
-        (a, b) => a + (b.cargo ? b.cargo : 0),
-        0
-      );
-      let totalAbono = this.accountingEntryDetails.reduce(
+      const totalAbono = this.accountingEntryDetails.reduce(
         (a, b) => a + (b.abono ? b.abono : 0),
         0
       );
-      this.newEntryForm.scuared =
-        totalAbono.toFixed(3) === totalCargo.toFixed(3);
+      const totalCargo = this.accountingEntryDetails.reduce(
+        (a, b) => a + (b.cargo ? b.cargo : 0),
+        0
+      );
+      this.newEntryForm.squared =
+        totalAbono.toFixed(3) == totalCargo.toFixed(3);
       this.newEntryForm.accounted = false;
     },
     saveEntry(formName, formData, details) {
@@ -675,8 +702,6 @@ export default {
         if (!valid) {
           return false;
         }
-      
-
         const save = () => {
           this.$confirm(
             "¿Estás seguro que deseas guardar esta partida?",
@@ -695,7 +720,7 @@ export default {
                         title: formData.title,
                         serie: formData.serie,
                         date: formData.date,
-                        squared: formData.scuared,
+                        squared: formData.squared,
                         accounted: formData.accounted,
                         accountingEntryType: formData.entryType,
                       },
@@ -706,7 +731,7 @@ export default {
                           concept: d.concept,
                           cargo: d.cargo,
                           abono: d.abono,
-                          order:details.indexOf(d)+1,
+                          order: details.indexOf(d) + 1,
                         };
                       }),
                     })
@@ -785,6 +810,7 @@ export default {
         }
       });
     },
+
     cancel() {
       this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
         confirmButtonText: "Si, salir",
