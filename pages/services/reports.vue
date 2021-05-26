@@ -290,23 +290,22 @@ export default {
       });
     },
     generateEspecialService(params, fileType) {
-      const bussinesInfo = () => this.$axios.get("/services/report/general");
-      const services = () => this.$axios.get("/services", { params });
+      const report = () =>
+        this.$axios.get("/services/report/general", { params });
       switch (fileType) {
         case "pdf":
-          Promise.all([bussinesInfo(), services()]).then((res) => {
-            const [bussinesInfo, services] = res;
-            const bussines = bussinesInfo.data.info;
-            const service = services.data.data;
+          Promise.all([report()]).then((res) => {
+            const [report] = res;
+            const bussines = report.data.company;
+            const services = report.data.services;
             this.reportForm.sellingType = "";
             this.reportForm.status = "";
             this.reportForm.initialCost = "";
             this.reportForm.finalCost = "";
-
             const name = this.reports.find(
               (r) => this.reportForm.reportType == r.id
             ).name;
-            const values = service.map((s) => {
+            const values = services.map((s) => {
               return [
                 { bold: false, text: s.index },
                 { bold: false, text: s.name },
@@ -319,6 +318,7 @@ export default {
                 { bold: false, text: s.sellingType.name, alignment: "center" },
               ];
             });
+            console.log(name);
 
             const docDefinition = {
               pageSize: "LETTER",
@@ -328,8 +328,8 @@ export default {
                 bussines.name,
                 bussines.nit,
                 bussines.nrc,
-                null,
-                name.toUpperCase()
+                null
+                // name.toUpperCase()
               ),
               footer: getFooter(),
               content: [
