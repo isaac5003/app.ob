@@ -284,6 +284,7 @@ export default {
           Promise.all([report()]).then((res) => {
             const [report] = res;
             const { name, nit, nrc } = report.data.company;
+            const nameReport = report.data.name;
             const customersData = report.data.customers;
             const values = [];
             for (const c of customersData) {
