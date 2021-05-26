@@ -1279,7 +1279,7 @@ export default {
       console.log(zone);
       this.sellerId = id;
       this.editSellerForm.name = name;
-      this.editSellerForm.invoicesZone = id;
+      this.editSellerForm.invoicesZone = zone.invoicesZone.id;
       this.showEditSeller = true;
     },
     submitEditSeller(formName, sellerId, { name, invoicesZone }) {
