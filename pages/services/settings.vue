@@ -167,7 +167,7 @@ export default {
                       title: "Exito",
                       message: res.data.message,
                     });
-                    this.pageloading = true;
+                    this.pageloading = false;
                   })
                   .catch((err) => {
                     this.$notify.error({
