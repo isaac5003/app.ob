@@ -1330,7 +1330,11 @@ export default {
         );
       });
     },
-    submitPayment(formName, { id, name }) {
+    submitPayment(formName, { id, name, cashPayment }) {
+      console.log(formName);
+      console.log(id);
+      console.log(name);
+      console.log(cashPayment);
       const action = id ? "actualizar" : "guardar";
       const method = id ? "PUT" : "POST";
       const url = `/invoices/payment-condition/${id ? id : ""}`;
@@ -1353,7 +1357,7 @@ export default {
                 this.$axios({
                   method,
                   url,
-                  data: { name },
+                  data: { name, cashPayment },
                 })
                   .then((res) => {
                     this.$notify.success({
