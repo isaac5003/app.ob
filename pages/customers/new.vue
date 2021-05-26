@@ -391,7 +391,10 @@ export default {
   head: {
     titleTemplate: `%s | Nuevo cliente`,
   },
-  components: { LayoutContent, Notification },
+  components: {
+    LayoutContent,
+    Notification,
+  },
   fetch() {
     const customerTypes = () => this.$axios.get(`/customers/types`);
     const customerTypeNaturals = () =>
