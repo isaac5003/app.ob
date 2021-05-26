@@ -385,8 +385,7 @@ export default {
       .then((res) => {
         const [entries, entryType] = res;
         this.entries = entries.data;
-        // this.count = entries.data.count;
-        this.entryType = entryType.data.entryTypes;
+        this.entryType = entryType.data.data;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message
@@ -559,7 +558,7 @@ export default {
               Promise.all([entry(), bussinesInfo()])
                 .then((res) => {
                   const [entry, bussinesInfo] = res;
-                  const accountingEntry = entry.data.entry;
+                  const accountingEntry = entry.data.data;
                   const { name, nit, nrc } = bussinesInfo.data.info;
 
                   let totalAbono = 0;

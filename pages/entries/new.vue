@@ -385,8 +385,8 @@ export default {
     Promise.all([entryTypes(), accountingCatalog()])
       .then((res) => {
         const [entryTypes, catalog] = res;
-        this.entryTypes = entryTypes.data.entryTypes;
-        this.accountingCatalog = catalog.data.accountingCatalog;
+        this.entryTypes = entryTypes.data.data;
+        this.accountingCatalog = catalog.data.data;
         this.loading = false;
       })
       .catch((err) => {
@@ -651,7 +651,7 @@ export default {
         this.$axios
           .get("/entries/catalog", { params: { search: query.toLowerCase() } })
           .then((res) => {
-            this.filteredCatalog = res.data.accountingCatalog;
+            this.filteredCatalog = res.data.data;
 
             this.loadingAccount = false;
           })

@@ -422,8 +422,8 @@ export default {
     Promise.all([entryTypes(), entry(), accountingCatalog()])
       .then((res) => {
         const [entryTypes, entry, accountingCatalog] = res;
-        this.accountingEntryTypes = entryTypes.data.entryTypes;
-        this.accountingCatalog = accountingCatalog.data.accountingCatalog;
+        this.accountingEntryTypes = entryTypes.data.data;
+        this.accountingCatalog = accountingCatalog.data.data;
         this.editEntryForm = {
           ...entry.data.entry,
           accountingEntryType: entry.data.entry.accountingEntryType.id,
@@ -710,7 +710,7 @@ export default {
         this.$axios
           .get("/entries/catalog", { params: { search: query.toLowerCase() } })
           .then((res) => {
-            this.filteredCatalog = res.data.accountingCatalog;
+            this.filteredCatalog = res.data.data;
 
             this.loadingAccount = false;
           })
@@ -865,6 +865,5 @@ export default {
       });
     },
   },
-  computed: {},
 };
 </script>

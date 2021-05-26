@@ -319,17 +319,15 @@ export default {
           Promise.all([bussinesInfo(), estadoResultados(), signatures()]).then(
             (res) => {
               const [bussinesInfo, estadoResultados, signatures] = res;
-              const { name, nit, nrc } = bussinesInfo.data.info;
-              const reportTitleName = estadoResultados.data.name;
-              const estadoResultado = estadoResultados.data.estadoResultados.map(
-                (er) => {
-                  return {
-                    ...er,
-                    section: true,
-                  };
-                }
-              );
-              const signature = signatures.data.signatures;
+              const { name, nit, nrc } = bussinesInfo.data.data;
+              const reportTitleName = estadoResultados.data.data;
+              const estadoResultado = estadoResultados.data.data.map((er) => {
+                return {
+                  ...er,
+                  section: true,
+                };
+              });
+              const signature = signatures.data.data;
               const postTitle =
                 "(Expresado en dólares de los Estados Unidos de América)";
               const values = [];
@@ -539,17 +537,15 @@ export default {
           Promise.all([bussinesInfo(), estadoResultados(), signatures()]).then(
             (res) => {
               const [bussinesInfo, estadoResultados, signatures] = res;
-              const { name, nit, nrc } = bussinesInfo.data.info;
-              const reportTitleName = estadoResultados.data.name;
-              const estadoResultado = estadoResultados.data.estadoResultados.map(
-                (er) => {
-                  return {
-                    ...er,
-                    section: true,
-                  };
-                }
-              );
-              const signature = signatures.data.signatures;
+              const { name, nit, nrc } = bussinesInfo.data.data;
+              const reportTitleName = estadoResultados.data.data;
+              const estadoResultado = estadoResultados.data.data.map((er) => {
+                return {
+                  ...er,
+                  section: true,
+                };
+              });
+              const signature = signatures.data.data;
               const postTitle =
                 "(Expresado en dólares de los Estados Unidos de América)";
               const data = [];
@@ -610,9 +606,9 @@ export default {
           Promise.all([bussinesInfo(), signatures(), settingsGeneral()]).then(
             (res) => {
               const [bussinesInfo, signatures, settingsGeneral] = res;
-              const { name, nit, nrc } = bussinesInfo.data.info;
-              const generales = settingsGeneral.data.general;
-              const signature = signatures.data.signatures;
+              const { name, nit, nrc } = bussinesInfo.data.data;
+              const generales = settingsGeneral.data.data;
+              const signature = signatures.data.data;
               const postTitle =
                 "(Expresado en dólares de los Estados Unidos de América)";
               this.$axios
@@ -623,9 +619,9 @@ export default {
                   },
                 })
                 .then((estadoResultados) => {
-                  const reportTitleName = estadoResultados.data.name;
+                  const reportTitleName = estadoResultados.data.data;
 
-                  const estadoResultado = estadoResultados.data.estadoResultados.map(
+                  const estadoResultado = estadoResultados.data.data.map(
                     (er) => {
                       return {
                         ...er,
@@ -931,10 +927,9 @@ export default {
         case "pdf":
           Promise.all([bussinesInfo(), balanceComprobacion()]).then((res) => {
             const [bussinesInfo, balanceComprobacion] = res;
-            const { name, nit, nrc } = bussinesInfo.data.info;
-            const comprobationBalance =
-              balanceComprobacion.data.balanceComprobacion;
-            const reportTitleName = balanceComprobacion.data.name;
+            const { name, nit, nrc } = bussinesInfo.data.data;
+            const comprobationBalance = balanceComprobacion.data.data;
+            const reportTitleName = balanceComprobacion.data.data;
             const values = [];
             const emptyRow = [{}, {}, {}, {}, {}, {}, {}];
             const mayores = comprobationBalance.filter(
@@ -1135,10 +1130,9 @@ export default {
         case "excel":
           Promise.all([bussinesInfo(), balanceComprobacion()]).then((res) => {
             const [bussinesInfo, balanceComprobacion] = res;
-            const { name, nit, nrc } = bussinesInfo.data.info;
-            const comprobationBalance =
-              balanceComprobacion.data.balanceComprobacion;
-            const reportTitleName = balanceComprobacion.data.name;
+            const { name, nit, nrc } = bussinesInfo.data.data;
+            const comprobationBalance = balanceComprobacion.data.data;
+            const reportTitleName = balanceComprobacion.data.data;
             const data = [];
 
             const mayores = comprobationBalance.filter(
@@ -1225,10 +1219,10 @@ export default {
         case "pdf":
           Promise.all([general(), bussinesInfo(), signatures()]).then((res) => {
             const [general, bussinesInfo, signatures] = res;
-            const [activo, pasivo, patrimonio] = general.data.balanceGeneral;
-            const reportTitleName = general.data.name;
-            const { name, nit, nrc } = bussinesInfo.data.info;
-            const { accountant, auditor, legal } = signatures.data.signatures;
+            const [activo, pasivo, patrimonio] = general.data.data;
+            const reportTitleName = general.data.data;
+            const { name, nit, nrc } = bussinesInfo.data.data;
+            const { accountant, auditor, legal } = signatures.data.data;
             const postTitle =
               "(Expresado en dólares de los Estados Unidos de América)";
             let activoValues = [];
@@ -1538,10 +1532,10 @@ export default {
         case "excel":
           Promise.all([general(), bussinesInfo(), signatures()]).then((res) => {
             const [general, bussinesInfo, signatures] = res;
-            const [activo, pasivo, patrimonio] = general.data.balanceGeneral;
-            const { name, nit, nrc } = bussinesInfo.data.info;
-            const { accountant, auditor, legal } = signatures.data.signatures;
-            const reportTitleName = general.data.name;
+            const [activo, pasivo, patrimonio] = general.data.data;
+            const { name, nit, nrc } = bussinesInfo.data.data;
+            const { accountant, auditor, legal } = signatures.data.data;
+            const reportTitleName = general.data.data;
             const postTitle =
               "(Expresado en dólares de los Estados Unidos de América)";
             let activoValues = [];
@@ -1631,8 +1625,8 @@ export default {
             (res) => {
               const [bussinesInfo, settingsGeneral, signatures] = res;
               const { name, nit, nrc } = bussinesInfo.data.info;
-              const { periodStart, peridoEnd } = settingsGeneral.data.general;
-              const { accountant, auditor, legal } = signatures.data.signatures;
+              const { periodStart, peridoEnd } = settingsGeneral.data.data;
+              const { accountant, auditor, legal } = signatures.data.data;
               const startDate = periodStart;
               const endDate = peridoEnd;
               const postTitle =
@@ -1646,8 +1640,8 @@ export default {
                   },
                 })
                 .then((res) => {
-                  const [activo, pasivo, patrimonio] = res.data.balanceGeneral;
-                  const reportTitleName = res.data.name;
+                  const [activo, pasivo, patrimonio] = res.data.data;
+                  const reportTitleName = res.data.data;
                   let activoValues = [];
                   let pasivoValues = [];
                   let patrimonioValues = [];
@@ -1964,8 +1958,8 @@ export default {
             (res) => {
               const [bussinesInfo, settingsGeneral, signatures] = res;
               const { name, nit, nrc } = bussinesInfo.data.info;
-              const { periodStart, peridoEnd } = settingsGeneral.data.general;
-              const { accountant, auditor, legal } = signatures.data.signatures;
+              const { periodStart, peridoEnd } = settingsGeneral.data.data;
+              const { accountant, auditor, legal } = signatures.data.data;
               const startDate = periodStart;
               const endDate = peridoEnd;
               const postTitle =
@@ -1979,8 +1973,8 @@ export default {
                   },
                 })
                 .then((res) => {
-                  const [activo, pasivo, patrimonio] = res.data.balanceGeneral;
-                  const reportTitleName = res.data.name;
+                  const [activo, pasivo, patrimonio] = res.data.data;
+                  const reportTitleName = res.data.data;
                   let activoValues = [];
                   let pasivoValues = [];
                   let patrimonioValues = [];
@@ -2068,9 +2062,9 @@ export default {
         case "pdf":
           Promise.all([catalog(), bussinesInfo()]).then((res) => {
             const [catalog, bussinesInfo] = res;
-            const catalogReport = catalog.data.accountingCatalog;
+            const catalogReport = catalog.data.data;
 
-            const { name, nit, nrc } = bussinesInfo.data.info;
+            const { name, nit, nrc } = bussinesInfo.data.data;
             const values = catalogReport.map((c) => {
               return [
                 { bold: c.isParent, text: c.code },
@@ -2181,9 +2175,9 @@ export default {
         case "pdf":
           Promise.all([bussinesInfo(), libroMayor()]).then((res) => {
             const [bussinesInfo, libroMayor] = res;
-            const { name, nit, nrc } = bussinesInfo.data.info;
-            const lib = libroMayor.data.accounts;
-            const reportTitleName = libroMayor.data.name;
+            const { name, nit, nrc } = bussinesInfo.data.data;
+            const lib = libroMayor.data.data;
+            const reportTitleName = libroMayor.data.data;
             const values = [];
             const emptyRow = [{}, {}, {}, {}, {}, {}];
 
@@ -2351,8 +2345,8 @@ export default {
         case "excel":
           Promise.all([bussinesInfo(), libroMayor()]).then((res) => {
             const [bussinesInfo, libroMayor] = res;
-            const { name, nit, nrc } = bussinesInfo.data.info;
-            const reportTitleName = libroMayor.data.name;
+            const { name, nit, nrc } = bussinesInfo.data.data;
+            const reportTitleName = libroMayor.data.data;
 
             const data = [];
             for (const account of libroMayor.data.accounts) {
@@ -2427,9 +2421,9 @@ export default {
         case "pdf":
           Promise.all([bussinesInfo(), auxiliares()]).then((res) => {
             const [bussinesInfo, auxiliares] = res;
-            const { name, nit, nrc } = bussinesInfo.data.info;
-            const reporteAuxiliares = auxiliares.data.accounts;
-            const reportTitleName = auxiliares.data.name;
+            const { name, nit, nrc } = bussinesInfo.data.data;
+            const reporteAuxiliares = auxiliares.data.data;
+            const reportTitleName = auxiliares.data.data;
             const values = [];
             const emptyRow = [{}, {}, {}, {}, {}, {}];
 
@@ -2600,8 +2594,8 @@ export default {
         case "excel":
           Promise.all([bussinesInfo(), auxiliares()]).then((res) => {
             const [bussinesInfo, auxiliares] = res;
-            const { name, nit, nrc } = bussinesInfo.data.info;
-            const reportTitleName = auxiliares.data.name;
+            const { name, nit, nrc } = bussinesInfo.data.data;
+            const reportTitleName = auxiliares.data.data;
             const data = [];
             for (const account of auxiliares.data.accounts) {
               data.push([
@@ -2683,9 +2677,9 @@ export default {
         case "pdf":
           Promise.all([movements()]).then((res) => {
             const [movements] = res;
-            const movementsReport = movements.data.accounts;
-            const reportTitleName = movements.data.name;
-            const bussinesInfo = movements.data.company;
+            const movementsReport = movements.data.data;
+            const reportTitleName = movements.data.data;
+            const bussinesInfo = movements.data.data;
             const values = [];
             const emptyRow = [{}, {}, {}, {}, {}, {}];
 
@@ -2945,7 +2939,7 @@ export default {
         this.$axios
           .get("/entries/catalog", { params: { search: query.toLowerCase() } })
           .then((res) => {
-            this.filteredCatalog = res.data.accountingCatalog;
+            this.filteredCatalog = res.data.data;
             this.loadingAccount = false;
           })
           .catch((err) => (this.errorMessage = err.response.data.message));
