@@ -94,8 +94,8 @@ export default {
       .then((res) => {
         const [catalog, settingIntegration] = res;
         this.catalogs = catalog.data.data;
-        this.integrationSettingForm.accountingCatalog  =
-          settingIntegration.data.integrations.catalog ;
+        this.integrationSettingForm.accountingCatalog =
+          settingIntegration.data.integrations.catalog;
         this.filteredCatalog = this.catalogs.filter(
           (c) => c.id == this.integrationSettingForm.accountingCatalog
         );
@@ -131,7 +131,7 @@ export default {
         this.$axios
           .get("entries/catalog", { params: { search: query.toLowerCase() } })
           .then((res) => {
-            this.filteredCatalog = res.data.accountingCatalog;
+            this.filteredCatalog = res.data.data;
           })
           .catch((err) => (this.errorMessage = err.response.data.message));
       } else {
