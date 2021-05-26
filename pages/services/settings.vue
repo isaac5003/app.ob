@@ -46,7 +46,7 @@
               >
                 <el-select
                   v-model="integrationSettingForm.accountingCatalog"
-                  placeholder="Ingrese el Nombre de la cuenta"
+                  placeholder="Ingrese el codigo o el  Nombre de la cuenta"
                   size="small"
                   :loading="loadingAccount"
                   remote
@@ -134,7 +134,7 @@ export default {
         this.$axios
           .get("entries/catalog", { params: { search: query.toLowerCase() } })
           .then((res) => {
-            this.filteredCatalog = res.data.accountingCatalog;
+            this.filteredCatalog = res.data.data;
             this.loadingAccount = false;
           })
           .catch((err) => (this.errorMessage = err.response.data.message));
