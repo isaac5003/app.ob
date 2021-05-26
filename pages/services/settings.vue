@@ -1,5 +1,6 @@
 <template>
   <layout-content
+    v-loading="pageloading"
     page-title="Configuraciones"
     :breadcrumb="[
       { name: 'Servicios', to: '/services' },
@@ -47,6 +48,7 @@
                   v-model="integrationSettingForm.accountingCatalog"
                   placeholder="Ingrese el Nombre de la cuenta"
                   size="small"
+                  :loading="loadingAccount"
                   remote
                   class="w-full"
                   clearable
@@ -112,6 +114,8 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+      loadingAccount: false,
+      pageloading: true,
       tab: "integrations",
       catalogs: [],
       filteredCatalog: [],
@@ -126,10 +130,12 @@ export default {
   methods: {
     findAccount(query) {
       if (query !== "") {
+        this.loadingAccount = true;
         this.$axios
           .get("entries/catalog", { params: { search: query.toLowerCase() } })
           .then((res) => {
             this.filteredCatalog = res.data.accountingCatalog;
+            this.loadingAccount = false;
           })
           .catch((err) => (this.errorMessage = err.response.data.message));
       } else {
