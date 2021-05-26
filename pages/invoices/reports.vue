@@ -374,13 +374,13 @@ export default {
           invoices,
           statuses,
         ] = res;
-        this.documentTypes = documentTypes.data.documentTypes;
-        this.customers = customers.data.customers;
-        this.sellers = sellers.data.sellers;
-        this.zones = zones.data.zones;
-        this.services = services.data.services;
+        this.documentTypes = documentTypes.data.data;
+        this.customers = customers.data.data;
+        this.sellers = sellers.data.data;
+        this.zones = zones.data.data;
+        this.services = services.data.data;
         this.invoices = invoices.data;
-        this.statuses = statuses.data.statuses;
+        this.statuses = statuses.data.data;
         this.loading = false;
       })
       .catch((err) => {
@@ -454,7 +454,6 @@ export default {
         const generales = () =>
           this.$axios.get("/invoices/report/general", {
             params: { ...params },
-            
           });
 
         switch (formData.radioType) {
@@ -462,10 +461,10 @@ export default {
             Promise.all([bussinesInfo(), generales()]).then((res) => {
               const [bussinesInfo, generales] = res;
               const { name, nit, nrc } = bussinesInfo.data.info;
-              const general= generales.data.report;
+              const general = generales.data.data;
               const values = [];
               const emptyRow = [{}, {}, {}, {}, {}, {}, {}, {}, {}];
-              const f = general.filter(x => x.count > 0)
+              const f = general.filter((x) => x.count > 0);
               for (const r of f) {
                 values.push(emptyRow);
                 values.push([
@@ -487,56 +486,56 @@ export default {
                     {
                       bold: false,
                       text: d.customer,
-                     decoration: d.status.id == 3 ? 'lineThrough' : false
+                      decoration: d.status.id == 3 ? "lineThrough" : false,
                     },
 
                     {
                       bold: false,
                       text: d.date,
                       alignment: "right",
-                      decoration: d.status.id == 3 ? 'lineThrough' : false
+                      decoration: d.status.id == 3 ? "lineThrough" : false,
                     },
                     {
                       bold: false,
                       text: d.documentNumber,
                       alignment: "left",
-                     decoration: d.status.id == 3 ? 'lineThrough' : false
+                      decoration: d.status.id == 3 ? "lineThrough" : false,
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.vGravada),
                       alignment: "right",
-                       decoration: d.status.id == 3 ? 'lineThrough' : false
+                      decoration: d.status.id == 3 ? "lineThrough" : false,
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.vNSujeta),
                       alignment: "right",
-                     decoration: d.status.id == 3 ? 'lineThrough' : false
+                      decoration: d.status.id == 3 ? "lineThrough" : false,
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.vExenta),
                       alignment: "right",
-                      decoration: d.status.id == 3 ? 'lineThrough' : false
+                      decoration: d.status.id == 3 ? "lineThrough" : false,
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.iva),
                       alignment: "right",
-                      decoration: d.status.id == 3 ? 'lineThrough' : false
+                      decoration: d.status.id == 3 ? "lineThrough" : false,
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.ivaRetenido),
                       alignment: "right",
-                       decoration: d.status.id == 3 ? 'lineThrough' : false
+                      decoration: d.status.id == 3 ? "lineThrough" : false,
                     },
                     {
                       bold: false,
                       text: this.$options.filters.formatMoney(d.total),
                       alignment: "right",
-                       decoration: d.status.id == 3 ? 'lineThrough' : false
+                      decoration: d.status.id == 3 ? "lineThrough" : false,
                     },
                   ]);
                 }
@@ -544,7 +543,7 @@ export default {
                 values.push([
                   {
                     bold: true,
-                    text: r.count + ` Registros para ` + r.code  
+                    text: r.count + ` Registros para ` + r.code,
                   },
                   {},
                   {},
@@ -576,7 +575,7 @@ export default {
                   {
                     bold: true,
                     text: this.$options.filters.formatMoney(r.totalTotal),
-                    alignment:"right",
+                    alignment: "right",
                   },
                 ]);
               }
@@ -613,7 +612,7 @@ export default {
                     table: {
                       headerRows: 1,
                       widths: [
-                        "38%", 
+                        "38%",
                         "7%",
                         "10%",
                         "9%",
@@ -692,13 +691,13 @@ export default {
             Promise.all([bussinesInfo(), generales()]).then((res) => {
               const [bussinesInfo, generales] = res;
               const { name, nit, nrc } = bussinesInfo.data.info;
-              const general = generales.data.report;
+              const general = generales.data.data;
 
               const data = [];
 
               for (const r of general) {
                 data.push([""]);
-                data.push([r.code, "", "", "", "", "", "", "", "",""])
+                data.push([r.code, "", "", "", "", "", "", "", "", ""]);
                 for (const d of r.documents) {
                   data.push([
                     d.customer,
@@ -713,7 +712,7 @@ export default {
                     d.status.name,
                   ]);
                 }
-            
+
                 data.push([""]);
                 data.push([
                   r.count + ` Registros para ` + r.code,
