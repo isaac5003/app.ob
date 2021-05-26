@@ -201,14 +201,11 @@ export default {
       integrationServiceAccount(),
     ])
       .then((res) => {
-        const [sellingTypes, service, catalog, integrationCatalog] = res;
-        this.catalogs = catalog.data.accountingCatalog;
-        this.sellingTypes = sellingTypes.data.types;
-
+        const [sellingTypes, service] = res;
+        this.sellingTypes = sellingTypes.data.data;
         this.servicesEditForm = {
-          ...service.data.service,
-          sellingType: service.data.service.sellingType.id,
-          accountingCatalog: integrationCatalog.data.integrations.catalog,
+          ...service.data.data,
+          sellingType: service.data.data.sellingType.id,
         };
         this.filteredCatalog = this.catalogs.filter(
           (c) => c.id == integrationCatalog.data.integrations.catalog
@@ -256,7 +253,7 @@ export default {
         this.$axios
           .get("/entries/catalog", { params: { search: query.toLowerCase() } })
           .then((res) => {
-            this.filteredCatalog = res.data.accountingCatalog;
+            this.filteredCatalog = res.data.data;
             this.loadingAccount = false;
           })
           .catch((err) => (this.errorMessage = err.response.data.message));
@@ -276,7 +273,6 @@ export default {
         accountingCatalog,
       }
     ) {
-      console.log(accountingCatalog);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;

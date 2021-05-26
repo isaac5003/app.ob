@@ -93,9 +93,9 @@ export default {
     Promise.all([catalog(), settingIntegration()])
       .then((res) => {
         const [catalog, settingIntegration] = res;
-        this.catalogs = catalog.data.accountingCatalog;
-        this.integrationSettingForm.accountingCatalog =
-          settingIntegration.data.integrations.catalog;
+        this.catalogs = catalog.data.data;
+        this.integrationSettingForm.accountingCatalog  =
+          settingIntegration.data.integrations.catalog ;
         this.filteredCatalog = this.catalogs.filter(
           (c) => c.id == this.integrationSettingForm.accountingCatalog
         );
