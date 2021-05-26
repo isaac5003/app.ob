@@ -65,8 +65,8 @@
           <template
             v-if="
               selectedCustomer &&
-                (!selectedCustomer.customerTypeNatural ||
-                  selectedCustomer.customerTypeNatural.id == 2)
+              (!selectedCustomer.customerTypeNatural ||
+                selectedCustomer.customerTypeNatural.id == 2)
             "
           >
             <div class="col-span-2 flex flex-col">
@@ -157,7 +157,7 @@
       </el-form>
       <el-table
         @sort-change="sortBy"
-        :data="customers.customers"
+        :data="customers.data"
         stripe
         size="mini"
         v-loading="tableloading"
@@ -266,6 +266,12 @@
                 >
                   <i class="el-icon-edit-outline"></i> Editar cliente
                 </el-dropdown-item>
+                  <el-dropdown-item
+                @click.native="
+                $router.push(`/customers/branchOffices?ref=${scope.row.id}`)"
+                >
+                    <i class="el-icon-map-location"></i> Sucursales
+                  </el-dropdown-item>
                 <el-dropdown-item @click.native="changeActive(scope.row)">
                   <span v-if="scope.row.isActiveCustomer">
                     <i class="el-icon-close"></i> Desactivar
@@ -273,12 +279,10 @@
                   <span v-else> <i class="el-icon-check"></i> Activar </span>
                   cliente
                 </el-dropdown-item>
-                <!-- <el-dropdown-item>
-                    <i class="el-icon-guide"></i> Sucursales
-                  </el-dropdown-item>
-                  <el-dropdown-item>
+              
+                  <!-- <el-dropdown-item>
                     <i class="el-icon-notebook-1"></i> Directorio
-                </el-dropdown-item>-->
+                </el-dropdown-item> -->
                 <el-dropdown-item
                   :divided="true"
                   class="text-red-500 font-semibold"
@@ -326,7 +330,7 @@ export default {
     Promise.all([customers()])
       .then((res) => {
         const [customers] = res;
-        this.customers = customers.data;
+        this.customers = customers.data.data;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
@@ -343,7 +347,7 @@ export default {
       status: "",
       sellingTypes: [],
       customers: {
-        customers: [],
+        data: [],
         count: 0,
       },
       filter: {
@@ -383,7 +387,7 @@ export default {
       this.$axios
         .get("/customers", { params })
         .then((res) => {
-          this.customers = res.data;
+          this.customers = res.data.data;
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
@@ -515,7 +519,6 @@ export default {
     },
     updateSelected(dataSelected, status) {
       const ids = dataSelected.map((x) => x.id);
-      console.log(ids);
       this.$confirm(
         `¿Estás seguro que deseas eliminar este cliente?`,
         "Confirmación",
@@ -557,9 +560,8 @@ export default {
       );
     },
     async openCustomerPreview({ id }) {
-      const { data } = await this.$axios.get(`/customers/${id}`);
-      (this.selectedCustomer = data.customer),
-        (this.showCustomerPreview = true);
+      const data = await this.$axios.get(`/customers/${id}`);
+      (this.selectedCustomer = data.data), (this.showCustomerPreview = true);
     },
     hasModule() {
       return hasModule("f6000cbb-1e6d-4f7d-a7cc-cadd78d23076", this.$auth.user);
