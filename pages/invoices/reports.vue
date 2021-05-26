@@ -478,13 +478,13 @@ export default {
           invoices,
           statuses,
         ] = res;
-        this.documentTypes = documentTypes.data.documentTypes;
-        this.customers = customers.data.customers;
-        this.sellers = sellers.data.sellers;
-        this.zones = zones.data.zones;
-        this.services = services.data.services;
+        this.documentTypes = documentTypes.data.data;
+        this.customers = customers.data.data;
+        this.sellers = sellers.data.data;
+        this.zones = zones.data.data;
+        this.services = services.data.data;
         this.invoices = invoices.data;
-        this.statuses = statuses.data.statuses;
+        this.statuses = statuses.data.data;
         this.loading = false;
       })
       .catch((err) => {

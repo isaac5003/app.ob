@@ -747,11 +747,11 @@ export default {
               documentTypes,
               branches,
             ] = res;
-            this.customers = customer.data.customers;
-            this.documents = documentTypes.data.documentTypes;
-            this.sellers = sellers.data.sellers;
-            this.paymentConditions = paymentConditions.data.paymentConditions;
-            this.branches = branches.data.branches;
+            this.customers = customer.data.data;
+            this.documents = documentTypes.data.data;
+            this.sellers = sellers.data.data;
+            this.paymentConditions = paymentConditions.data.data;
+            this.branches = branches.data.data;
             this.salesEditForm = {
               ...data.invoice,
               customer: data.invoice.customer.id,
@@ -766,7 +766,7 @@ export default {
               customerNit: data.invoice.customerNit,
               customerGiro: data.invoice.customerGiro,
             };
-            this.details = data.invoice.details.map((de) => {
+            this.details = data.invoice.data.map((de) => {
               return {
                 ...de,
 
@@ -898,7 +898,7 @@ export default {
       this.$axios
         .get("/services", { params: { active: true } })
         .then((res) => {
-          this.services = res.data.services;
+          this.services = res.data.data;
           switch (type) {
             case "new":
               this.showAddService = true;
@@ -950,21 +950,21 @@ export default {
         Promise.all([branches(), tributary()])
           .then((res) => {
             const [branches, tributary] = res;
-            this.branches = branches.data.branches;
+            this.branches = branches.data.data;
 
             this.branch = {};
             this.tributary = {
               ...tributary.data.customer,
-              customerGiro: tributary.data.customer.giro,
-              customerNrc: tributary.data.customer.nrc,
-              customerNit: tributary.data.customer.nit,
+              customerGiro: tributary.data.data.giro,
+              customerNrc: tributary.data.data.nrc,
+              customerNit: tributary.data.data.nit,
             };
             this.loading = false;
             this.validateDocumentType(
               this.salesEditForm.documentType,
               this.tributary
             );
-            this.salesEditForm.customerBranch = branches.data.branches.find(
+            this.salesEditForm.customerBranch = branches.data.data.find(
               (b) => b.default
             ).id;
             this.selectBranch(this.salesEditForm.customerBranch, this.branches);

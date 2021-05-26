@@ -1973,7 +1973,6 @@
         :rules="newzoneRules"
         status-icon
         ref="newSellerForm"
-        @submit.prevent.native="submitSeller('newSellerForm', newSellerForm)"
       >
         <div>
           <el-form-item label="Nombre del vendedor" prop="name">
@@ -2010,9 +2009,7 @@
         <el-button
           type="primary"
           size="small"
-          @click.native="
-            submitEditSeller('editSellerForm', sellerId, editSellerForm)
-          "
+          @click.native="submitSeller('newSellerForm', newSellerForm)"
           >Guardar</el-button
         >
         <el-button @click="showEditSeller = false" size="small"
@@ -2033,9 +2030,6 @@
         :rules="newzoneRules"
         status-icon
         ref="editSellerForm"
-        @submit.prevent.native="
-          submitEditSeller('editSellerForm', sellerId, editSellerForm)
-        "
       >
         <div>
           <el-row :gutter="15">
@@ -2782,10 +2776,10 @@ export default {
     ])
       .then((res) => {
         const [zones, sellers, payment, documents] = res;
-        this.zones = zones.data.zones;
-        this.sellers = sellers.data.sellers;
-        this.payments = payment.data.paymentConditions;
-        this.correlativeForm.documents = documents.data.documents;
+        this.zones = zones.data.data;
+        this.sellers = sellers.data.data;
+        this.payments = payment.data.data;
+        this.correlativeForm.documents = documents.data.data;
 
         this.pageloading = false;
       })
@@ -2873,7 +2867,7 @@ export default {
       this.$axios
         .get("/invoices/zones")
         .then((res) => {
-          this.zones = res.data.zones;
+          this.zones = res.data.data;
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
@@ -2883,7 +2877,7 @@ export default {
       this.$axios
         .get("/invoices/sellers")
         .then((res) => {
-          this.sellers = res.data.sellers;
+          this.sellers = res.data.data;
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
@@ -2893,7 +2887,7 @@ export default {
       this.$axios
         .get("/invoices/payment-condition")
         .then((res) => {
-          this.payments = res.data.paymentConditions;
+          this.payments = res.data.data;
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
@@ -3237,6 +3231,9 @@ export default {
       });
     },
     editSeller({ id, name, ...zone }) {
+      console.log(id);
+      console.log(name);
+      console.log(zone);
       this.sellerId = id;
       this.editSellerForm.name = name;
       this.editSellerForm.invoicesZone = zone.invoicesZone.id;
@@ -3353,7 +3350,7 @@ export default {
     },
     async fetchDocuments() {
       const { data } = await this.$axios.get("/invoices/documents");
-      this.correlativeForm.documents = data.documents;
+      this.correlativeForm.documents = data.data;
       this.pageloading = false;
     },
     changeActiveCorrelative(formName, correlative, index) {

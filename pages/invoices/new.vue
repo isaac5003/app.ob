@@ -87,7 +87,7 @@
                 <el-checkbox
                   v-if="
                     newServiceForm.sellingType == 3 &&
-                      salesNewForm.documentType != 3
+                    salesNewForm.documentType != 3
                   "
                   border
                   v-model="newServiceForm.incTax"
@@ -218,7 +218,7 @@
                   border
                   v-if="
                     editServiceForm.sellingType == 3 &&
-                      salesNewForm.documentType != 3
+                    salesNewForm.documentType != 3
                   "
                   v-model="editServiceForm.incTax"
                   size="small"
@@ -589,8 +589,8 @@
                   <span
                     v-if="
                       scope.row.sellingType == 1 &&
-                        salesNewForm.documentType != 3 &&
-                        salesNewForm.documentType != 6
+                      salesNewForm.documentType != 3 &&
+                      salesNewForm.documentType != 6
                     "
                     >{{
                       calcSujeta(salesNewForm.documentType, scope.row)
@@ -614,8 +614,8 @@
                   <span
                     v-if="
                       scope.row.sellingType == 2 &&
-                        salesNewForm.documentType != 3 &&
-                        salesNewForm.documentType != 6
+                      salesNewForm.documentType != 3 &&
+                      salesNewForm.documentType != 6
                     "
                     >{{
                       calcExenta(salesNewForm.documentType, scope.row)
@@ -634,8 +634,8 @@
                   <span
                     v-if="
                       scope.row.sellingType == 3 ||
-                        salesNewForm.documentType == 3 ||
-                        salesNewForm.documentType == 6
+                      salesNewForm.documentType == 3 ||
+                      salesNewForm.documentType == 6
                     "
                     >{{
                       calcGravada(salesNewForm.documentType, scope.row)
@@ -797,10 +797,10 @@ export default {
     Promise.all([sellers(), paymentsConditions(), customers(), documents()])
       .then((res) => {
         const [sellers, paymentConditions, customers, documents] = res;
-        this.sellers = sellers.data.sellers;
-        this.paymentConditions = paymentConditions.data.paymentConditions;
-        this.customers = customers.data.customers;
-        this.documentTypes = documents.data.documents
+        this.sellers = sellers.data.data;
+        this.paymentConditions = paymentConditions.data.data;
+        this.customers = customers.data.data;
+        this.documentTypes = documents.data.data
           .filter((d) => d.active == true)
           .map((d) => d.documentType);
         this.loading = false;
@@ -914,7 +914,7 @@ export default {
       this.$axios
         .get("/services", { params: { active: true } })
         .then((res) => {
-          this.services = res.data.services;
+          this.services = res.data.data;
           this.showAddService = true;
         })
         .catch((err) => {
@@ -961,9 +961,9 @@ export default {
         Promise.all([branches(), tributary()])
           .then((res) => {
             const [branches, tributary, taxerType] = res;
-            this.branches = branches.data.branches;
+            this.branches = branches.data.data;
 
-            this.tributary = tributary.data.customer;
+            this.tributary = tributary.data.data;
             this.loading = false;
             this.validateDocumentType(
               this.salesNewForm.documentType,
@@ -971,7 +971,7 @@ export default {
             );
 
             this.branch = {};
-            this.salesNewForm.customerBranch = branches.data.branches.find(
+            this.salesNewForm.customerBranch = branches.data.data.find(
               (b) => b.default
             ).id;
 
@@ -992,10 +992,9 @@ export default {
         this.$axios
           .get("/invoices/documents", { params: { type: id } })
           .then((res) => {
-            this.documentInfo = res.data.documents;
-            this.salesNewForm.authorization =
-              res.data.documents[0].authorization;
-            this.salesNewForm.sequence = res.data.documents[0].current;
+            this.documentInfo = res.data.data;
+            this.salesNewForm.authorization = res.data.data[0].authorization;
+            this.salesNewForm.sequence = res.data.data[0].current;
           })
           .catch((err) => {
             this.errorMessage = err.response.data.message;

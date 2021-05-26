@@ -819,13 +819,13 @@ export default {
           invoices,
           statuses,
         ] = res;
-        this.documentTypes = documentTypes.data.documentTypes;
-        this.customers = customers.data.customers;
-        this.sellers = sellers.data.sellers;
-        this.zones = zones.data.zones;
-        this.services = services.data.services;
+        this.documentTypes = documentTypes.data.data;
+        this.customers = customers.data.data;
+        this.sellers = sellers.data.data;
+        this.zones = zones.data.data;
+        this.services = services.data.data;
         this.invoices = invoices.data;
-        this.statuses = statuses.data.statuses;
+        this.statuses = statuses.data.data;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message
@@ -953,7 +953,7 @@ export default {
     },
     async openInvoicePreview({ id }) {
       const { data } = await this.$axios.get(`/invoices/${id}`);
-      this.selectedInvoice = data.invoice;
+      this.selectedInvoice = data.data;
       this.showInvoicePreview = true;
     },
     voidDocument({ id }) {
@@ -1191,7 +1191,7 @@ export default {
                   try {
                     const vadd = 1;
                     const hadd = 3;
-                    const conf = document.data.layout;
+                    const conf = document.data.data;
 
                     // Crea el documento base
                     const pdfDocument = new jsPDF({
@@ -1208,44 +1208,44 @@ export default {
                       let value = "";
                       switch (header.value) {
                         case "invoice_autorization":
-                          value = invoice.data.invoice.authorization;
+                          value = invoice.data.data.authorization;
                           break;
                         case "invoice_number":
-                          value = invoice.data.invoice.sequence;
+                          value = invoice.data.data.sequence;
                           break;
                         case "customer_name":
-                          value = invoice.data.invoice.customerName;
+                          value = invoice.data.data.customerName;
                           break;
                         case "invoice_date":
-                          value = invoice.data.invoice.invoiceDate;
+                          value = invoice.data.data.invoiceDate;
                           break;
                         case "customer_address1":
-                          value = invoice.data.invoice.customerAddress1;
+                          value = invoice.data.data.customerAddress1;
                           break;
                         case "customer_address2":
-                          value = invoice.data.invoice.customerAddress2;
+                          value = invoice.data.data.customerAddress2;
                           break;
                         case "customer_nrc":
-                          value = invoice.data.invoice.customerNrc;
+                          value = invoice.data.data.customerNrc;
                           break;
                         case "customer_nit":
-                          value = invoice.data.invoice.customerNit;
+                          value = invoice.data.data.customerNit;
                           break;
                         case "customer_city":
-                          value = invoice.data.invoice.customerCity;
+                          value = invoice.data.data.customerCity;
                           break;
                         case "customer_giro":
-                          value = invoice.data.invoice.customerGiro;
+                          value = invoice.data.data.customerGiro;
                           break;
                         case "customer_state":
-                          value = invoice.data.invoice.customerState;
+                          value = invoice.data.data.customerState;
                           break;
                         case "seller_name":
-                          value = invoice.data.invoice.invoicesSeller.name;
+                          value = invoice.data.data.invoicesSeller.name;
                           break;
                         case "payment_condition":
                           value =
-                            invoice.data.invoice.invoicesPaymentsCondition.name;
+                            invoice.data.data.invoicesPaymentsCondition.name;
                           break;
                       }
 
@@ -1356,46 +1356,44 @@ export default {
                       switch (total.value) {
                         case "sum":
                           let sum =
-                            parseFloat(invoice.data.invoice.sum) +
-                            (invoice.data.invoice.documentType.id == 1
-                              ? parseFloat(invoice.data.invoice.iva)
+                            parseFloat(invoice.data.data.sum) +
+                            (invoice.data.data.documentType.id == 1
+                              ? parseFloat(invoice.data.data.iva)
                               : 0);
                           value = this.$options.filters.formatMoney(sum);
                           break;
                         case "iva":
                           value = this.$options.filters.formatMoney(
-                            invoice.data.invoice.iva
+                            invoice.data.data.iva
                           );
                           break;
                         case "subtotal":
                           value = this.$options.filters.formatMoney(
-                            invoice.data.invoice.subtotal
+                            invoice.data.data.subtotal
                           );
                           break;
                         case "iva_retenido":
                           value = this.$options.filters.formatMoney(
-                            invoice.data.invoice.ivaRetenido
+                            invoice.data.data.ivaRetenido
                           );
                           break;
                         case "ventas_exentas":
                           value = this.$options.filters.formatMoney(
-                            invoice.data.invoice.ventasExentas
+                            invoice.data.data.ventasExentas
                           );
                           break;
                         case "ventas_no_sujetas":
                           value = this.$options.filters.formatMoney(
-                            invoice.data.invoice.ventasNoSujetas
+                            invoice.data.data.ventasNoSujetas
                           );
                           break;
                         case "venta_total":
                           value = this.$options.filters.formatMoney(
-                            invoice.data.invoice.ventaTotal
+                            invoice.data.data.ventaTotal
                           );
                           break;
                         case "venta_total_text":
-                          value = numeroALetras(
-                            invoice.data.invoice.ventaTotal
-                          );
+                          value = numeroALetras(invoice.data.data.ventaTotal);
                           break;
                       }
                       const splitText = pdfDocument.splitTextToSize(
@@ -1419,8 +1417,6 @@ export default {
                           type: "warning",
                           beforeClose: (action, instance, done) => {
                             if (action === "confirm") {
-                              //PUT invoices/status/printed/:id
-                              //esta parte imagino que no esta todacia
                               this.$axios
                                 .put(`/invoices/status/printed/${id}`)
                                 .then((res) => {
