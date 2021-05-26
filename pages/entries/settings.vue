@@ -1413,12 +1413,12 @@ export default {
           general,
         ] = res;
         if (balance.data.balanceGeneral) {
-          this.tableData = balance.data.balanceGeneral.report;
-          this.specialAccounts = { ...balance.data.balanceGeneral.special };
+          this.tableData = balance.data.data.report;
+          this.specialAccounts = { ...balance.data.data.special };
         }
         if (general.data.general) {
-          this.fiscalPeriodForm.startDate = general.data.general.periodStart;
-          this.fiscalPeriodForm.endDate = general.data.general.peridoEnd;
+          this.fiscalPeriodForm.startDate = general.data.data.periodStart;
+          this.fiscalPeriodForm.endDate = general.data.data.peridoEnd;
         }
 
         if (signatures.data.signatures) {
@@ -1441,9 +1441,9 @@ export default {
           });
         }
 
-        this.catalogs = accounts.data.accountingCatalog;
-        this.accounts = accountCatalogs.data.accountingCatalog;
-        this.accountsCount = accountCatalogs.data.count;
+        this.catalogs = accounts.data.data;
+        this.accounts = accountCatalogs.data.data;
+        this.accountsCount = accountCatalogs.data.data;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
@@ -1859,8 +1859,8 @@ export default {
     //general
     fetchGeneral() {
       this.$axios.get("/entries/setting/general").then((res) => {
-        (this.fiscalPeriodForm.startDate = res.data.general.periodStart),
-          (this.fiscalPeriodForm.endDate = res.data.general.peridoEnd);
+        (this.fiscalPeriodForm.startDate = res.data.data.periodStart),
+          (this.fiscalPeriodForm.endDate = res.data.data.peridoEnd);
       });
     },
 
@@ -1868,7 +1868,7 @@ export default {
     fetchAsignatures() {
       this.$axios
         .get("/entries/setting/signatures")
-        .then((res) => (this.firmantesForm = res.signatures.data.signatures));
+        .then((res) => (this.firmantesForm = res.signatures.data.data));
     },
     //  CatalogAccount
     openMayorAccountDialog() {
@@ -2034,7 +2034,7 @@ export default {
       this.$axios
         .get("/entries/catalog", { params })
         .then((res) => {
-          this.accounts = res.data.accountingCatalog;
+          this.accounts = res.data.data;
           this.accountsCount = res.data.count;
           this.tableloading = false;
         })
@@ -2193,7 +2193,7 @@ export default {
         this.$axios
           .get("/entries/catalog", { params: { search: query.toLowerCase() } })
           .then((res) => {
-            this.filteredCatalog = res.data.accountingCatalog;
+            this.filteredCatalog = res.data.data;
             this.loadingAccount = false;
           })
           .catch((err) => (this.errorMessage = err.response.data.message));
@@ -2289,7 +2289,7 @@ export default {
       this.$axios
         .get("/entries/setting/balance-general")
         .then((res) => {
-          this.tableData = balance.data.balanceGeneral.report;
+          this.tableData = balance.data.data.report;
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
@@ -2401,7 +2401,7 @@ export default {
       this.$axios
         .get("/entries/setting/estado-resultados")
         .then((res) => {
-          this.tablesData = res.data.estadoResultados;
+          this.tablesData = res.data.data;
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
