@@ -388,7 +388,7 @@ export default {
       this.$axios
         .get("/customers", { params })
         .then((res) => {
-          this.customers = res.data.data;
+          this.customers = res.data;
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
