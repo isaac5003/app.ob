@@ -1416,13 +1416,13 @@ export default {
           this.tableData = balance.data.data.report;
           this.specialAccounts = { ...balance.data.data.special };
         }
-        if (general.data.general) {
+        if (general.data.data) {
           this.fiscalPeriodForm.startDate = general.data.data.periodStart;
-          this.fiscalPeriodForm.endDate = general.data.data.peridoEnd;
+          this.fiscalPeriodForm.endDate = general.data.data.periodEnd;
         }
 
-        if (signatures.data.signatures) {
-          this.firmantesForm = signatures.data.signatures;
+        if (signatures.data.data) {
+          this.firmantesForm = signatures.data.data;
         }
 
         if (results.data.estadoResultados) {
