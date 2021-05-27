@@ -223,7 +223,7 @@
       <!-- La tabla tiene las medidas exacta, la suma de las colummnas tiene 960-->
       <el-table
         @sort-change="sortBy"
-        :data="entries.entries"
+        :data="entries.data"
         stripe
         size="mini"
         ref="multipleTable"
@@ -383,9 +383,11 @@ export default {
     const entryType = () => this.$axios.get("/entries/types");
     Promise.all([entries(), entryType()])
       .then((res) => {
+        this.loading = false;
         const [entries, entryType] = res;
         this.entries = entries.data;
         this.entryType = entryType.data.data;
+        this.loading = false;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message
@@ -403,7 +405,7 @@ export default {
       },
       selecEntries: {},
       showInvoicePreview: false,
-      loading: false,
+      loading: true,
       errorMessage: "",
       searchValue: "",
       entryType: [],
@@ -419,7 +421,7 @@ export default {
       },
 
       entries: {
-        entries: [],
+        data: [],
         count: 0,
       },
     };
@@ -696,7 +698,6 @@ export default {
                   pdfMake.createPdf(docDefinition).open();
                 })
                 .catch((err) => {
-                  console.error(err);
                   this.errorMessage = err.response.data.message;
                 })
                 .then((alw) => {
