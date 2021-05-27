@@ -549,7 +549,7 @@
         <!-- La tabla esta en la medida establecida -->
         <el-table
           @sort-change="sortBy"
-          :data="invoices.invoices"
+          :data="invoices.data"
           stripe
           size="mini"
           v-loading="tableloading"
@@ -572,7 +572,7 @@
           </el-table-column>
           <el-table-column
             label="Tipo"
-            prop="documentType.id"
+            prop="documentType"
             width="75"
             sortable="custom"
           >
@@ -848,7 +848,7 @@ export default {
       services: [],
       statuses: [],
       invoices: {
-        invoices: [],
+        data: [],
         count: 0,
       },
       page: {
@@ -884,12 +884,11 @@ export default {
     },
     isLastInvoice(sequence, documentTypeId, authorization) {
       // Filtra las facturas del mismo tipo y numero de autorizacion.
-      const invoices = this.invoices.invoices.filter(
+      const invoices = this.invoices.data.filter(
         (invoice) =>
           invoice.documentType.id === documentTypeId &&
           invoice.authorization === authorization
       );
-
       // Obtiene la secuencia maxima de las facturas
       const maxSequence = Math.max.apply(
         Math,
@@ -954,6 +953,7 @@ export default {
     async openInvoicePreview({ id }) {
       const { data } = await this.$axios.get(`/invoices/${id}`);
       this.selectedInvoice = data.data;
+      console.log(this.selectedInvoice);
       this.showInvoicePreview = true;
     },
     voidDocument({ id }) {
