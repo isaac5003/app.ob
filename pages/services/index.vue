@@ -295,6 +295,7 @@ export default {
       this.fetchServices();
     },
     changeActive({ id, active }) {
+      console.log(id);
       console.log(active);
       const action = active ? "desactivar" : "activar";
       this.$confirm(
@@ -309,7 +310,7 @@ export default {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
               this.$axios
-                .put(`/services/status/${id}`, { status: !active })
+                .put(`/services/status/${id}`, { active: !active })
                 .then((res) => {
                   this.$notify.success({
                     title: "Éxito",
