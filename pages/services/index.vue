@@ -295,8 +295,6 @@ export default {
       this.fetchServices();
     },
     changeActive({ id, active }) {
-      console.log(id);
-      console.log(active);
       const action = active ? "desactivar" : "activar";
       this.$confirm(
         `¿Estás seguro que deseas ${action} este servicio?`,
