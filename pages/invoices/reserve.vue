@@ -16,20 +16,22 @@
       ref="reserveNewForm"
     >
       <div class="grid grid-cols-12 gap-4">
-        <div class="col-span-3" >
-          <el-form-item label="Tipo de documento" prop="documentType">
+        <div class="col-span-3">
+          <el-form-item label="Tipo de documento">
             <el-select
               v-model="reserve.documentType"
-              class="w-full"
               size="small"
               clearable
-              placeholder="Seleccionar"
+              placeholder="Todos los tipos:"
+              class="w-full"
+              @change="fetchInvoices"
             >
+              <el-option label="Todos los tipos" value="" />
               <el-option
-                v-for="d in documentTypes"
-                :key="d.id"
-                :label="`${d.code} - ${d.name}`"
-                :value="d.id"
+                v-for="item in documentTypes"
+                :key="item.id"
+                :label="`${item.code} - ${item.name}`"
+                :value="item.id"
               >
               </el-option>
             </el-select>
@@ -58,21 +60,16 @@
             >
             </el-input>
           </el-form-item>
-      </div>
-      </div>
-     <div class="flex justify-end ">
-          <el-button
-            type="primary"
-            size="small"
-            @click.native="
-              addToDetails('')
-            "
-            >Guardar</el-button
-          >
-          <el-button @click="$router.push('/invoices')" size="small"
-            >Cancelar</el-button
-          >
         </div>
+      </div>
+      <div class="flex justify-end">
+        <el-button type="primary" size="small" @click.native="addToDetails('')"
+          >Guardar</el-button
+        >
+        <el-button @click="$router.push('/invoices')" size="small"
+          >Cancelar</el-button
+        >
+      </div>
     </el-form>
   </layout-content>
 </template>
@@ -97,7 +94,7 @@ export default {
     Promise.all([documentTypes()])
       .then((res) => {
         const [documentTypes] = res;
-        this.documentTypes = documentTypes.data.documentTypes;
+        this.documentTypes = documentTypes.data.data;
       })
       .catch((err) => {
         console.log(err);
@@ -113,7 +110,7 @@ export default {
         DocumentType: "",
         since: "",
         until: "",
-        a:""
+        a: "",
       },
     };
   },
