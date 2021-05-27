@@ -2177,7 +2177,7 @@
     >
       <el-tab-pane label="Zonas y vendedores" name="zones-sellers">
         <!-- Inicio de tablas zonas y vendedores -->
-        <div class="grid grid-cols-12">
+        <div class="grid grid-cols-12 gap-4">
           <!-- tabla de zonas -->
           <div class="col-span-5 flex flex-col space-y-4">
             <div class="flex justify-between items-center">
