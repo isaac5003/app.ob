@@ -413,7 +413,9 @@ export default {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
               this.$axios
-                .put(`/customers/status/${id}`, { status: !isActiveCustomer })
+                .put(`/customers/status/${id}`, {
+                  isActiveCustomer: !isActiveCustomer,
+                })
                 .then((res) => {
                   this.$notify.success({
                     title: "Éxito",
@@ -562,7 +564,8 @@ export default {
     },
     async openCustomerPreview({ id }) {
       const data = await this.$axios.get(`/customers/${id}`);
-      (this.selectedCustomer = data.data), (this.showCustomerPreview = true);
+      (this.selectedCustomer = data.data.data),
+        (this.showCustomerPreview = true);
     },
     hasModule() {
       return hasModule("f6000cbb-1e6d-4f7d-a7cc-cadd78d23076", this.$auth.user);
