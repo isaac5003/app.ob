@@ -223,7 +223,7 @@ export default {
     Promise.all([sellingTypes(), services()])
       .then((res) => {
         const [sellingTypes, services] = res;
-        this.sellingTypes = sellingTypes.data.type;
+        this.sellingTypes = sellingTypes.data.data;
         this.services = services.data;
       })
       .catch((err) => {
@@ -295,6 +295,7 @@ export default {
       this.fetchServices();
     },
     changeActive({ id, active }) {
+      console.log(active);
       const action = active ? "desactivar" : "activar";
       this.$confirm(
         `¿Estás seguro que deseas ${action} este servicio?`,
