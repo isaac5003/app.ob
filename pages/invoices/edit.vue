@@ -719,7 +719,9 @@ export default {
       .then(({ data }) => {
         const customer = () => this.$axios.get(`/customers`);
         const branches = () =>
-          this.$axios.get(`/customers/${data.data.customer.id}/branches`);
+          data.data.customer
+            ? this.$axios.get(`/customers/${data.data.customer.id}/branches`)
+            : null;
         const sellers = () =>
           this.$axios.get("/invoices/sellers", {
             params: { active: true },
@@ -748,19 +750,30 @@ export default {
             this.documents = documentTypes.data.data;
             this.sellers = sellers.data.data;
             this.paymentConditions = paymentConditions.data.data;
-            this.branches = branches.data.data;
+            this.branches = branches ? branches.data.data : [];
             this.salesEditForm = {
               ...data.data,
-              customer: data.data.customer.id,
-              customerBranch: data.data.customerBranch.id,
-              invoicesPaymentsCondition: data.data.invoicesPaymentsCondition.id,
-              invoicesSellers: data.data.invoicesSeller.id,
+              invoiceRawDate: data.data.invoiceRawDate
+                ? data.data.invoiceRawDate
+                : "",
+              customer: data.data.customer ? data.data.customer.id : "",
+              customerBranch: data.data.customerBranch
+                ? data.data.customerBranch.id
+                : "",
+              invoicesPaymentsCondition: data.data.invoicesPaymentsCondition
+                ? data.data.invoicesPaymentsCondition.id
+                : null,
+              invoicesSellers: data.data.invoicesSeller
+                ? data.data.invoicesSeller.id
+                : null,
               documentType: data.data.documentType.id,
             };
             this.tributary = {
-              customerNrc: data.data.customerNrc,
-              customerNit: data.data.customerNit,
-              customerGiro: data.data.customerGiro,
+              customerNrc: data.data.customerNrc ? data.data.customerNrc : "",
+              customerNit: data.data.customerNit ? data.data.customerNit : "",
+              customerGiro: data.data.customerGiro
+                ? data.data.customerGiro
+                : "",
             };
             this.details = data.data.details.map((de) => {
               return {
@@ -772,9 +785,15 @@ export default {
               };
             });
             this.branch = {
-              address1: data.invoice.customerAddress1,
-              state: { name: data.invoice.customerState },
-              city: { name: data.invoice.customerCity },
+              address1: data.data.customerAddress1
+                ? data.data.customerAddress1
+                : "",
+              state: {
+                name: data.data.customerState ? data.data.customerState : "",
+              },
+              city: {
+                name: data.data.customerCity ? data.data.customerCity : "",
+              },
             };
 
             this.loading = false;
@@ -1087,6 +1106,8 @@ export default {
                       ventasExentas: this.ventasExentas.toFixed(2),
                       ventasNoSujetas: this.ventasNoSujetas.toFixed(2),
                       ventaTotal: this.ventaTotal.toFixed(2),
+                      status:
+                        formData.status.id == "4" ? "1" : formData.status.id,
                     },
                     details: details.map((d) => {
                       return {

@@ -682,6 +682,7 @@
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item
                     @click.native="openInvoicePreview(scope.row)"
+                    v-if="scope.row.status.id != '4'"
                   >
                     <i class="el-icon-view"></i> Vista previa
                   </el-dropdown-item>
@@ -689,7 +690,9 @@
                     @click.native="
                       $router.push(`/invoices/edit?ref=${scope.row.id}`)
                     "
-                    v-if="scope.row.status.id == '1'"
+                    v-if="
+                      scope.row.status.id == '1' || scope.row.status.id == '4'
+                    "
                   >
                     <i class="el-icon-edit-outline"></i> Editar documento
                   </el-dropdown-item>

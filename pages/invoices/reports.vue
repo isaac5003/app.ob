@@ -93,112 +93,109 @@
                 </el-date-picker>
               </el-form-item>
             </div>
-            <template>
-              <div class="col-span-4">
-                <el-form-item label="Cliente:">
-                  <el-select
-                    v-model="filterForm.customer"
-                    size="small"
-                    class="w-full"
-                    clearable
-                    filterable
-                    default-first-option
-                    placeholder="Todos los clientes:"
-                  >
-                    <el-option label="Todos los clientes" value="" />
-                    <el-option-group key="ACTIVOS" label="ACTIVOS">
-                      <el-option
-                        v-for="item in activeCustomers"
-                        :key="item.id"
-                        :label="item.name"
-                        :value="item.id"
-                      >
-                        <div
-                          class="flex flex-row justify-between items-end py-1 leading-normal"
-                        >
-                          <div class="flex flex-col">
-                            <span class="text-xs text-gray-500">{{
-                              item.shortName
-                            }}</span>
-                            <span>{{ item.name }}</span>
-                          </div>
-                          <span class="text-xs text-gray-500">{{
-                            item.nrc
-                          }}</span>
-                        </div>
-                      </el-option>
-                    </el-option-group>
-                    <el-option-group key="INACTIVOS" label="INACTIVOS">
-                      <el-option
-                        v-for="item in inactiveCustomers"
-                        :key="item.id"
-                        :label="item.name"
-                        :value="item.id"
-                      >
-                        <div
-                          class="flex flex-row justify-between items-end py-1 leading-normal"
-                        >
-                          <div class="flex flex-col">
-                            <span class="text-xs text-gray-500">{{
-                              item.shortName
-                            }}</span>
-                            <span>{{ item.name }}</span>
-                          </div>
-                          <span class="text-xs text-gray-500">{{
-                            item.nrc
-                          }}</span>
-                        </div>
-                      </el-option>
-                    </el-option-group>
-                  </el-select>
-                </el-form-item>
-              </div>
-            </template>
-            <template>
-              <div class="col-span-2">
-                <el-form-item label="Tipo fact:">
-                  <el-select
-                    v-model="filterForm.invoiceType"
-                    size="small"
-                    clearable
-                    placeholder="Todos los tipos:"
-                    class="w-full"
-                  >
-                    <el-option label="Todos los tipos" value="" />
+
+            <div class="col-span-4">
+              <el-form-item label="Cliente:">
+                <el-select
+                  v-model="filterForm.customer"
+                  size="small"
+                  class="w-full"
+                  clearable
+                  filterable
+                  default-first-option
+                  placeholder="Todos los clientes:"
+                >
+                  <el-option label="Todos los clientes" value="" />
+                  <el-option-group key="ACTIVOS" label="ACTIVOS">
                     <el-option
-                      v-for="item in documentTypes"
-                      :key="item.id"
-                      :label="`${item.code} - ${item.name}`"
-                      :value="item.id"
-                    >
-                    </el-option>
-                  </el-select>
-                </el-form-item>
-              </div>
-            </template>
-            <template>
-              <div class="col-span-2">
-                <el-form-item label="Estado:">
-                  <el-select
-                    v-model="filterForm.status"
-                    size="small"
-                    clearable
-                    placeholder="Todos los estados:"
-                    class="w-full"
-                  >
-                    <el-option label="Todos los estados" value="" />
-                    <el-option
-                      style="width: 103%"
-                      v-for="item in statuses"
+                      v-for="item in activeCustomers"
                       :key="item.id"
                       :label="item.name"
                       :value="item.id"
                     >
+                      <div
+                        class="flex flex-row justify-between items-end py-1 leading-normal"
+                      >
+                        <div class="flex flex-col">
+                          <span class="text-xs text-gray-500">{{
+                            item.shortName
+                          }}</span>
+                          <span>{{ item.name }}</span>
+                        </div>
+                        <span class="text-xs text-gray-500">{{
+                          item.nrc
+                        }}</span>
+                      </div>
                     </el-option>
-                  </el-select>
-                </el-form-item>
-              </div>
-            </template>
+                  </el-option-group>
+                  <el-option-group key="INACTIVOS" label="INACTIVOS">
+                    <el-option
+                      v-for="item in inactiveCustomers"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    >
+                      <div
+                        class="flex flex-row justify-between items-end py-1 leading-normal"
+                      >
+                        <div class="flex flex-col">
+                          <span class="text-xs text-gray-500">{{
+                            item.shortName
+                          }}</span>
+                          <span>{{ item.name }}</span>
+                        </div>
+                        <span class="text-xs text-gray-500">{{
+                          item.nrc
+                        }}</span>
+                      </div>
+                    </el-option>
+                  </el-option-group>
+                </el-select>
+              </el-form-item>
+            </div>
+
+            <div class="col-span-2">
+              <el-form-item label="Tipo fact:">
+                <el-select
+                  v-model="filterForm.documentType"
+                  size="small"
+                  clearable
+                  placeholder="Todos los tipos:"
+                  class="w-full"
+                >
+                  <el-option label="Todos los tipos" value="" />
+                  <el-option
+                    v-for="item in documentTypes"
+                    :key="item.id"
+                    :label="`${item.code} - ${item.name}`"
+                    :value="item.id"
+                  >
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </div>
+
+            <div class="col-span-2">
+              <el-form-item label="Estado:">
+                <el-select
+                  v-model="filterForm.status"
+                  size="small"
+                  clearable
+                  placeholder="Todos los estados:"
+                  class="w-full"
+                >
+                  <el-option label="Todos los estados" value="" />
+                  <el-option
+                    style="width: 103%"
+                    v-for="item in statuses"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </div>
           </div>
           <!-- div vendedor, zona servicio-->
           <div class="grid grid-cols-12 gap-4">
@@ -505,7 +502,7 @@ export default {
         reportType: "",
         dateRange: "",
         customer: "",
-        invoiceType: "",
+        documentType: "",
         status: "",
         seller: "",
         zone: "",
@@ -586,44 +583,33 @@ export default {
         }
       }
     },
-    generateReport(
-      formName,
-      {
-        customer,
-        dateRange,
-        documentType,
-        invoiceType,
-        radioType,
-        reportType,
-        seller,
-        service,
-        status,
-        zone,
-      }
-    ) {
+    generateReport(formName, data) {
       this.$refs[formName].validate((valid) => {
         if (!valid) {
           return false;
         }
 
         this.generating = true;
-        switch (reportType) {
+        switch (data.reportType) {
           case "detalleReportes":
             this.detailsReports(
-              customer,
-              dateRange,
-              documentType,
-              invoiceType,
-              radioType,
-              reportType,
-              seller,
-              service,
-              status,
-              zone
+              data.customer,
+              data.dateRange,
+              data.documentType,
+              data.radioType,
+              data.seller,
+              data.service,
+              data.status,
+              data.zone
             );
             break;
           case "listadoVentas":
-            this.sellignReports(customer, dateRange, invoiceType, radioType);
+            this.sellignReports(
+              data.customer,
+              data.dateRange,
+              data.documentType,
+              data.radioType
+            );
             break;
         }
       });
@@ -632,9 +618,7 @@ export default {
       customer,
       dateRange,
       documentType,
-      invoiceType,
       radioType,
-      reportType,
       seller,
       service,
       status,
@@ -642,19 +626,29 @@ export default {
     ) {
       const startDate = dateRange[0];
       const endDate = dateRange[1];
+      let params = { startDate, endDate };
+      if (customer) {
+        params = { ...params, customer };
+      }
+      if (documentType) {
+        params = { ...params, documentType };
+      }
+      if (seller) {
+        params = { ...params, seller };
+      }
+      if (service) {
+        params = { ...params, service };
+      }
+      if (status) {
+        params = { ...params, status };
+      }
+      if (zone) {
+        params = { ...params, zone };
+      }
 
       const report = () =>
         this.$axios.get("/invoices/report/general", {
-          params: {
-            startDate,
-            endDate,
-            customer,
-            documentType: invoiceType,
-            status,
-            seller,
-            zone,
-            service,
-          },
+          params,
         });
       switch (radioType) {
         case "pdf":
@@ -877,10 +871,10 @@ export default {
           });
           break;
         case "excel":
-          Promise.all([bussinesInfo(), generales()]).then((res) => {
-            const [bussinesInfo, generales] = res;
-            const { name, nit, nrc } = bussinesInfo.data.info;
-            const general = generales.data.report;
+          Promise.all([report()]).then((res) => {
+            const [report] = res;
+            const { name, nit, nrc } = report.data.company;
+            const general = report.data.invoices;
 
             const data = [];
 
@@ -958,57 +952,58 @@ export default {
           break;
       }
     },
-    sellignReports(customer, dateRange, invoiceType, radioType) {
+    sellignReports(customer, dateRange, documentType, radioType) {
       const startDate = dateRange[0];
       const endDate = dateRange[1];
+      let params = { startDate, endDate };
+      if (customer) {
+        params = { ...params, customer };
+      }
+      if (documentType) {
+        params = { ...params, documentType };
+      }
 
-      const bussinesInfo = () => this.$axios.get("/business/info");
-      const generales = () =>
-        this.$axios.get("/invoices/report/general", {
-          params: {
-            startDate,
-            endDate,
-            customer,
-            documentType: invoiceType,
-          },
+      const report = () =>
+        this.$axios.get("/invoices/report/invoice-list", {
+          params,
         });
       switch (radioType) {
         case "pdf":
-          Promise.all([bussinesInfo(), generales()]).then((res) => {
-            const [bussinesInfo, generales] = res;
-            const { name, nit, nrc } = bussinesInfo.data.info;
-            const general = generales.data.report;
+          Promise.all([report()]).then((res) => {
+            const [report] = res;
+            const { name, nit, nrc } = report.data.company;
+            const general = report.data.invoices;
 
             const values = [];
             const emptyRow = [{}, {}, {}, {}, {}];
 
             for (const r of general) {
               values.push(emptyRow);
-              for (const d of r.documents) {
-                values.push([
-                  {
-                    bold: true,
-                    text: r.code,
-                  },
-                  {
-                    bold: false,
-                    text: d.customer,
-                  },
-                  {
-                    bold: false,
-                    text: d.date,
-                  },
-                  {
-                    bold: false,
-                    text: d.documentNumber,
-                  },
-                  {
-                    bold: false,
-                    text: this.$options.filters.formatMoney(d.total),
-                    alignment: "right",
-                  },
-                ]);
-              }
+
+              values.push([
+                {
+                  bold: true,
+                  text: r.code,
+                },
+                {
+                  bold: false,
+                  text: r.customer,
+                },
+                {
+                  bold: false,
+                  text: r.date,
+                },
+                {
+                  bold: false,
+                  text: r.documentNumber,
+                },
+                {
+                  bold: false,
+                  text: this.$options.filters.formatMoney(r.total),
+                  alignment: "right",
+                },
+              ]);
+
               values.push(emptyRow);
             }
 
@@ -1086,24 +1081,24 @@ export default {
           });
           break;
         case "excel":
-          Promise.all([bussinesInfo(), generales()]).then((res) => {
-            const [bussinesInfo, generales] = res;
-            const { name, nit, nrc } = bussinesInfo.data.info;
-            const general = generales.data.report;
+       Promise.all([report()]).then((res) => {
+            const [report] = res;
+            const { name, nit, nrc } = report.data.company;
+            const general = report.data.invoices;
 
             const data = [];
 
             for (const r of general) {
               data.push([""]);
-              for (const d of r.documents) {
+            
                 data.push([
                   r.code,
-                  d.customer,
-                  d.date,
-                  d.documentNumber,
-                  d.total,
+                  r.customer,
+                  r.date,
+                  r.documentNumber,
+                  r.total,
                 ]);
-              }
+              
               data.push([""]);
             }
             const document = [
