@@ -2907,7 +2907,7 @@ export default {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
               this.$axios
-                .put(`/invoices/zones/status/${id}`, { status: !active })
+                .put(`/invoices/zones/status/${id}`, { active: !active })
                 .then((res) => {
                   this.$notify.success({
                     title: "Éxito",
@@ -2947,7 +2947,7 @@ export default {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
               this.$axios
-                .put(`/invoices/sellers/status/${id}`, { status: !active })
+                .put(`/invoices/sellers/status/${id}`, { active: !active })
                 .then((res) => {
                   this.$notify.success({
                     title: "Éxito",
@@ -2988,7 +2988,7 @@ export default {
               instance.confirmButtonText = "Procesando...";
               this.$axios
                 .put(`/invoices/payment-condition/status/${id}`, {
-                  status: !active,
+                  active: !active,
                 })
                 .then((res) => {
                   this.$notify.success({
@@ -3388,7 +3388,7 @@ export default {
                 instance.confirmButtonText = "Procesando...";
                 this.$axios
                   .put(`/invoices/documents/status/${correlative.id}`, {
-                    status: correlative.active,
+                    active: correlative.active,
                   })
 
                   .then((res) => {
@@ -3489,5 +3489,3 @@ export default {
   },
 };
 </script>
-  
-

@@ -425,17 +425,17 @@ export default {
         this.accountingEntryTypes = entryTypes.data.data;
         this.accountingCatalog = accountingCatalog.data.data;
         this.editEntryForm = {
-          ...entry.data.entry,
-          accountingEntryType: entry.data.entry.accountingEntryType.id,
+          ...entry.data.data,
+          accountingEntryType: entry.data.data.accountingEntryType.id,
         };
-        this.accountingEntryDetails = entry.data.entry.accountingEntryDetails.map(
+        this.accountingEntryDetails = entry.data.data.accountingEntryDetails.map(
           (d) => {
             return {
               ...d,
               accountingCatalog: d.accountingCatalog.id,
               code: d.accountingCatalog.code,
               order: !d.order
-                ? entry.data.entry.accountingEntryDetails.indexOf(d) + 1
+                ? entry.data.data.accountingEntryDetails.indexOf(d) + 1
                 : d.order,
             };
           }

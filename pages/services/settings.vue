@@ -55,6 +55,7 @@
                   filterable
                   default-first-option
                   :remote-method="findAccount"
+                  @focus="filteredCatalog = []"
                 >
                   <el-option
                     v-for="c in filteredCatalog"

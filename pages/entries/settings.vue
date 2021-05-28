@@ -372,7 +372,7 @@
     <!-- editar cuenta contable -->
     <el-dialog
       :id="activeAccount != null ? activeAccount.code : ''"
-      title="Editar cuenta contable 2"
+      title="Editar cuenta contable"
       :visible.sync="showEditAccount"
       :append-to-body="true"
       :close-on-click-modal="false"
@@ -500,7 +500,7 @@
             @click.native="
               submitEditedCatalog(
                 activeAccount,
-                'accountFormEdit',
+                'activeAccount',
                 activeAccount.parentCatalog
               )
             "
@@ -911,8 +911,8 @@
               "
               :disabled="
                 !firmantesForm.legal ||
-                !firmantesForm.accountant ||
-                !firmantesForm.auditor
+                  !firmantesForm.accountant ||
+                  !firmantesForm.auditor
               "
               >Guardar</el-button
             >
@@ -1819,8 +1819,8 @@ export default {
     //general
     fetchGeneral() {
       this.$axios.get("/entries/setting/general").then((res) => {
-        (this.fiscalPeriodForm.startDate = res.data.general.periodStart),
-          (this.fiscalPeriodForm.endDate = res.data.general.peridoEnd);
+        (this.fiscalPeriodForm.startDate = res.data.data.periodStart),
+          (this.fiscalPeriodForm.endDate = res.data.data.periodEnd);
       });
     },
 
@@ -1828,7 +1828,7 @@ export default {
     fetchAsignatures() {
       this.$axios
         .get("/entries/setting/signatures")
-        .then((res) => (this.firmantesForm = res.signatures.data.signatures));
+        .then((res) => (this.firmantesForm = res.data.data));
     },
     //  CatalogAccount
     openMayorAccountDialog() {
@@ -2016,7 +2016,7 @@ export default {
 
         this.activeAccount = {
           ...account,
-          code: `0${account.code.slice(-1)}`,
+          code: `${account.code}`,
         };
       }
     },
@@ -2064,12 +2064,14 @@ export default {
         if (!valid) {
           return false;
         }
-
+        let realCode = accounts.code;
         // Genera el codigo real a guardar
-        const realCode =
-          Object.keys(activeAccount).length > 0
-            ? `${activeAccount.code}${accounts.code}`
-            : `${accounts.code}`;
+        if (activeAccount) {
+          realCode =
+            Object.keys(activeAccount).length > 0
+              ? `${activeAccount.code}${accounts.code}`
+              : `${accounts.code}`;
+        }
 
         // Verifica si los codigos nuevos y los guardados estan duplicados entre ellos.
         // const catalog = this.accounts.map((a) => a.code);
@@ -2357,7 +2359,7 @@ export default {
       this.$axios
         .get("/entries/setting/estado-resultados")
         .then((res) => {
-          this.tablesData = res.data.estadoResultados;
+          this.tablesData = res.data.data.estadoResultados;
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
