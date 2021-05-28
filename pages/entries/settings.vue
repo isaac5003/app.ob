@@ -1444,7 +1444,6 @@ export default {
         });
       })
       .catch((err) => {
-        console.log(err);
         this.errorMessage = err.response.data.message;
       })
       .then((alw) => (this.pageloading = false));
