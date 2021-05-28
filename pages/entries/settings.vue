@@ -1,7 +1,7 @@
 <template>
   <layout-content
-    v-loading="pageloading"
     page-title="Configuraciones"
+    v-loading="pageloading"
     :breadcrumb="[
       { name: 'Contabilidad', to: '/entries' },
       { name: 'Configuraciones', to: null },
@@ -13,6 +13,7 @@
       title="Nueva cuenta mayor"
       :visible.sync="showCreateCatalogDialog"
       :append-to-body="true"
+      :close-on-click-modal="false"
       width="900px"
     >
       <el-form :model="mayorAccountForm" status-icon ref="mayorAccountForm">
@@ -34,6 +35,7 @@
               :min="1"
               size="small"
               autocomplete="off"
+              @change="setStorage('mayorAccountForm', mayorAccountForm)"
             />
           </el-form-item>
           <el-form-item
@@ -50,6 +52,7 @@
               maxlength="100"
               minlength="3"
               show-word-limit
+              @change="setStorage('mayorAccountForm', mayorAccountForm)"
             />
           </el-form-item>
           <el-form-item class="col-span-2">
@@ -59,6 +62,7 @@
               class="mt-5"
               style="width: 100%"
               v-model="item.isAcreedora"
+              @change="setStorage('mayorAccountForm', mayorAccountForm)"
             >
               Acreedora
             </el-checkbox>
@@ -70,6 +74,7 @@
               class="mt-5"
               style="width: 100%"
               v-model="item.isBalance"
+              @change="setStorage('mayorAccountForm', mayorAccountForm)"
             >
               Balance
             </el-checkbox>
@@ -119,6 +124,7 @@
       title="Editar cuenta mayor"
       :visible.sync="showEditMayorDialog"
       :append-to-body="true"
+      :close-on-click-modal="false"
       width="900px"
     >
       <el-form
@@ -146,7 +152,7 @@
               type="number"
               :min="1"
               size="small"
-              :disabled="activeAccount.isParent && activeAccount.subAccounts"
+              @change="setStorage('activeAccount', activeAccount)"
             />
           </el-form-item>
           <el-form-item
@@ -166,7 +172,11 @@
               },
             ]"
           >
-            <el-input v-model="activeAccount.name" size="small" />
+            <el-input
+              v-model="activeAccount.name"
+              size="small"
+              @change="setStorage('activeAccount', activeAccount)"
+            />
           </el-form-item>
           <el-form-item prop="service" class="col-span-2">
             <el-checkbox
@@ -175,6 +185,7 @@
               size="small"
               border
               class="w-full mt-5"
+              @change="setStorage('activeAccount', activeAccount)"
             />
           </el-form-item>
           <el-form-item prop="service" class="col-span-2">
@@ -184,6 +195,7 @@
               size="small"
               border
               class="w-full mt-5"
+              @change="setStorage('activeAccount', activeAccount)"
             />
           </el-form-item>
         </div>
@@ -194,9 +206,7 @@
           <el-button
             type="primary"
             size="small"
-            @click.native="
-              submitEditedCatalog(accounts, 'activeAccount', activeAccount)
-            "
+            @click.native="submitEditedCatalog(activeAccount, 'activeAccount')"
             >Guardar</el-button
           >
           <el-button @click="showEditMayorDialog = false" size="small"
@@ -210,6 +220,7 @@
       title="Nueva cuenta contable"
       :visible.sync="showCreateAccountEntryDialog"
       :append-to-body="true"
+      :close-on-click-modal="false"
       width="900px"
     >
       <el-form :model="subAccountForm" status-icon ref="subAccountForm">
@@ -248,6 +259,7 @@
                   :min="1"
                   size="small"
                   autocomplete="off"
+                  @change="setStorage('subAccountForm', subAccountForm)"
                 />
               </el-form-item>
               <div class="col-span-5">
@@ -270,6 +282,7 @@
                       maxlength="100"
                       minlength="3"
                       show-word-limit
+                      @change="setStorage('subAccountForm', subAccountForm)"
                     />
                   </el-form-item>
                   <el-form-item class="col-span-6" label="Descripción">
@@ -281,6 +294,7 @@
                       maxlength="100"
                       minlength="3"
                       show-word-limit
+                      @change="setStorage('subAccountForm', subAccountForm)"
                     />
                   </el-form-item>
                 </div>
@@ -292,6 +306,7 @@
                   class="mt-5"
                   style="width: 100%"
                   v-model="item.isAcreedora"
+                  @change="setStorage('subAccountForm', subAccountForm)"
                 >
                   Acreedora
                 </el-checkbox>
@@ -303,6 +318,7 @@
                   class="mt-5"
                   style="width: 100%"
                   v-model="subAccountForm.items[i].isBalance"
+                  @change="setStorage('subAccountForm', subAccountForm)"
                 >
                   Balance
                 </el-checkbox>
@@ -359,12 +375,13 @@
       title="Editar cuenta contable"
       :visible.sync="showEditAccount"
       :append-to-body="true"
+      :close-on-click-modal="false"
       width="900px"
     >
       <el-form
         :model="activeAccount"
         status-icon
-        ref="accountFormEdit"
+        ref="activeAccount"
         class="space-y-4"
       >
         <notification
@@ -414,6 +431,7 @@
                 :min="1"
                 size="small"
                 :disabled="activeAccount.subAccounts"
+                @change="setStorage('activeAccount', activeAccount)"
               />
             </el-form-item>
             <el-form-item
@@ -433,10 +451,22 @@
                 },
               ]"
             >
-              <el-input v-model="activeAccount.name" size="small" />
+              <el-input
+                v-model="activeAccount.name"
+                size="small"
+                @change="setStorage('activeAccount', activeAccount)"
+              />
             </el-form-item>
-            <el-form-item class="col-span-3" label="Descripción">
-              <el-input v-model="activeAccount.description" size="small" />
+            <el-form-item
+              class="col-span-3"
+              label="Descripción"
+              prop="description"
+            >
+              <el-input
+                v-model="activeAccount.description"
+                size="small"
+                @change="setStorage('activeAccount', activeAccount)"
+              />
             </el-form-item>
             <el-form-item class="col-span-2">
               <el-checkbox
@@ -445,6 +475,7 @@
                 size="small"
                 border
                 class="w-full mt-5"
+                @change="setStorage('activeAccount', activeAccount)"
               />
             </el-form-item>
             <el-form-item class="col-span-2">
@@ -454,6 +485,7 @@
                 size="small"
                 border
                 class="w-full mt-5"
+                @change="setStorage('activeAccount', activeAccount)"
               />
             </el-form-item>
           </div>
@@ -466,7 +498,11 @@
             type="primary"
             size="small"
             @click.native="
-              submitEditedCatalog(accounts, 'accountFormEdit', activeAccount)
+              submitEditedCatalog(
+                activeAccount,
+                'activeAccount',
+                activeAccount.parentCatalog
+              )
             "
             >Guardar</el-button
           >
@@ -484,6 +520,7 @@
       :visible.sync="showAddAccount"
       width="500px"
       :append-to-body="true"
+      :close-on-click-modal="false"
       @open="selectedCatalog = []"
     >
       <div class="grid grid-cols-12">
@@ -501,6 +538,7 @@
             class="w-full"
             size="small"
             @focus="filterCatalog = []"
+            @change="setStorage('selectedCatalog', selectedCatalog)"
           >
             <el-option
               v-for="item in filteredCatalog"
@@ -529,6 +567,7 @@
       :visible.sync="showChangeDisplayName"
       width="500px"
       :append-to-body="true"
+      :close-on-click-modal="false"
       @open="newDisplayName = ''"
     >
       <div class="flex flex-col space-y-2">
@@ -557,6 +596,7 @@
       :visible.sync="showChangeDisplayName"
       width="550px"
       :append-to-body="true"
+      :close-on-click-modal="false"
     >
       <div class="flex flex-col space-y-2">
         <span>Cambiar de: {{ selectedParentAccount.name }}</span>
@@ -581,6 +621,18 @@
             size="small"
             clearable
             :disabled="!allowNewDisplayName"
+            @change="
+              setStorage(
+                fiscalPeriodForm,
+                firmantesForm,
+                mayorAccountForm,
+                subAccountForm,
+                activeAccount,
+                newDisplayName,
+                specialAccounts,
+                newDisplayNameEstado
+              )
+            "
           />
         </div>
       </div>
@@ -608,6 +660,7 @@
       :visible.sync="showAddAccountEstado"
       width="500px"
       :append-to-body="true"
+      :close-on-click-modal="false"
     >
       <div class="grid grid-cols-12">
         <div class="col-span-12">
@@ -623,6 +676,7 @@
             :loading="loadingAccount"
             class="w-full"
             size="small"
+            @change="setStorage('selectedCatalogEstado', selectedCatalogEstado)"
           >
             <el-option
               v-for="item in filteredCatalog"
@@ -655,6 +709,7 @@
       :visible.sync="showChangeDisplayNameEstado"
       width="550px"
       :append-to-body="true"
+      :close-on-click-modal="false"
     >
       <div class="flex flex-col space-y-2">
         <span>Cambiar de: {{ selectedParentAccountEstado.name }}</span>
@@ -679,6 +734,18 @@
             size="small"
             clearable
             :disabled="!allowNewDisplayNameEstado"
+            @change="
+              setStorage(
+                fiscalPeriodForm,
+                firmantesForm,
+                mayorAccountForm,
+                subAccountForm,
+                activeAccount,
+                newDisplayName,
+                specialAccounts,
+                newDisplayNameEstado
+              )
+            "
           />
         </div>
       </div>
@@ -714,16 +781,6 @@
     >
       <!--  tab generales -->
       <el-tab-pane label="Generales" name="general">
-        <!-- <div class="grid grid-cols-12">
-          <div class="col-span-12">
-            <Notification
-              class="mb-4 w-full"
-              type="info"
-              title="Información"
-              
-            />
-          </div>
-        </div> -->
         <el-form
           :model="fiscalPeriodForm"
           :rules="fiscalPeriodFormRules"
@@ -743,6 +800,7 @@
                 placeholder="Fecha inicial"
                 style="width: 100%"
                 value-format="yyyy-MM-dd"
+                @change="setStorage('fiscalPeriodForm', fiscalPeriodForm)"
               >
               </el-date-picker>
             </el-form-item>
@@ -755,6 +813,7 @@
                 format="MMM-yyyy"
                 placeholder="Fecha final"
                 style="width: 100%"
+                @change="setStorage('fiscalPeriodForm', fiscalPeriodForm)"
               >
               </el-date-picker>
             </el-form-item>
@@ -780,16 +839,6 @@
       </el-tab-pane>
       <!-- Firmantes -->
       <el-tab-pane label="Firmantes" name="signatures">
-        <!-- <div class="grid grid-cols-12">
-          <div class="col-span-12">
-            <Notification
-              class="mb-4 w-full"
-              type="info"
-              title="Información"
-              
-            />
-          </div>
-        </div> -->
         <el-form
           :model="firmantesForm"
           :rules="firmantesFormRules"
@@ -811,6 +860,7 @@
                 show-word-limit
                 clearable
                 placeholder=""
+                @change="setStorage('firmantesForm', firmantesForm)"
               >
               </el-input>
             </el-form-item>
@@ -830,6 +880,7 @@
                 filterable
                 clearable
                 placeholder=""
+                @change="setStorage('firmantesForm', firmantesForm)"
               >
               </el-input>
             </el-form-item>
@@ -846,6 +897,7 @@
                 filterable
                 clearable
                 placeholder=""
+                @change="setStorage('firmantesForm', firmantesForm)"
               >
               </el-input>
             </el-form-item>
@@ -859,8 +911,8 @@
               "
               :disabled="
                 !firmantesForm.legal ||
-                !firmantesForm.accountant ||
-                !firmantesForm.auditor
+                  !firmantesForm.accountant ||
+                  !firmantesForm.auditor
               "
               >Guardar</el-button
             >
@@ -986,15 +1038,20 @@
               <el-form-item label="Utilidad ejercicios anteriores">
                 <el-select
                   filterable
+                  remote
                   default-first-option
                   clearable
                   v-model="specialAccounts.accum_gain"
                   placeholder="Escribe el numero o nombre de la cuenta"
+                  :remote-method="findAccount"
+                  :loading="loadingAccount"
                   class="w-full"
                   size="small"
+                  @focus="filteredCatalog = []"
+                  @change="setStorage('specialAccounts', specialAccounts)"
                 >
                   <el-option
-                    v-for="item in catalogs"
+                    v-for="item in filteredCatalog"
                     :key="item.id"
                     :label="`${item.code} - ${item.name}`"
                     :value="item.id"
@@ -1005,6 +1062,7 @@
             <div class="col-span-3">
               <el-form-item label="Perdida ejercicios anteriores">
                 <el-select
+                  remote
                   filterable
                   default-first-option
                   clearable
@@ -1012,9 +1070,13 @@
                   placeholder="Escribe el numero o nombre de la cuenta"
                   class="w-full"
                   size="small"
+                  :remote-method="findAccount"
+                  :loading="loadingAccount"
+                  @focus="filteredCatalog = []"
+                  @change="setStorage('specialAccounts', specialAccounts)"
                 >
                   <el-option
-                    v-for="item in catalogs"
+                    v-for="item in filteredCatalog"
                     :key="item.id"
                     :label="`${item.code} - ${item.name}`"
                     :value="item.id"
@@ -1025,6 +1087,7 @@
             <div class="col-span-3">
               <el-form-item label="Utilidad presente ejercicio">
                 <el-select
+                  remote
                   filterable
                   default-first-option
                   clearable
@@ -1032,9 +1095,13 @@
                   placeholder="Escribe el numero o nombre de la cuenta"
                   class="w-full"
                   size="small"
+                  :remote-method="findAccount"
+                  :loading="loadingAccount"
+                  @focus="filteredCatalog = []"
+                  @change="setStorage('specialAccounts', specialAccounts)"
                 >
                   <el-option
-                    v-for="item in catalogs"
+                    v-for="item in filteredCatalog"
                     :key="item.id"
                     :label="`${item.code} - ${item.name}`"
                     :value="item.id"
@@ -1045,6 +1112,7 @@
             <div class="col-span-3">
               <el-form-item label="Perdida presente ejercicio">
                 <el-select
+                  remote
                   filterable
                   default-first-option
                   clearable
@@ -1052,9 +1120,13 @@
                   placeholder="Escribe el numero o nombre de la cuenta"
                   class="w-full"
                   size="small"
+                  :remote-method="findAccount"
+                  :loading="loadingAccount"
+                  @focus="filteredCatalog = []"
+                  @change="setStorage('specialAccounts', specialAccounts)"
                 >
                   <el-option
-                    v-for="item in catalogs"
+                    v-for="item in filteredCatalog"
                     :key="item.id"
                     :label="`${item.code} - ${item.name}`"
                     :value="item.id"
@@ -1290,50 +1362,6 @@
           <el-button size="small">Cancelar</el-button>
         </div>
       </el-tab-pane>
-
-      <!--  tab de firmante -->
-      <!-- tab integraciones -->
-      <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
-        <Notification
-          class="w-full"
-          type="info"
-          title="Integraciones"
-          message="En esta sección se realizan las configuraciones de integración con otros modulos de manera general. Estas configuraciones se aplicarán a todos los clientes que no tengan una configuración individual."
-        />
-        <el-tabs
-          tab-position="left"
-          v-model="utab"
-          @tab-click="
-            $router
-              .replace({
-                path: `/invoices/settings`,
-                query: { tab, utab },
-              })
-              .catch(() => {})
-          "
-        >
-          <el-tab-pane
-            v-for="(integration, k) of filteredIntegrations"
-            :key="k"
-            :name="integration.id"
-          >
-            <span slot="label" class="flex items-center justify-between"
-              ><svg
-                class="w-5 h-5 mr-2"
-                fill="none"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="1.5"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                v-html="integration.icon"
-              />
-              {{ integration.name }}</span
-            >
-            {{ integration.name }}
-          </el-tab-pane>
-        </el-tabs>
-      </el-tab-pane> -->
     </el-tabs>
   </layout-content>
 </template>
@@ -1349,11 +1377,17 @@ import {
   checkBeforeLeave,
   checkBeforeEnter,
 } from "../../tools";
-
+const storagekey = "entries-settings";
 export default {
   name: "EntriesSettings",
   components: { LayoutContent, Notification },
   fetch() {
+    const name = Object.keys(localStorage).find((k) =>
+      k.startsWith(storagekey)
+    );
+
+    const value = JSON.parse(localStorage.getItem(name));
+
     // Se ubica en el tab correcto
     if (this.$route.query.tab) {
       this.tab = this.$route.query.tab;
@@ -1386,102 +1420,41 @@ export default {
           signatures,
           general,
         ] = res;
-        if (balance.data.balanceGeneral) {
-          this.tableData = balance.data.balanceGeneral.report;
-          this.specialAccounts = { ...balance.data.balanceGeneral.special };
-        }
-        if (general.data.general) {
-          this.fiscalPeriodForm.startDate = general.data.general.periodStart;
-          this.fiscalPeriodForm.endDate = general.data.general.peridoEnd;
-        }
-
-        if (signatures.data.signatures) {
-          this.firmantesForm = signatures.data.signatures;
-        }
-
-        if (results.data.estadoResultados) {
-          this.tablesData = results.data.estadoResultados.map((r) => {
-            const obj = { ...r };
-            if (r.children) {
-              const children = r.children.map((ch) => {
-                return {
-                  ...ch,
-                  code: ch.id,
-                };
-              });
-              obj["children"] = children;
-            }
-            return obj;
-          });
-        }
-
-        this.catalogs = accounts.data.accountingCatalog;
-        this.accounts = accountCatalogs.data.accountingCatalog;
+        this.filteredCatalog = accounts.data.data;
+        this.accounts = accountCatalogs.data.data;
         this.accountsCount = accountCatalogs.data.count;
+        this.catalogs = accounts.data.data;
+        this.tableData = balance.data.data.balanceGeneral.report;
+        this.firmantesForm = signatures.data.data;
+        this.fiscalPeriodForm.startDate = general.data.data.periodStart;
+        this.fiscalPeriodForm.endDate = general.data.data.periodEnd;
+        this.specialAccounts = { ...balance.data.data.balanceGeneral.special };
+        this.tablesData = results.data.data.estadoResultados.map((r) => {
+          const obj = { ...r };
+          if (r.children) {
+            const children = r.children.map((ch) => {
+              return {
+                ...ch,
+                code: ch.id,
+              };
+            });
+            obj["children"] = children;
+          }
+          return obj;
+        });
       })
       .catch((err) => {
-        console.log(err);
         this.errorMessage = err.response.data.message;
       })
       .then((alw) => (this.pageloading = false));
+
+    //checkBeforeEnter(this, name, value, name.replace(`${storagekey}-`, ""));
   },
   fetchOnServer: false,
+  /* beforeRouteLeave(to, from, next) {
+    checkBeforeLeave(this, storagekey, next);
+  }, */
   data() {
-    const newCargoValidateCompare = (rule, value, callback) => {
-      const abono =
-        this.newEntryDetailForm.abono > 0
-          ? this.newEntryDetailForm.abono.toFixed(2)
-          : "";
-      const val = value > 0 ? value.toFixed(2) : "";
-      if (!abono) {
-        if (!val) {
-          callback(new Error("Este campo es requerido."));
-        } else {
-          callback();
-        }
-      } else if (abono && val) {
-        return callback(
-          new Error("No puedes agregar cargo y abono al mismo tiempo")
-        );
-      } else {
-        callback();
-      }
-    };
-    const startDateValidateCompare = (rule, value, callback) => {
-      const startDate = this.fiscalPeriodForm.startDate
-        ? new Date(this.fiscalPeriodForm.startDate)
-        : "";
-      const val = value ? new Date(value) : "";
-      if (!startDate) {
-        if (!val) {
-          callback(new Error("Este campo es requerido."));
-        } else {
-          callback();
-        }
-      } else if (startDate > val) {
-        return callback(new Error("La fecha inicial no puede ser mayor"));
-      } else {
-        callback();
-      }
-    };
-    const endDateValidateCompare = (rule, value, callback) => {
-      const endDate = this.fiscalPeriodForm.endDate
-        ? new Date(this.fiscalPeriodForm.endDate)
-        : "";
-      const val = value ? new Date(value) : "";
-      if (!endDate) {
-        if (!val) {
-          callback(new Error("Este campo es requerido."));
-        } else {
-          callback();
-        }
-      } else if (endDate < val) {
-        return callback(new Error("La fecha final no puede ser menor"));
-      } else {
-        callback();
-      }
-    };
-
     return {
       pageloading: true,
       tableloading: false,
@@ -1831,11 +1804,23 @@ export default {
     };
   },
   methods: {
+    setStorage(formName, formData) {
+      const list = Object.keys(localStorage).filter((k) =>
+        k.startsWith(storagekey)
+      );
+      for (const k of list) {
+        localStorage.removeItem(k);
+      }
+      localStorage.setItem(
+        `${storagekey}-${formName}`,
+        JSON.stringify(formData)
+      );
+    },
     //general
     fetchGeneral() {
       this.$axios.get("/entries/setting/general").then((res) => {
-        (this.fiscalPeriodForm.startDate = res.data.general.periodStart),
-          (this.fiscalPeriodForm.endDate = res.data.general.peridoEnd);
+        (this.fiscalPeriodForm.startDate = res.data.data.periodStart),
+          (this.fiscalPeriodForm.endDate = res.data.data.periodEnd);
       });
     },
 
@@ -1843,7 +1828,7 @@ export default {
     fetchAsignatures() {
       this.$axios
         .get("/entries/setting/signatures")
-        .then((res) => (this.firmantesForm = res.signatures.data.signatures));
+        .then((res) => (this.firmantesForm = res.data.data));
     },
     //  CatalogAccount
     openMayorAccountDialog() {
@@ -2009,7 +1994,7 @@ export default {
       this.$axios
         .get("/entries/catalog", { params })
         .then((res) => {
-          this.accounts = res.data.accountingCatalog;
+          this.accounts = res.data.data;
           this.accountsCount = res.data.count;
           this.tableloading = false;
         })
@@ -2031,7 +2016,7 @@ export default {
 
         this.activeAccount = {
           ...account,
-          code: `0${account.code.slice(-1)}`,
+          code: `${account.code}`,
         };
       }
     },
@@ -2075,17 +2060,18 @@ export default {
       );
     },
     submitEditedCatalog(accounts, formName, activeAccount) {
-      console.log("REFFFF", accounts, formName, activeAccount);
       this.$refs[formName].validate((valid) => {
         if (!valid) {
           return false;
         }
-
+        let realCode = accounts.code;
         // Genera el codigo real a guardar
-        const realCode =
-          Object.keys(activeAccount).length > 0
-            ? `${activeAccount.code}${accounts.code}`
-            : `${accounts.code}`;
+        if (activeAccount) {
+          realCode =
+            Object.keys(activeAccount).length > 0
+              ? `${activeAccount.code}${accounts.code}`
+              : `${accounts.code}`;
+        }
 
         // Verifica si los codigos nuevos y los guardados estan duplicados entre ellos.
         // const catalog = this.accounts.map((a) => a.code);
@@ -2114,8 +2100,9 @@ export default {
                 instance.confirmButtonText = "Procesando...";
 
                 this.$axios
-                  .put(`/entries/catalog/${activeAccount.id}`, {
-                    ...activeAccount,
+                  .put(`/entries/catalog/${accounts.id}`, {
+                    ...accounts,
+                    code: realCode,
                   })
                   .then((res) => {
                     this.$notify.success({
@@ -2172,7 +2159,7 @@ export default {
         this.$axios
           .get("/entries/catalog", { params: { search: query.toLowerCase() } })
           .then((res) => {
-            this.filteredCatalog = res.data.accountingCatalog;
+            this.filteredCatalog = res.data.data;
             this.loadingAccount = false;
           })
           .catch((err) => (this.errorMessage = err.response.data.message));
@@ -2372,7 +2359,7 @@ export default {
       this.$axios
         .get("/entries/setting/estado-resultados")
         .then((res) => {
-          this.tablesData = res.data.estadoResultados;
+          this.tablesData = res.data.data.estadoResultados;
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
@@ -2528,10 +2515,6 @@ export default {
       );
     },
   },
-  computed: {
-    // filteredIntegrations() {
-    //   return this.integrations.filter((i) => hasModule(i.ref, this.$auth.user));
-    // },
-  },
+  computed: {},
 };
 </script>

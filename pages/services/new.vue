@@ -140,7 +140,7 @@ export default {
     Promise.all([sellingTypes()])
       .then((res) => {
         const [sellingTypes] = res;
-        this.sellingTypes = sellingTypes.data.types;
+        this.sellingTypes = sellingTypes.data.data;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
@@ -260,7 +260,7 @@ export default {
     },
   },
   watch: {
-    "servicesNewForm.name": function (val, oldVal) {
+    "servicesNewForm.name": function(val, oldVal) {
       this.servicesNewForm.description = val;
     },
   },

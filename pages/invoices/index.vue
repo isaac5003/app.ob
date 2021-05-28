@@ -72,6 +72,14 @@
             >
             <el-tag
               size="small"
+              type="warning"
+              v-else-if="selectedInvoice && selectedInvoice.status.id === 5"
+            >
+              <i class="el-icon-question"></i
+              >{{ selectedInvoice.status.name }}</el-tag
+            >
+            <el-tag
+              size="small"
               type="danger"
               v-else-if="selectedInvoice && selectedInvoice.status.id === 3"
             >
@@ -178,7 +186,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 1 &&
-                  selectedInvoice.documentType.id != 3
+                    selectedInvoice.documentType.id != 3
                 "
                 >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
               >
@@ -194,7 +202,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 2 &&
-                  selectedInvoice.documentType.id != 3
+                    selectedInvoice.documentType.id != 3
                 "
                 >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
               >
@@ -210,7 +218,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 3 ||
-                  selectedInvoice.documentType.id == 3
+                    selectedInvoice.documentType.id == 3
                 "
                 >{{
                   (selectedInvoice.documentType.id == 1
@@ -364,7 +372,7 @@
                     </div>
                   </el-option>
                 </el-option-group>
-                   <!-- toda esbien -->
+                <!-- toda esbien -->
                 <el-option-group key="INACTIVOS" label="INACTIVOS">
                   <el-option
                     style="height: 50px"
@@ -541,13 +549,15 @@
         <!-- La tabla esta en la medida establecida -->
         <el-table
           @sort-change="sortBy"
-          :data="invoices.invoices"
+          :data="invoices.data"
           stripe
           size="mini"
           v-loading="tableloading"
+          ref="multipleTable"
+          @selection-change="handleSelectionChange"
         >
-          <!-- column 1 -->
-          <el-table-column prop="index" width="50" label="#" />
+          <el-table-column type="selection" width="45" />
+          <el-table-column prop="index" width="50" label=" #" />
           <el-table-column
             label="# Documento"
             prop="sequence"
@@ -562,8 +572,8 @@
           </el-table-column>
           <el-table-column
             label="Tipo"
-            prop="documentType.id"
-            width="70"
+            prop="documentType"
+            width="75"
             sortable="custom"
           >
             <template slot-scope="scope">
@@ -581,9 +591,10 @@
           <el-table-column
             label="Cliente"
             prop="customerName"
-            min-width="340"
+            min-width="260"
             sortable="custom"
           />
+
           <el-table-column
             label="Estado"
             prop="status.id"
@@ -596,15 +607,11 @@
                 type="info"
                 v-if="scope.row.status.id == '1'"
               >
-                <i class="el-icon-warning"></i>
+                <i class="el-icon-circle-plus"></i>
                 {{ scope.row.status.name }}
               </el-tag>
-              <el-tag
-                size="small"
-                type="success"
-                v-else-if="scope.row.status.id == '2'"
-              >
-                <i class="el-icon-success"></i>
+              <el-tag size="small" v-else-if="scope.row.status.id == '2'">
+                <i class="el-icon-warning"></i>
                 {{ scope.row.status.name }}</el-tag
               >
               <el-tag
@@ -623,8 +630,17 @@
                 <i class="el-icon-question"></i>
                 {{ scope.row.status.name }}</el-tag
               >
+              <el-tag
+                size="small"
+                type="success"
+                v-else-if="scope.row.status.id == '5'"
+              >
+                <i class="el-icon-success"></i>
+                {{ scope.row.status.name }}</el-tag
+              >
             </template>
           </el-table-column>
+
           <el-table-column
             label="Total"
             width="80"
@@ -636,13 +652,37 @@
               <span>{{ scope.row.ventaTotal | formatMoney }}</span>
             </template>
           </el-table-column>
-          <el-table-column label width="70" align="center">
+          <el-table-column label width="100" align="center">
+            <!-- dropdpwn selecction -->
+            <template slot="header" v-if="multipleSelection.length > 0">
+              <el-dropdown trigger="click" size="mini">
+                <el-button size="mini" type="primary" class="group">
+                  <span class="hidden group-hover:inline">
+                    {{ multipleSelection.length }} Filas</span
+                  >
+                  <i class="el-icon-more"
+                /></el-button>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item>
+                    <i class="el-icon-view"></i>Vista previa
+                  </el-dropdown-item>
+                  <el-dropdown-item>
+                    <i class="el-icon-printer"></i>Imprimir documento
+                  </el-dropdown-item>
+                  <el-dropdown-item :divided="true">
+                    <i class="el-icon-refresh-left"></i> Revertir estados
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </template>
+            <!-- dropdown 1 -->
             <template slot-scope="scope">
               <el-dropdown trigger="click" szie="mini">
                 <el-button icon="el-icon-more" size="mini" />
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item
                     @click.native="openInvoicePreview(scope.row)"
+                    v-if="scope.row.status.id != '4'"
                   >
                     <i class="el-icon-view"></i> Vista previa
                   </el-dropdown-item>
@@ -650,9 +690,17 @@
                     @click.native="
                       $router.push(`/invoices/edit?ref=${scope.row.id}`)
                     "
-                    v-if="scope.row.status.id == '1'"
+                    v-if="
+                      scope.row.status.id == '1' || scope.row.status.id == '4'
+                    "
                   >
                     <i class="el-icon-edit-outline"></i> Editar documento
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    v-if="scope.row.status.id == '2'"
+                    @click.native="paidDocument(scope.row)"
+                  >
+                    <i class="el-icon-check"></i> Marcar como pagado
                   </el-dropdown-item>
                   <el-dropdown-item
                     v-if="scope.row.status.id == 1"
@@ -674,7 +722,9 @@
                   <el-dropdown-item
                     :divided="true"
                     v-if="
-                      scope.row.status.id == '2' || scope.row.status.id == '3'
+                      scope.row.status.id == '2' ||
+                        scope.row.status.id == '3' ||
+                        scope.row.status.id == '5'
                     "
                     @click.native="reverseDocument(scope.row)"
                   >
@@ -685,11 +735,11 @@
                     class="font-semibold"
                     v-if="
                       scope.row.status.id == '1' &&
-                      !isLastInvoice(
-                        scope.row.sequence,
-                        scope.row.documentType.id,
-                        scope.row.authorization
-                      )
+                        !isLastInvoice(
+                          scope.row.sequence,
+                          scope.row.documentType.id,
+                          scope.row.authorization
+                        )
                     "
                     @click.native="deleteInvoice(scope.row)"
                   >
@@ -700,13 +750,14 @@
                     class="text-red-500 font-semibold"
                     @click.native="voidDocument(scope.row)"
                     v-if="
-                      scope.row.status.id === '2' ||
-                      (isLastInvoice(
-                        scope.row.sequence,
-                        scope.row.documentType.id,
-                        scope.row.authorization
-                      ) &&
-                        scope.row.status.id != '3')
+                      (scope.row.status.id === '2' ||
+                        scope.row.status.id === '5' ||
+                        scope.row.status.id != '3') &&
+                        isLastInvoice(
+                          scope.row.sequence,
+                          scope.row.documentType.id,
+                          scope.row.authorization
+                        )
                     "
                   >
                     <i class="el-icon-circle-close"></i>
@@ -770,13 +821,13 @@ export default {
           invoices,
           statuses,
         ] = res;
-        this.documentTypes = documentTypes.data.documentTypes;
-        this.customers = customers.data.customers;
-        this.sellers = sellers.data.sellers;
-        this.zones = zones.data.zones;
-        this.services = services.data.services;
+        this.documentTypes = documentTypes.data.data;
+        this.customers = customers.data.data;
+        this.sellers = sellers.data.data;
+        this.zones = zones.data.data;
+        this.services = services.data.data;
         this.invoices = invoices.data;
-        this.statuses = statuses.data.statuses;
+        this.statuses = statuses.data.data;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message
@@ -788,6 +839,7 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+      multipleSelection: [],
       errorMessage: "",
       pageloading: true,
       tableloading: false,
@@ -798,7 +850,7 @@ export default {
       services: [],
       statuses: [],
       invoices: {
-        invoices: [],
+        data: [],
         count: 0,
       },
       page: {
@@ -824,6 +876,9 @@ export default {
     };
   },
   methods: {
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
     sortBy({ column, prop, order }) {
       this.filter.prop = prop;
       this.filter.order = order;
@@ -831,12 +886,11 @@ export default {
     },
     isLastInvoice(sequence, documentTypeId, authorization) {
       // Filtra las facturas del mismo tipo y numero de autorizacion.
-      const invoices = this.invoices.invoices.filter(
+      const invoices = this.invoices.data.filter(
         (invoice) =>
           invoice.documentType.id === documentTypeId &&
           invoice.authorization === authorization
       );
-
       // Obtiene la secuencia maxima de las facturas
       const maxSequence = Math.max.apply(
         Math,
@@ -900,7 +954,8 @@ export default {
     },
     async openInvoicePreview({ id }) {
       const { data } = await this.$axios.get(`/invoices/${id}`);
-      this.selectedInvoice = data.invoice;
+      this.selectedInvoice = data.data;
+      console.log(this.selectedInvoice);
       this.showInvoicePreview = true;
     },
     voidDocument({ id }) {
@@ -1138,7 +1193,7 @@ export default {
                   try {
                     const vadd = 1;
                     const hadd = 3;
-                    const conf = document.data.layout;
+                    const conf = document.data.data;
 
                     // Crea el documento base
                     const pdfDocument = new jsPDF({
@@ -1155,44 +1210,44 @@ export default {
                       let value = "";
                       switch (header.value) {
                         case "invoice_autorization":
-                          value = invoice.data.invoice.authorization;
+                          value = invoice.data.data.authorization;
                           break;
                         case "invoice_number":
-                          value = invoice.data.invoice.sequence;
+                          value = invoice.data.data.sequence;
                           break;
                         case "customer_name":
-                          value = invoice.data.invoice.customerName;
+                          value = invoice.data.data.customerName;
                           break;
                         case "invoice_date":
-                          value = invoice.data.invoice.invoiceDate;
+                          value = invoice.data.data.invoiceDate;
                           break;
                         case "customer_address1":
-                          value = invoice.data.invoice.customerAddress1;
+                          value = invoice.data.data.customerAddress1;
                           break;
                         case "customer_address2":
-                          value = invoice.data.invoice.customerAddress2;
+                          value = invoice.data.data.customerAddress2;
                           break;
                         case "customer_nrc":
-                          value = invoice.data.invoice.customerNrc;
+                          value = invoice.data.data.customerNrc;
                           break;
                         case "customer_nit":
-                          value = invoice.data.invoice.customerNit;
+                          value = invoice.data.data.customerNit;
                           break;
                         case "customer_city":
-                          value = invoice.data.invoice.customerCity;
+                          value = invoice.data.data.customerCity;
                           break;
                         case "customer_giro":
-                          value = invoice.data.invoice.customerGiro;
+                          value = invoice.data.data.customerGiro;
                           break;
                         case "customer_state":
-                          value = invoice.data.invoice.customerState;
+                          value = invoice.data.data.customerState;
                           break;
                         case "seller_name":
-                          value = invoice.data.invoice.invoicesSeller.name;
+                          value = invoice.data.data.invoicesSeller.name;
                           break;
                         case "payment_condition":
                           value =
-                            invoice.data.invoice.invoicesPaymentsCondition.name;
+                            invoice.data.data.invoicesPaymentsCondition.name;
                           break;
                       }
 
@@ -1303,46 +1358,44 @@ export default {
                       switch (total.value) {
                         case "sum":
                           let sum =
-                            parseFloat(invoice.data.invoice.sum) +
-                            (invoice.data.invoice.documentType.id == 1
-                              ? parseFloat(invoice.data.invoice.iva)
+                            parseFloat(invoice.data.data.sum) +
+                            (invoice.data.data.documentType.id == 1
+                              ? parseFloat(invoice.data.data.iva)
                               : 0);
                           value = this.$options.filters.formatMoney(sum);
                           break;
                         case "iva":
                           value = this.$options.filters.formatMoney(
-                            invoice.data.invoice.iva
+                            invoice.data.data.iva
                           );
                           break;
                         case "subtotal":
                           value = this.$options.filters.formatMoney(
-                            invoice.data.invoice.subtotal
+                            invoice.data.data.subtotal
                           );
                           break;
                         case "iva_retenido":
                           value = this.$options.filters.formatMoney(
-                            invoice.data.invoice.ivaRetenido
+                            invoice.data.data.ivaRetenido
                           );
                           break;
                         case "ventas_exentas":
                           value = this.$options.filters.formatMoney(
-                            invoice.data.invoice.ventasExentas
+                            invoice.data.data.ventasExentas
                           );
                           break;
                         case "ventas_no_sujetas":
                           value = this.$options.filters.formatMoney(
-                            invoice.data.invoice.ventasNoSujetas
+                            invoice.data.data.ventasNoSujetas
                           );
                           break;
                         case "venta_total":
                           value = this.$options.filters.formatMoney(
-                            invoice.data.invoice.ventaTotal
+                            invoice.data.data.ventaTotal
                           );
                           break;
                         case "venta_total_text":
-                          value = numeroALetras(
-                            invoice.data.invoice.ventaTotal
-                          );
+                          value = numeroALetras(invoice.data.data.ventaTotal);
                           break;
                       }
                       const splitText = pdfDocument.splitTextToSize(
@@ -1366,8 +1419,6 @@ export default {
                           type: "warning",
                           beforeClose: (action, instance, done) => {
                             if (action === "confirm") {
-                              //PUT invoices/status/printed/:id
-                              //esta parte imagino que no esta todacia
                               this.$axios
                                 .put(`/invoices/status/printed/${id}`)
                                 .then((res) => {
@@ -1428,6 +1479,44 @@ export default {
             } else {
               done();
             }
+          },
+        }
+      );
+    },
+    paidDocument({ id }) {
+      this.$confirm(
+        `¿Estás seguro que deseas pagar este documento?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, pagar`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .put(`/invoices/status/paid/${id}`)
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchInvoices();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, pagar`;
+                  done();
+                });
+            }
+            done();
           },
         }
       );

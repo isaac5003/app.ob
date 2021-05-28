@@ -223,11 +223,20 @@
       <!-- La tabla tiene las medidas exacta, la suma de las colummnas tiene 960-->
       <el-table
         @sort-change="sortBy"
-        :data="entries.entries"
+        :data="entries.data"
         stripe
         size="mini"
+        ref="multipleTable"
+        @selection-change="handleSelectionChange"
       >
-        <el-table-column label="#" prop="index" width="50" align="center" />
+        <el-table-column type="selection" width="45" />
+        <el-table-column
+          type="index"
+          label="#"
+          prop="index"
+          width="50"
+          align="center"
+        />
         <el-table-column
           sortable="custom"
           label="Serie"
@@ -243,7 +252,7 @@
           sortable="custom"
           label="Titulo"
           prop="title"
-          min-width="360"
+          min-width="300"
         />
         <el-table-column
           label="Cargo"
@@ -290,6 +299,30 @@
           </template>
         </el-table-column>
         <el-table-column label width="70" align="center">
+          <!-- dropdpwn selecction -->
+          <template slot="header" v-if="multipleSelection.length > 0">
+            <el-dropdown>
+              <el-button
+                trigger="click"
+                icon="el-icon-more"
+                type="primary"
+                size="mini"
+                class="transition ease-out duration-700"
+              ></el-button>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>
+                  <i class="el-icon-view"></i>Vista previa
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <i class="el-icon-printer"></i>Imprimir documento
+                </el-dropdown-item>
+                <el-dropdown-item :divided="true">
+                  <i class="el-icon-refresh-left"></i> Revertir estados
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </template>
+          <!-- dropdown 1 -->
           <template slot-scope="scope">
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />
@@ -350,10 +383,11 @@ export default {
     const entryType = () => this.$axios.get("/entries/types");
     Promise.all([entries(), entryType()])
       .then((res) => {
+        this.loading = false;
         const [entries, entryType] = res;
         this.entries = entries.data;
-        // this.count = entries.data.count;
-        this.entryType = entryType.data.entryTypes;
+        this.entryType = entryType.data.data;
+        this.loading = false;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message
@@ -364,13 +398,14 @@ export default {
   fetchOnServer: false,
   data() {
     return {
+      multipleSelection: [],
       page: {
         limit: 10,
         page: 1,
       },
       selecEntries: {},
       showInvoicePreview: false,
-      loading: false,
+      loading: true,
       errorMessage: "",
       searchValue: "",
       entryType: [],
@@ -386,12 +421,15 @@ export default {
       },
 
       entries: {
-        entries: [],
+        data: [],
         count: 0,
       },
     };
   },
   methods: {
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
     fetchEntries() {
       let params = this.page;
       if (this.filterBy.dateRange !== null) {
@@ -517,13 +555,14 @@ export default {
             if (action === "confirm") {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
-              const entry = () => this.$axios.get(`/entries/${id}`);
-              const bussinesInfo = () => this.$axios.get("/business/info");
-              Promise.all([entry(), bussinesInfo()])
+              const report = () =>
+                this.$axios.get(`/entries/report/print-entry/${id}`);
+
+              Promise.all([report()])
                 .then((res) => {
-                  const [entry, bussinesInfo] = res;
-                  const accountingEntry = entry.data.entry;
-                  const { name, nit, nrc } = bussinesInfo.data.info;
+                  const [report] = res;
+                  const accountingEntry = report.data.entry;
+                  const { name, nit, nrc } = report.data.company;
 
                   let totalAbono = 0;
                   let totalCargo = 0;
@@ -595,7 +634,7 @@ export default {
                   const docDefinition = {
                     info: {
                       title: `partida_contable_${this.$dateFns.format(
-                        new Date(accountingEntry.rawDate),
+                        new Date(accountingEntry.date),
                         "yyyyMMdd"
                       )}`,
                     },
@@ -617,7 +656,7 @@ export default {
                         layout: "noBorders",
                         table: {
                           headerRows: 1,
-                          widths: ["11%", "auto", "auto", "10%", "10%"],
+                          widths: ["10%", "30%", "20%", "20%", "20%"],
                           heights: -5,
                           body: [
                             [
@@ -660,7 +699,7 @@ export default {
                   pdfMake.createPdf(docDefinition).open();
                 })
                 .catch((err) => {
-                  console.log(err);
+                  console.error(err);
                   this.errorMessage = err.response.data.message;
                 })
                 .then((alw) => {
@@ -680,7 +719,7 @@ export default {
 
     async openPreviewEntry({ id }) {
       const { data } = await this.$axios.get(`/entries/${id}`);
-      this.selecEntries = data.entry;
+      this.selecEntries = data.data;
       this.showInvoicePreview = true;
     },
   },
