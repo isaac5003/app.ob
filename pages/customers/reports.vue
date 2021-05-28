@@ -196,7 +196,7 @@ export default {
     },
     reportCustomers(fileType) {
       const report = () => this.$axios.get("/customers/report/general");
-      // const bussinesInfo = () => this.$axios.get("/business/info");
+
       switch (fileType) {
         case "pdf":
           Promise.all([report()]).then((res) => {
@@ -646,7 +646,7 @@ export default {
 
           break;
         case "excel":
-          Promise.all([bussinesInfo(), customer(), branches()])
+          Promise.all([report()])
             .then((res) => {
               const [report] = res;
               const customerData = report.data.customer;

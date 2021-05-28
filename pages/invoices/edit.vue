@@ -560,7 +560,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 1 &&
-                      salesEditForm.documentType != 3
+                        salesEditForm.documentType != 3
                     "
                     >{{
                       calcSujeta(salesEditForm.documentType, scope.row)
@@ -579,7 +579,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 2 &&
-                      salesEditForm.documentType != 3
+                        salesEditForm.documentType != 3
                     "
                     >{{
                       calcExenta(salesEditForm.documentType, scope.row)
@@ -598,7 +598,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 3 ||
-                      salesEditForm.documentType == 3
+                        salesEditForm.documentType == 3
                     "
                     >{{
                       calcGravada(salesEditForm.documentType, scope.row)
@@ -717,12 +717,9 @@ export default {
     this.$axios
       .get(`/invoices/${this.$route.query.ref}`)
       .then(({ data }) => {
-        const customer = () =>
-          this.$axios.get(`/customers`, {
-            params: { isActiveCustomer: true },
-          });
+        const customer = () => this.$axios.get(`/customers`);
         const branches = () =>
-          this.$axios.get(`/customers/${data.invoice.customer.id}/branches`);
+          this.$axios.get(`/customers/${data.data.customer.id}/branches`);
         const sellers = () =>
           this.$axios.get("/invoices/sellers", {
             params: { active: true },
@@ -753,20 +750,19 @@ export default {
             this.paymentConditions = paymentConditions.data.data;
             this.branches = branches.data.data;
             this.salesEditForm = {
-              ...data.invoice,
-              customer: data.invoice.customer.id,
-              customerBranch: data.invoice.customerBranch.id,
-              invoicesPaymentsCondition:
-                data.invoice.invoicesPaymentsCondition.id,
-              invoicesSellers: data.invoice.invoicesSeller.id,
-              documentType: data.invoice.documentType.id,
+              ...data.data,
+              customer: data.data.customer.id,
+              customerBranch: data.data.customerBranch.id,
+              invoicesPaymentsCondition: data.data.invoicesPaymentsCondition.id,
+              invoicesSellers: data.data.invoicesSeller.id,
+              documentType: data.data.documentType.id,
             };
             this.tributary = {
-              customerNrc: data.invoice.customerNrc,
-              customerNit: data.invoice.customerNit,
-              customerGiro: data.invoice.customerGiro,
+              customerNrc: data.data.customerNrc,
+              customerNit: data.data.customerNit,
+              customerGiro: data.data.customerGiro,
             };
-            this.details = data.invoice.data.map((de) => {
+            this.details = data.data.details.map((de) => {
               return {
                 ...de,
 
@@ -788,6 +784,7 @@ export default {
           });
       })
       .catch((err) => {
+        console.error(err);
         this.errorMessage = err.response.data.message;
       });
 
@@ -1081,21 +1078,23 @@ export default {
                         formData.invoicesPaymentsCondition,
                       invoicesSeller: formData.invoicesSellers,
                       sum:
-                        formData.documentType == 1 ? this.sumasCF : this.sumas,
-                      iva: this.taxes,
-                      subtotal: this.subtotal,
-                      ivaRetenido: this.ivaRetenido,
-                      ventasExentas: this.ventasExentas,
-                      ventasNoSujetas: this.ventasNoSujetas,
-                      ventaTotal: this.ventaTotal,
+                        formData.documentType == 1
+                          ? this.sumasCF.toFixed(2)
+                          : this.sumas.toFixed(2),
+                      iva: this.taxes.toFixed(2),
+                      subtotal: this.subtotal.toFixed(2),
+                      ivaRetenido: this.ivaRetenido.toFixed(2),
+                      ventasExentas: this.ventasExentas.toFixed(2),
+                      ventasNoSujetas: this.ventasNoSujetas.toFixed(2),
+                      ventaTotal: this.ventaTotal.toFixed(2),
                     },
                     details: details.map((d) => {
                       return {
                         chargeDescription: d.chargeDescription,
-                        quantity: d.quantity,
-                        unitPrice: d.unitPrice,
+                        quantity: d.quantity.toFixed(2),
+                        unitPrice: d.unitPrice.toFixed(2),
                         incTax: d.incTax,
-                        ventaPrice: d.ventaPrice,
+                        ventaPrice: d.ventaPrice.toFixed(2),
                         service: d.service,
                         sellingType: d.sellingType,
                       };

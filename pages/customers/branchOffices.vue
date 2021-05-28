@@ -616,10 +616,10 @@ export default {
       .then((res) => {
         const [countries, states, cities, customer] = res;
 
-        this.countries = countries.data.countries;
-        this.rawStates = states.data.states;
-        this.rawCities = cities.data.cities;
-        this.customer = customer.data.customer;
+        this.countries = countries.data.data;
+        this.rawStates = states.data.data;
+        this.rawCities = cities.data.data;
+        this.customer = customer.data.data;
       })
       .catch((err) => {
         this.$message.error(err.response.data.message);

@@ -186,7 +186,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 1 &&
-                  selectedInvoice.documentType.id != 3
+                    selectedInvoice.documentType.id != 3
                 "
                 >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
               >
@@ -202,7 +202,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 2 &&
-                  selectedInvoice.documentType.id != 3
+                    selectedInvoice.documentType.id != 3
                 "
                 >{{ parseFloat(scope.row.ventaPrice) | formatMoney }}</span
               >
@@ -218,7 +218,7 @@
               <span
                 v-if="
                   scope.row.sellingType.id == 3 ||
-                  selectedInvoice.documentType.id == 3
+                    selectedInvoice.documentType.id == 3
                 "
                 >{{
                   (selectedInvoice.documentType.id == 1
@@ -720,8 +720,8 @@
                     :divided="true"
                     v-if="
                       scope.row.status.id == '2' ||
-                      scope.row.status.id == '3' ||
-                      scope.row.status.id == '5'
+                        scope.row.status.id == '3' ||
+                        scope.row.status.id == '5'
                     "
                     @click.native="reverseDocument(scope.row)"
                   >
@@ -732,11 +732,11 @@
                     class="font-semibold"
                     v-if="
                       scope.row.status.id == '1' &&
-                      !isLastInvoice(
-                        scope.row.sequence,
-                        scope.row.documentType.id,
-                        scope.row.authorization
-                      )
+                        !isLastInvoice(
+                          scope.row.sequence,
+                          scope.row.documentType.id,
+                          scope.row.authorization
+                        )
                     "
                     @click.native="deleteInvoice(scope.row)"
                   >
@@ -747,15 +747,14 @@
                     class="text-red-500 font-semibold"
                     @click.native="voidDocument(scope.row)"
                     v-if="
-                      scope.row.status.id === '2' ||
-                      scope.row.status.id === '5' ||
-                      scope.row.status.id != '3' ||
-                      (isLastInvoice(
-                        scope.row.sequence,
-                        scope.row.documentType.id,
-                        scope.row.authorization
-                      ) &&
-                        scope.row.status.id != '3')
+                      (scope.row.status.id === '2' ||
+                        scope.row.status.id === '5' ||
+                        scope.row.status.id != '3') &&
+                        isLastInvoice(
+                          scope.row.sequence,
+                          scope.row.documentType.id,
+                          scope.row.authorization
+                        )
                     "
                   >
                     <i class="el-icon-circle-close"></i>

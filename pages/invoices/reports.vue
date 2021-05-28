@@ -643,8 +643,7 @@ export default {
       const startDate = dateRange[0];
       const endDate = dateRange[1];
 
-      const bussinesInfo = () => this.$axios.get("/business/info");
-      const generales = () =>
+      const report = () =>
         this.$axios.get("/invoices/report/general", {
           params: {
             startDate,
@@ -659,10 +658,10 @@ export default {
         });
       switch (radioType) {
         case "pdf":
-          Promise.all([bussinesInfo(), generales()]).then((res) => {
-            const [bussinesInfo, generales] = res;
-            const { name, nit, nrc } = bussinesInfo.data.info;
-            const general = generales.data.report;
+          Promise.all([report()]).then((res) => {
+            const [report] = res;
+            const { name, nit, nrc } = report.data.company;
+            const general = report.data.invoices;
 
             const values = [];
             const emptyRow = [{}, {}, {}, {}, {}, {}, {}, {}, {}];

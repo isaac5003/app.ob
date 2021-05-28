@@ -43,7 +43,7 @@
               size="small"
               placeholder=""
               v-model="reserve.until"
-              :disabled="true"
+              :disabled="!reserve.documentType"
               readonly
             >
             </el-input>
@@ -55,7 +55,7 @@
               size="small"
               placeholder=""
               v-model="reserve.since"
-              :disabled="true"
+              :disabled="!reserve.documentType"
               readonly
             >
             </el-input>

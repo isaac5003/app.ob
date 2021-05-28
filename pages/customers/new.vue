@@ -299,7 +299,7 @@
                 class="col-span-2"
                 v-if="
                   customersNewForm.customerType == 1 ||
-                  customersNewForm.customerTypeNatural == 2
+                    customersNewForm.customerTypeNatural == 2
                 "
               >
                 <el-form-item label="NRC" prop="nrc">
@@ -317,7 +317,7 @@
               class="grid grid-cols-12 gap-4"
               v-if="
                 customersNewForm.customerType == 1 ||
-                customersNewForm.customerTypeNatural == 2
+                  customersNewForm.customerTypeNatural == 2
               "
             >
               <div class="col-span-4">
@@ -487,6 +487,7 @@ export default {
         nrc: inputValidation(true, 3),
         customerTaxerType: selectValidation(true),
         giro: inputValidation(true, 5, 150),
+        customerTypeNatural: selectValidation(true),
       },
     };
   },

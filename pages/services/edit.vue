@@ -142,6 +142,7 @@
                 class="w-full"
                 :loading="loadingAccount"
                 :remote-method="findAccount"
+                @focus="filteredCatalog = []"
               >
                 <el-option
                   v-for="c in filteredCatalog"
@@ -201,15 +202,19 @@ export default {
       integrationServiceAccount(),
     ])
       .then((res) => {
-        const [sellingTypes, service] = res;
+        const [sellingTypes, service, catalog, integration] = res;
         this.sellingTypes = sellingTypes.data.data;
         this.servicesEditForm = {
           ...service.data.data,
           sellingType: service.data.data.sellingType.id,
+          accountingCatalog: integration.data.integrations.catalog,
         };
+
+        this.catalogs = catalog.data.data;
         this.filteredCatalog = this.catalogs.filter(
-          (c) => c.id == integrationCatalog.data.integrations.catalog
+          (c) => c.id == integration.data.integrations.catalog
         );
+        this.pageloading = false;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;

@@ -396,7 +396,11 @@ export default {
             const [report] = res;
             const bussines = report.data.company;
             const services = report.data.services;
-            this.reportForm.sellingType = "";
+            if (params.formName) {
+              this.$refs[params.formName].fields
+                .find((f) => f.prop == "sellingType")
+                .resetField();
+            }
             this.reportForm.status = "";
             this.reportForm.initialCost = "";
             this.reportForm.finalCost = "";
