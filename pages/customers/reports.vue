@@ -205,7 +205,7 @@ export default {
             const { name, nrc, nit } = report.data.company;
             const nameReport = report.data.name;
             const values = [];
-            const emptyRow = [{}, {}, {}, {}, {}];
+            const emptyRow = [{}, {}, {}, {}, {}, {}, {}];
 
             for (const c of customersData) {
               values.push(emptyRow);
@@ -222,6 +222,8 @@ export default {
                 {
                   text: c.nrc,
                 },
+                { text: c.contactName },
+                { text: c.contactPhone },
                 {
                   text: c.isActiveCustomer ? "Activo" : "Inactivo",
                 },
@@ -239,7 +241,7 @@ export default {
                   layout: "noBorders",
                   table: {
                     headerRows: 1,
-                    widths: ["auto", "15%", "15%", "10%", "10%"],
+                    widths: ["auto", "15%", "15%", "10%", "10%", "10%", "10%"],
                     heights: -5,
                     body: [
                       [
@@ -257,6 +259,14 @@ export default {
                         },
                         {
                           text: "NRC",
+                          style: "tableHeader",
+                        },
+                        {
+                          text: "NOMBRE DE CONTACTO",
+                          style: "tableHeader",
+                        },
+                        {
+                          text: "Nº DE CONTACTO",
                           style: "tableHeader",
                         },
                         {
