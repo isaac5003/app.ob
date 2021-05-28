@@ -555,13 +555,14 @@ export default {
             if (action === "confirm") {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
-              const entry = () => this.$axios.get(`/entries/${id}`);
-              const bussinesInfo = () => this.$axios.get("/business/info");
-              Promise.all([entry(), bussinesInfo()])
+              const report = () =>
+                this.$axios.get(`/entries/report/print-entry/${id}`);
+
+              Promise.all([report()])
                 .then((res) => {
-                  const [entry, bussinesInfo] = res;
-                  const accountingEntry = entry.data.data;
-                  const { name, nit, nrc } = bussinesInfo.data.info;
+                  const [report] = res;
+                  const accountingEntry = report.data.entry;
+                  const { name, nit, nrc } = report.data.company;
 
                   let totalAbono = 0;
                   let totalCargo = 0;
@@ -633,7 +634,7 @@ export default {
                   const docDefinition = {
                     info: {
                       title: `partida_contable_${this.$dateFns.format(
-                        new Date(accountingEntry.rawDate),
+                        new Date(accountingEntry.date),
                         "yyyyMMdd"
                       )}`,
                     },
@@ -698,6 +699,7 @@ export default {
                   pdfMake.createPdf(docDefinition).open();
                 })
                 .catch((err) => {
+                  console.error(err);
                   this.errorMessage = err.response.data.message;
                 })
                 .then((alw) => {
@@ -717,7 +719,7 @@ export default {
 
     async openPreviewEntry({ id }) {
       const { data } = await this.$axios.get(`/entries/${id}`);
-      this.selecEntries = data.entry;
+      this.selecEntries = data.data;
       this.showInvoicePreview = true;
     },
   },
