@@ -379,6 +379,7 @@
                 class="w-full"
                 :remote-method="findAccount"
                 :loading="loadingAccount"
+                @focus="filteredCatalog = []"
               >
                 <el-option
                   v-for="a in filteredCatalog"
