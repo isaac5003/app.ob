@@ -302,6 +302,7 @@ export default {
                     description,
                     incIva,
                     incRenta,
+                    accountingCatalog,
                   });
                 const integration = () =>
                   this.$axios.put(
