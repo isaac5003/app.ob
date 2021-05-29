@@ -387,7 +387,7 @@ export default {
   components: { LayoutContent, Notification },
   fetch() {
     const customer = () =>
-      this.$axios.get(`/customers/${this.$route.query.ref}`);
+      this.$axios.get(`/providers/${this.$route.query.ref}`);
     const customerTypes = () => this.$axios.get(`/customers/types`);
     const customerTypeNaturals = () =>
       this.$axios.get(`/customers/type-naturals`);
@@ -421,16 +421,16 @@ export default {
           cities,
         ] = res;
 
-        this.customerTypes = customerTypes.data.types;
-        this.customerTypeNaturals = customerTypeNaturals.data.typeNaturals;
-        this.customerTaxerTypes = customerTaxerTypes.data.taxerTypes;
-        const customer = customerData.data.customer;
+        this.customerTypes = customerTypes.data.data;
+        this.customerTypeNaturals = customerTypeNaturals.data.data;
+        this.customerTaxerTypes = customerTaxerTypes.data.data;
+        const customer = customerData.data.data;
         let branch = customer.customerBranches[0];
         this.customer = customer;
 
-        this.countries = countries.data.countries;
-        this.rawStates = states.data.states;
-        this.rawCities = cities.data.cities;
+        this.countries = countries.data.data;
+        this.rawStates = states.data.data;
+        this.rawCities = cities.data.data;
 
         const phone = branch.contactInfo.phones
           ? branch.contactInfo.phones[0]
@@ -438,7 +438,7 @@ export default {
         const email = branch.contactInfo.emails
           ? branch.contactInfo.emails[0]
           : branch.contactInfo.email;
-        this.customersEditForm = {
+        this.providerEditForm = {
           name: customer.name,
           shortName: customer.shortName,
           isCustomer: customer.isCustomer,
@@ -548,7 +548,7 @@ export default {
                 instance.confirmButtonLoading = true;
                 instance.confirmButtonText = "Procesando...";
                 this.$axios
-                  .put(`/customers/${this.$route.query.ref}`, {
+                  .put(`/providers/${this.$route.query.ref}`, {
                     name: formData.name,
                     shortName: formData.shortName,
                     isCustomer: formData.isCustomer,

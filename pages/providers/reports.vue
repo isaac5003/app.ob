@@ -148,7 +148,7 @@ export default {
         providers: selectValidation(true),
       },
       reports: [
-        { name: "Listado de proveedores", id: "Proveedores" },
+        { name: "Listado de proveedores", id: "proveedores" },
         { name: "Perfil de cliente", id: "perfil" },
       ],
       requirementForm: null,
@@ -177,20 +177,37 @@ export default {
         }
       }
     },
+ generateReport(formName, { reportType, radio, providers }) {
+      this.$refs[formName].validate((valid) => {
+        if (!valid) {
+          return false;
+        }
 
-    reportProviders(fileType) {
-      const providers = () => this.$axios.get("/providers");
-      const bussinesInfo = () => this.$axios.get("/bussiness/info");
+        this.generating = true;
+        switch (reportType) {
+          case "proveedores":
+            this.reportProviders(radio);
+            break;
+          case "perfil":
+            this.reportProvider(providers, radio);
+            break;
+        }
+      });
+    },
+  reportProviders(fileType) {
+      const report = () => this.$axios.get("/providers/report/general");
+
       switch (fileType) {
         case "pdf":
-          Promise.all([providers(), bussinesInfo()]).then((res) => {
-            const [providers, bussinesInfo] = res;
-            const providersData = providers.data.providers;
-            const { name, nit, nrc } = bussinesInfo.data.info;
+          Promise.all([report()]).then((res) => {
+            const [report] = res;
+            const customersData = report.data.providers;
+            const { name, nrc, nit } = report.data.company;
+            const nameReport = report.data.name;
             const values = [];
-            const emtyRow = [{}, {}, {}, {}, {}];
+            const emptyRow = [{}, {}, {}, {}, {}, {}, {}];
 
-            for (const c of providersData) {
+            for (const c of customersData) {
               values.push(emptyRow);
               values.push([
                 {
@@ -205,16 +222,21 @@ export default {
                 {
                   text: c.nrc,
                 },
+                { text: c.contactName },
+                { text: c.contactPhone },
                 {
-                  text: c.isActiveProviders ? "Activo" : "Inactivo",
+                  text: c.isActiveCustomer ? "Activo" : "Inactivo",
                 },
               ]);
             }
             const docDefinition = {
+               info: {
+                title: nameReport
+              },
               pageSize: "LETTER",
               pageOrientation: "portrait",
               pageMargins: [20, 60, 20, 40],
-              header: getHeader(name, nit, nrc, null, "REPORTE DE PROVEEDORES"),
+              header: getHeader(name, nit, nrc, null, nameReport),
               footer: getFooter(),
               content: [
                 {
@@ -222,7 +244,7 @@ export default {
                   layout: "noBorders",
                   table: {
                     headerRows: 1,
-                    widths: ["auto", "15%", "15%", "10%", "10%"],
+                    widths: ["auto", "15%", "15%", "10%", "10%", "10%", "10%"],
                     heights: -5,
                     body: [
                       [
@@ -243,6 +265,14 @@ export default {
                           style: "tableHeader",
                         },
                         {
+                          text: "NOMBRE DE CONTACTO",
+                          style: "tableHeader",
+                        },
+                        {
+                          text: "Nº DE CONTACTO",
+                          style: "tableHeader",
+                        },
+                        {
                           text: "ESTADO",
                           style: "tableHeader",
                         },
@@ -260,27 +290,28 @@ export default {
               },
             };
             this.generating = false;
-            pdfMake.createPDF(docDefinition).open();
+            pdfMake.createPdf(docDefinition).open();
           });
           break;
-        case "exel":
-          Promise.all([customers(), bussinesInfo()]).then((res) => {
-            const [providers, bussinesInfo] = res;
-            const { name, nit, nrc } = bussinesInfo.data.info;
-            const providersData = providers.data.customers;
+        case "excel":
+          Promise.all([report()]).then((res) => {
+            const [report] = res;
+            const { name, nit, nrc } = report.data.company;
+            const nameReport = report.data.name;
+            const customersData = report.data.providers;
             const values = [];
-            for (const c of providersData) {
+            for (const c of customersData) {
               values.push([
                 c.name,
                 c.customerType.name,
                 c.nit,
                 c.nrc,
-                c.isActiveProvider ? "Activo" : "Inactivo",
+                c.isActiveCustomer ? "Activo" : "Inactivo",
               ]);
             }
             const document = [
               [name],
-              ["REPORTE CLIENTES", `NIT: ${nit}`, `NRC: ${nrc}`],
+              [nameReport, `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               ["NOMBRE", "TIPO", "NIT", "NRC", "ESTADO"],
               ...values,
@@ -296,25 +327,21 @@ export default {
           break;
       }
     },
-       reportProvider(providersId, fileType) {
-      const providers = () => this.$axios.get(`/providers/${providersId}`);
-      const branches = () =>
-        this.$axios.get(`/providers/${proviadersId}/branches`);
-      const bussinesInfo = () => this.$axios.get("/business/info");
+    reportCustomer(customerId, fileType) {
+      const report = () => this.$axios.get(`/providers/report/${customerId}`);
       switch (fileType) {
         case "pdf":
-          Promise.all([bussinesInfo(), providers(), branches()])
+          Promise.all([report()])
             .then((res) => {
-              const [bussinesInfo, providers, branch] = res;
-
-              const { name, nit, nrc } = bussinesInfo.data.info;
-              const providersData = providers.data.providers;
-              const branches = branch.data.branches;
+              const [report] = res;
+              const customerData = report.data.provider;
+              const branches = report.data.provider.customerBranches;
+              const { name, nrc, nit } = report.data.company;
+              const nameReport = report.data.name;
               const values = [];
               const valuesTable = [];
               const valuesGeneral = [];
               const valuesTributary = [];
-
               valuesGeneral.push([
                 {
                   bold: true,
@@ -322,7 +349,7 @@ export default {
                   text: "Nombre:",
                 },
                 {
-                  text: providersData.name,
+                  text: customerData.name,
                 },
                 {
                   bold: true,
@@ -330,7 +357,7 @@ export default {
                   text: "Identificador:",
                 },
                 {
-                  text: providersData.shortName,
+                  text: customerData.shortName,
                 },
                 {
                   bold: true,
@@ -338,15 +365,16 @@ export default {
                   text: "Estado:",
                 },
                 {
-                  text: providersData.isActiveProvider ? "Activo" : "Inactivo",
+                  text: customerData.isActiveCustomer ? "Activo" : "Inactivo",
                 },
               ]);
+
               valuesGeneral.push([
                 { bold: true, text: "Contacto: " },
                 {
-                  text: providersData.customerBranches.contacName
-                    ? providersData.customersBranches.contacName
-                    : "----------------",
+                  text: customerData.customerBranches[0].contactName
+                    ? customerData.customerBranches[0].contactName
+                    : "--------",
                 },
                 {
                   bold: true,
@@ -354,8 +382,8 @@ export default {
                   text: "Telefono: ",
                 },
                 {
-                  text: providersData.customerBranches.contactInfo
-                    ? customerData.customerBranches.contactInfo
+                  text: customerData.constactPhone
+                    ? customerData.constactPhone
                     : "--------",
                 },
                 {
@@ -364,8 +392,8 @@ export default {
                   text: "Correo: ",
                 },
                 {
-                  text: providersData.customerBranches.contactInfo
-                    ? customerData.customerBranches.contactInfo
+                  text: customerData.contactEmail
+                    ? customerData.contactEmail
                     : "-------",
                 },
               ]);
@@ -381,46 +409,60 @@ export default {
                   style: "generalInfo",
                 },
               ]);
+
               valuesTributary.push([
                 {
                   bold: true,
                   text: "DUI: ",
                 },
                 {
-                  text: providersData.dui ? customerData.dui : "-------",
+                  text: customerData.dui ? customerData.dui : "-------",
                 },
                 {
                   bold: true,
                   text: "NRC: ",
                 },
                 {
-                  text: providersData.nrc ? customerData.nrc : "-------",
+                  text: customerData.nrc ? customerData.nrc : "-------",
                 },
                 {
                   bold: true,
                   text: "NIT: ",
                 },
-                { text: providersData.nit ? customerData.nit : "-------" },
+                { text: customerData.nit ? customerData.nit : "-------" },
+                {},
+                {},
+              ]);
+              valuesTributary.push([{}, {}, {}, {}, {}, {}, {}, {}]);
+              valuesTributary.push([
                 {
                   bold: true,
                   text: "GIRO: ",
                 },
                 {
-                  text: providersData.giro ? customerData.giro : " -------",
+                  text: customerData.giro ? customerData.giro : " -------",
+                  colSpan: 6,
                 },
+                {},
+                {},
+                {},
+                {},
+                {},
+                {},
               ]);
+              valuesTributary.push([{}, {}, {}, {}, {}, {}, {}, {}]);
               valuesTributary.push([
                 {
                   bold: true,
                   text: "Tipo de cliente: ",
                 },
                 {
-                  text: providersData.customerType.name,
+                  text: customerData.customerType.name,
                 },
                 {
                   bold: true,
                   text:
-                    providersData.customerType.id == 2
+                    customerData.customerType.id == 2
                       ? "Tipo de persona natural: "
                       : "",
                   colSpan: 2,
@@ -428,8 +470,8 @@ export default {
                 {},
                 {
                   text:
-                    providersData.customerType.id == 2
-                      ? providersData.customerTypeNatural.name
+                    customerData.customerType.id == 2
+                      ? customerData.customerTypeNatural.name
                       : "",
                 },
                 {
@@ -439,8 +481,8 @@ export default {
                 },
                 {},
                 {
-                  text: providersData.customerTaxerType
-                    ? providersData.customerTaxerType.name
+                  text: customerData.customerTaxerType
+                    ? customerData.customerTaxerType.name
                     : "---------------",
                 },
               ]);
@@ -481,12 +523,12 @@ export default {
 
               const docDefinition = {
                 info: {
-                  title: `reporte_perfil_cliente_${providersData.name}`,
+                  title: `reporte_perfil_cliente_${customerData.name}`,
                 },
                 pageSize: "LETTER",
                 pageOrientation: "portrait",
                 pageMargins: [20, 60, 20, 40],
-                header: getHeader(name, nit, nrc, null, `PERFIL DE CLIENTE`),
+                header: getHeader(name, nit, nrc, null, nameReport),
                 footer: getFooter(),
                 content: [
                   {
@@ -610,18 +652,20 @@ export default {
               pdfMake.createPdf(docDefinition).open();
             })
             .catch((err) => {
+              console.error(err);
               this.errorMessage =
                 "Error al generar el PDF, contacta con tu administrador";
             });
+
           break;
         case "excel":
-          Promise.all([bussinesInfo(), providers(), branches()])
+          Promise.all([report()])
             .then((res) => {
-              const [bussinesInfo, providers, branch] = res;
-
-              const { name, nit, nrc } = bussinesInfo.data.info;
-              const providersData = providers.data.customer;
-              const branches = branch.data.branches;
+              const [report] = res;
+              const customerData = report.data.provider;
+              const branches = report.data.provider.customerBranches;
+              const { name, nrc, nit } = report.data.company;
+              const nameReport = report.data.name;
               const values = [];
               const valuesTable = [];
               const valuesGeneral = [];
@@ -629,49 +673,49 @@ export default {
 
               valuesGeneral.push([
                 `Nombre:`,
-                providersData.name,
+                customerData.name,
                 `Identificador:`,
-                providersData.shortName,
+                customerData.shortName,
                 `Estado:`,
-                providersData.isActiveProvider ? "Activo" : "Inactivo",
+                customerData.isActiveCustomer ? "Activo" : "Inactivo",
               ]);
               valuesGeneral.push([
                 "Contacto:",
-                providersData.customerBranches.contacName
-                  ? providersData.customerBranches.contacName
+                customerData.customerBranches.contacName
+                  ? customerData.customerBranches.contacName
                   : "----------------",
                 "Telefono: ",
-                providersData.customerBranches.contactInfo
-                  ? providersData.customerBranches.contactInfo
+                customerData.customerBranches.contactInfo
+                  ? customerData.customerBranches.contactInfo
                   : "--------",
                 "Correo: ",
-                providersData.customerBranches.contactInfo
-                  ? providersData.customerBranches.contactInfo
+                customerData.customerBranches.contactInfo
+                  ? customerData.customerBranches.contactInfo
                   : "-------",
               ]);
 
               valuesTributary.push([
                 "DUI: ",
-                providersData.dui ? providersData.dui : "-------",
+                customerData.dui ? customerData.dui : "-------",
                 "NRC: ",
-                providersData.nrc ?providersData.nrc : "-------",
+                customerData.nrc ? customerData.nrc : "-------",
                 "NIT: ",
-                providersData.nit ? providersData.nit : "-------",
+                customerData.nit ? customerData.nit : "-------",
                 "GIRO: ",
-                providersData.giro ? providersData.giro : " -------",
+                customerData.giro ? customerData.giro : " -------",
               ]);
               valuesTributary.push([
                 "Tipo de cliente:",
-                providersData.customerType.name,
-                providersData.customerType.id == 2
+                customerData.customerType.name,
+                customerData.customerType.id == 2
                   ? "Tipo de persona natural: "
                   : "",
-                providersData.customerType.id == 2
-                  ? providersData.customerTypeNatural.name
+                customerData.customerType.id == 2
+                  ? customerData.customerTypeNatural.name
                   : "",
                 "Tipo de contribuyente: ",
-                providersData.customerTaxerType
-                  ?providersData.customerTaxerType.name
+                customerData.customerTaxerType
+                  ? customerData.customerTaxerType.name
                   : "---------------",
               ]);
 
@@ -688,7 +732,7 @@ export default {
 
               const document = [
                 [name],
-                [`PERFIL DE CLIENTE`, `NIT: ${nit}`, `NRC: ${nrc}`],
+                [nameReport, `NIT: ${nit}`, `NRC: ${nrc}`],
                 [""],
                 ["INFORMACIÓN GENERAL"],
                 ...valuesGeneral,
@@ -710,7 +754,7 @@ export default {
 
               const sheet = XLSX.utils.aoa_to_sheet(document);
               const workbook = XLSX.utils.book_new();
-              const fileName = `reporte_cliente_${providersData.shortName}`;
+              const fileName = `reporte_cliente_${customerData.shortName}`;
               XLSX.utils.book_append_sheet(workbook, sheet, fileName);
               XLSX.writeFile(workbook, `${fileName}.xlsx`);
               this.generating = false;
