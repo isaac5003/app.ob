@@ -2857,9 +2857,7 @@ export default {
     };
   },
   methods: {
-    handleChange(value) {
-      console.log(value);
-    },
+    handleChange(value) {},
     closeDialogs(name) {
       this.$refs[name].resetFields();
     },
@@ -3231,9 +3229,6 @@ export default {
       });
     },
     editSeller({ id, name, ...zone }) {
-      console.log(id);
-      console.log(name);
-      console.log(zone);
       this.sellerId = id;
       this.editSellerForm.name = name;
       this.editSellerForm.invoicesZone = zone.invoicesZone.id;
