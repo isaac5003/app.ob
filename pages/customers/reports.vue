@@ -213,6 +213,8 @@ export default {
                 {
                   text: c.name,
                 },
+                  { text: c.contactName },
+                  { text: c.contactPhone },
                 {
                   text: c.customerType.name,
                 },
@@ -222,14 +224,15 @@ export default {
                 {
                   text: c.nrc,
                 },
-                { text: c.contactName },
-                { text: c.contactPhone },
                 {
                   text: c.isActiveCustomer ? "Activo" : "Inactivo",
                 },
               ]);
             }
             const docDefinition = {
+               info: {
+                title: nameReport,
+              },
               pageSize: "LETTER",
               pageOrientation: "portrait",
               pageMargins: [20, 60, 20, 40],
@@ -241,12 +244,20 @@ export default {
                   layout: "noBorders",
                   table: {
                     headerRows: 1,
-                    widths: ["auto", "15%", "15%", "10%", "10%", "10%", "10%"],
+                    widths: ["auto", "15%", "9%", "13%", "17%", "9%", "7%"],
                     heights: -5,
                     body: [
                       [
                         {
                           text: "NOMBRE",
+                          style: "tableHeader",
+                        },
+                         {
+                          text: "CONTACTO",
+                          style: "tableHeader",
+                        },
+                        {
+                          text: "TELEFONO",
                           style: "tableHeader",
                         },
                         {
@@ -261,14 +272,7 @@ export default {
                           text: "NRC",
                           style: "tableHeader",
                         },
-                        {
-                          text: "NOMBRE DE CONTACTO",
-                          style: "tableHeader",
-                        },
-                        {
-                          text: "Nº DE CONTACTO",
-                          style: "tableHeader",
-                        },
+                       
                         {
                           text: "ESTADO",
                           style: "tableHeader",
@@ -316,7 +320,7 @@ export default {
 
             const sheet = XLSX.utils.aoa_to_sheet(document);
             const workbook = XLSX.utils.book_new();
-            const fileName = "report";
+            const fileName = nameReport;
             XLSX.utils.book_append_sheet(workbook, sheet, fileName);
             XLSX.writeFile(workbook, `${fileName}.xlsx`);
             this.generating = false;
@@ -520,7 +524,7 @@ export default {
 
               const docDefinition = {
                 info: {
-                  title: `reporte_perfil_cliente_${customerData.name}`,
+                  title: nameReport,
                 },
                 pageSize: "LETTER",
                 pageOrientation: "portrait",
@@ -751,7 +755,7 @@ export default {
 
               const sheet = XLSX.utils.aoa_to_sheet(document);
               const workbook = XLSX.utils.book_new();
-              const fileName = `reporte_cliente_${customerData.shortName}`;
+              const fileName = nameReport;
               XLSX.utils.book_append_sheet(workbook, sheet, fileName);
               XLSX.writeFile(workbook, `${fileName}.xlsx`);
               this.generating = false;

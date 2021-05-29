@@ -1,6 +1,6 @@
 <template>
   <layout-content
-    v-loanding="pageloading"
+    v-loading="pageloading"
     page-title="Listado de proveedores"
     :breadcrumb="[
       { name: 'Proveedores', to: '/providers' },

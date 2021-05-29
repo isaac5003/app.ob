@@ -1,6 +1,6 @@
 <template>
   <layout-content
-    v-loanding=""
+    v-loading=""
     page-title="Reportes"
     :breadcrumb="[
       { name: 'Provedores', to: '/providers/reports' },
@@ -149,7 +149,7 @@ export default {
       },
       reports: [
         { name: "Listado de proveedores", id: "proveedores" },
-        { name: "Perfil de cliente", id: "perfil" },
+        { name: "Perfil de proveedor", id: "perfil" },
       ],
       requirementForm: null,
       accountingCatalog: [],
@@ -167,7 +167,7 @@ export default {
             this.$axios
               .get("/providers")
               .then((res) => {
-                this.providers = res.data.providers;
+                this.providers = res.data.data;
                 this.requirementForm = "proveedores";
               })
               .catch((err) => err.data.errorMessage);
@@ -213,6 +213,8 @@ export default {
                 {
                   text: c.name,
                 },
+                  { text: c.contactName },
+                  { text: c.contactPhone },
                 {
                   text: c.customerType.name,
                 },
@@ -222,8 +224,6 @@ export default {
                 {
                   text: c.nrc,
                 },
-                { text: c.contactName },
-                { text: c.contactPhone },
                 {
                   text: c.isActiveCustomer ? "Activo" : "Inactivo",
                 },
@@ -231,7 +231,7 @@ export default {
             }
             const docDefinition = {
                info: {
-                title: nameReport
+                title: nameReport,
               },
               pageSize: "LETTER",
               pageOrientation: "portrait",
@@ -244,12 +244,20 @@ export default {
                   layout: "noBorders",
                   table: {
                     headerRows: 1,
-                    widths: ["auto", "15%", "15%", "10%", "10%", "10%", "10%"],
+                    widths: ["auto", "15%", "9%", "13%", "17%", "9%", "7%"],
                     heights: -5,
                     body: [
                       [
                         {
                           text: "NOMBRE",
+                          style: "tableHeader",
+                        },
+                         {
+                          text: "CONTACTO",
+                          style: "tableHeader",
+                        },
+                        {
+                          text: "TELEFONO",
                           style: "tableHeader",
                         },
                         {
@@ -264,14 +272,7 @@ export default {
                           text: "NRC",
                           style: "tableHeader",
                         },
-                        {
-                          text: "NOMBRE DE CONTACTO",
-                          style: "tableHeader",
-                        },
-                        {
-                          text: "Nº DE CONTACTO",
-                          style: "tableHeader",
-                        },
+                       
                         {
                           text: "ESTADO",
                           style: "tableHeader",
@@ -319,7 +320,7 @@ export default {
 
             const sheet = XLSX.utils.aoa_to_sheet(document);
             const workbook = XLSX.utils.book_new();
-            const fileName = "report";
+            const fileName = nameReport;
             XLSX.utils.book_append_sheet(workbook, sheet, fileName);
             XLSX.writeFile(workbook, `${fileName}.xlsx`);
             this.generating = false;
@@ -327,7 +328,7 @@ export default {
           break;
       }
     },
-    reportCustomer(customerId, fileType) {
+    reportProvider(customerId, fileType) {
       const report = () => this.$axios.get(`/providers/report/${customerId}`);
       switch (fileType) {
         case "pdf":
@@ -523,7 +524,7 @@ export default {
 
               const docDefinition = {
                 info: {
-                  title: `reporte_perfil_cliente_${customerData.name}`,
+                  title: nameReport,
                 },
                 pageSize: "LETTER",
                 pageOrientation: "portrait",
@@ -754,7 +755,7 @@ export default {
 
               const sheet = XLSX.utils.aoa_to_sheet(document);
               const workbook = XLSX.utils.book_new();
-              const fileName = `reporte_cliente_${customerData.shortName}`;
+              const fileName = nameReport;
               XLSX.utils.book_append_sheet(workbook, sheet, fileName);
               XLSX.writeFile(workbook, `${fileName}.xlsx`);
               this.generating = false;

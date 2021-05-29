@@ -354,8 +354,45 @@
             </el-form-item>
           </div>
         </el-tab-pane>
+         <el-tab-pane
+          label="Integraciones"
+          name="integrations"
+          class="space-y-2"
+        >
+          <Notification
+            class="w-full"
+            type="info"
+            title="Integraciones"
+            message="En esta sección se realizan las configuraciones de integración con otros modulos de manera general. Estas configuraciones se aplicarán a todos los servicios que no tengan una configuración individual."
+          />
+
+          <div class="grid grid-cols-12 gap-4">
+            <el-form-item label="Seleccione una cuenta" class="col-span-4">
+              <el-select
+                filterable
+                remote
+                v-model="providerEditForm.accountingCatalog"
+                placeholder="Seleccione una cuenta"
+                size="small"
+                clearable
+                class="w-full"
+                :remote-method="findAccount"
+                :loading="loadingAccount"
+              >
+                <el-option
+                  v-for="a in filteredCatalog"
+                  :key="a.id"
+                  :label="`${a.code} - ${a.name}`"
+                  :value="a.id"
+                  :disabled="a.isParent == true"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </div>
+        </el-tab-pane>
       </el-tabs>
-      <div class="flex justify-end" v-if="activeTab != 'integrations'">
+      <div class="flex justify-end" >
         <el-button type="primary" size="small" native-type="submit"
           >Actualizar</el-button
         >
@@ -395,6 +432,9 @@ export default {
     const countries = () => this.$axios.get(`/others/countries`);
     const states = () => this.$axios.get(`/others/states`);
     const cities = () => this.$axios.get(`/others/cities`);
+       const settingsIntegrations = () =>
+      this.$axios.get(`/providers/${this.$route.query.ref}/integrations`);
+    const catalog = () => this.$axios.get("/entries/catalog");
 
     Promise.all([
       customerTypes(),
@@ -404,6 +444,8 @@ export default {
       countries(),
       states(),
       cities(),
+      settingsIntegrations(),
+catalog()
     ])
       .then((res) => {
         // Se ubica en el tab seleccionado
@@ -419,6 +461,8 @@ export default {
           countries,
           states,
           cities,
+          settingsIntegrations,
+          catalog,
         ] = res;
 
         this.customerTypes = customerTypes.data.data;
@@ -431,6 +475,7 @@ export default {
         this.countries = countries.data.data;
         this.rawStates = states.data.data;
         this.rawCities = cities.data.data;
+this.catalogs = catalog.data.data;
 
         const phone = branch.contactInfo.phones
           ? branch.contactInfo.phones[0]
@@ -464,8 +509,11 @@ export default {
           country: branch.country.id,
           state: branch.state.id,
           city: branch.city.id,
+           accountingCatalog: settingsIntegrations.data.integrations.catalog,
         };
-
+ this.filteredCatalog = this.catalogs.filter(
+          (c) => c.id == settingsIntegrations.data.integrations.catalog
+        );
         this.loading = false;
       })
       .catch((err) => {
@@ -510,8 +558,12 @@ export default {
         country: "",
         state: "",
         city: "",
+        accountingCatalog:""
       },
       customer: null,
+      filteredCatalog: [],
+      loadingAccount: false,
+      catalogs: [],
     };
   },
   methods: {
@@ -547,9 +599,9 @@ export default {
               if (action === "confirm") {
                 instance.confirmButtonLoading = true;
                 instance.confirmButtonText = "Procesando...";
-                this.$axios
-                  .put(`/providers/${this.$route.query.ref}`, {
-                    name: formData.name,
+                 const provider = () =>
+                  this.$axios.put(`/providers/${this.$route.query.ref}`, {
+                     name: formData.name,
                     shortName: formData.shortName,
                     isCustomer: formData.isCustomer,
                     dui: formData.dui,
@@ -581,11 +633,21 @@ export default {
                       state: formData.state,
                       city: formData.city,
                     },
-                  })
+                  });
+                const integration = () =>
+                  this.$axios.put(
+                    `/providers/${this.$route.query.ref}/integrations`,
+                    {
+                      accountingCatalog: formData.accountingCatalog,
+                    }
+                  );
+                Promise.all([provider(), integration()])
                   .then((res) => {
+                    const [provider, integration] = res;
+
                     this.$notify.success({
                       title: "Exito",
-                      message: res.data.message,
+                      message: `${provider.data.message} y ${integration.data.message}`,
                     });
                     setTimeout(() => {
                       this.$router.push("/providers");
@@ -603,13 +665,27 @@ export default {
                     localStorage.removeItem(storagekey);
                     done();
                   });
-              } else {
+              }  else {
                 done();
               }
             },
           }
         );
       });
+    },
+    findAccount(query) {
+      if (query !== "") {
+        this.loadingAccount = true;
+        this.$axios
+          .get("/entries/catalog", { params: { search: query.toLowerCase() } })
+          .then((res) => {
+            this.filteredCatalog = res.data.data;
+            this.loadingAccount = false;
+          })
+          .catch((err) => (this.errorMessage = err.response.data.message));
+      } else {
+        this.filteredCatalog = [];
+      }
     },
   },
   computed: {
