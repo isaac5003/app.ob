@@ -911,8 +911,8 @@
               "
               :disabled="
                 !firmantesForm.legal ||
-                  !firmantesForm.accountant ||
-                  !firmantesForm.auditor
+                !firmantesForm.accountant ||
+                !firmantesForm.auditor
               "
               >Guardar</el-button
             >
@@ -2247,7 +2247,7 @@ export default {
       this.$axios
         .get("/entries/setting/balance-general")
         .then((res) => {
-          this.tableData = balance.data.balanceGeneral.report;
+          this.tableData = res.data.data.balanceGeneral.report;
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
