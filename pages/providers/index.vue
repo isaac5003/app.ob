@@ -37,7 +37,7 @@
               <el-tag size="small" type="warning" v-else>Inactivo</el-tag>
             </div>
           </div>
-         
+
           <div class="col-span-2 flex flex-col" v-if="hasModule()">
             <span class="font-semibold">Es cliente</span>
 
@@ -65,8 +65,8 @@
           <template
             v-if="
               selectedProvider &&
-              (!selectedProvider.customerTypeNatural ||
-                selectedProvider.customerTypeNatural.id == 2)
+                (!selectedProvider.customerTypeNatural ||
+                  selectedProvider.customerTypeNatural.id == 2)
             "
           >
             <div class="col-span-2 flex flex-col">
@@ -240,6 +240,13 @@
                 >
                   <i class="el-icon-edit-outline"></i> Editar proveedor
                 </el-dropdown-item>
+                <el-dropdown-item
+                  @click.native="
+                    $router.push(`/providers/branchOffices?ref=${scope.row.id}`)
+                  "
+                >
+                  <i class="el-icon-map-location"></i> Sucursales
+                </el-dropdown-item>
                 <el-dropdown-item @click.native="changeActive(scope.row)">
                   <span v-if="scope.row.isActiveProvider">
                     <i class="el-icon-close"></i> Desactivar
@@ -248,11 +255,8 @@
                   proveedor
                 </el-dropdown-item>
                 <!-- <el-dropdown-item>
-                    <i class="el-icon-guide"></i> Sucursales
-                  </el-dropdown-item>
-                  <el-dropdown-item>
-                    <i class="el-icon-notebook-1"></i> Directorio
-                </el-dropdown-item>-->
+                  <i class="el-icon-notebook-1"></i> Directorio
+                </el-dropdown-item> -->
                 <el-dropdown-item
                   :divided="true"
                   class="text-red-500 font-semibold"
@@ -301,8 +305,8 @@ export default {
         const [providers] = res;
         this.providers = providers.data;
 
-        this.pageloading = false
-        this.tableloading = false
+        this.pageloading = false;
+        this.tableloading = false;
       })
       .catch((err) => {
         this.errorMessage = err.respose.data.message;
@@ -370,7 +374,7 @@ export default {
       this.page.limit = val;
       this.fetchProviders();
     },
-      changeActive({ id, isActiveProvider }) {
+    changeActive({ id, isActiveProvider }) {
       const action = isActiveProvider ? "desactivar" : "activar";
       this.$confirm(
         `¿Estás seguro que deseas ${action} este proveedor?`,
@@ -451,8 +455,7 @@ export default {
     },
     async openProviderPreview({ id }) {
       const { data } = await this.$axios.get(`/providers/${id}`);
-      (this.selectedProvider = data.data),
-        (this.showProviderPreview = true);
+      (this.selectedProvider = data.data), (this.showProviderPreview = true);
     },
     hasModule() {
       return hasModule("9ff0b6f4-9c58-475b-b2dd-5eea6d7b66aa", this.$auth.user);
@@ -463,6 +466,5 @@ export default {
       this.fetchProviders();
     },
   },
-
 };
 </script>

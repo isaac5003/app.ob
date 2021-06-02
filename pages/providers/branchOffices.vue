@@ -2,7 +2,7 @@
   <layout-content
     page-title="Sucursales"
     :breadcrumb="[
-      { name: 'Clientes', to: '/customers' },
+      { name: 'Proveedores', to: '/providers' },
       { name: 'Sucursales', to: null },
     ]"
   >
@@ -531,28 +531,28 @@
           <div class="col-span-3">
             <div class="flex flex-col">
               <span>CLIENTE</span>
-              <el-form-item :label="`${customer ? customer.name : ''}`">
+              <el-form-item :label="`${provider ? provider.name : ''}`">
               </el-form-item>
             </div>
           </div>
           <div class="col-span-2">
             <div class="flex flex-col">
               <span>NIT</span>
-              <el-form-item :label="`${customer.nit ? customer.nit : ''}`">
+              <el-form-item :label="`${provider.nit ? provider.nit : ''}`">
               </el-form-item>
             </div>
           </div>
           <div class="col-span-1">
             <div class="flex flex-col">
               <span>NRC</span>
-              <el-form-item :label="`${customer.nrc ? customer.nrc : ''}`">
+              <el-form-item :label="`${provider.nrc ? provider.nrc : ''}`">
               </el-form-item>
             </div>
           </div>
           <div class="col-span-3">
             <div class="flex flex-col">
               <span>GIRO</span>
-              <el-form-item :label="`${customer.giro ? customer.giro : ''}`">
+              <el-form-item :label="`${provider.giro ? provider.giro : ''}`">
               </el-form-item>
             </div>
           </div>
@@ -629,7 +629,7 @@
                 <el-dropdown-item>
                   <i class="el-icon-close"></i>Desactivar sucursales
                 </el-dropdown-item>
-                <el-dropdown-item :divided="true">
+                <el-dropdown-item :divided="true" v-if="!scope.row.default">
                   <i class="el-icon-delete"></i> Eliminar sucursales
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -705,30 +705,30 @@ export default {
     const countries = () => this.$axios.get(`/others/countries`);
     const states = () => this.$axios.get(`/others/states`);
     const cities = () => this.$axios.get(`/others/cities`);
-    const customer = () =>
-      this.$axios.get(`/customers/${this.$route.query.ref}`);
-    const customerBranches = () =>
-      this.$axios.get(`/customers/${this.$route.query.ref}/branches`);
+    const provider = () =>
+      this.$axios.get(`/providers/${this.$route.query.ref}`);
+    const providerBranches = () =>
+      this.$axios.get(`/providers/${this.$route.query.ref}/branches`);
 
     Promise.all([
       countries(),
       states(),
       cities(),
-      customer(),
-      customerBranches(),
+      provider(),
+      providerBranches(),
     ])
       .then((res) => {
-        const [countries, states, cities, customer, customerBranches] = res;
+        const [countries, states, cities, provider, providerBranches] = res;
 
         this.countries = countries.data.data;
         this.rawStates = states.data.data;
         this.rawCities = cities.data.data;
-        this.customer = customer.data.data;
-        this.branches = customerBranches.data;
+        this.provider = provider.data.data;
+        this.branches = providerBranches.data;
       })
       .catch((err) => {
         this.$message.error(err.response.data.message);
-        this.$router.push("/customers");
+        this.$router.push("/providers");
       })
       .then((alw) => (this.pageloading = false));
   },
@@ -741,7 +741,7 @@ export default {
       rawCities: [],
       cities: [],
       states: [],
-      customer: {},
+      provider: {},
       text: "",
       pageloading: true,
       showBranchOffices: false,
@@ -837,14 +837,13 @@ export default {
     },
     async openBranchPreview(id) {
       const { data } = await this.$axios.get(
-        `/customers/${this.$route.query.ref}/branches/${id}`
+        `/providers/${this.$route.query.ref}/branches/${id}`
       );
       (this.selectedBranch = data.data), (this.showViewPreview = true);
     },
 
     handleSelectionChange(val) {
       this.multipleSelection = val;
-      console.log(this.multipleSelection.length);
     },
 
     officetAdd() {
@@ -902,7 +901,7 @@ export default {
               instance.confirmButtonText = "Procesando...";
               this.$axios
                 .put(
-                  `/customers/${this.$route.query.ref}/branches/${id}/default`
+                  `/providers/${this.$route.query.ref}/branches/${id}/default`
                 )
                 .then((res) => {
                   this.$notify.success({
@@ -946,7 +945,7 @@ export default {
       }
 
       this.$axios
-        .get(`/customers/${this.$route.query.ref}/branches`, { params })
+        .get(`/providers/${this.$route.query.ref}/branches`, { params })
         .then((res) => {
           this.branches = res.data;
         })
@@ -969,7 +968,7 @@ export default {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
               this.$axios
-                .delete(`/customers/${this.$route.query.ref}/branches/${id}`)
+                .delete(`/providers/${this.$route.query.ref}/branches/${id}`)
                 .then((res) => {
                   this.$notify.success({
                     title: "Éxito",
@@ -1003,7 +1002,7 @@ export default {
 
     async openEditDialog(id) {
       const { data } = await this.$axios.get(
-        `/customers/${this.$route.query.ref}/branches/${id}`
+        `/providers/${this.$route.query.ref}/branches/${id}`
       );
       this.editOfficeForm.name = data.data.name;
       this.editOfficeForm.contactName = data.data.contactName;
@@ -1041,7 +1040,7 @@ export default {
                 instance.confirmButtonText = "Procesando...";
                 const branch = () =>
                   this.$axios.put(
-                    `/customers/${this.$route.query.ref}/branches/${branchData.id}`,
+                    `/providers/${this.$route.query.ref}/branches/${branchData.id}`,
                     {
                       branch: {
                         name: branchData.name,
@@ -1111,7 +1110,7 @@ export default {
                 instance.confirmButtonLoading = true;
                 instance.confirmButtonText = "Procesando...";
                 this.$axios
-                  .post(`/customers/${this.$route.query.ref}/branches`, {
+                  .post(`/providers/${this.$route.query.ref}/branches`, {
                     branches: data.items.map((b) => {
                       return {
                         name: b.name,

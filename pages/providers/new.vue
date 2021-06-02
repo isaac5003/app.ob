@@ -299,7 +299,7 @@
                 class="col-span-2"
                 v-if="
                   providerNewForm.customerType == 1 ||
-                  providerNewForm.customerTypeNatural == 2
+                    providerNewForm.customerTypeNatural == 2
                 "
               >
                 <el-form-item label="NRC" prop="nrc">
@@ -317,7 +317,7 @@
               class="grid grid-cols-12 gap-4"
               v-if="
                 providerNewForm.customerType == 1 ||
-                providerNewForm.customerTypeNatural == 2
+                  providerNewForm.customerTypeNatural == 2
               "
             >
               <div class="col-span-4">
@@ -545,8 +545,8 @@ export default {
                     branch: {
                       contactName: formData.contactName,
                       contactInfo: {
-                        phones: [formData.phone],
-                        emails: [formData.email],
+                        phones: [formData.phone ? formData.phone : ""],
+                        emails: [formData.email ? formData.email : ""],
                       },
                       address1: formData.address1,
                       address2: formData.address2,
