@@ -16,41 +16,61 @@
     >
       <div class="flex flex-col space-y-6">
         <div class="grid grid-cols-12 gap-4">
-          <div class="col-span-5 flex flex-col">
+          <div class="col-span-4 flex flex-col">
             <span class="font-semibold">Nombre de sucursal</span>
-            <span>Grupo agropecuario de El Salvador S.A C.V</span>
+            <div class="flex justify-between">
+              {{ selectedBranch ? selectedBranch.name : "" }}
+              <el-tag
+                size="small"
+                type="info"
+                effect="dark"
+                v-if="selectedBranch ? selectedBranch.default : false"
+              >
+                <i class="el-icon-place"></i>
+                Principal</el-tag
+              >
+            </div>
           </div>
+
           <div class="col-span-2 flex flex-col">
             <span class="font-semibold">Pais</span>
-            <span>El Salvador</span>
+            <span>{{ selectedBranch ? selectedBranch.country.name : "" }}</span>
           </div>
           <div class="col-span-2 flex flex-col">
             <span class="font-semibold">Deparmento</span>
-            <span>San Salvador</span>
+            <span>{{ selectedBranch ? selectedBranch.state.name : "" }}</span>
           </div>
-          <div class="col-span-2 flex flex-col">
+          <div class="col-span-3 flex flex-col">
             <span class="font-semibold">Municipio</span>
-            <span>Cuscatancingo</span>
+            <span>{{ selectedBranch ? selectedBranch.city.name : "" }}</span>
           </div>
         </div>
         <div class="grid grid-cols-12 gap-4">
-          <div class="col-span-3 flex flex-col">
+          <div class="col-span-6 flex flex-col">
             <span class="font-semibold">Dirección 1</span>
-            <span>Avenida los naranjo</span>
+            <span>{{ selectedBranch ? selectedBranch.address1 : "" }}</span>
           </div>
-          <div class="col-span-3 flex flex-col">
+          <div class="col-span-6 flex flex-col">
             <span class="font-semibold">Dirección 2</span>
-            <span>calle wascoran</span>
+            <span>{{ selectedBranch ? selectedBranch.address2 : "" }}</span>
           </div>
         </div>
         <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-3 flex flex-col">
+            <span class="font-semibold">Nombre de contacto</span>
+            <span>{{ selectedBranch ? selectedBranch.contactName : "" }}</span>
+          </div>
           <div class="col-span-3 flex flex-col">
             <span class="font-semibold">Teléfono</span>
-            <span>+503 0000-0000</span>
+            <span>{{
+              selectedBranch ? selectedBranch.contactInfo.phones[0] : ""
+            }}</span>
           </div>
           <div class="col-span-3 flex flex-col">
             <span class="font-semibold">Correo</span>
-            <span>example@axample.com</span>
+            <span>{{
+              selectedBranch ? selectedBranch.contactInfo.emails[0] : ""
+            }}</span>
           </div>
         </div>
         <div class="flex justify-end">
@@ -69,13 +89,29 @@
       width="900px"
       @close="closeDialog('editOfficeForm', 'edit')"
     >
-      <div class="flex flex-col space-y-2">
+      <div class="flex flex-col space-y-4">
         <el-form
           :model="editOfficeForm"
           :rules="editOfficeFormRules"
           status-icon
           ref="editOfficeForm"
+          @submit.native.prevent="
+            submitEditBranch('editOfficeForm', editOfficeForm)
+          "
         >
+          <div class="grid grid-cols-12 gap-4">
+            <el-form-item
+              label="Nombre de la sucursal"
+              class="col-span-12"
+              prop="name"
+            >
+              <el-input
+                size="small"
+                class="w-full"
+                v-model="editOfficeForm.name"
+              />
+            </el-form-item>
+          </div>
           <!-- Seleccion de pais,departamento y municipio -->
           <div class="grid grid-cols-12 gap-4">
             <el-form-item label="Pais" class="col-span-4" prop="country">
@@ -86,6 +122,7 @@
                 filterable
                 clearable
                 default-first-option
+                @change="clearSelectEdit('state')"
               >
                 <el-option
                   v-for="c in countries"
@@ -104,6 +141,7 @@
                 filterable
                 clearable
                 default-first-option
+                @change="clearSelectEdit('city')"
               >
                 <el-option
                   v-for="c in editStates"
@@ -135,13 +173,17 @@
           </div>
           <!-- Direcciones -->
           <div class="grid grid-cols-12 gap-4">
-            <el-form-item label="Dirección 1" class="col-span-4" prop="address">
+            <el-form-item
+              label="Dirección 1"
+              class="col-span-6"
+              prop="address1"
+            >
               <el-input
-                v-model="editOfficeForm.address"
+                v-model="editOfficeForm.address1"
                 placeholder="Col, ciudad, pjs, pol, #casa"
                 class="w-full"
                 size="small"
-                maxlength="10"
+                maxlength="150"
                 show-word-limit
               >
                 <el-option> </el-option>
@@ -149,16 +191,16 @@
             </el-form-item>
             <el-form-item
               label="Dirección 2"
-              class="col-span-4"
-              prop="address1"
+              class="col-span-6"
+              prop="address2"
             >
               <el-input
-                v-model="editOfficeForm.address1"
+                v-model="editOfficeForm.address2"
                 type="text"
                 placeholder="Col, ciudad, pjs, pol, #casa"
                 class="w-full"
                 size="small"
-                maxlength="10"
+                maxlength="150"
                 show-word-limit
               >
                 <el-option> </el-option>
@@ -167,38 +209,52 @@
           </div>
           <!-- Contactos -->
           <h1 class="text-blue-500">Contacto</h1>
-          <div class="grid grid-cols-12 gap-4 mt-4 border-b-2">
-            <el-form-item label="Teléfono" class="col-span-4" prop="phone">
+          <div class="grid grid-cols-12 gap-4 ">
+            <el-form-item
+              label="Nombre de contacto"
+              class="col-span-4"
+              prop="contactName"
+            >
               <el-input
-                v-model="editOfficeForm.phone"
-                placeholder="0000-0000"
+                v-model="editOfficeForm.contactName"
+                placeholder="Nombre de contacto"
                 class="w-full"
                 size="small"
-                v-mask="'####-####'"
               >
                 <el-option> </el-option>
               </el-input>
             </el-form-item>
+            <el-form-item label="Teléfono" class="col-span-4" prop="phones">
+              <el-input
+                v-model="editOfficeForm.phones"
+                placeholder="0000-0000"
+                class="w-full"
+                size="small"
+                v-mask="'####-####'"
+              />
+            </el-form-item>
             <el-form-item
               label="Correo electronico"
-              prop="email"
+              prop="emails"
               class="col-span-4"
             >
               <el-input
-                v-model="editOfficeForm.email"
+                v-model="editOfficeForm.emails"
                 class="w-full"
                 placeholder="example@example.com"
                 size="small"
-              >
-                <el-option> </el-option>
-              </el-input>
+              />
             </el-form-item>
           </div>
 
           <div class="grid grid-cols-12 gap-4 mt-3">
             <div class="col-span-12">
               <div class="flex justify-end">
-                <el-button type="primary" size="small" class="col-span-2"
+                <el-button
+                  type="primary"
+                  size="small"
+                  class="col-span-2"
+                  native-type="submit"
                   >Guardar</el-button
                 >
                 <el-button
@@ -228,13 +284,12 @@
           :rules="editOfficeFormRules"
           status-icon
           ref="addOfficeNewForm"
+          @submit.native.prevent="
+            submitNewBranches('addOfficeNewForm', addOfficeNewForm)
+          "
         >
           <!-- Seleccion de pais,departamento y municipio -->
-          <div
-            class="space-y-4"
-            v-for="(item, i) in addOfficeNewForm.items"
-            :key="i"
-          >
+          <div v-for="(item, i) in addOfficeNewForm.items" :key="i">
             <div class="grid grid-cols-12 mt-4">
               <div class="col-span-12">
                 <div class="flex justify-between">
@@ -251,6 +306,20 @@
                   ></el-button>
                 </div>
               </div>
+            </div>
+            <div class="grid grid-cols-12 gap-4">
+              <el-form-item
+                label="Nombre de la sucursal"
+                class="col-span-12"
+                :prop="`items.${i}.name`"
+                :rules="{
+                  required: true,
+                  message: 'Requerido',
+                  trigger: 'change',
+                }"
+              >
+                <el-input size="small" class="w-full" v-model="item.name" />
+              </el-form-item>
             </div>
             <div class="grid grid-cols-12 gap-4">
               <el-form-item
@@ -341,28 +410,7 @@
             <div class="grid grid-cols-12 gap-4">
               <el-form-item
                 label="Dirección 1"
-                class="col-span-4"
-                :prop="`items.${i}.address`"
-                :rules="{
-                  required: true,
-                  message: 'Requerido',
-                  trigger: 'change',
-                }"
-              >
-                <el-input
-                  v-model="item.address"
-                  placeholder="Col, ciudad, pjs, pol, #casa"
-                  class="w-full"
-                  size="small"
-                  maxlength="10"
-                  show-word-limit
-                >
-                  <el-option> </el-option>
-                </el-input>
-              </el-form-item>
-              <el-form-item
-                label="Dirección 2"
-                class="col-span-4"
+                class="col-span-6"
                 :prop="`items.${i}.address1`"
                 :rules="{
                   required: true,
@@ -372,11 +420,23 @@
               >
                 <el-input
                   v-model="item.address1"
+                  placeholder="Col, ciudad, pjs, pol, #casa"
+                  class="w-full"
+                  size="small"
+                  maxlength="150"
+                  show-word-limit
+                >
+                  <el-option> </el-option>
+                </el-input>
+              </el-form-item>
+              <el-form-item label="Dirección 2" class="col-span-6">
+                <el-input
+                  v-model="item.address2"
                   type="text"
                   placeholder="Col, ciudad, pjs, pol, #casa"
                   class="w-full"
                   size="small"
-                  maxlength="10"
+                  maxlength="150"
                   show-word-limit
                 >
                   <el-option> </el-option>
@@ -386,16 +446,17 @@
             <!-- Contactos -->
             <h1 class="text-blue-700">Contacto</h1>
             <div class="grid grid-cols-12 gap-4 mt-4 border-b-2">
-              <el-form-item
-                label="Teléfono"
-                class="col-span-4"
-                :prop="`items.${i}.phone`"
-                :rules="{
-                  required: true,
-                  message: 'Requerido',
-                  trigger: 'change',
-                }"
-              >
+              <el-form-item label="Nombre de contacto" class="col-span-4">
+                <el-input
+                  v-model="item.contactName"
+                  placeholder="Nombre de contacto"
+                  class="w-full"
+                  size="small"
+                >
+                  <el-option> </el-option>
+                </el-input>
+              </el-form-item>
+              <el-form-item label="Teléfono" class="col-span-4">
                 <el-input
                   v-model="item.phone"
                   placeholder="0000-0000"
@@ -434,7 +495,11 @@
             </div>
             <div class="col-span-6">
               <div class="flex justify-end">
-                <el-button type="primary" size="small" class="col-span-2"
+                <el-button
+                  type="primary"
+                  size="small"
+                  class="col-span-2"
+                  native-type="submit"
                   >Guardar</el-button
                 >
                 <el-button
@@ -473,21 +538,21 @@
           <div class="col-span-2">
             <div class="flex flex-col">
               <span>NIT</span>
-              <el-form-item :label="`${customer ? customer.nit : ''}`">
+              <el-form-item :label="`${customer.nit ? customer.nit : ''}`">
               </el-form-item>
             </div>
           </div>
           <div class="col-span-1">
             <div class="flex flex-col">
               <span>NRC</span>
-              <el-form-item :label="`${customer ? customer.nrc : ''}`">
+              <el-form-item :label="`${customer.nrc ? customer.nrc : ''}`">
               </el-form-item>
             </div>
           </div>
           <div class="col-span-3">
             <div class="flex flex-col">
               <span>GIRO</span>
-              <el-form-item :label="`${customer ? customer.giro : ''}`">
+              <el-form-item :label="`${customer.giro ? customer.giro : ''}`">
               </el-form-item>
             </div>
           </div>
@@ -495,11 +560,12 @@
       </el-form>
 
       <el-table
-        :data="tabla"
+        :data="branches.data"
         ref="multipleTable"
         @selection-change="handleSelectionChange"
         stripe
         size="mini"
+        @sort-change="sortBy"
       >
         <el-table-column type="selection" width="45"> </el-table-column>
 
@@ -509,19 +575,34 @@
           min-width="355"
           sortable="custom"
           prop="name"
-        ></el-table-column>
-        <el-table-column
-          label="Teléfono"
-          width="100"
-          sortable="custom"
-          prop="phone"
-        />
-        <el-table-column
-          label="Correo"
-          width="200"
-          sortable="custom"
-          prop="email"
-        ></el-table-column>
+        >
+          <template slot-scope="scope">
+            <span> {{ scope.row.name }}</span>
+            <el-tag
+              size="small"
+              type="info"
+              effect="dark"
+              v-if="scope.row.default"
+            >
+              <i class="el-icon-place"></i>
+              Principal</el-tag
+            >
+          </template></el-table-column
+        >
+        <el-table-column label="Teléfono" width="100" prop="phone">
+          <template slot-scope="scope">
+            <span>{{
+              scope.row.contactInfo ? scope.row.contactInfo.phones[0] : ""
+            }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="Correo" width="200" prop="email">
+          <template slot-scope="scope">
+            <span>{{
+              scope.row.contactInfo ? scope.row.contactInfo.emails[0] : ""
+            }}</span>
+          </template></el-table-column
+        >
         <el-table-column
           label="Pais"
           width="100"
@@ -529,6 +610,9 @@
           prop="country"
           show-overflow-tooltip
         >
+          <template slot-scope="scope">
+            <span>{{ scope.row.country.name }}</span>
+          </template>
         </el-table-column>
         <el-table-column label width="110" align="center">
           <template slot="header" v-if="multipleSelection.length > 0">
@@ -556,19 +640,25 @@
             <el-dropdown trigger="click" szie="mini">
               <el-button icon="el-icon-more" size="mini" />
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item @click.native="openBranchPreview(scope.row)">
+                <el-dropdown-item
+                  @click.native="openBranchPreview(scope.row.id)"
+                >
                   <i class="el-icon-view"></i> Vista previa
                 </el-dropdown-item>
-                <el-dropdown-item @click.native="openEditPreview(scope.row)">
+                <el-dropdown-item @click.native="openEditDialog(scope.row.id)">
                   <i class="el-icon-edit-outline"></i> Editar sucursal
                 </el-dropdown-item>
-                <el-dropdown-item>
-                  <i class="el-icon-map-location"></i>Definir como principal
+                <el-dropdown-item
+                  @click.native="setDefaultBranch(scope.row.id)"
+                  v-if="!scope.row.default"
+                >
+                  <i class="el-icon-place"></i>Definir como principal
                 </el-dropdown-item>
 
                 <el-dropdown-item
                   :divided="true"
-                  class="text-red-500 font-semibold"
+                  class=" font-semibold  text-red-500"
+                  @click.native="deleteBranch(scope.row.id)"
                 >
                   <i class="el-icon-delete"></i> Eliminar sucursal
                 </el-dropdown-item>
@@ -579,11 +669,13 @@
       </el-table>
       <div class="flex justify-end">
         <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="fetchBranches"
           :current-page.sync="page.page"
           :page-sizes="[5, 10, 15, 25, 50, 100]"
           :page-size="page.size"
           layout="total, sizes, prev, pager, next"
-          :total="parseInt(BranchOffices.count)"
+          :total="parseInt(branches.count)"
           :pager-count="5"
         />
       </div>
@@ -600,7 +692,11 @@ import {
   checkBeforeEnter,
 } from "../../tools";
 import Notification from "../../components/Notification";
+
+const storagekey = "branches";
+
 export default {
+  name: "CustomerBranches",
   components: {
     LayoutContent,
     Notification,
@@ -611,15 +707,24 @@ export default {
     const cities = () => this.$axios.get(`/others/cities`);
     const customer = () =>
       this.$axios.get(`/customers/${this.$route.query.ref}`);
+    const customerBranches = () =>
+      this.$axios.get(`/customers/${this.$route.query.ref}/branches`);
 
-    Promise.all([countries(), states(), cities(), customer()])
+    Promise.all([
+      countries(),
+      states(),
+      cities(),
+      customer(),
+      customerBranches(),
+    ])
       .then((res) => {
-        const [countries, states, cities, customer] = res;
+        const [countries, states, cities, customer, customerBranches] = res;
 
         this.countries = countries.data.data;
         this.rawStates = states.data.data;
         this.rawCities = cities.data.data;
         this.customer = customer.data.data;
+        this.branches = customerBranches.data;
       })
       .catch((err) => {
         this.$message.error(err.response.data.message);
@@ -646,67 +751,50 @@ export default {
       addOfficeNewForm: {
         items: [
           {
+            name: "",
+            contactName: "",
             country: "",
             state: "",
             city: "",
-            address: "",
             address1: "",
-            phone: "",
-            email: "",
+            address2: "",
+            phones: "",
+            emails: "",
             states: [],
             cities: [],
           },
         ],
       },
       editOfficeForm: {
+        name: "",
         country: "",
         state: "",
         city: "",
-        address: "",
         address1: "",
-        phone: "",
-        email: "",
+        address2: "",
+        phones: "",
+        emails: "",
+        contactName: "",
       },
       editOfficeFormRules: {
-        country: selectValidation(true),
-        state: selectValidation(true),
-        city: selectValidation(true),
-        address: inputValidation(true),
+        name: inputValidation(true),
+
         address1: inputValidation(true),
-        phone: inputValidation(true),
-        email: inputValidation(true, null, null, "email"),
       },
-      BranchOffices: {
-        BranchOffices: [],
-        count: 0,
-      },
-      tabla: [
-        {
-          index: 1,
-          name: "Grupo agropecuario de El Salvador S.A C.V",
-          phone: "2332-3244",
-          email: "example@example.com",
-          country: "El Salvador",
-        },
-        {
-          index: 2,
-          name: "Impresa respuesto",
-          phone: "2332-3244",
-          email: "example@example.com",
-          country: "El Salvador",
-        },
-        {
-          index: 3,
-          name: "Siman Sv de CV",
-          phone: "2332-3244",
-          email: "example@example.com",
-          country: "El Salvador",
-        },
-      ],
 
       page: {
         limit: 10,
         page: 1,
+      },
+
+      branches: {
+        count: 0,
+        data: [],
+      },
+      selectedBranch: "",
+      filter: {
+        prop: "",
+        order: null,
       },
     };
   },
@@ -729,12 +817,28 @@ export default {
       }
     },
 
-    openBranchPreview(id) {
-      this.showViewPreview = true;
+    clearSelectEdit(name) {
+      switch (name) {
+        case "state":
+          this.editOfficeForm.state = "";
+          this.editOfficeForm.city = "";
+          break;
+        case "city":
+          this.editOfficeForm.city = "";
+          break;
+      }
     },
-    openEditPreview() {
-      this.showEditPreview = true;
+    handleSizeChange(val) {
+      this.page.limit = val;
+      this.fetchBranches();
     },
+    async openBranchPreview(id) {
+      const { data } = await this.$axios.get(
+        `/customers/${this.$route.query.ref}/branches/${id}`
+      );
+      (this.selectedBranch = data.data), (this.showViewPreview = true);
+    },
+
     handleSelectionChange(val) {
       this.multipleSelection = val;
       console.log(this.multipleSelection.length);
@@ -742,13 +846,17 @@ export default {
 
     officetAdd() {
       this.addOfficeNewForm.items.push({
+        name: "",
+        contactName: "",
         country: "",
         state: "",
         city: "",
         address: "",
         address1: "",
-        phone: "",
-        email: "",
+        phones: "",
+        emails: "",
+        states: [],
+        cities: [],
       });
     },
 
@@ -775,6 +883,274 @@ export default {
       }
 
       return false;
+    },
+
+    setDefaultBranch(id) {
+      this.$confirm(
+        `¿Estás seguro que deseas definir como principal esta sucursal?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, guardar.`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .put(
+                  `/customers/${this.$route.query.ref}/branches/${id}/default`
+                )
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchBranches();
+                })
+                .catch((err) => {
+                  console.error(err);
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, guardar`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
+    },
+
+    fetchBranches() {
+      this.tableloading = true;
+      let params = this.page;
+      if (this.status !== "") {
+        params = { ...params, active: this.status };
+      }
+
+      if (this.filter.order) {
+        params = {
+          ...params,
+          prop: this.filter.prop,
+          order: this.filter.order,
+        };
+      }
+
+      this.$axios
+        .get(`/customers/${this.$route.query.ref}/branches`, { params })
+        .then((res) => {
+          this.branches = res.data;
+        })
+        .catch((err) => {
+          this.errorMessage = err.response.data.message;
+        })
+        .then((alw) => (this.tableloading = false));
+    },
+
+    deleteBranch(id) {
+      this.$confirm(
+        `¿Estás seguro que deseas eliminar esta sucursal?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, eliminar`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .delete(`/customers/${this.$route.query.ref}/branches/${id}`)
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchBranches();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    message: err.response.data.message,
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, eliminar`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
+    },
+
+    sortBy({ column, prop, order }) {
+      this.filter.prop = prop;
+      this.filter.order = order;
+      this.fetchBranches();
+    },
+
+    async openEditDialog(id) {
+      const { data } = await this.$axios.get(
+        `/customers/${this.$route.query.ref}/branches/${id}`
+      );
+      this.editOfficeForm = data.data;
+      this.editOfficeForm.country = data.data.country.id;
+      this.editOfficeForm.state = data.data.state.id;
+      this.editOfficeForm.city = data.data.city.id;
+      this.editOfficeForm.phones = data.data.contactInfo.phones[0];
+      this.editOfficeForm.emails = data.data.contactInfo.emails[0];
+
+      this.showEditPreview = true;
+    },
+    resetForm(formName) {
+      if (this.$refs[formName]) {
+        this.$refs[formName].resetFields();
+      }
+    },
+    submitEditBranch(formName, branchData) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+
+        this.$confirm(
+          "¿Estás seguro que deseas actualizar esta sucursal?",
+          "Confirmación",
+          {
+            confirmButtonText: "Si, actualizar",
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                const branch = () =>
+                  this.$axios.put(
+                    `/customers/${this.$route.query.ref}/branches/${branchData.id}`,
+                    {
+                      branch: {
+                        name: branchData.name,
+                        contactName: branchData.contactName,
+                        address1: branchData.address1,
+                        address2: branchData.address2,
+                        country: branchData.country,
+                        state: branchData.state,
+                        city: branchData.city,
+                        contactInfo: {
+                          phones: [branchData.phones ? branchData.phones : ""],
+                          emails: [branchData.emails ? branchData.emails : ""],
+                        },
+                      },
+                    }
+                  );
+
+                Promise.all([branch()])
+                  .then((res) => {
+                    const [branch] = res;
+
+                    this.$notify.success({
+                      title: "Exito",
+                      message: `${branch.data.message}`,
+                    });
+                    this.showEditPreview = false;
+
+                    this.fetchBranches();
+                    this.resetForm(formName);
+                  })
+                  .catch((err) => {
+                    this.$notify.error({
+                      title: "Error",
+                      message: err.response.data.message,
+                    });
+                  })
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = "Si, actualizar";
+                    localStorage.removeItem(storagekey);
+                    done();
+                  });
+              } else {
+                done();
+              }
+            },
+          }
+        );
+      });
+    },
+
+    submitNewBranches(formName, data) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+
+        this.$confirm(
+          "¿Estás seguro que deseas guardar estas sucursales?",
+          "Confirmación",
+          {
+            confirmButtonText: "Si, guardar",
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                this.$axios
+                  .post(`/customers/${this.$route.query.ref}/branches`, {
+                    branches: data.items.map((b) => {
+                      return {
+                        name: b.name,
+                        contactName: b.contactName,
+                        address1: b.address1,
+                        address2: b.address2,
+                        country: b.country,
+                        state: b.state,
+                        city: b.city,
+                        contactInfo: {
+                          phones: [b.phones ? b.phones : ""],
+                          emails: [b.emails ? b.emails : ""],
+                        },
+                      };
+                    }),
+                  })
+
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Exito",
+                      message: res.data.message,
+                    });
+                    this.fetchDocuments();
+                    this.pageloading = true;
+                  })
+                  .catch((err) => {
+                    instance.confirmButtonLoading = false;
+                    this.$notify.error({
+                      title: "Error",
+                      message: err.response.data.message,
+                    });
+                  })
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = "Si, guardar";
+                    done();
+                  });
+              } else {
+                instance.confirmButtonLoading = false;
+                done();
+              }
+            },
+          }
+        );
+      });
     },
   },
   computed: {
