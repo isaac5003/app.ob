@@ -1354,7 +1354,7 @@
         </div>
       </el-tab-pane>
 
-      <!--  tab de Integraciones  -->
+      <!-- tab de Integraciones 
       <el-tab-pane label="Integraciones" name="integraciones">
         <div class="grid grid-cols-12">
           <div class="col-span-12">
@@ -1413,7 +1413,7 @@
             </div>
           </el-form>
         </div>
-      </el-tab-pane>
+      </el-tab-pane> -->
       <!-- tab integraciones -->
       <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
         <Notification
