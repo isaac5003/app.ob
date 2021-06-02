@@ -147,10 +147,14 @@
             prop="code"
             :rules="{ required: true, message: 'Requerido', trigger: 'blur' }"
           >
-            <el-input v-model="activeAccount.code" type="number" :min="1"
-            size="small" <<<<<<< HEAD @change="setStorage('activeAccount',
-            activeAccount)" ======= :disabled="activeAccount.isParent &&
-            activeAccount.subAccounts" >>>>>>> development />
+            <el-input
+              v-model="activeAccount.code"
+              type="number"
+              :min="1"
+              size="small"
+              @change="setStorage('activeAccount', activeAccount)"
+              :disabled="activeAccount.isParent && activeAccount.subAccounts"
+            />
           </el-form-item>
           <el-form-item
             class="col-span-6"
@@ -903,8 +907,8 @@
               "
               :disabled="
                 !firmantesForm.legal ||
-                !firmantesForm.accountant ||
-                !firmantesForm.auditor
+                  !firmantesForm.accountant ||
+                  !firmantesForm.auditor
               "
               >Guardar</el-button
             >
@@ -1349,9 +1353,8 @@
           <el-button size="small" @click="cancel()">Cancelar</el-button>
         </div>
       </el-tab-pane>
-      <<<<<<< HEAD =======
 
-      <!--  tab de Integraciones  -->
+      <!-- tab de Integraciones 
       <el-tab-pane label="Integraciones" name="integraciones">
         <div class="grid grid-cols-12">
           <div class="col-span-12">
@@ -1410,7 +1413,7 @@
             </div>
           </el-form>
         </div>
-      </el-tab-pane>
+      </el-tab-pane> -->
       <!-- tab integraciones -->
       <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
         <Notification
@@ -1453,7 +1456,6 @@
           </el-tab-pane>
         </el-tabs>
       </el-tab-pane> -->
-      >>>>>>> development
     </el-tabs>
   </layout-content>
 </template>
