@@ -419,7 +419,12 @@ function hasModule(module, user) {
     (a) => a.id == user.workspace.company.id
   );
   const branch = company.branches.find((b) => b.id == user.workspace.branch.id);
-  return branch.modules.map((m) => m.id).includes(module);
+  const modules = branch.modules.map((m) => m.id);
+  if (Array.isArray(module)) {
+    return modules.map(m => module.includes(m)).every(m => m)
+  } else {
+    return modules.includes(module);
+  }
 }
 
 const getHeader = (name, nit, nrc, lastDay, docName, dateType = 'date', preTitle = null, postTitle = null) => {
