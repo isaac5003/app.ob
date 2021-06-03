@@ -164,7 +164,11 @@
         </el-form>
       </div>
 
-      <div class="col-span-8 min-h-4/5">
+      <div
+        class="col-span-8 min-h-4/5"
+        v-loading="loading"
+        element-loading-text="Cargando..."
+      >
         <iframe class="w-full h-full" id="iframe" src=""></iframe>
       </div>
     </div>
@@ -188,6 +192,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       generating: false,
       pageLoading: false,
       errorMessage: "",
@@ -261,6 +266,7 @@ export default {
         }
 
         this.generating = true;
+        this.loading = true;
         switch (reportType) {
           case "balanceAnual":
             this.balanceAnual(radio, preview);
@@ -528,6 +534,7 @@ export default {
             };
             this.generating = false;
             this.generatePDF(docDefinition, preview);
+            this.loading = false;
           });
           break;
         case "excel":
@@ -588,6 +595,7 @@ export default {
             XLSX.utils.book_append_sheet(workbook, sheet, fileName);
             XLSX.writeFile(workbook, `${fileName}.xlsx`);
             this.generating = false;
+            this.loading = false;
           });
           break;
       }
@@ -826,6 +834,7 @@ export default {
                 };
                 this.generating = false;
                 this.generatePDF(docDefinition, preview);
+                this.loading = false;
               });
           });
           break;
@@ -898,6 +907,7 @@ export default {
                 XLSX.utils.book_append_sheet(workbook, sheet, fileName);
                 XLSX.writeFile(workbook, `${fileName}.xlsx`);
                 this.generating = false;
+                this.loading = false;
               });
           });
           break;
@@ -1111,6 +1121,7 @@ export default {
             };
             this.generating = false;
             this.generatePDF(docDefinition, preview);
+            this.loading = false;
           });
           break;
         case "excel":
@@ -1188,6 +1199,7 @@ export default {
             XLSX.utils.book_append_sheet(workbook, sheet, fileName);
             XLSX.writeFile(workbook, `${fileName}.xlsx`);
             this.generating = false;
+            this.loading = false;
           });
           break;
       }
@@ -1512,6 +1524,7 @@ export default {
             };
             this.generating = false;
             this.generatePDF(docDefinition, preview);
+            this.loading = false;
           });
           break;
         case "excel":
@@ -1595,6 +1608,7 @@ export default {
             XLSX.utils.book_append_sheet(workbook, sheet, fileName);
             XLSX.writeFile(workbook, `${fileName}.xlsx`);
             this.generating = false;
+            this.loading = false;
           });
 
           break;
@@ -1750,10 +1764,7 @@ export default {
 
                 const docDefinition = {
                   info: {
-                    title: `balance_general_${this.$dateFns.format(
-                      new Date(periodStart),
-                      "yyyyMMdd"
-                    )}`,
+                    title: reportTitleName,
                   },
                   pageSize: "LETTER",
                   pageOrientation: "landscape",
@@ -1932,8 +1943,10 @@ export default {
                 };
                 this.generating = false;
                 this.generatePDF(docDefinition, preview);
+                this.loading = false;
               });
           });
+
           break;
         case "excel":
           Promise.all([settingsGeneral()]).then((res) => {
@@ -2021,13 +2034,11 @@ export default {
 
                 const sheet = XLSX.utils.aoa_to_sheet(document);
                 const workbook = XLSX.utils.book_new();
-                const fileName = `balance_general_al_${this.$dateFns.format(
-                  new Date(periodStart),
-                  "yyyyMMdd"
-                )}`;
+                const fileName = "balance_general_anual";
                 XLSX.utils.book_append_sheet(workbook, sheet, fileName);
                 XLSX.writeFile(workbook, `${fileName}.xlsx`);
                 this.generating = false;
+                this.loading = false;
               });
           });
           break;
@@ -2108,6 +2119,7 @@ export default {
             };
             this.generating = false;
             this.generatePDF(docDefinition, preview);
+            this.loading = false;
           });
           break;
         case "excel":
@@ -2138,6 +2150,7 @@ export default {
             XLSX.utils.book_append_sheet(workbook, sheet, fileName);
             XLSX.writeFile(workbook, `${fileName}.xlsx`);
             this.generating = false;
+            this.loading = false;
           });
           break;
       }
@@ -2319,6 +2332,7 @@ export default {
             };
             this.generating = false;
             this.generatePDF(docDefinition, preview);
+            this.loading = false;
           });
           break;
         case "excel":
@@ -2383,6 +2397,7 @@ export default {
             XLSX.utils.book_append_sheet(workbook, sheet, fileName);
             XLSX.writeFile(workbook, `${fileName}.xlsx`);
             this.generating = false;
+            this.loading = false;
           });
           break;
       }
@@ -2567,6 +2582,7 @@ export default {
             };
             this.generating = false;
             this.generatePDF(docDefinition, preview);
+            this.loading = false;
           });
           break;
         case "excel":
@@ -2638,6 +2654,7 @@ export default {
             XLSX.utils.book_append_sheet(workbook, sheet, fileName);
             XLSX.writeFile(workbook, `${fileName}.xlsx`);
             this.generating = false;
+            this.loading = false;
           });
           break;
       }
@@ -2831,8 +2848,8 @@ export default {
               },
             };
             this.generating = false;
-
             this.generatePDF(docDefinition, preview);
+            this.loading = false;
           });
 
           break;
@@ -2908,6 +2925,7 @@ export default {
             XLSX.utils.book_append_sheet(workbook, sheet, fileName);
             XLSX.writeFile(workbook, `${fileName}.xlsx`);
             this.generating = false;
+            this.loading = false;
           });
           break;
       }
@@ -2947,6 +2965,7 @@ export default {
       }
     },
     generateRangeAccount(dateRanges, accounts) {
+      this.loading = true;
       if (dateRanges.length > 0 && accounts.length > 0) {
         this.generateDetalleCuentas(dateRanges, "pdf", true);
       }

@@ -911,8 +911,8 @@
               "
               :disabled="
                 !firmantesForm.legal ||
-                  !firmantesForm.accountant ||
-                  !firmantesForm.auditor
+                !firmantesForm.accountant ||
+                !firmantesForm.auditor
               "
               >Guardar</el-button
             >
@@ -2171,9 +2171,17 @@ export default {
       let addTo = this.tableData.find((td) => {
         return td.children.find((c) => c.id == selected.id);
       });
+
       addTo = addTo.children.find((c) => c.id == selected.id);
       for (const code of list) {
         const account = this.catalogs.find((c) => c.id == code);
+        if (addTo.children.filter((c) => c.id == account.code).length > 0) {
+          this.$notify.error({
+            title: "Error",
+            message: "No se puede agregar una cuenta que ya existe.",
+          });
+          return false;
+        }
         addTo.children.push({
           id: account.code,
           name: account.name,
@@ -2247,7 +2255,7 @@ export default {
       this.$axios
         .get("/entries/setting/balance-general")
         .then((res) => {
-          this.tableData = balance.data.balanceGeneral.report;
+          this.tableData = res.data.data.balanceGeneral.report;
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
