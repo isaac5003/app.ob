@@ -153,6 +153,7 @@
               :min="1"
               size="small"
               @change="setStorage('activeAccount', activeAccount)"
+              :disabled="activeAccount.isParent && activeAccount.subAccounts"
             />
           </el-form-item>
           <el-form-item
@@ -372,7 +373,7 @@
     <!-- editar cuenta contable -->
     <el-dialog
       :id="activeAccount != null ? activeAccount.code : ''"
-      title="Editar cuenta contable"
+      title="Editar cuenta contable 2"
       :visible.sync="showEditAccount"
       :append-to-body="true"
       :close-on-click-modal="false"
@@ -516,7 +517,7 @@
     <!-- BALANCE General
     ADDaccount -->
     <el-dialog
-      :title="`Agregar cuenta a: ${selectedParentAccount.name}`"
+      :title="`Agregar cuenta a1: ${selectedParentAccount.name}`"
       :visible.sync="showAddAccount"
       width="500px"
       :append-to-body="true"
@@ -656,7 +657,7 @@
     </el-dialog>
     <!-- Estadoderesultados -->
     <el-dialog
-      :title="`Agregar cuenta a: ${selectedParentAccountEstado.name}`"
+      :title="`Agregar cuenta a2: ${selectedParentAccountEstado.name}`"
       :visible.sync="showAddAccountEstado"
       width="500px"
       :append-to-body="true"
@@ -1360,6 +1361,67 @@
             >Guardar</el-button
           >
           <el-button size="small">Cancelar</el-button>
+        </div>
+      </el-tab-pane>
+
+      <!-- tab de Integraciones  -->
+      <el-tab-pane label="Integraciones" name="integraciones">
+        <div class="grid grid-cols-12">
+          <div class="col-span-12">
+            <Notification class="mb-4 w-full" type="info" title="Información" />
+          </div>
+        </div>
+
+        <div class="flex flex-col space-y-2">
+          <el-form>
+            <div class="grid grid-cols-12 gap-4">
+              <el-form-item
+                label="Cuenta contable para pagos de contado"
+                class="col-span-4"
+              >
+                <el-select
+                  class="w-full"
+                  size="small"
+                  clearable
+                  filterable
+                ></el-select>
+              </el-form-item>
+              <el-form-item
+                prop=""
+                label="Tipo de integración contable"
+                class="col-span-5"
+              >
+                <el-radio-group class="w-full">
+                  <el-row :gutter="15">
+                    <el-col :span="8">
+                      <el-radio
+                        border
+                        label="Automatico"
+                        size="small"
+                        class="w-full"
+                        >Automático</el-radio
+                      >
+                    </el-col>
+                    <el-col :span="8">
+                      <el-radio
+                        border
+                        label="Manual"
+                        size="small"
+                        class="w-full"
+                        >Manual</el-radio
+                      >
+                    </el-col>
+                  </el-row>
+                </el-radio-group>
+              </el-form-item>
+            </div>
+            <div class="flex justify-end">
+              <el-button type="primary" size="small">Guardar</el-button>
+              <el-button size="small" @click="$router.push('/entries')"
+                >Cancelar</el-button
+              >
+            </div>
+          </el-form>
         </div>
       </el-tab-pane>
     </el-tabs>
