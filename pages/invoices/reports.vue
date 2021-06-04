@@ -680,6 +680,7 @@ export default {
             const [report] = res;
             const { name, nit, nrc } = report.data.company;
             const general = report.data.invoices;
+            const titleName = report.data.name;
 
             const values = [];
             const emptyRow = [{}, {}, {}, {}, {}, {}, {}, {}, {}];
@@ -792,13 +793,7 @@ export default {
 
             const docDefinition = {
               info: {
-                title: `detallesdocs_${this.$dateFns.format(
-                  new Date(startDate),
-                  "yyyyMMdd"
-                )}_detallesdocs_${this.$dateFns.format(
-                  new Date(endDate),
-                  "yyyyMMdd"
-                )}`,
+                title: titleName,
               },
               pageSize: "LETTER",
               pageOrientation: "landscape",
@@ -997,6 +992,7 @@ export default {
             const [report] = res;
             const { name, nit, nrc } = report.data.company;
             const general = report.data.invoices;
+            const titleName = report.data.name;
 
             const values = [];
             const emptyRow = [{}, {}, {}, {}, {}];
@@ -1033,13 +1029,7 @@ export default {
 
             const docDefinition = {
               info: {
-                title: `detallesdocs_${this.$dateFns.format(
-                  new Date(startDate),
-                  "yyyyMMdd"
-                )}_detallesdocs_${this.$dateFns.format(
-                  new Date(endDate),
-                  "yyyyMMdd"
-                )}`,
+                title: titleName,
               },
               pageSize: "LETTER",
               pageOrientation: "landscape",
