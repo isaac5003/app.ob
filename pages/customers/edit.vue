@@ -9,6 +9,7 @@
   >
     <el-form
       :model="customersEditForm"
+      :rules="customersEditFormRuler"
       status-icon
       ref="customersEditForm"
       @submit.native.prevent="
@@ -552,6 +553,19 @@ export default {
         state: "",
         city: "",
         accountingCatalog: "",
+      },
+      customersEditFormRuler: {
+        name: inputValidation(true, 5, 100),
+        shortName: inputValidation(true, 3, 15),
+        address1: inputValidation(true, 5, 150),
+        giro: inputValidation(true, 5, 150),
+        nit: inputValidation(true, 5, 150),
+        country: selectValidation(true),
+        state: selectValidation(true),
+        city: selectValidation(true),
+        customerType: selectValidation(true),
+        customerTypeNatural: selectValidation(true),
+        customerTaxerType: selectValidation(true),
       },
       customer: null,
       filteredCatalog: [],
