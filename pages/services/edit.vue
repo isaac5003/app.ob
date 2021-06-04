@@ -172,7 +172,7 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import {hasModule} from  "../../tools/index.js"
+import {hasModule, parseErrors} from  "../../tools/index.js"
 import {
   checkBeforeEnter,
   checkBeforeLeave,
@@ -218,9 +218,13 @@ export default {
         );
         this.pageloading = false;
       })
-      .catch((err) => {
-        this.errorMessage = err.response.data.message;
-      })
+    .catch((err) => {
+                    this.$notify.error({
+                      title: "Error",
+                      dangerouslyUseHTMLString: true,
+                      message:parseErrors(err.response.data.message),
+                    });
+                  })
       .then((alw) => (this.pageloading = false));
     checkBeforeEnter(this, storagekey, "servicesNewForm");
   },
@@ -263,7 +267,14 @@ export default {
             this.filteredCatalog = res.data.data;
             this.loadingAccount = false;
           })
-          .catch((err) => (this.errorMessage = err.response.data.message));
+         .catch((err) => {
+                  
+                    this.$notify.error({
+                      title: "Error",
+                      dangerouslyUseHTMLString: true,
+                      message:parseErrors(err.response.data.message),
+                    });
+                  });
       } else {
         this.filteredCatalog = [];
       }
@@ -327,7 +338,8 @@ export default {
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message:parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
