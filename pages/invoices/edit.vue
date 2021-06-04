@@ -274,7 +274,12 @@
       :rules="salesEditFormRules"
       status-icon
       @submit.prevent.native="
-        saveUpdateInvoice('salesEditForm', salesEditForm, details)
+        saveUpdateInvoice(
+          'salesEditForm',
+          salesEditForm,
+          details,
+          paymentConditions
+        )
       "
       ref="salesEditForm"
     >
@@ -555,7 +560,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 1 &&
-                      salesEditForm.documentType != 3
+                        salesEditForm.documentType != 3
                     "
                     >{{
                       calcSujeta(salesEditForm.documentType, scope.row)
@@ -574,7 +579,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 2 &&
-                      salesEditForm.documentType != 3
+                        salesEditForm.documentType != 3
                     "
                     >{{
                       calcExenta(salesEditForm.documentType, scope.row)
@@ -593,7 +598,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 3 ||
-                      salesEditForm.documentType == 3
+                        salesEditForm.documentType == 3
                     "
                     >{{
                       calcGravada(salesEditForm.documentType, scope.row)
@@ -610,14 +615,12 @@
                       @click="openEditDetail(scope.$index, scope.row)"
                       size="small"
                       icon="el-icon-edit"
-                      circle
                     ></el-button>
                     <el-button
                       type="danger"
                       @click="deleteDetail(scope.$index)"
                       size="small"
                       icon="el-icon-delete"
-                      circle
                     ></el-button>
                   </div>
                 </template>
@@ -714,12 +717,11 @@ export default {
     this.$axios
       .get(`/invoices/${this.$route.query.ref}`)
       .then(({ data }) => {
-        const customer = () =>
-          this.$axios.get(`/customers`, {
-            params: { isActiveCustomer: true },
-          });
+        const customer = () => this.$axios.get(`/customers`);
         const branches = () =>
-          this.$axios.get(`/customers/${data.invoice.customer.id}/branches`);
+          data.data.customer
+            ? this.$axios.get(`/customers/${data.data.customer.id}/branches`)
+            : null;
         const sellers = () =>
           this.$axios.get("/invoices/sellers", {
             params: { active: true },
@@ -744,28 +746,36 @@ export default {
               documentTypes,
               branches,
             ] = res;
-
-            this.customers = customer.data.customers;
-            this.documents = documentTypes.data.documentTypes;
-            this.sellers = sellers.data.sellers;
-            this.paymentConditions = paymentConditions.data.paymentConditions;
-            this.branches = branches.data.branches;
+            this.customers = customer.data.data;
+            this.documents = documentTypes.data.data;
+            this.sellers = sellers.data.data;
+            this.paymentConditions = paymentConditions.data.data;
+            this.branches = branches ? branches.data.data : [];
             this.salesEditForm = {
-              ...data.invoice,
-              customer: data.invoice.customer.id,
-              customerBranch: data.invoice.customerBranch.id,
-              invoicesPaymentsConditions:
-                data.invoice.invoicesPaymentsCondition.id,
-              invoicesSellers: data.invoice.invoicesSeller.id,
-              documentType: data.invoice.documentType.id,
+              ...data.data,
+              invoiceRawDate: data.data.invoiceRawDate
+                ? data.data.invoiceRawDate
+                : "",
+              customer: data.data.customer ? data.data.customer.id : "",
+              customerBranch: data.data.customerBranch
+                ? data.data.customerBranch.id
+                : "",
+              invoicesPaymentsCondition: data.data.invoicesPaymentsCondition
+                ? data.data.invoicesPaymentsCondition.id
+                : null,
+              invoicesSellers: data.data.invoicesSeller
+                ? data.data.invoicesSeller.id
+                : null,
+              documentType: data.data.documentType.id,
             };
-
             this.tributary = {
-              customerNrc: data.invoice.customerNrc,
-              customerNit: data.invoice.customerNit,
-              customerGiro: data.invoice.customerGiro,
+              customerNrc: data.data.customerNrc ? data.data.customerNrc : "",
+              customerNit: data.data.customerNit ? data.data.customerNit : "",
+              customerGiro: data.data.customerGiro
+                ? data.data.customerGiro
+                : "",
             };
-            this.details = data.invoice.details.map((de) => {
+            this.details = data.data.details.map((de) => {
               return {
                 ...de,
 
@@ -775,9 +785,15 @@ export default {
               };
             });
             this.branch = {
-              address1: data.invoice.customerAddress1,
-              state: { name: data.invoice.customerState },
-              city: { name: data.invoice.customerCity },
+              address1: data.data.customerAddress1
+                ? data.data.customerAddress1
+                : "",
+              state: {
+                name: data.data.customerState ? data.data.customerState : "",
+              },
+              city: {
+                name: data.data.customerCity ? data.data.customerCity : "",
+              },
             };
 
             this.loading = false;
@@ -787,6 +803,7 @@ export default {
           });
       })
       .catch((err) => {
+        console.error(err);
         this.errorMessage = err.response.data.message;
       });
 
@@ -897,7 +914,7 @@ export default {
       this.$axios
         .get("/services", { params: { active: true } })
         .then((res) => {
-          this.services = res.data.services;
+          this.services = res.data.data;
           switch (type) {
             case "new":
               this.showAddService = true;
@@ -949,21 +966,21 @@ export default {
         Promise.all([branches(), tributary()])
           .then((res) => {
             const [branches, tributary] = res;
-            this.branches = branches.data.branches;
+            this.branches = branches.data.data;
 
             this.branch = {};
             this.tributary = {
               ...tributary.data.customer,
-              customerGiro: tributary.data.customer.giro,
-              customerNrc: tributary.data.customer.nrc,
-              customerNit: tributary.data.customer.nit,
+              customerGiro: tributary.data.data.giro,
+              customerNrc: tributary.data.data.nrc,
+              customerNit: tributary.data.data.nit,
             };
             this.loading = false;
             this.validateDocumentType(
               this.salesEditForm.documentType,
               this.tributary
             );
-            this.salesEditForm.customerBranch = branches.data.branches.find(
+            this.salesEditForm.customerBranch = branches.data.data.find(
               (b) => b.default
             ).id;
             this.selectBranch(this.salesEditForm.customerBranch, this.branches);
@@ -1074,28 +1091,31 @@ export default {
                       authorization: formData.authorization,
                       sequence: formData.sequence,
                       invoiceDate: formData.invoiceRawDate,
-
                       customer: formData.customer,
                       customerBranch: formData.customerBranch,
                       invoicesPaymentsCondition:
-                        formData.invoicesPaymentsCondition.id,
+                        formData.invoicesPaymentsCondition,
                       invoicesSeller: formData.invoicesSellers,
                       sum:
-                        formData.documentType == 1 ? this.sumasCF : this.sumas,
-                      iva: this.taxes,
-                      subtotal: this.subtotal,
-                      ivaRetenido: this.ivaRetenido,
-                      ventasExentas: this.ventasExentas,
-                      ventasNoSujetas: this.ventasNoSujetas,
-                      ventaTotal: this.ventaTotal,
+                        formData.documentType == 1
+                          ? this.sumasCF.toFixed(2)
+                          : this.sumas.toFixed(2),
+                      iva: this.taxes.toFixed(2),
+                      subtotal: this.subtotal.toFixed(2),
+                      ivaRetenido: this.ivaRetenido.toFixed(2),
+                      ventasExentas: this.ventasExentas.toFixed(2),
+                      ventasNoSujetas: this.ventasNoSujetas.toFixed(2),
+                      ventaTotal: this.ventaTotal.toFixed(2),
+                      status:
+                        formData.status.id == "4" ? "1" : formData.status.id,
                     },
                     details: details.map((d) => {
                       return {
                         chargeDescription: d.chargeDescription,
-                        quantity: d.quantity,
-                        unitPrice: d.unitPrice,
+                        quantity: d.quantity.toFixed(2),
+                        unitPrice: d.unitPrice.toFixed(2),
                         incTax: d.incTax,
-                        ventaPrice: d.ventaPrice,
+                        ventaPrice: d.ventaPrice.toFixed(2),
                         service: d.service,
                         sellingType: d.sellingType,
                       };

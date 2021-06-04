@@ -1,25 +1,25 @@
 <template>
   <layout-content
     v-loading="pageloading"
-    page-title="Nuevo cliente"
+    page-title="Nuevo proveedor"
     :breadcrumb="[
-      { name: 'Clientes', to: '/customers' },
-      { name: 'Nuevo cliente', to: null },
+      { name: 'Proveedores', to: '/providers' },
+      { name: 'Nuevo proveedor', to: null },
     ]"
   >
     <el-form
-      :model="customersNewForm"
-      :rules="customersNewFormRules"
+      :model="providerNewForm"
+      :rules="providerNewFormRules"
       status-icon
-      ref="customersNewForm"
+      ref="providerNewForm"
       @submit.native.prevent="
-        submitNewCustomer('customersNewForm', customersNewForm)
+        submitNewProvider('providerNewForm', providerNewForm)
       "
       class="flex flex-col"
     >
       <div class="flex flex-col">
         <div class="flex flex-col space-y-2">
-          <span class="text-sm font-semibold">Información general</span>
+          <span class="text-sm font-semibold">Informacion general</span>
           <div class="flex flex-col">
             <div class="grid grid-cols-12 gap-4">
               <el-form-item
@@ -30,13 +30,13 @@
                 <el-input
                   clearable
                   type="text"
-                  v-model="customersNewForm.name"
+                  v-model="providerNewForm.name"
                   size="small"
                   autocomplete="off"
                   maxlength="100"
                   minlength="5"
                   show-word-limit
-                  @change="setStorage(customersNewForm)"
+                  @change="setStorage(providerNewForm)"
                 />
               </el-form-item>
               <el-form-item
@@ -47,25 +47,25 @@
                 <el-input
                   clearable
                   type="text"
-                  v-model="customersNewForm.shortName"
+                  v-model="providerNewForm.shortName"
                   size="small"
                   autocomplete="off"
                   maxlength="15"
                   minlength="3"
                   show-word-limit
-                  @change="setStorage(customersNewForm)"
+                  @change="setStorage(providerNewForm)"
                 />
               </el-form-item>
               <el-form-item
                 label="Es tambien proveedor"
-                prop="isProvider"
+                prop="isCustomer"
                 class="col-span-2"
                 v-if="false"
               >
                 <el-radio-group
-                  v-model="customersNewForm.isProvider"
+                  v-model="providerNewForm.isCustomer"
                   class="w-full"
-                  @change="setStorage(customersNewForm)"
+                  @change="setStorage(providerNewForm)"
                 >
                   <el-radio :label="true">Si</el-radio>
                   <el-radio :label="false">No</el-radio>
@@ -81,13 +81,13 @@
                 <el-input
                   clearable
                   type="text"
-                  v-model="customersNewForm.address1"
+                  v-model="providerNewForm.address1"
                   size="small"
                   autocomplete="off"
                   maxlength="150"
                   minlength="5"
                   show-word-limit
-                  @change="setStorage(customersNewForm)"
+                  @change="setStorage(providerNewForm)"
                 />
               </el-form-item>
               <el-form-item
@@ -98,13 +98,13 @@
                 <el-input
                   clearable
                   type="text"
-                  v-model="customersNewForm.address2"
+                  v-model="providerNewForm.address2"
                   size="small"
                   autocomplete="off"
                   maxlength="150"
                   minlength="5"
                   show-word-limit
-                  @change="setStorage(customersNewForm)"
+                  @change="setStorage(providerNewForm)"
                 />
               </el-form-item>
             </div>
@@ -112,7 +112,7 @@
               <el-form-item label="País" prop="country" class="col-span-4">
                 <el-select
                   class="w-full"
-                  v-model="customersNewForm.country"
+                  v-model="providerNewForm.country"
                   size="small"
                   placeholder="Seleccionar país"
                   filterable
@@ -135,7 +135,7 @@
               >
                 <el-select
                   class="w-full"
-                  v-model="customersNewForm.state"
+                  v-model="providerNewForm.state"
                   size="small"
                   placeholder="Seleccionar departamento"
                   filterable
@@ -154,13 +154,13 @@
               <el-form-item label="Municipio" prop="city" class="col-span-4">
                 <el-select
                   class="w-full"
-                  v-model="customersNewForm.city"
+                  v-model="providerNewForm.city"
                   size="small"
                   placeholder="Seleccionar municipio"
                   filterable
                   clearable
                   default-first-option
-                  @change="setStorage(customersNewForm)"
+                  @change="setStorage(providerNewForm)"
                 >
                   <el-option
                     v-for="city in cities"
@@ -177,13 +177,13 @@
                   <el-input
                     clearable
                     type="text"
-                    v-model="customersNewForm.contactName"
+                    v-model="providerNewForm.contactName"
                     size="small"
                     autocomplete="off"
                     maxlength="50"
                     minlength="5"
                     show-word-limit
-                    @change="setStorage(customersNewForm)"
+                    @change="setStorage(providerNewForm)"
                   />
                 </el-form-item>
               </div>
@@ -192,12 +192,12 @@
                   <el-input
                     clearable
                     type="text"
-                    v-model="customersNewForm.phone"
+                    v-model="providerNewForm.phone"
                     size="small"
                     autocomplete="off"
                     placeholder="####-####"
                     v-mask="'####-####'"
-                    @change="setStorage(customersNewForm)"
+                    @change="setStorage(providerNewForm)"
                   />
                 </el-form-item>
               </div>
@@ -206,10 +206,10 @@
                   <el-input
                     clearable
                     type="text"
-                    v-model="customersNewForm.email"
+                    v-model="providerNewForm.email"
                     size="small"
                     autocomplete="off"
-                    @change="setStorage(customersNewForm)"
+                    @change="setStorage(providerNewForm)"
                   />
                 </el-form-item>
               </div>
@@ -217,7 +217,7 @@
           </div>
         </div>
         <div class="flex flex-col space-y-2">
-          <span class="text-sm font-semibold">Información tributaria</span>
+          <span class="text-sm font-semibold">Informacion tributaria</span>
           <div class="flex flex-col">
             <div class="grid grid-cols-12 gap-4">
               <el-form-item
@@ -227,13 +227,13 @@
               >
                 <el-select
                   class="w-full"
-                  v-model="customersNewForm.customerType"
+                  v-model="providerNewForm.customerType"
                   size="small"
                   placeholder="Seleccionar tipo de cliente"
                   filterable
                   clearable
                   default-first-option
-                  @change="setStorage(customersNewForm)"
+                  @change="setStorage(providerNewForm)"
                 >
                   <el-option
                     v-for="ct in customerTypes"
@@ -247,17 +247,17 @@
                 label="Tipo de persona natural"
                 prop="customerTypeNatural"
                 class="col-span-4"
-                v-if="customersNewForm.customerType == 2"
+                v-if="providerNewForm.customerType == 2"
               >
                 <el-select
                   class="w-full"
-                  v-model="customersNewForm.customerTypeNatural"
+                  v-model="providerNewForm.customerTypeNatural"
                   size="small"
                   placeholder="Seleccionar tipo de persona natural"
                   filterable
                   clearable
                   default-first-option
-                  @change="setStorage(customersNewForm)"
+                  @change="setStorage(providerNewForm)"
                 >
                   <el-option
                     v-for="ct in customerTypeNaturals"
@@ -269,16 +269,16 @@
               </el-form-item>
             </div>
             <div class="grid grid-cols-12 gap-4">
-              <div class="col-span-4" v-if="customersNewForm.customerType == 2">
+              <div class="col-span-4" v-if="providerNewForm.customerType == 2">
                 <el-form-item label="DUI" prop="dui">
                   <el-input
                     type="text"
-                    v-model="customersNewForm.dui"
+                    v-model="providerNewForm.dui"
                     size="small"
                     autocomplete="off"
                     placeholder="########-#"
                     v-mask="'########-#'"
-                    @change="setStorage(customersNewForm)"
+                    @change="setStorage(providerNewForm)"
                   />
                 </el-form-item>
               </div>
@@ -286,29 +286,29 @@
                 <el-form-item label="NIT" prop="nit">
                   <el-input
                     type="text"
-                    v-model="customersNewForm.nit"
+                    v-model="providerNewForm.nit"
                     size="small"
                     autocomplete="off"
                     placeholder="####-######-###-#"
                     v-mask="'####-######-###-#'"
-                    @change="setStorage(customersNewForm)"
+                    @change="setStorage(providerNewForm)"
                   />
                 </el-form-item>
               </div>
               <div
                 class="col-span-2"
                 v-if="
-                  customersNewForm.customerType == 1 ||
-                    customersNewForm.customerTypeNatural == 2
+                  providerNewForm.customerType == 1 ||
+                    providerNewForm.customerTypeNatural == 2
                 "
               >
                 <el-form-item label="NRC" prop="nrc">
                   <el-input
                     type="text"
-                    v-model="customersNewForm.nrc"
+                    v-model="providerNewForm.nrc"
                     size="small"
                     autocomplete="off"
-                    @change="setStorage(customersNewForm)"
+                    @change="setStorage(providerNewForm)"
                   />
                 </el-form-item>
               </div>
@@ -316,8 +316,8 @@
             <div
               class="grid grid-cols-12 gap-4"
               v-if="
-                customersNewForm.customerType == 1 ||
-                  customersNewForm.customerTypeNatural == 2
+                providerNewForm.customerType == 1 ||
+                  providerNewForm.customerTypeNatural == 2
               "
             >
               <div class="col-span-4">
@@ -327,13 +327,13 @@
                 >
                   <el-select
                     class="w-full"
-                    v-model="customersNewForm.customerTaxerType"
+                    v-model="providerNewForm.customerTaxerType"
                     size="small"
                     placeholder="Seleccionar tipo de contribuyente"
                     filterable
                     clearable
                     default-first-option
-                    @change="setStorage(customersNewForm)"
+                    @change="setStorage(providerNewForm)"
                   >
                     <el-option
                       v-for="ct in customerTaxerTypes"
@@ -348,13 +348,13 @@
                 <el-form-item label="Giro" prop="giro">
                   <el-input
                     type="text"
-                    v-model="customersNewForm.giro"
+                    v-model="providerNewForm.giro"
                     size="small"
                     autocomplete="off"
                     maxlength="150"
                     minlength="5"
                     show-word-limit
-                    @change="setStorage(customersNewForm)"
+                    @change="setStorage(providerNewForm)"
                   />
                 </el-form-item>
               </div>
@@ -366,7 +366,7 @@
         <el-button type="primary" size="small" native-type="submit"
           >Guardar</el-button
         >
-        <el-button size="small" @click="$router.push('/customers')"
+        <el-button size="small" @click="$router.push('/providers')"
           >Cancelar</el-button
         >
       </div>
@@ -384,17 +384,14 @@ import {
 } from "../../tools";
 import Notification from "../../components/Notification";
 
-const storagekey = "new-customer";
+const storagekey = "new-provider";
 
 export default {
-  name: "CustomerNew",
+  name: "ProviderNew",
   head: {
-    titleTemplate: `%s | Nuevo cliente`,
+    titleTemplate: `%s | Nuevo provider`,
   },
-  components: {
-    LayoutContent,
-    Notification,
-  },
+  components: { LayoutContent, Notification },
   fetch() {
     const customerTypes = () => this.$axios.get(`/customers/types`);
     const customerTypeNaturals = () =>
@@ -450,10 +447,10 @@ export default {
       customerTypes: [],
       customerTypeNaturals: [],
       customerTaxerTypes: [],
-      customersNewForm: {
+      providerNewForm: {
         name: "",
         shortName: "",
-        isProvider: false,
+        isCustomer: false,
         dui: null,
         nit: "",
         nrc: "",
@@ -470,10 +467,10 @@ export default {
         state: "",
         city: "",
       },
-      customersNewFormRules: {
+      providerNewFormRules: {
         name: inputValidation(true, 5, 100),
         shortName: inputValidation(true, 3, 15),
-        isProvider: false,
+        isCustomer: false,
         address1: inputValidation(true, 5, 150),
         address2: inputValidation(false, 5, 150),
         country: selectValidation(true),
@@ -492,29 +489,29 @@ export default {
     };
   },
   methods: {
-    setStorage(customersNewForm) {
-      localStorage.setItem(storagekey, JSON.stringify(customersNewForm));
+    setStorage(providerNewForm) {
+      localStorage.setItem(storagekey, JSON.stringify(providerNewForm));
     },
     clearSelect(name) {
       switch (name) {
         case "state":
-          this.customersNewForm.state = "";
-          this.customersNewForm.city = "";
+          this.providerNewForm.state = "";
+          this.providerNewForm.city = "";
           break;
         case "city":
-          this.customersNewForm.city = "";
+          this.providerNewForm.city = "";
           break;
       }
-      this.setStorage(this.customersNewForm);
+      this.setStorage(this.providerNewForm);
     },
-    submitNewCustomer(formName, formData) {
+    submitNewProvider(formName, formData) {
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
         }
 
         this.$confirm(
-          "¿Estás seguro que deseas guardar este nuevo cliente?",
+          "¿Estás seguro que deseas guardar este nuevo proveedor?",
           "Confirmación",
           {
             confirmButtonText: "Si, guardar",
@@ -525,10 +522,10 @@ export default {
                 instance.confirmButtonLoading = true;
                 instance.confirmButtonText = "Procesando...";
                 this.$axios
-                  .post("/customers", {
+                  .post("/providers", {
                     name: formData.name,
                     shortName: formData.shortName,
-                    isProvider: formData.isProvider,
+                    isCustomer: formData.isCustomer,
                     dui: formData.dui,
                     nit: formData.nit,
                     nrc: formData.nrc,
@@ -548,8 +545,8 @@ export default {
                     branch: {
                       contactName: formData.contactName,
                       contactInfo: {
-                        phones: [formData.phone],
-                        emails: [formData.email],
+                        phones: [formData.phone ? formData.phone : ""],
+                        emails: [formData.email ? formData.email : ""],
                       },
                       address1: formData.address1,
                       address2: formData.address2,
@@ -566,7 +563,7 @@ export default {
                     localStorage.removeItem(storagekey);
                     setTimeout(() => {
                       this.$confirm(
-                        "¿Deseas crear un nuevo cliente?",
+                        "¿Deseas crear un nuevo proveedor?",
                         "Confirmación",
                         {
                           confirmButtonText: "Si, porfavor",
@@ -580,7 +577,7 @@ export default {
                           this.$refs[formName].resetFields();
                         })
                         .catch(() => {
-                          this.$router.push("/customers");
+                          this.$router.push("/providers");
                         });
                     }, 500);
                   })
@@ -607,12 +604,12 @@ export default {
   computed: {
     states() {
       return this.rawStates.filter(
-        (s) => s.country.id == this.customersNewForm.country
+        (s) => s.country.id == this.providerNewForm.country
       );
     },
     cities() {
       return this.rawCities.filter(
-        (c) => c.state.id == this.customersNewForm.state
+        (c) => c.state.id == this.providerNewForm.state
       );
     },
   },

@@ -1,13 +1,13 @@
 <template>
   <layout-content
-    v-loading="loading"
+    v-loading=""
     page-title="Reportes"
     :breadcrumb="[
-      { name: 'Clientes', to: '/customers' },
+      { name: 'Provedores', to: '/providers/reports' },
       { name: 'Reportes', to: null },
     ]"
   >
-    <div class="flex justify-center" v-if="errorMessage">
+      <div class="flex justify-center" v-if="errorMessage">
       <Notification
         class="w-1/2"
         type="danger"
@@ -76,11 +76,11 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-12 gap-4" v-if="requirementForm == 'clientes'">
+      <div class="grid grid-cols-12 gap-4" v-if="requirementForm == 'proveedores'">
         <div class="col-span-5">
           <el-form-item label="Clientes" prop="customers">
             <el-select
-              v-model="reportForm.customers"
+              v-model="reportForm.providers"
               placeholder="Seleccione el cliente"
               size="small"
               class="w-full"
@@ -89,7 +89,7 @@
               clearable
             >
               <el-option
-                v-for="c in customers"
+                v-for="c in providers"
                 :key="c.id"
                 :label="c.name"
                 :value="c.id"
@@ -125,11 +125,12 @@ import XLSX from "xlsx";
 import { selectValidation, getHeader, getFooter } from "../../tools";
 import { eachMonthOfInterval } from "date-fns";
 export default {
-  name: "customerReports",
+  name: "providerReports",
   components: {
     LayoutContent,
     Notification,
   },
+
   data() {
     return {
       errorMessage: "",
@@ -139,20 +140,20 @@ export default {
       reportForm: {
         reportType: "",
         radio: "pdf",
-        customers: "",
+        providers: "",
       },
       reportFormRules: {
         reportType: selectValidation("change", true),
         dateRange: selectValidation("change", true),
-        customers: selectValidation(true),
+        providers: selectValidation(true),
       },
       reports: [
-        { name: "Listado de clientes", id: "clientes" },
-        { name: "Perfil de cliente", id: "perfil" },
+        { name: "Listado de proveedores", id: "proveedores" },
+        { name: "Perfil de proveedor", id: "perfil" },
       ],
       requirementForm: null,
       accountingCatalog: [],
-      customers: null,
+      providers: null,
     };
   },
 
@@ -164,20 +165,19 @@ export default {
         switch (id) {
           case "perfil":
             this.$axios
-              .get("/customers")
+              .get("/providers")
               .then((res) => {
-                this.customers = res.data.data;
-                this.requirementForm = "clientes";
+                this.providers = res.data.data;
+                this.requirementForm = "proveedores";
               })
               .catch((err) => err.data.errorMessage);
-
             break;
           default:
             this.requirementForm = "";
         }
       }
     },
-    generateReport(formName, { reportType, radio, customers }) {
+ generateReport(formName, { reportType, radio, providers }) {
       this.$refs[formName].validate((valid) => {
         if (!valid) {
           return false;
@@ -185,23 +185,23 @@ export default {
 
         this.generating = true;
         switch (reportType) {
-          case "clientes":
-            this.reportCustomers(radio);
+          case "proveedores":
+            this.reportProviders(radio);
             break;
           case "perfil":
-            this.reportCustomer(customers, radio);
+            this.reportProvider(providers, radio);
             break;
         }
       });
     },
-    reportCustomers(fileType) {
-      const report = () => this.$axios.get("/customers/report/general");
+  reportProviders(fileType) {
+      const report = () => this.$axios.get("/providers/report/general");
 
       switch (fileType) {
         case "pdf":
           Promise.all([report()]).then((res) => {
             const [report] = res;
-            const customersData = report.data.customers;
+            const customersData = report.data.providers;
             const { name, nrc, nit } = report.data.company;
             const nameReport = report.data.name;
             const values = [];
@@ -299,7 +299,7 @@ export default {
             const [report] = res;
             const { name, nit, nrc } = report.data.company;
             const nameReport = report.data.name;
-            const customersData = report.data.customers;
+            const customersData = report.data.providers;
             const values = [];
             for (const c of customersData) {
               values.push([
@@ -328,15 +328,15 @@ export default {
           break;
       }
     },
-    reportCustomer(customerId, fileType) {
-      const report = () => this.$axios.get(`/customers/report/${customerId}`);
+    reportProvider(customerId, fileType) {
+      const report = () => this.$axios.get(`/providers/report/${customerId}`);
       switch (fileType) {
         case "pdf":
           Promise.all([report()])
             .then((res) => {
               const [report] = res;
-              const customerData = report.data.customer;
-              const branches = report.data.customer.customerBranches;
+              const customerData = report.data.provider;
+              const branches = report.data.provider.customerBranches;
               const { name, nrc, nit } = report.data.company;
               const nameReport = report.data.name;
               const values = [];
@@ -663,8 +663,8 @@ export default {
           Promise.all([report()])
             .then((res) => {
               const [report] = res;
-              const customerData = report.data.customer;
-              const branches = report.data.customer.customerBranches;
+              const customerData = report.data.provider;
+              const branches = report.data.provider.customerBranches;
               const { name, nrc, nit } = report.data.company;
               const nameReport = report.data.name;
               const values = [];
@@ -767,14 +767,13 @@ export default {
           break;
       }
     },
-
-    cancel() {
+       cancel() {
       this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
         confirmButtonText: "Si, salir",
         cancelButtonText: "Cancelar",
         type: "warning",
       }).then(() => {
-        this.$router.push("/customers");
+        this.$router.push("/providers");
       });
     },
   },

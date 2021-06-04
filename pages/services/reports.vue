@@ -60,7 +60,7 @@
       </div>
       <div class="grid grid-cols-12 gap-4" v-if="requirementForm == 'seller'">
         <div class="col-span-3">
-          <el-form-item label="Seleccione el tipo de venta">
+          <el-form-item label="Seleccione el tipo de venta" prop="sellingType">
             <el-select
               v-model="reportForm.sellingType"
               placeholder="Selecione reporte"
@@ -149,7 +149,6 @@
         <el-button size="small" @click="$router.push('/services')"
           >Cancelar</el-button
         >
-        </div>
       </div>
     </el-form>
   </layout-content>
@@ -176,7 +175,6 @@ const storagekey = "report";
 export default {
   name: "CustomerSettings",
   components: { LayoutContent, Notification },
-  fetch() {},
   fetchOnServer: false,
   beforeRouteLeave(to, from, next) {
     checkBeforeLeave(this, storagekey, next);
@@ -221,7 +219,8 @@ export default {
         radio: "pdf",
       },
       reportFormRules: {
-        reportType: selectValidation("change", true),
+        reportType: selectValidation(true, "change"),
+        sellingType: selectValidation(true, "change"),
         initialCost: inputValidation(true, 0, null, "number"),
         finalCost: inputValidation(true, 0, null, "number"),
       },
@@ -239,7 +238,7 @@ export default {
           case "seller":
             this.requirementForm = "seller";
             this.$axios.get("/services/selling-types").then((res) => {
-              this.sellingTypes = res.data.types;
+              this.sellingTypes = res.data.data;
             });
             break;
           case "status":
@@ -262,7 +261,7 @@ export default {
         this.generating = true;
         let params = {};
         if (reportForm.sellingType) {
-          params = { type: reportForm.sellingType };
+          params = { type: reportForm.sellingType, formName };
         } else if (reportForm.status) {
           switch (reportForm.status) {
             case 1:
@@ -292,21 +291,28 @@ export default {
       });
     },
     generateEspecialService(params, fileType) {
-      const bussinesInfo = () => this.$axios.get("/services/report/general");
-      const services = () => this.$axios.get("/services", { params });
+      const report = () =>
+        this.$axios.get("/services/report/general", { params });
       switch (fileType) {
         case "pdf":
-          Promise.all([bussinesInfo(), services()]).then((res) => {
-            const [bussinesInfo, services] = res;
-            const bussines = bussinesInfo.data.company;
-            const service = services.data.services;
-            this.reportForm.sellingType = "";
+          Promise.all([report()]).then((res) => {
+            const [report] = res;
+            const bussines = report.data.company;
+            const services = report.data.services;
+            if (params.formName) {
+              this.$refs[params.formName].fields
+                .find((f) => f.prop == "sellingType")
+                .resetField();
+            }
+
             this.reportForm.status = "";
             this.reportForm.initialCost = "";
             this.reportForm.finalCost = "";
 
-            // const name = this.reports.find((r)=> this.reportForm.reportType == r.id).name
-            const values = service.map((s) => {
+            const name = this.reports.find(
+              (r) => this.reportForm.reportType == r.id
+            ).name;
+            const values = services.map((s) => {
               return [
                 { bold: false, text: s.index },
                 { bold: false, text: s.name },
@@ -386,16 +392,22 @@ export default {
           });
           break;
         case "excel":
-          Promise.all([bussinesInfo(), services()]).then((res) => {
-            const [bussinesInfo, services] = res;
-            const bussines = bussinesInfo.data.company;
-            const service = services.data.services;
-            this.reportForm.sellingType = "";
+          Promise.all([report()]).then((res) => {
+            const [report] = res;
+            const bussines = report.data.company;
+            const services = report.data.services;
+            if (params.formName) {
+              this.$refs[params.formName].fields
+                .find((f) => f.prop == "sellingType")
+                .resetField();
+            }
             this.reportForm.status = "";
             this.reportForm.initialCost = "";
             this.reportForm.finalCost = "";
-            //  const name = this.reports.find((r)=> this.reportForm.reportType == r.id).name
-            const data = service.map((s) => {
+            const name = this.reports.find(
+              (r) => this.reportForm.reportType == r.id
+            ).name;
+            const data = services.map((s) => {
               return [
                 s.index,
                 s.name,
@@ -432,12 +444,12 @@ export default {
       }
     },
     generateServiceReport(fileType) {
-      const service = () => this.$axios.get("/services/report/general");
+      const report = () => this.$axios.get("/services/report/general");
       switch (fileType) {
         case "pdf":
-          Promise.all([service()]).then((res) => {
-            const [service] = res;
-            const { company, services } = service.data;
+          Promise.all([report()]).then((res) => {
+            const [report] = res;
+            const { company, services } = report.data;
             const values = services.map((s) => {
               return [
                 { bold: false, text: s.index },
@@ -513,7 +525,7 @@ export default {
           });
           break;
         case "excel":
-          Promise.all([service()]).then((res) => {
+          Promise.all([report()]).then((res) => {
             const [service] = res;
             const { company, services } = service.data;
 
@@ -552,6 +564,5 @@ export default {
       }
     },
   },
-  computed: {},
 };
 </script>
