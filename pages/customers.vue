@@ -7,6 +7,7 @@
 
 <script>
 import LayoutSubmenu from "../components/layout/Submenu";
+import {hasModule} from "../tools/index.js"
 import { getIcon } from "../tools";
 export default {
   name: "Customers",
@@ -15,6 +16,11 @@ export default {
     id: "9ff0b6f4-9c58-475b-b2dd-5eea6d7b66aa",
   },
   components: { LayoutSubmenu },
+  fetch() {
+   if (!hasModule(["f6000cbb-1e6d-4f7d-a7cc-cadd78d23076"], this.$auth.user)) {
+     this.menu = this.menu.slice(0, -1);    }
+ },
+ 
   data() {
     return {
       menu: [
