@@ -1,5 +1,6 @@
 <template>
   <layout-content
+    v-loading="pageloading"
     page-title="Sucursales"
     :breadcrumb="[
       { name: 'Clientes', to: '/customers' },
@@ -425,9 +426,7 @@
                   size="small"
                   maxlength="150"
                   show-word-limit
-                >
-                  <el-option> </el-option>
-                </el-input>
+                />
               </el-form-item>
               <el-form-item label="Dirección 2" class="col-span-6">
                 <el-input
@@ -437,10 +436,7 @@
                   class="w-full"
                   size="small"
                   maxlength="150"
-                  show-word-limit
-                >
-                  <el-option> </el-option>
-                </el-input>
+                />
               </el-form-item>
             </div>
             <!-- Contactos -->
@@ -470,7 +466,12 @@
               <el-form-item
                 label="Correo electronico"
                 class="col-span-4"
-                prop="email"
+                :prop="`items.${i}.emails`"
+                :rules="{
+                  type: 'email',
+                  message: 'Ingresa una direccion de correo valida.',
+                  trigger: 'change',
+                }"
               >
                 <el-input
                   v-model="item.emails"
@@ -949,6 +950,7 @@ export default {
         .get(`/customers/${this.$route.query.ref}/branches`, { params })
         .then((res) => {
           this.branches = res.data;
+          this.pageloading = false;
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
