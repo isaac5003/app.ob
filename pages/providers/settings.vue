@@ -42,7 +42,7 @@
           />
           <div class="grid grid-cols-12 gap-4">
             <el-form-item label="Seleccione una cuenta" class="col-span-4"
-            v-if="hasMOdule('a98b98e6-b2d5-42a3-853d-9516f64eade8')">
+            v-if="hasModule('a98b98e6-b2d5-42a3-853d-9516f64eade8')">
               <el-select
                 v-model="integrationSettingForm.accountingCatalog"
                 placeholder="Ingrese el codigo o nombre de la cuenta"

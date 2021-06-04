@@ -562,7 +562,7 @@ export default {
                 .then((res) => {
                   const [report] = res;
                   const accountingEntry = report.data.entry;
-                  const { name, nit, nrc } = report.data.data.company;
+                  const { name, nit, nrc } = report.data.company;
 
                   let totalAbono = 0;
                   let totalCargo = 0;
