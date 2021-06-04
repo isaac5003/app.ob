@@ -119,7 +119,7 @@
           label="Integraciones"
           name="integrations"
           class="space-y-2"
-           v-if="hasModule()"
+          v-if="hasModule()"
         >
           <Notification
             class="w-full"
@@ -172,7 +172,7 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import {hasModule, parseErrors} from  "../../tools/index.js"
+import { hasModule, parseErrors } from "../../tools/index.js";
 import {
   checkBeforeEnter,
   checkBeforeLeave,
@@ -218,13 +218,9 @@ export default {
         );
         this.pageloading = false;
       })
-    .catch((err) => {
-                    this.$notify.error({
-                      title: "Error",
-                      dangerouslyUseHTMLString: true,
-                      message:parseErrors(err.response.data.message),
-                    });
-                  })
+      .catch((err) => {
+        this.errorMessage = err.response.data.message;
+      })
       .then((alw) => (this.pageloading = false));
     checkBeforeEnter(this, storagekey, "servicesNewForm");
   },
@@ -267,14 +263,7 @@ export default {
             this.filteredCatalog = res.data.data;
             this.loadingAccount = false;
           })
-         .catch((err) => {
-                  
-                    this.$notify.error({
-                      title: "Error",
-                      dangerouslyUseHTMLString: true,
-                      message:parseErrors(err.response.data.message),
-                    });
-                  });
+          .catch((err) => (this.errorMessage = err.response.data.message));
       } else {
         this.filteredCatalog = [];
       }
@@ -339,7 +328,7 @@ export default {
                     this.$notify.error({
                       title: "Error",
                       dangerouslyUseHTMLString: true,
-                      message:parseErrors(err.response.data.message),
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
@@ -362,8 +351,11 @@ export default {
         this.servicesEditForm.incIva = false;
       }
     },
-        hasModule() {
-      return hasModule(["f6000cbb-1e6d-4f7d-a7cc-cadd78d23076"], this.$auth.user);
+    hasModule() {
+      return hasModule(
+        ["f6000cbb-1e6d-4f7d-a7cc-cadd78d23076"],
+        this.$auth.user
+      );
     },
   },
 };
