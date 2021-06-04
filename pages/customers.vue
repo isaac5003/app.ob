@@ -7,8 +7,7 @@
 
 <script>
 import LayoutSubmenu from "../components/layout/Submenu";
-import {hasModule} from "../tools/index.js"
-import { getIcon } from "../tools";
+import { getIcon, hasModule } from "../tools";
 export default {
   name: "Customers",
   middleware: "access",
