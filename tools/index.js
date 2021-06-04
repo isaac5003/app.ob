@@ -606,6 +606,18 @@ const fixDate = (date) => {
   return format(endOfMonth(zonedTimeToUtc(date)), 'yyyy-MM-dd')
 }
 
+function parseErrors(errors) {
+  if (Array.isArray(errors)) {
+    let list = "";
+    for (const e of errors.filter((e) => e)) {
+      list += `<li>${e}</li>`;
+    }
+    return `<ul class="list-outside list-disc">${list}</ul>`;
+  } else {
+    return errors
+  }
+}
+
 module.exports = {
   getIcon,
   inputValidation,
@@ -618,5 +630,6 @@ module.exports = {
   calculatedAmount,
   getHeader,
   getFooter,
-  fixDate
+  fixDate,
+  parseErrors
 };
