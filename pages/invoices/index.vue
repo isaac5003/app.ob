@@ -787,7 +787,7 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import { numeroALetras, calculatedAmount } from "../../tools";
+import { numeroALetras, calculatedAmount, parseErrors } from "../../tools";
 import jsPDF from "jspdf";
 export default {
   name: "InvoicesIndex",
@@ -980,7 +980,8 @@ export default {
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {
@@ -1018,7 +1019,8 @@ export default {
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {
@@ -1056,7 +1058,8 @@ export default {
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {
@@ -1429,7 +1432,10 @@ export default {
                                 .catch((err) => {
                                   this.$notify.error({
                                     title: "Error",
-                                    message: err.response.data.message,
+                                    dangerouslyUseHTMLString: true,
+                                    message: parseErrors(
+                                      err.response.data.message
+                                    ),
                                   });
                                 });
                               done();
@@ -1505,7 +1511,8 @@ export default {
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {
