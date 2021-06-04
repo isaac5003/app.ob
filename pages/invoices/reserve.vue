@@ -76,6 +76,7 @@ import {
   checkBeforeLeave,
   checkBeforeEnter,
   amountValidate,
+  parseErrors,
 } from "../../tools";
 import Notification from "../../components/Notification";
 import jsPDF from "jspdf";
@@ -181,10 +182,10 @@ export default {
                     }, 500);
                   })
                   .catch((err) => {
-                    console.error(err);
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {

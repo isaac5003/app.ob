@@ -209,7 +209,7 @@
           </div>
           <!-- Contactos -->
           <h1 class="text-blue-500">Contacto</h1>
-          <div class="grid grid-cols-12 gap-4 ">
+          <div class="grid grid-cols-12 gap-4">
             <el-form-item
               label="Nombre de contacto"
               class="col-span-4"
@@ -656,7 +656,7 @@
 
                 <el-dropdown-item
                   :divided="true"
-                  class=" font-semibold  text-red-500"
+                  class="font-semibold text-red-500"
                   @click.native="deleteBranch(scope.row.id)"
                   v-if="!scope.row.default"
                 >
@@ -690,6 +690,7 @@ import {
   selectValidation,
   checkBeforeLeave,
   checkBeforeEnter,
+  parseErrors,
 } from "../../tools";
 import Notification from "../../components/Notification";
 
@@ -911,10 +912,10 @@ export default {
                   this.fetchBranches();
                 })
                 .catch((err) => {
-                  console.error(err);
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {
@@ -979,7 +980,8 @@ export default {
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {
@@ -1074,7 +1076,8 @@ export default {
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
@@ -1138,10 +1141,10 @@ export default {
                     this.showBranchOffices = false;
                   })
                   .catch((err) => {
-                    instance.confirmButtonLoading = false;
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {

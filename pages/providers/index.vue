@@ -65,8 +65,8 @@
           <template
             v-if="
               selectedProvider &&
-                (!selectedProvider.customerTypeNatural ||
-                  selectedProvider.customerTypeNatural.id == 2)
+              (!selectedProvider.customerTypeNatural ||
+                selectedProvider.customerTypeNatural.id == 2)
             "
           >
             <div class="col-span-2 flex flex-col">
@@ -288,7 +288,7 @@
 //Import components
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import { hasModule } from "../../tools/index.js";
+import { hasModule, parseErrors } from "../../tools/index.js";
 export default {
   name: "ProvidersIndex",
   head: {
@@ -304,7 +304,6 @@ export default {
       .then((res) => {
         const [providers] = res;
         this.providers = providers.data;
-
         this.pageloading = false;
         this.tableloading = false;
       })
@@ -401,7 +400,8 @@ export default {
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {
@@ -439,7 +439,8 @@ export default {
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {

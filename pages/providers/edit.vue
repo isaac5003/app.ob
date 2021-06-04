@@ -354,11 +354,11 @@
             </el-form-item>
           </div>
         </el-tab-pane>
-         <el-tab-pane
+        <el-tab-pane
           label="Integraciones"
           name="integrations"
           class="space-y-2"
-          v-if="hasModule()"
+          v-if="hasModule(['a98b98e6-b2d5-42a3-853d-9516f64eade8'])"
         >
           <Notification
             class="w-full"
@@ -368,7 +368,11 @@
           />
 
           <div class="grid grid-cols-12 gap-4">
-            <el-form-item label="Seleccione una cuenta" class="col-span-4">
+            <el-form-item
+              label="Seleccione una cuenta"
+              class="col-span-4"
+              v-if="hasModule('a98b98e6-b2d5-42a3-853d-9516f64eade8')"
+            >
               <el-select
                 filterable
                 remote
@@ -393,7 +397,7 @@
           </div>
         </el-tab-pane>
       </el-tabs>
-      <div class="flex justify-end" >
+      <div class="flex justify-end">
         <el-button type="primary" size="small" native-type="submit"
           >Actualizar</el-button
         >
@@ -407,12 +411,13 @@
 
 <script>
 import LayoutContent from "../../components/layout/Content";
-import {hasModule} from "../../tools/index.js"
 import {
   inputValidation,
   selectValidation,
   checkBeforeLeave,
   checkBeforeEnter,
+  hasModule,
+  parseErrors,
 } from "../../tools";
 import Notification from "../../components/Notification";
 
@@ -434,7 +439,7 @@ export default {
     const countries = () => this.$axios.get(`/others/countries`);
     const states = () => this.$axios.get(`/others/states`);
     const cities = () => this.$axios.get(`/others/cities`);
-       const settingsIntegrations = () =>
+    const settingsIntegrations = () =>
       this.$axios.get(`/providers/${this.$route.query.ref}/integrations`);
     const catalog = () => this.$axios.get("/entries/catalog");
 
@@ -447,7 +452,7 @@ export default {
       states(),
       cities(),
       settingsIntegrations(),
-catalog()
+      catalog(),
     ])
       .then((res) => {
         // Se ubica en el tab seleccionado
@@ -477,7 +482,7 @@ catalog()
         this.countries = countries.data.data;
         this.rawStates = states.data.data;
         this.rawCities = cities.data.data;
-this.catalogs = catalog.data.data;
+        this.catalogs = catalog.data.data;
 
         const phone = branch.contactInfo.phones
           ? branch.contactInfo.phones[0]
@@ -511,9 +516,9 @@ this.catalogs = catalog.data.data;
           country: branch.country.id,
           state: branch.state.id,
           city: branch.city.id,
-           accountingCatalog: settingsIntegrations.data.integrations.catalog,
+          accountingCatalog: settingsIntegrations.data.integrations.catalog,
         };
- this.filteredCatalog = this.catalogs.filter(
+        this.filteredCatalog = this.catalogs.filter(
           (c) => c.id == settingsIntegrations.data.integrations.catalog
         );
         this.loading = false;
@@ -560,7 +565,7 @@ this.catalogs = catalog.data.data;
         country: "",
         state: "",
         city: "",
-        accountingCatalog:""
+        accountingCatalog: "",
       },
       customer: null,
       filteredCatalog: [],
@@ -569,7 +574,6 @@ this.catalogs = catalog.data.data;
     };
   },
   methods: {
-   
     setStorage(providerEditForm) {
       localStorage.setItem(storagekey, JSON.stringify(providerEditForm));
     },
@@ -602,9 +606,9 @@ this.catalogs = catalog.data.data;
               if (action === "confirm") {
                 instance.confirmButtonLoading = true;
                 instance.confirmButtonText = "Procesando...";
-                 const provider = () =>
+                const provider = () =>
                   this.$axios.put(`/providers/${this.$route.query.ref}`, {
-                     name: formData.name,
+                    name: formData.name,
                     shortName: formData.shortName,
                     isCustomer: formData.isCustomer,
                     dui: formData.dui,
@@ -659,7 +663,8 @@ this.catalogs = catalog.data.data;
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
@@ -668,7 +673,7 @@ this.catalogs = catalog.data.data;
                     localStorage.removeItem(storagekey);
                     done();
                   });
-              }  else {
+              } else {
                 done();
               }
             },
@@ -690,9 +695,9 @@ this.catalogs = catalog.data.data;
         this.filteredCatalog = [];
       }
     },
-     hasModule() {
-      return hasModule(["f6000cbb-1e6d-4f7d-a7cc-cadd78d23076"], this.$auth.user);
-   },
+    hasModule(modules) {
+      return hasModule(modules, this.$auth.user);
+    },
   },
   computed: {
     states() {
