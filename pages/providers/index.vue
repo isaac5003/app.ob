@@ -304,7 +304,6 @@ export default {
       .then((res) => {
         const [providers] = res;
         this.providers = providers.data;
-
         this.pageloading = false;
         this.tableloading = false;
       })
