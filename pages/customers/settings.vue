@@ -173,7 +173,8 @@ export default {
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
@@ -189,7 +190,7 @@ export default {
         );
       });
     },
-         hasModule(modules) {
+    hasModule(modules) {
       return hasModule(modules, this.$auth.user);
     },
   },

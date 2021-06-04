@@ -65,8 +65,8 @@
           <template
             v-if="
               selectedCustomer &&
-                (!selectedCustomer.customerTypeNatural ||
-                  selectedCustomer.customerTypeNatural.id == 2)
+              (!selectedCustomer.customerTypeNatural ||
+                selectedCustomer.customerTypeNatural.id == 2)
             "
           >
             <div class="col-span-2 flex flex-col">
@@ -308,7 +308,7 @@
 import { id } from "date-fns/locale";
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import { hasModule } from "../../tools/index.js";
+import { hasModule, parseErrors } from "../../tools/index.js";
 export default {
   name: "CustomersIndex",
   head: {
@@ -418,7 +418,8 @@ export default {
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {
@@ -456,7 +457,8 @@ export default {
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {
@@ -498,7 +500,8 @@ export default {
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {
@@ -540,7 +543,15 @@ export default {
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
+                  });
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {
