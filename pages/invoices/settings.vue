@@ -46,7 +46,6 @@
               <div class="flex-1">
                 <el-input-number
                   v-model="num"
-                  @change="handleChange"
                   :min="1"
                   :max="10"
                   class="w-full"
@@ -60,8 +59,7 @@
               <div class="flex-1 text-xs">Alto de página</div>
               <div class="flex-1">
                 <el-input-number
-                  v-model="num"
-                  @change="handleChange"
+                  v-model="invoiceModel.resolution.height"
                   :min="1"
                   :max="10"
                   class="w-full"
@@ -75,8 +73,7 @@
               <div class="flex-1 text-xs">Ancho de página</div>
               <div class="flex-1">
                 <el-input-number
-                  v-model="num"
-                  @change="handleChange"
+                  v-model="invoiceModel.resolution.width"
                   :min="1"
                   :max="10"
                   class="w-full"
@@ -89,15 +86,16 @@
         <!-- Numero de factura y tamaño de texto  -->
         <div class="grid grid-cols-12 gap-8">
           <div class="col-span-4">
-            <el-checkbox v-model="checked">Correlativo</el-checkbox>
+            <el-checkbox v-model="invoiceModel.invoice_authorization.show"
+              >Correlativo</el-checkbox
+            >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Media de X" prop="invoice_authorization">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.invoice_authorization.x"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -111,9 +109,8 @@
                 <el-form-item label="Media de Y">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.invoice_authorization.y"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -127,9 +124,8 @@
                 <el-form-item label="Media de L">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.invoice_authorization.l"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -142,15 +138,16 @@
             </div>
           </div>
           <div class="col-span-4">
-            <el-checkbox v-model="checked">Secuencia</el-checkbox>
+            <el-checkbox v-model="invoiceModel.invoice_number.show"
+              >Secuencia</el-checkbox
+            >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
                 <el-form-item label="Media de X">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.invoice_number.x"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -164,9 +161,8 @@
                 <el-form-item label="Media de Y">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.invoice_number.y"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -177,12 +173,11 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Media de L">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.invoice_number.l"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -198,15 +193,16 @@
         <!-- senores, fecha y Direccion  -->
         <div class="grid grid-cols-12 gap-8">
           <div class="col-span-4">
-            <el-checkbox v-model="checked">Señor (es)</el-checkbox>
+            <el-checkbox v-model="invoiceModel.customer_name.show"
+              >Señor (es)</el-checkbox
+            >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
                 <el-form-item label="Media de X">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.customer_name.x"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -220,9 +216,8 @@
                 <el-form-item label="Media de Y">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.customer_name.y"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -236,9 +231,8 @@
                 <el-form-item label="Media de L">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.customer_name.l"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -259,7 +253,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -275,7 +268,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -291,7 +283,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -312,7 +303,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -328,7 +318,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -344,7 +333,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -368,7 +356,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -384,7 +371,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -400,7 +386,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -421,7 +406,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -437,7 +421,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -453,7 +436,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -474,7 +456,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -489,7 +470,6 @@
                   <template>
                     <el-input-number
                       v-model="num"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       controls-position="right"
@@ -506,7 +486,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -532,7 +511,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -548,7 +526,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -564,7 +541,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -585,7 +561,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -601,7 +576,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -617,7 +591,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -643,7 +616,6 @@
               >
               <el-input-number
                 v-model="num"
-                @change="handleChange"
                 :min="1"
                 :max="10"
                 class="w-full"
@@ -656,7 +628,6 @@
               <span class="flex-1 text-xs">Tamaño de texto</span>
               <el-input-number
                 v-model="num"
-                @change="handleChange"
                 :min="1"
                 :max="10"
                 class="w-full"
@@ -676,7 +647,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -692,7 +662,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -708,7 +677,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -730,7 +698,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -746,7 +713,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -762,7 +728,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -784,7 +749,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -800,7 +764,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -816,7 +779,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -840,7 +802,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -856,7 +817,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -872,7 +832,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -894,7 +853,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -910,7 +868,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -926,7 +883,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -948,7 +904,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -964,7 +919,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -980,7 +934,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1005,7 +958,6 @@
               <div class="flex-1">
                 <el-input-number
                   v-model="num"
-                  @change="handleChange"
                   :min="1"
                   :max="10"
                   class="w-full"
@@ -1027,7 +979,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1043,7 +994,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1059,7 +1009,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1081,7 +1030,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1097,7 +1045,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1113,7 +1060,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1135,7 +1081,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1151,7 +1096,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1167,7 +1111,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1192,7 +1135,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1208,7 +1150,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1224,7 +1165,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1246,7 +1186,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1262,7 +1201,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1278,7 +1216,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1300,7 +1237,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1316,7 +1252,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1332,7 +1267,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1357,7 +1291,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1373,7 +1306,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1389,7 +1321,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1411,7 +1342,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1427,7 +1357,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1443,7 +1372,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1465,7 +1393,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1481,7 +1408,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1497,7 +1423,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1522,7 +1447,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1538,7 +1462,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1554,7 +1477,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1576,7 +1498,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1592,7 +1513,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1608,7 +1528,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1630,7 +1549,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1646,7 +1564,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1662,7 +1579,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1687,7 +1603,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1703,7 +1618,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1719,7 +1633,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1741,7 +1654,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1757,7 +1669,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1773,7 +1684,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1795,7 +1705,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1811,7 +1720,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1827,7 +1735,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1852,7 +1759,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1868,7 +1774,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1884,7 +1789,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1905,7 +1809,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1921,7 +1824,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1937,7 +1839,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1959,7 +1860,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1975,7 +1875,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -1991,7 +1890,6 @@
                     <el-input-number
                       v-model="num"
                       controls-position="right"
-                      @change="handleChange"
                       :min="1"
                       :max="10"
                       style="width: 90%"
@@ -2005,7 +1903,12 @@
           </div>
         </div>
         <div class="flex flex-row justify-end">
-          <el-button type="primary" size="small">Guardar </el-button>
+          <el-button
+            type="primary"
+            size="small"
+            @click.native="sumitModelInvoice('invoiceModel', invoiceModel)"
+            >Guardar
+          </el-button>
           <el-button size="small" @click="closeDialog = false"
             >Cerrar</el-button
           >
@@ -2986,7 +2889,7 @@ export default {
         invoicesZone: "",
       },
       invoiceModel: {
-        configuration: "",
+        configuration: "positions",
         resolution: {
           width: "",
           height: "",
@@ -2994,17 +2897,28 @@ export default {
         invoice_authorization: {
           x: "",
           y: "",
-          length: "",
-          value: "",
-          show: "",
+          l: "",
+          value: "invoice_authorization",
+          show: false,
+        },
+        invoice_number: {
+          x: "",
+          y: "",
+          l: "",
+          value: "invoice_number",
+          show: false,
+        },
+        customer_name: {
+          x: "",
+          y: "",
+          l: "",
+          value: "customer_name",
+          show: false,
         },
       },
     };
   },
   methods: {
-    handleChange(value) {
-      console.log(value);
-    },
     closeDialogs(name) {
       this.$refs[name].resetFields();
     },
@@ -3376,9 +3290,6 @@ export default {
       });
     },
     editSeller({ id, name, ...zone }) {
-      console.log(id);
-      console.log(name);
-      console.log(zone);
       this.sellerId = id;
       this.editSellerForm.name = name;
       this.editSellerForm.invoicesZone = zone.invoicesZone.id;
@@ -3625,6 +3536,9 @@ export default {
           }
         );
       });
+    },
+    sumitModelInvoice(formName, modelInvoice) {
+      console.log(formName, modelInvoice);
     },
   },
   computed: {
