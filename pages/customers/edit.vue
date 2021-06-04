@@ -370,8 +370,11 @@
           />
 
           <div class="grid grid-cols-12 gap-4">
-            <el-form-item label="Seleccione una cuenta" class="col-span-4"
-            v-if="hasModule('a98b98e6-b2d5-42a3-853d-9516f64eade8')">
+            <el-form-item
+              label="Seleccione una cuenta"
+              class="col-span-4"
+              v-if="hasModule('a98b98e6-b2d5-42a3-853d-9516f64eade8')"
+            >
               <el-select
                 filterable
                 remote
@@ -416,7 +419,8 @@ import {
   selectValidation,
   checkBeforeLeave,
   checkBeforeEnter,
-  hasModule
+  hasModule,
+  parseErrors,
 } from "../../tools";
 import Notification from "../../components/Notification";
 
@@ -666,7 +670,8 @@ export default {
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
@@ -697,7 +702,7 @@ export default {
         this.filteredCatalog = [];
       }
     },
-        hasModule(modules) {
+    hasModule(modules) {
       return hasModule(modules, this.$auth.user);
     },
   },
