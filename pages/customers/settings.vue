@@ -84,7 +84,7 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import { hasModule } from "../../tools/index.js";
+import { hasModule, parseErrors } from "../../tools/index.js";
 export default {
   name: "CustomerSettings",
   components: { LayoutContent, Notification },

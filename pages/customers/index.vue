@@ -547,13 +547,6 @@ export default {
                     message: parseErrors(err.response.data.message),
                   });
                 })
-                .catch((err) => {
-                  this.$notify.error({
-                    title: "Error",
-                    dangerouslyUseHTMLString: true,
-                    message: parseErrors(err.response.data.message),
-                  });
-                })
                 .then((alw) => {
                   instance.confirmButtonLoading = false;
                   instance.confirmButtonText = `Si, eliminar`;
