@@ -87,7 +87,7 @@
                 <el-checkbox
                   v-if="
                     newServiceForm.sellingType == 3 &&
-                      salesNewForm.documentType != 3
+                    salesNewForm.documentType != 3
                   "
                   border
                   v-model="newServiceForm.incTax"
@@ -218,7 +218,7 @@
                   border
                   v-if="
                     editServiceForm.sellingType == 3 &&
-                      salesNewForm.documentType != 3
+                    salesNewForm.documentType != 3
                   "
                   v-model="editServiceForm.incTax"
                   size="small"
@@ -589,8 +589,8 @@
                   <span
                     v-if="
                       scope.row.sellingType == 1 &&
-                        salesNewForm.documentType != 3 &&
-                        salesNewForm.documentType != 6
+                      salesNewForm.documentType != 3 &&
+                      salesNewForm.documentType != 6
                     "
                     >{{
                       calcSujeta(salesNewForm.documentType, scope.row)
@@ -614,8 +614,8 @@
                   <span
                     v-if="
                       scope.row.sellingType == 2 &&
-                        salesNewForm.documentType != 3 &&
-                        salesNewForm.documentType != 6
+                      salesNewForm.documentType != 3 &&
+                      salesNewForm.documentType != 6
                     "
                     >{{
                       calcExenta(salesNewForm.documentType, scope.row)
@@ -634,8 +634,8 @@
                   <span
                     v-if="
                       scope.row.sellingType == 3 ||
-                        salesNewForm.documentType == 3 ||
-                        salesNewForm.documentType == 6
+                      salesNewForm.documentType == 3 ||
+                      salesNewForm.documentType == 6
                     "
                     >{{
                       calcGravada(salesNewForm.documentType, scope.row)
@@ -1165,7 +1165,8 @@ export default {
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
