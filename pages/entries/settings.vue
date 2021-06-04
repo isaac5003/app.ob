@@ -1432,12 +1432,14 @@
 import { endOfMonth, format, startOfMonth, differenceInMonths } from "date-fns";
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import { getIcon, hasModule } from "../../tools";
 import {
   inputValidation,
   selectValidation,
   checkBeforeLeave,
   checkBeforeEnter,
+  getIcon,
+  hasModule,
+  parseErrors,
 } from "../../tools";
 const storagekey = "entries-settings";
 export default {
@@ -2106,7 +2108,8 @@ export default {
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {

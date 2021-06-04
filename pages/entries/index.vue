@@ -371,7 +371,7 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import { getHeader, getFooter } from "../../tools";
+import { getHeader, getFooter, parseErrors } from "../../tools";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -503,7 +503,8 @@ export default {
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {
