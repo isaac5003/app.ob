@@ -87,7 +87,7 @@
                 <el-checkbox
                   v-if="
                     newServiceForm.sellingType == 3 &&
-                      salesNewForm.documentType != 3
+                    salesNewForm.documentType != 3
                   "
                   border
                   v-model="newServiceForm.incTax"
@@ -218,7 +218,7 @@
                   border
                   v-if="
                     editServiceForm.sellingType == 3 &&
-                      salesNewForm.documentType != 3
+                    salesNewForm.documentType != 3
                   "
                   v-model="editServiceForm.incTax"
                   size="small"
@@ -383,7 +383,13 @@
                       @change="setStorage(salesNewForm)"
                     >
                       <div
-                        class="flex flex-row justify-between items-end py-1 leading-normal"
+                        class="
+                          flex flex-row
+                          justify-between
+                          items-end
+                          py-1
+                          leading-normal
+                        "
                       >
                         <div class="flex flex-col">
                           <span class="text-xs text-gray-500">{{
@@ -589,8 +595,8 @@
                   <span
                     v-if="
                       scope.row.sellingType == 1 &&
-                        salesNewForm.documentType != 3 &&
-                        salesNewForm.documentType != 6
+                      salesNewForm.documentType != 3 &&
+                      salesNewForm.documentType != 6
                     "
                     >{{
                       calcSujeta(salesNewForm.documentType, scope.row)
@@ -614,8 +620,8 @@
                   <span
                     v-if="
                       scope.row.sellingType == 2 &&
-                        salesNewForm.documentType != 3 &&
-                        salesNewForm.documentType != 6
+                      salesNewForm.documentType != 3 &&
+                      salesNewForm.documentType != 6
                     "
                     >{{
                       calcExenta(salesNewForm.documentType, scope.row)
@@ -634,8 +640,8 @@
                   <span
                     v-if="
                       scope.row.sellingType == 3 ||
-                        salesNewForm.documentType == 3 ||
-                        salesNewForm.documentType == 6
+                      salesNewForm.documentType == 3 ||
+                      salesNewForm.documentType == 6
                     "
                     >{{
                       calcGravada(salesNewForm.documentType, scope.row)
@@ -1149,13 +1155,33 @@ export default {
                         }
                       )
                         .then(() => {
-                          this.resetForm("salesNewForm");
-                          this.salesNewForm.documentType = 1;
+                          console.log(formData.documentType);
+                          this.salesNewForm.documentType =
+                            formData.documentType;
+                          this.$refs[formName].fields
+                            .find((f) => f.prop == "customer")
+                            .resetField();
+                          this.$refs[formName].fields
+                            .find((f) => f.prop == "customerBranch")
+                            .resetField();
+                          this.$refs[formName].fields
+                            .find((f) => f.prop == "invoicesPaymentsCondition")
+                            .resetField();
+                          this.$refs[formName].fields
+                            .find((f) => f.prop == "invoicesSellers")
+                            .resetField();
+                          this.$refs[formName].fields
+                            .find((f) => f.prop == "invoiceDate")
+                            .resetField();
                           this.salesNewForm.customerBranch = "";
                           this.details = [];
                           this.branches = [];
                           this.branch = {};
                           this.tributary = {};
+                          this.validateDocumentType(
+                            formData.documentType,
+                            null
+                          );
                         })
                         .catch(() => {
                           this.$router.push("/invoices");
