@@ -119,7 +119,7 @@
           label="Integraciones"
           name="integrations"
           class="space-y-2"
-           v-if="hasModule(['a98b98e6-b2d5-42a3-853d-9516f64eade8'])"
+          v-if="hasModule(['a98b98e6-b2d5-42a3-853d-9516f64eade8'])"
         >
           <Notification
             class="w-full"
@@ -173,7 +173,7 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import {hasModule} from  "../../tools/index.js"
+import { hasModule, parseErrors } from "../../tools/index.js";
 import {
   checkBeforeEnter,
   checkBeforeLeave,
@@ -328,7 +328,8 @@ export default {
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
