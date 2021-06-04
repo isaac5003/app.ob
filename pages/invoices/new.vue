@@ -1155,7 +1155,6 @@ export default {
                         }
                       )
                         .then(() => {
-                          console.log(formData.documentType);
                           this.salesNewForm.documentType =
                             formData.documentType;
                           this.$refs[formName].fields
