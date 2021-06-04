@@ -421,7 +421,7 @@ function hasModule(module, user) {
   const branch = company.branches.find((b) => b.id == user.workspace.branch.id);
   const modules = branch.modules.map((m) => m.id);
   if (Array.isArray(module)) {
-    return modules.map(m => module.includes(m)).every(m => m)
+    return modules.map(m => module.includes(m)).some(m => m)
   } else {
     return modules.includes(module);
   }
