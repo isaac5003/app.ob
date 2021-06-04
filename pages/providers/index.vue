@@ -1,6 +1,6 @@
 <template>
   <layout-content
-    v-loanding="pageloading"
+    v-loading="pageloading"
     page-title="Listado de proveedores"
     :breadcrumb="[
       { name: 'Proveedores', to: '/providers' },
@@ -37,13 +37,13 @@
               <el-tag size="small" type="warning" v-else>Inactivo</el-tag>
             </div>
           </div>
-          <!-- no esta definido por que no esta la api  -->
-          <div class="col-span-2 flex flex-col">
-            <span class="font-semibold">Es proveedor</span>
+
+          <div class="col-span-2 flex flex-col" v-if="hasModule()">
+            <span class="font-semibold">Es cliente</span>
 
             <el-tag size="small" type="warning" class="w-auto">{{
               selectedProvider
-                ? selectedProvider.isActiveProvider
+                ? selectedProvider.isCustomer
                   ? "SI"
                   : "NO"
                 : ""
@@ -65,8 +65,8 @@
           <template
             v-if="
               selectedProvider &&
-              (!selectedProvider.customerTypeNatural ||
-                selectedProvider.customerTypeNatural.id == 2)
+                (!selectedProvider.customerTypeNatural ||
+                  selectedProvider.customerTypeNatural.id == 2)
             "
           >
             <div class="col-span-2 flex flex-col">
@@ -157,10 +157,10 @@
       </el-form>
       <el-table
         @sort-change="sortBy"
-        :data="providers.providers"
+        :data="providers.data"
         stripe
         size="mini"
-        v-loading="tablelcoading"
+        v-loading="tableloading"
         ref="multipleTable"
         @selection-change="handleSelectionChange"
       >
@@ -200,7 +200,7 @@
         <el-table-column
           label="Estado"
           width="110"
-          prop="isActiveProviders"
+          prop="isActiveProvider"
           sortable="custom"
         >
           <template slot-scope="scope">
@@ -238,27 +238,31 @@
                     $router.push(`/providers/edit?ref=${scope.row.id}`)
                   "
                 >
-                  <i class="el-icon-edit-outline"></i> Editar cliente
+                  <i class="el-icon-edit-outline"></i> Editar proveedor
+                </el-dropdown-item>
+                <el-dropdown-item
+                  @click.native="
+                    $router.push(`/providers/branchOffices?ref=${scope.row.id}`)
+                  "
+                >
+                  <i class="el-icon-map-location"></i> Sucursales
                 </el-dropdown-item>
                 <el-dropdown-item @click.native="changeActive(scope.row)">
                   <span v-if="scope.row.isActiveProvider">
                     <i class="el-icon-close"></i> Desactivar
                   </span>
                   <span v-else> <i class="el-icon-check"></i> Activar </span>
-                  cliente
+                  proveedor
                 </el-dropdown-item>
                 <!-- <el-dropdown-item>
-                    <i class="el-icon-guide"></i> Sucursales
-                  </el-dropdown-item>
-                  <el-dropdown-item>
-                    <i class="el-icon-notebook-1"></i> Directorio
-                </el-dropdown-item>-->
+                  <i class="el-icon-notebook-1"></i> Directorio
+                </el-dropdown-item> -->
                 <el-dropdown-item
                   :divided="true"
                   class="text-red-500 font-semibold"
                   @click.native="deleteProvider(scope.row)"
                 >
-                  <i class="el-icon-delete"></i> Eliminar cliente
+                  <i class="el-icon-delete"></i> Eliminar proveedor
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -284,7 +288,7 @@
 //Import components
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-
+import { hasModule } from "../../tools/index.js";
 export default {
   name: "ProvidersIndex",
   head: {
@@ -300,17 +304,20 @@ export default {
       .then((res) => {
         const [providers] = res;
         this.providers = providers.data;
+
+        this.pageloading = false;
+        this.tableloading = false;
       })
       .catch((err) => {
         this.errorMessage = err.respose.data.message;
       })
-      .then((alw) => (this.pageloadig = false));
+      .then((alw) => (this.pageloadign = false));
   },
   fetchOnServer: false,
 
   data() {
     return {
-      pageloadig: true,
+      pageloading: true,
       tableloading: true,
       errorMessage: "",
       searchValue: "",
@@ -318,7 +325,7 @@ export default {
       multipleSelection: [],
       sellingTypes: [],
       providers: {
-        providers: [],
+        data: [],
         count: 0,
       },
       filter: {
@@ -341,10 +348,10 @@ export default {
       this.tableloading = true;
       let params = this.page;
       if (this.status !== "") {
-        paramas = { ...params, active: this.status };
+        params = { ...params, active: this.status };
       }
       if (this.searchValue !== "") {
-        paramas = { ...params, search: this.searchValue.toLowerCase() };
+        params = { ...params, search: this.searchValue.toLowerCase() };
       }
       if (this.filter.order) {
         params = {
@@ -369,8 +376,8 @@ export default {
     },
     changeActive({ id, isActiveProvider }) {
       const action = isActiveProvider ? "desactivar" : "activar";
-      this.$confim(
-        `¿Estás seguro que deseas ${action} este cliente?`,
+      this.$confirm(
+        `¿Estás seguro que deseas ${action} este proveedor?`,
         "Confirmación",
         {
           confirmButtonText: `Si, ${action}`,
@@ -381,10 +388,12 @@ export default {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
               this.$axios
-                .put(`/providers/status/${id}`, { status: !isActiveProvider })
+                .put(`/providers/status/${id}`, {
+                  isActiveProvider: !isActiveProvider,
+                })
                 .then((res) => {
                   this.$notify.success({
-                    title: "Exito",
+                    title: "Éxito",
                     message: res.data.message,
                   });
                   this.fetchProviders();
@@ -392,7 +401,7 @@ export default {
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.respose.data.message,
+                    message: err.response.data.message,
                   });
                 })
                 .then((alw) => {
@@ -446,11 +455,10 @@ export default {
     },
     async openProviderPreview({ id }) {
       const { data } = await this.$axios.get(`/providers/${id}`);
-      (this.selectedProvider = data.provider),
-        (this.showProviderPreview = true);
+      (this.selectedProvider = data.data), (this.showProviderPreview = true);
     },
     hasModule() {
-      return hasModule("f6000cbb-1e6d-4f7d-a7cc-cadd78d23076", this.$auth.user);
+      return hasModule("9ff0b6f4-9c58-475b-b2dd-5eea6d7b66aa", this.$auth.user);
     },
     sortBy({ column, prop, order }) {
       this.filter.prop = prop;

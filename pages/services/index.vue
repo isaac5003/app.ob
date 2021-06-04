@@ -73,7 +73,7 @@
       <el-table
         @sort-change="sortBy"
         v-loading="tableloading"
-        :data="services.services"
+        :data="services.data"
         stripe
         size="mini"
         ref="multipleTable"
@@ -223,7 +223,7 @@ export default {
     Promise.all([sellingTypes(), services()])
       .then((res) => {
         const [sellingTypes, services] = res;
-        this.sellingTypes = sellingTypes.data.types;
+        this.sellingTypes = sellingTypes.data.data;
         this.services = services.data;
       })
       .catch((err) => {
@@ -247,7 +247,7 @@ export default {
       },
       sellingTypes: [],
       services: {
-        services: [],
+        data: [],
         count: 0,
       },
       page: {
@@ -308,7 +308,7 @@ export default {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
               this.$axios
-                .put(`/services/status/${id}`, { status: !active })
+                .put(`/services/status/${id}`, { active: !active })
                 .then((res) => {
                   this.$notify.success({
                     title: "Éxito",

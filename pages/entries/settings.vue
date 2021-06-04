@@ -1,7 +1,7 @@
 <template>
   <layout-content
-    v-loading="pageloading"
     page-title="Configuraciones"
+    v-loading="pageloading"
     :breadcrumb="[
       { name: 'Contabilidad', to: '/entries' },
       { name: 'Configuraciones', to: null },
@@ -207,9 +207,7 @@
           <el-button
             type="primary"
             size="small"
-            @click.native="
-              submitEditedCatalog(accounts, 'activeAccount', activeAccount)
-            "
+            @click.native="submitEditedCatalog(activeAccount, 'activeAccount')"
             >Guardar</el-button
           >
           <el-button @click="showEditMayorDialog = false" size="small"
@@ -501,7 +499,11 @@
             type="primary"
             size="small"
             @click.native="
-              submitEditedCatalog(accounts, 'accountFormEdit', activeAccount)
+              submitEditedCatalog(
+                activeAccount,
+                'activeAccount',
+                activeAccount.parentCatalog
+              )
             "
             >Guardar</el-button
           >
@@ -511,6 +513,7 @@
         </div>
       </span>
     </el-dialog>
+
     <!-- BALANCE General
     ADDaccount -->
     <el-dialog
@@ -829,7 +832,9 @@
               "
               >Guardar</el-button
             >
-            <el-button size="small" @click="cancel()"> Cancelar </el-button>
+            <el-button size="small" @click="$router.push('/entries')">
+              Cancelar
+            </el-button>
           </div>
         </el-form>
       </el-tab-pane>
@@ -907,12 +912,14 @@
               "
               :disabled="
                 !firmantesForm.legal ||
-                  !firmantesForm.accountant ||
-                  !firmantesForm.auditor
+                !firmantesForm.accountant ||
+                !firmantesForm.auditor
               "
               >Guardar</el-button
             >
-            <el-button size="small" @click="cancel()">Cancelar</el-button>
+            <el-button size="small" @click="$router.push('/entries')"
+              >Cancelar</el-button
+            >
           </div>
         </el-form>
       </el-tab-pane>
@@ -1025,6 +1032,7 @@
             />
           </div>
         </div>
+
         <el-form>
           <div class="grid grid-cols-12 gap-4">
             <div class="col-span-3">
@@ -1129,6 +1137,7 @@
             </div>
           </div>
         </el-form>
+
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-12">
             <el-table
@@ -1175,7 +1184,7 @@
                     v-if="scope.row.showAdd"
                     class="item"
                     effect="dark"
-                    content="Agregar nueva cuenta11"
+                    content="Agregar nueva cuenta"
                     placement="top"
                   >
                     <el-button
@@ -1205,6 +1214,7 @@
             </el-table>
           </div>
         </div>
+
         <div class="flex justify-end mt-4">
           <el-button
             type="primary"
@@ -1218,7 +1228,7 @@
             "
             >Guardar</el-button
           >
-          <el-button size="small" @click="cancel()">Cancelar</el-button>
+          <el-button size="small">Cancelar</el-button>
         </div>
       </el-tab-pane>
 
@@ -1350,11 +1360,11 @@
             @click.native="submitResults(tablesData)"
             >Guardar</el-button
           >
-          <el-button size="small" @click="cancel()">Cancelar</el-button>
+          <el-button size="small">Cancelar</el-button>
         </div>
       </el-tab-pane>
 
-      <!-- tab de Integraciones 
+      <!-- tab de Integraciones  -->
       <el-tab-pane label="Integraciones" name="integraciones">
         <div class="grid grid-cols-12">
           <div class="col-span-12">
@@ -1413,49 +1423,7 @@
             </div>
           </el-form>
         </div>
-      </el-tab-pane> -->
-      <!-- tab integraciones -->
-      <!-- <el-tab-pane label="Integraciones" name="integrations" class="space-y-3">
-        <Notification
-          class="w-full"
-          type="info"
-          title="Integraciones"
-          message="En esta sección se realizan las configuraciones de integración con otros modulos de manera general. Estas configuraciones se aplicarán a todos los clientes que no tengan una configuración individual."
-        />
-        <el-tabs
-          tab-position="left"
-          v-model="utab"
-          @tab-click="
-            $router
-              .replace({
-                path: `/invoices/settings`,
-                query: { tab, utab },
-              })
-              .catch(() => {})
-          "
-        >
-          <el-tab-pane
-            v-for="(integration, k) of filteredIntegrations"
-            :key="k"
-            :name="integration.id"
-          >
-            <span slot="label" class="flex items-center justify-between"
-              ><svg
-                class="w-5 h-5 mr-2"
-                fill="none"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="1.5"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                v-html="integration.icon"
-              />
-              {{ integration.name }}</span
-            >
-            {{ integration.name }}
-          </el-tab-pane>
-        </el-tabs>
-      </el-tab-pane> -->
+      </el-tab-pane>
     </el-tabs>
   </layout-content>
 </template>
@@ -1514,44 +1482,16 @@ export default {
           signatures,
           general,
         ] = res;
-        if (balance.data.balanceGeneral) {
-          this.tableData = balance.data.balanceGeneral.report;
-          this.specialAccounts = { ...balance.data.balanceGeneral.special };
-        }
-        if (general.data.general) {
-          this.fiscalPeriodForm.startDate = general.data.general.periodStart;
-          this.fiscalPeriodForm.endDate = general.data.general.peridoEnd;
-        }
-
-        if (signatures.data.signatures) {
-          this.firmantesForm = signatures.data.signatures;
-        }
-
-        if (results.data.estadoResultados) {
-          this.tablesData = results.data.estadoResultados.map((r) => {
-            const obj = { ...r };
-            if (r.children) {
-              const children = r.children.map((ch) => {
-                return {
-                  ...ch,
-                  code: ch.id,
-                };
-              });
-              obj["children"] = children;
-            }
-            return obj;
-          });
-        }
-
-        this.accounts = accountCatalogs.data.accountingCatalog;
+        this.filteredCatalog = accounts.data.data;
+        this.accounts = accountCatalogs.data.data;
         this.accountsCount = accountCatalogs.data.count;
-        this.catalogs = accounts.data.accountingCatalog;
-        this.tableData = balance.data.balanceGeneral.report;
-        this.firmantesForm = signatures.data.signatures;
-        this.fiscalPeriodForm.startDate = general.data.general.periodStart;
-        this.fiscalPeriodForm.endDate = general.data.general.peridoEnd;
-        this.specialAccounts = { ...balance.data.balanceGeneral.special };
-        this.tablesData = results.data.estadoResultados.map((r) => {
+        this.catalogs = accounts.data.data;
+        this.tableData = balance.data.data.balanceGeneral.report;
+        this.firmantesForm = signatures.data.data;
+        this.fiscalPeriodForm.startDate = general.data.data.periodStart;
+        this.fiscalPeriodForm.endDate = general.data.data.periodEnd;
+        this.specialAccounts = { ...balance.data.data.balanceGeneral.special };
+        this.tablesData = results.data.data.estadoResultados.map((r) => {
           const obj = { ...r };
           if (r.children) {
             const children = r.children.map((ch) => {
@@ -1564,8 +1504,6 @@ export default {
           }
           return obj;
         });
-
-        this.filteredCatalog = this.catalogs;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
@@ -1943,8 +1881,8 @@ export default {
     //general
     fetchGeneral() {
       this.$axios.get("/entries/setting/general").then((res) => {
-        (this.fiscalPeriodForm.startDate = res.data.general.periodStart),
-          (this.fiscalPeriodForm.endDate = res.data.general.peridoEnd);
+        (this.fiscalPeriodForm.startDate = res.data.data.periodStart),
+          (this.fiscalPeriodForm.endDate = res.data.data.periodEnd);
       });
     },
 
@@ -1952,7 +1890,7 @@ export default {
     fetchAsignatures() {
       this.$axios
         .get("/entries/setting/signatures")
-        .then((res) => (this.firmantesForm = res.signatures.data.signatures));
+        .then((res) => (this.firmantesForm = res.data.data));
     },
     //  CatalogAccount
     openMayorAccountDialog() {
@@ -2118,7 +2056,7 @@ export default {
       this.$axios
         .get("/entries/catalog", { params })
         .then((res) => {
-          this.accounts = res.data.accountingCatalog;
+          this.accounts = res.data.data;
           this.accountsCount = res.data.count;
           this.tableloading = false;
         })
@@ -2132,14 +2070,15 @@ export default {
       this.fetchCatalog();
     },
     openEditAccount(account) {
-      if (account.isParent) {
+      if (account.code.length == 1) {
         this.showEditMayorDialog = true;
         this.activeAccount = { ...account };
       } else {
         this.showEditAccount = true;
+
         this.activeAccount = {
           ...account,
-          code: account.code.slice(account.parentCatalog.code.length),
+          code: `${account.code}`,
         };
       }
     },
@@ -2187,14 +2126,19 @@ export default {
         if (!valid) {
           return false;
         }
-
+        let realCode = accounts.code;
         // Genera el codigo real a guardar
-        const realCode = `${activeAccount.parentCatalog.code}${activeAccount.code}`;
+        if (activeAccount) {
+          realCode =
+            Object.keys(activeAccount).length > 0
+              ? `${activeAccount.code}${accounts.code}`
+              : `${accounts.code}`;
+        }
 
         // Verifica si los codigos nuevos y los guardados estan duplicados entre ellos.
         // const catalog = this.accounts.map((a) => a.code);
         const catalog = this.accounts
-          .filter((a) => a.id !== activeAccount.id)
+          .filter((a) => a.id != accounts.id)
           .map((a) => a.code);
 
         if (catalog.includes(realCode)) {
@@ -2218,8 +2162,8 @@ export default {
                 instance.confirmButtonText = "Procesando...";
 
                 this.$axios
-                  .put(`/entries/catalog/${activeAccount.id}`, {
-                    ...activeAccount,
+                  .put(`/entries/catalog/${accounts.id}`, {
+                    ...accounts,
                     code: realCode,
                   })
                   .then((res) => {
@@ -2277,7 +2221,7 @@ export default {
         this.$axios
           .get("/entries/catalog", { params: { search: query.toLowerCase() } })
           .then((res) => {
-            this.filteredCatalog = res.data.accountingCatalog;
+            this.filteredCatalog = res.data.data;
             this.loadingAccount = false;
           })
           .catch((err) => (this.errorMessage = err.response.data.message));
@@ -2289,10 +2233,10 @@ export default {
       let addTo = this.tableData.find((td) => {
         return td.children.find((c) => c.id == selected.id);
       });
+
       addTo = addTo.children.find((c) => c.id == selected.id);
       for (const code of list) {
         const account = this.catalogs.find((c) => c.id == code);
-
         if (addTo.children.filter((c) => c.id == account.code).length > 0) {
           this.$notify.error({
             title: "Error",
@@ -2373,7 +2317,7 @@ export default {
       this.$axios
         .get("/entries/setting/balance-general")
         .then((res) => {
-          this.tableData = balance.data.balanceGeneral.report;
+          this.tableData = res.data.data.balanceGeneral.report;
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
@@ -2485,7 +2429,7 @@ export default {
       this.$axios
         .get("/entries/setting/estado-resultados")
         .then((res) => {
-          this.tablesData = res.data.estadoResultados;
+          this.tablesData = res.data.data.estadoResultados;
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
@@ -2641,5 +2585,6 @@ export default {
       );
     },
   },
+  computed: {},
 };
 </script>

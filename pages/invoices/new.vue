@@ -797,14 +797,14 @@ export default {
     Promise.all([sellers(), paymentsConditions(), customers(), documents()])
       .then((res) => {
         const [sellers, paymentConditions, customers, documents] = res;
-        this.sellers = sellers.data.sellers;
-        this.paymentConditions = paymentConditions.data.paymentConditions;
-        this.customers = customers.data.customers;
-        this.documentTypes = documents.data.documents
+        this.sellers = sellers.data.data;
+        this.paymentConditions = paymentConditions.data.data;
+        this.customers = customers.data.data;
+        this.documentTypes = documents.data.data
           .filter((d) => d.active == true)
           .map((d) => d.documentType);
         this.loading = false;
-        this.salesNewForm.documentType = 1;
+        this.salesNewForm.documentType = this.documentTypes[0].id;
         this.validateDocumentType(
           this.salesNewForm.documentType,
           this.tributary
@@ -914,7 +914,7 @@ export default {
       this.$axios
         .get("/services", { params: { active: true } })
         .then((res) => {
-          this.services = res.data.services;
+          this.services = res.data.data;
           this.showAddService = true;
         })
         .catch((err) => {
@@ -961,9 +961,9 @@ export default {
         Promise.all([branches(), tributary()])
           .then((res) => {
             const [branches, tributary, taxerType] = res;
-            this.branches = branches.data.branches;
+            this.branches = branches.data.data;
 
-            this.tributary = tributary.data.customer;
+            this.tributary = tributary.data.data;
             this.loading = false;
             this.validateDocumentType(
               this.salesNewForm.documentType,
@@ -971,7 +971,7 @@ export default {
             );
 
             this.branch = {};
-            this.salesNewForm.customerBranch = branches.data.branches.find(
+            this.salesNewForm.customerBranch = branches.data.data.find(
               (b) => b.default
             ).id;
 
@@ -990,12 +990,13 @@ export default {
     validateDocumentType(id, tributary) {
       if (id) {
         this.$axios
-          .get("/invoices/documents", { params: { type: id } })
+          .get("/invoices/documents")
           .then((res) => {
-            this.documentInfo = res.data.documents;
-            this.salesNewForm.authorization =
-              res.data.documents[0].authorization;
-            this.salesNewForm.sequence = res.data.documents[0].current;
+            this.documentInfo = res.data.data.find(
+              (d) => d.documentType.id == id
+            );
+            this.salesNewForm.authorization = this.documentInfo.authorization;
+            this.salesNewForm.sequence = this.documentInfo.current;
           })
           .catch((err) => {
             this.errorMessage = err.response.data.message;
@@ -1107,21 +1108,23 @@ export default {
                         formData.invoicesPaymentsCondition,
                       invoicesSeller: formData.invoicesSellers,
                       sum:
-                        formData.documentType == 1 ? this.sumasCF : this.sumas,
-                      iva: this.taxes,
-                      subtotal: this.subtotal,
-                      ivaRetenido: this.ivaRetenido,
-                      ventasExentas: this.ventasExentas,
-                      ventasNoSujetas: this.ventasNoSujetas,
-                      ventaTotal: this.ventaTotal,
+                        formData.documentType == 1
+                          ? this.sumasCF.toFixed(2)
+                          : this.sumas.toFixed(2),
+                      iva: this.taxes.toFixed(2),
+                      subtotal: this.subtotal.toFixed(2),
+                      ivaRetenido: this.ivaRetenido.toFixed(2),
+                      ventasExentas: this.ventasExentas.toFixed(2),
+                      ventasNoSujetas: this.ventasNoSujetas.toFixed(2),
+                      ventaTotal: this.ventaTotal.toFixed(2),
                     },
                     details: details.map((d) => {
                       return {
                         chargeDescription: d.chargeDescription,
-                        quantity: d.quantity,
-                        unitPrice: d.unitPrice,
+                        quantity: d.quantity.toFixed(2),
+                        unitPrice: d.unitPrice.toFixed(2),
                         incTax: d.incTax,
-                        ventaPrice: d.ventaPrice,
+                        ventaPrice: d.ventaPrice.toFixed(2),
                         service: d.service,
                         sellingType: d.sellingType,
                       };

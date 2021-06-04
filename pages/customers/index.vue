@@ -157,7 +157,7 @@
       </el-form>
       <el-table
         @sort-change="sortBy"
-        :data="customers.customers"
+        :data="customers.data"
         stripe
         size="mini"
         v-loading="tableloading"
@@ -229,21 +229,13 @@
                 <i class="el-icon-more"></i>
               </el-button>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item
-                  @click.native="updateSelected(multipleSelection, true)"
-                >
+                <el-dropdown-item>
                   <i class="el-icon-check"></i>Activar seleccionados
                 </el-dropdown-item>
-                <el-dropdown-item
-                  @click.native="updateSelected(multipleSelection, false)"
-                >
+                <el-dropdown-item>
                   <i class="el-icon-close"></i>Desactivar seleccionados
                 </el-dropdown-item>
-                <el-dropdown-item
-                  @click.native="deleteSelected(multipleSelection)"
-                  :divided="true"
-                  class="font-semibold"
-                >
+                <el-dropdown-item :divided="true" class="font-semibold">
                   <i class="el-icon-delete"></i> Eliminar seleccionados
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -266,12 +258,13 @@
                 >
                   <i class="el-icon-edit-outline"></i> Editar cliente
                 </el-dropdown-item>
-                  <el-dropdown-item
-                @click.native="
-                $router.push(`/customers/branchOffices?ref=${scope.row.id}`)"
+                <el-dropdown-item
+                  @click.native="
+                    $router.push(`/customers/branchOffices?ref=${scope.row.id}`)
+                  "
                 >
-                    <i class="el-icon-map-location"></i> Sucursales
-                  </el-dropdown-item>
+                  <i class="el-icon-map-location"></i> Sucursales
+                </el-dropdown-item>
                 <el-dropdown-item @click.native="changeActive(scope.row)">
                   <span v-if="scope.row.isActiveCustomer">
                     <i class="el-icon-close"></i> Desactivar
@@ -279,8 +272,8 @@
                   <span v-else> <i class="el-icon-check"></i> Activar </span>
                   cliente
                 </el-dropdown-item>
-              
-                  <!-- <el-dropdown-item>
+
+                <!-- <el-dropdown-item>
                     <i class="el-icon-notebook-1"></i> Directorio
                 </el-dropdown-item> -->
                 <el-dropdown-item
@@ -347,7 +340,7 @@ export default {
       status: "",
       sellingTypes: [],
       customers: {
-        customers: [],
+        data: [],
         count: 0,
       },
       filter: {
@@ -412,7 +405,9 @@ export default {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
               this.$axios
-                .put(`/customers/status/${id}`, { status: !isActiveCustomer })
+                .put(`/customers/status/${id}`, {
+                  isActiveCustomer: !isActiveCustomer,
+                })
                 .then((res) => {
                   this.$notify.success({
                     title: "Éxito",
@@ -519,7 +514,6 @@ export default {
     },
     updateSelected(dataSelected, status) {
       const ids = dataSelected.map((x) => x.id);
-      console.log(ids);
       this.$confirm(
         `¿Estás seguro que deseas eliminar este cliente?`,
         "Confirmación",
@@ -561,8 +555,8 @@ export default {
       );
     },
     async openCustomerPreview({ id }) {
-      const { data } = await this.$axios.get(`/customers/${id}`);
-      (this.selectedCustomer = data.customer),
+      const data = await this.$axios.get(`/customers/${id}`);
+      (this.selectedCustomer = data.data.data),
         (this.showCustomerPreview = true);
     },
     hasModule() {

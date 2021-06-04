@@ -166,7 +166,7 @@ export default {
             this.$axios
               .get("/customers")
               .then((res) => {
-                this.customers = res.data.customers;
+                this.customers = res.data.data;
                 this.requirementForm = "clientes";
               })
               .catch((err) => err.data.errorMessage);
@@ -195,16 +195,17 @@ export default {
       });
     },
     reportCustomers(fileType) {
-      const customers = () => this.$axios.get("/customers");
-      const bussinesInfo = () => this.$axios.get("/business/info");
+      const report = () => this.$axios.get("/customers/report/general");
+
       switch (fileType) {
         case "pdf":
-          Promise.all([customers(), bussinesInfo()]).then((res) => {
-            const [customers, bussinesInfo] = res;
-            const customersData = customers.data.customers;
-            const { name, nit, nrc } = bussinesInfo.data.info;
+          Promise.all([report()]).then((res) => {
+            const [report] = res;
+            const customersData = report.data.customers;
+            const { name, nrc, nit } = report.data.company;
+            const nameReport = report.data.name;
             const values = [];
-            const emptyRow = [{}, {}, {}, {}, {}];
+            const emptyRow = [{}, {}, {}, {}, {}, {}, {}];
 
             for (const c of customersData) {
               values.push(emptyRow);
@@ -212,6 +213,8 @@ export default {
                 {
                   text: c.name,
                 },
+                  { text: c.contactName },
+                  { text: c.contactPhone },
                 {
                   text: c.customerType.name,
                 },
@@ -227,10 +230,13 @@ export default {
               ]);
             }
             const docDefinition = {
+               info: {
+                title: nameReport,
+              },
               pageSize: "LETTER",
               pageOrientation: "portrait",
               pageMargins: [20, 60, 20, 40],
-              header: getHeader(name, nit, nrc, null, "REPORTE CLIENTES"),
+              header: getHeader(name, nit, nrc, null, nameReport),
               footer: getFooter(),
               content: [
                 {
@@ -238,12 +244,20 @@ export default {
                   layout: "noBorders",
                   table: {
                     headerRows: 1,
-                    widths: ["auto", "15%", "15%", "10%", "10%"],
+                    widths: ["auto", "15%", "9%", "13%", "17%", "9%", "7%"],
                     heights: -5,
                     body: [
                       [
                         {
                           text: "NOMBRE",
+                          style: "tableHeader",
+                        },
+                         {
+                          text: "CONTACTO",
+                          style: "tableHeader",
+                        },
+                        {
+                          text: "TELEFONO",
                           style: "tableHeader",
                         },
                         {
@@ -258,6 +272,7 @@ export default {
                           text: "NRC",
                           style: "tableHeader",
                         },
+                       
                         {
                           text: "ESTADO",
                           style: "tableHeader",
@@ -280,10 +295,11 @@ export default {
           });
           break;
         case "excel":
-          Promise.all([customers(), bussinesInfo()]).then((res) => {
-            const [customers, bussinesInfo] = res;
-            const { name, nit, nrc } = bussinesInfo.data.info;
-            const customersData = customers.data.customers;
+          Promise.all([report()]).then((res) => {
+            const [report] = res;
+            const { name, nit, nrc } = report.data.company;
+            const nameReport = report.data.name;
+            const customersData = report.data.customers;
             const values = [];
             for (const c of customersData) {
               values.push([
@@ -296,7 +312,7 @@ export default {
             }
             const document = [
               [name],
-              ["REPORTE CLIENTES", `NIT: ${nit}`, `NRC: ${nrc}`],
+              [nameReport, `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               ["NOMBRE", "TIPO", "NIT", "NRC", "ESTADO"],
               ...values,
@@ -304,7 +320,7 @@ export default {
 
             const sheet = XLSX.utils.aoa_to_sheet(document);
             const workbook = XLSX.utils.book_new();
-            const fileName = "report";
+            const fileName = nameReport;
             XLSX.utils.book_append_sheet(workbook, sheet, fileName);
             XLSX.writeFile(workbook, `${fileName}.xlsx`);
             this.generating = false;
@@ -313,18 +329,16 @@ export default {
       }
     },
     reportCustomer(customerId, fileType) {
-      const customer = () => this.$axios.get(`/customers/${customerId}`);
-      const branches = () =>
-        this.$axios.get(`/customers/${customerId}/branches`);
-      const bussinesInfo = () => this.$axios.get("/business/info");
+      const report = () => this.$axios.get(`/customers/report/${customerId}`);
       switch (fileType) {
         case "pdf":
-          Promise.all([bussinesInfo(), customer(), branches()])
+          Promise.all([report()])
             .then((res) => {
-              const [bussinesInfo, customer, branch] = res;
-              const { name, nit, nrc } = bussinesInfo.data.info;
-              const customerData = customer.data.customer;
-              const branches = branch.data.branches;
+              const [report] = res;
+              const customerData = report.data.customer;
+              const branches = report.data.customer.customerBranches;
+              const { name, nrc, nit } = report.data.company;
+              const nameReport = report.data.name;
               const values = [];
               const valuesTable = [];
               const valuesGeneral = [];
@@ -369,8 +383,8 @@ export default {
                   text: "Telefono: ",
                 },
                 {
-                  text: customerData.customerBranches[0].contactInfo.phones
-                    ? customerData.customerBranches[0].contactInfo.phones
+                  text: customerData.constactPhone
+                    ? customerData.constactPhone
                     : "--------",
                 },
                 {
@@ -379,8 +393,8 @@ export default {
                   text: "Correo: ",
                 },
                 {
-                  text: customerData.customerBranches[0].contactInfo.emails
-                    ? customerData.customerBranches[0].contactInfo.emails
+                  text: customerData.contactEmail
+                    ? customerData.contactEmail
                     : "-------",
                 },
               ]);
@@ -510,12 +524,12 @@ export default {
 
               const docDefinition = {
                 info: {
-                  title: `reporte_perfil_cliente_${customerData.name}`,
+                  title: nameReport,
                 },
                 pageSize: "LETTER",
                 pageOrientation: "portrait",
                 pageMargins: [20, 60, 20, 40],
-                header: getHeader(name, nit, nrc, null, `PERFIL DE CLIENTE`),
+                header: getHeader(name, nit, nrc, null, nameReport),
                 footer: getFooter(),
                 content: [
                   {
@@ -639,19 +653,20 @@ export default {
               pdfMake.createPdf(docDefinition).open();
             })
             .catch((err) => {
+              console.error(err);
               this.errorMessage =
                 "Error al generar el PDF, contacta con tu administrador";
             });
 
           break;
         case "excel":
-          Promise.all([bussinesInfo(), customer(), branches()])
+          Promise.all([report()])
             .then((res) => {
-              const [bussinesInfo, customer, branch] = res;
-
-              const { name, nit, nrc } = bussinesInfo.data.info;
-              const customerData = customer.data.customer;
-              const branches = branch.data.branches;
+              const [report] = res;
+              const customerData = report.data.customer;
+              const branches = report.data.customer.customerBranches;
+              const { name, nrc, nit } = report.data.company;
+              const nameReport = report.data.name;
               const values = [];
               const valuesTable = [];
               const valuesGeneral = [];
@@ -718,7 +733,7 @@ export default {
 
               const document = [
                 [name],
-                [`PERFIL DE CLIENTE`, `NIT: ${nit}`, `NRC: ${nrc}`],
+                [nameReport, `NIT: ${nit}`, `NRC: ${nrc}`],
                 [""],
                 ["INFORMACIÓN GENERAL"],
                 ...valuesGeneral,
@@ -740,7 +755,7 @@ export default {
 
               const sheet = XLSX.utils.aoa_to_sheet(document);
               const workbook = XLSX.utils.book_new();
-              const fileName = `reporte_cliente_${customerData.shortName}`;
+              const fileName = nameReport;
               XLSX.utils.book_append_sheet(workbook, sheet, fileName);
               XLSX.writeFile(workbook, `${fileName}.xlsx`);
               this.generating = false;

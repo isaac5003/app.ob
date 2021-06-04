@@ -217,7 +217,7 @@
           </div>
         </div>
         <div class="flex flex-col space-y-2">
-          <span class="text-sm font-semibold">Informacion general</span>
+          <span class="text-sm font-semibold">Informacion tributaria</span>
           <div class="flex flex-col">
             <div class="grid grid-cols-12 gap-4">
               <el-form-item
@@ -299,7 +299,7 @@
                 class="col-span-2"
                 v-if="
                   providerNewForm.customerType == 1 ||
-                  providerNewForm.customerTypeNatural == 2
+                    providerNewForm.customerTypeNatural == 2
                 "
               >
                 <el-form-item label="NRC" prop="nrc">
@@ -317,7 +317,7 @@
               class="grid grid-cols-12 gap-4"
               v-if="
                 providerNewForm.customerType == 1 ||
-                providerNewForm.customerTypeNatural == 2
+                  providerNewForm.customerTypeNatural == 2
               "
             >
               <div class="col-span-4">
@@ -419,12 +419,12 @@ export default {
           cities,
         ] = res;
 
-        this.customerTypes = customerTypes.data.types;
-        this.customerTypeNaturals = customerTypeNaturals.data.typeNaturals;
-        this.customerTaxerTypes = customerTaxerTypes.data.taxerTypes;
-        this.countries = countries.data.countries;
-        this.rawStates = states.data.states;
-        this.rawCities = cities.data.cities;
+        this.customerTypes = customerTypes.data.data;
+        this.customerTypeNaturals = customerTypeNaturals.data.data;
+        this.customerTaxerTypes = customerTaxerTypes.data.data;
+        this.countries = countries.data.data;
+        this.rawStates = states.data.data;
+        this.rawCities = cities.data.data;
       })
       .catch((err) => {
         this.$message.error(err.response.data.message);
@@ -484,6 +484,7 @@ export default {
         nrc: inputValidation(true, 3),
         customerTaxerType: selectValidation(true),
         giro: inputValidation(true, 5, 150),
+        customerTypeNatural: selectValidation(true),
       },
     };
   },
@@ -521,7 +522,7 @@ export default {
                 instance.confirmButtonLoading = true;
                 instance.confirmButtonText = "Procesando...";
                 this.$axios
-                  .post("/customers", {
+                  .post("/providers", {
                     name: formData.name,
                     shortName: formData.shortName,
                     isCustomer: formData.isCustomer,
@@ -544,8 +545,8 @@ export default {
                     branch: {
                       contactName: formData.contactName,
                       contactInfo: {
-                        phones: [formData.phone],
-                        emails: [formData.email],
+                        phones: [formData.phone ? formData.phone : ""],
+                        emails: [formData.email ? formData.email : ""],
                       },
                       address1: formData.address1,
                       address2: formData.address2,
