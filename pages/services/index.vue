@@ -223,7 +223,7 @@ export default {
     Promise.all([sellingTypes(), services()])
       .then((res) => {
         const [sellingTypes, services] = res;
-        this.sellingTypes = sellingTypes.data.type;
+        this.sellingTypes = sellingTypes.data.data;
         this.services = services.data;
       })
       .catch((err) => {
@@ -308,7 +308,7 @@ export default {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
               this.$axios
-                .put(`/services/status/${id}`, { status: !active })
+                .put(`/services/status/${id}`, { active: !active })
                 .then((res) => {
                   this.$notify.success({
                     title: "Éxito",

@@ -65,8 +65,8 @@
           <template
             v-if="
               selectedCustomer &&
-              (!selectedCustomer.customerTypeNatural ||
-                selectedCustomer.customerTypeNatural.id == 2)
+                (!selectedCustomer.customerTypeNatural ||
+                  selectedCustomer.customerTypeNatural.id == 2)
             "
           >
             <div class="col-span-2 flex flex-col">
@@ -229,21 +229,13 @@
                 <i class="el-icon-more"></i>
               </el-button>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item
-                  @click.native="updateSelected(multipleSelection, true)"
-                >
+                <el-dropdown-item>
                   <i class="el-icon-check"></i>Activar seleccionados
                 </el-dropdown-item>
-                <el-dropdown-item
-                  @click.native="updateSelected(multipleSelection, false)"
-                >
+                <el-dropdown-item>
                   <i class="el-icon-close"></i>Desactivar seleccionados
                 </el-dropdown-item>
-                <el-dropdown-item
-                  @click.native="deleteSelected(multipleSelection)"
-                  :divided="true"
-                  class="font-semibold"
-                >
+                <el-dropdown-item :divided="true" class="font-semibold">
                   <i class="el-icon-delete"></i> Eliminar seleccionados
                 </el-dropdown-item>
               </el-dropdown-menu>

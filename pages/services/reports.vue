@@ -261,7 +261,7 @@ export default {
         this.generating = true;
         let params = {};
         if (reportForm.sellingType) {
-          params = { type: reportForm.sellingType };
+          params = { type: reportForm.sellingType, formName };
         } else if (reportForm.status) {
           switch (reportForm.status) {
             case 1:
@@ -299,7 +299,12 @@ export default {
             const [report] = res;
             const bussines = report.data.company;
             const services = report.data.services;
-            this.reportForm.sellingType = "";
+            if (params.formName) {
+              this.$refs[params.formName].fields
+                .find((f) => f.prop == "sellingType")
+                .resetField();
+            }
+
             this.reportForm.status = "";
             this.reportForm.initialCost = "";
             this.reportForm.finalCost = "";
@@ -391,7 +396,11 @@ export default {
             const [report] = res;
             const bussines = report.data.company;
             const services = report.data.services;
-            this.reportForm.sellingType = "";
+            if (params.formName) {
+              this.$refs[params.formName].fields
+                .find((f) => f.prop == "sellingType")
+                .resetField();
+            }
             this.reportForm.status = "";
             this.reportForm.initialCost = "";
             this.reportForm.finalCost = "";

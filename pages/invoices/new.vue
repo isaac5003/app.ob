@@ -87,7 +87,7 @@
                 <el-checkbox
                   v-if="
                     newServiceForm.sellingType == 3 &&
-                    salesNewForm.documentType != 3
+                      salesNewForm.documentType != 3
                   "
                   border
                   v-model="newServiceForm.incTax"
@@ -218,7 +218,7 @@
                   border
                   v-if="
                     editServiceForm.sellingType == 3 &&
-                    salesNewForm.documentType != 3
+                      salesNewForm.documentType != 3
                   "
                   v-model="editServiceForm.incTax"
                   size="small"
@@ -589,8 +589,8 @@
                   <span
                     v-if="
                       scope.row.sellingType == 1 &&
-                      salesNewForm.documentType != 3 &&
-                      salesNewForm.documentType != 6
+                        salesNewForm.documentType != 3 &&
+                        salesNewForm.documentType != 6
                     "
                     >{{
                       calcSujeta(salesNewForm.documentType, scope.row)
@@ -614,8 +614,8 @@
                   <span
                     v-if="
                       scope.row.sellingType == 2 &&
-                      salesNewForm.documentType != 3 &&
-                      salesNewForm.documentType != 6
+                        salesNewForm.documentType != 3 &&
+                        salesNewForm.documentType != 6
                     "
                     >{{
                       calcExenta(salesNewForm.documentType, scope.row)
@@ -634,8 +634,8 @@
                   <span
                     v-if="
                       scope.row.sellingType == 3 ||
-                      salesNewForm.documentType == 3 ||
-                      salesNewForm.documentType == 6
+                        salesNewForm.documentType == 3 ||
+                        salesNewForm.documentType == 6
                     "
                     >{{
                       calcGravada(salesNewForm.documentType, scope.row)
@@ -804,7 +804,7 @@ export default {
           .filter((d) => d.active == true)
           .map((d) => d.documentType);
         this.loading = false;
-        this.salesNewForm.documentType = 1;
+        this.salesNewForm.documentType = this.documentTypes[0].id;
         this.validateDocumentType(
           this.salesNewForm.documentType,
           this.tributary
@@ -990,11 +990,13 @@ export default {
     validateDocumentType(id, tributary) {
       if (id) {
         this.$axios
-          .get("/invoices/documents", { params: { type: id } })
+          .get("/invoices/documents")
           .then((res) => {
-            this.documentInfo = res.data.data;
-            this.salesNewForm.authorization = res.data.data[0].authorization;
-            this.salesNewForm.sequence = res.data.data[0].current;
+            this.documentInfo = res.data.data.find(
+              (d) => d.documentType.id == id
+            );
+            this.salesNewForm.authorization = this.documentInfo.authorization;
+            this.salesNewForm.sequence = this.documentInfo.current;
           })
           .catch((err) => {
             this.errorMessage = err.response.data.message;
@@ -1106,21 +1108,23 @@ export default {
                         formData.invoicesPaymentsCondition,
                       invoicesSeller: formData.invoicesSellers,
                       sum:
-                        formData.documentType == 1 ? this.sumasCF : this.sumas,
-                      iva: this.taxes,
-                      subtotal: this.subtotal,
-                      ivaRetenido: this.ivaRetenido,
-                      ventasExentas: this.ventasExentas,
-                      ventasNoSujetas: this.ventasNoSujetas,
-                      ventaTotal: this.ventaTotal,
+                        formData.documentType == 1
+                          ? this.sumasCF.toFixed(2)
+                          : this.sumas.toFixed(2),
+                      iva: this.taxes.toFixed(2),
+                      subtotal: this.subtotal.toFixed(2),
+                      ivaRetenido: this.ivaRetenido.toFixed(2),
+                      ventasExentas: this.ventasExentas.toFixed(2),
+                      ventasNoSujetas: this.ventasNoSujetas.toFixed(2),
+                      ventaTotal: this.ventaTotal.toFixed(2),
                     },
                     details: details.map((d) => {
                       return {
                         chargeDescription: d.chargeDescription,
-                        quantity: d.quantity,
-                        unitPrice: d.unitPrice,
+                        quantity: d.quantity.toFixed(2),
+                        unitPrice: d.unitPrice.toFixed(2),
                         incTax: d.incTax,
-                        ventaPrice: d.ventaPrice,
+                        ventaPrice: d.ventaPrice.toFixed(2),
                         service: d.service,
                         sellingType: d.sellingType,
                       };

@@ -223,7 +223,7 @@
       <!-- La tabla tiene las medidas exacta, la suma de las colummnas tiene 960-->
       <el-table
         @sort-change="sortBy"
-        :data="entries.entries"
+        :data="entries.data"
         stripe
         size="mini"
         ref="multipleTable"
@@ -383,9 +383,11 @@ export default {
     const entryType = () => this.$axios.get("/entries/types");
     Promise.all([entries(), entryType()])
       .then((res) => {
+        this.loading = false;
         const [entries, entryType] = res;
         this.entries = entries.data;
         this.entryType = entryType.data.data;
+        this.loading = false;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message
@@ -403,7 +405,7 @@ export default {
       },
       selecEntries: {},
       showInvoicePreview: false,
-      loading: false,
+      loading: true,
       errorMessage: "",
       searchValue: "",
       entryType: [],
@@ -419,7 +421,7 @@ export default {
       },
 
       entries: {
-        entries: [],
+        data: [],
         count: 0,
       },
     };
@@ -553,13 +555,14 @@ export default {
             if (action === "confirm") {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
-              const entry = () => this.$axios.get(`/entries/${id}`);
-              const bussinesInfo = () => this.$axios.get("/business/info");
-              Promise.all([entry(), bussinesInfo()])
+              const report = () =>
+                this.$axios.get(`/entries/report/print-entry/${id}`);
+
+              Promise.all([report()])
                 .then((res) => {
-                  const [entry, bussinesInfo] = res;
-                  const accountingEntry = entry.data.data;
-                  const { name, nit, nrc } = bussinesInfo.data.info;
+                  const [report] = res;
+                  const accountingEntry = report.data.entry;
+                  const { name, nit, nrc } = report.data.company;
 
                   let totalAbono = 0;
                   let totalCargo = 0;
@@ -631,7 +634,7 @@ export default {
                   const docDefinition = {
                     info: {
                       title: `partida_contable_${this.$dateFns.format(
-                        new Date(accountingEntry.rawDate),
+                        new Date(accountingEntry.date),
                         "yyyyMMdd"
                       )}`,
                     },
@@ -716,7 +719,7 @@ export default {
 
     async openPreviewEntry({ id }) {
       const { data } = await this.$axios.get(`/entries/${id}`);
-      this.selecEntries = data.entry;
+      this.selecEntries = data.data;
       this.showInvoicePreview = true;
     },
   },

@@ -119,6 +119,7 @@
           label="Integraciones"
           name="integrations"
           class="space-y-2"
+           v-if="hasModule(['a98b98e6-b2d5-42a3-853d-9516f64eade8'])"
         >
           <Notification
             class="w-full"
@@ -131,6 +132,7 @@
               label="Seleccione una cuenta"
               prop="accountingCatalog"
               class="col-span-4"
+              v-if="hasModule('a98b98e6-b2d5-42a3-853d-9516f64eade8')"
             >
               <el-select
                 v-model="servicesEditForm.accountingCatalog"
@@ -142,6 +144,7 @@
                 class="w-full"
                 :loading="loadingAccount"
                 :remote-method="findAccount"
+                @focus="filteredCatalog = []"
               >
                 <el-option
                   v-for="c in filteredCatalog"
@@ -170,6 +173,7 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
+import {hasModule} from  "../../tools/index.js"
 import {
   checkBeforeEnter,
   checkBeforeLeave,
@@ -201,15 +205,19 @@ export default {
       integrationServiceAccount(),
     ])
       .then((res) => {
-        const [sellingTypes, service] = res;
+        const [sellingTypes, service, catalog, integration] = res;
         this.sellingTypes = sellingTypes.data.data;
         this.servicesEditForm = {
           ...service.data.data,
           sellingType: service.data.data.sellingType.id,
+          accountingCatalog: integration.data.integrations.catalog,
         };
+
+        this.catalogs = catalog.data.data;
         this.filteredCatalog = this.catalogs.filter(
-          (c) => c.id == integrationCatalog.data.integrations.catalog
+          (c) => c.id == integration.data.integrations.catalog
         );
+        this.pageloading = false;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
@@ -297,6 +305,7 @@ export default {
                     description,
                     incIva,
                     incRenta,
+                    accountingCatalog,
                   });
                 const integration = () =>
                   this.$axios.put(
@@ -341,6 +350,9 @@ export default {
       } else {
         this.servicesEditForm.incIva = false;
       }
+    },
+    hasModule(modules) {
+      return hasModule(modules, this.$auth.user);
     },
   },
 };

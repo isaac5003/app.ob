@@ -33,6 +33,7 @@
           label="Integraciones"
           name="integrations"
           class="space-y-2"
+          v-if="hasModule(['a98b98e6-b2d5-42a3-853d-9516f64eade8'])"
         >
           <Notification
             class="w-full"
@@ -52,6 +53,7 @@
                 class="w-full"
                 default-first-option
                 :remote-method="findAccount"
+                @focus="filteredCatalog = []"
               >
                 <el-option
                   v-for="c in filteredCatalog"
@@ -82,7 +84,7 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-
+import { hasModule } from "../../tools/index.js";
 export default {
   name: "CustomerSettings",
   components: { LayoutContent, Notification },
@@ -186,6 +188,9 @@ export default {
           }
         );
       });
+    },
+         hasModule(modules) {
+      return hasModule(modules, this.$auth.user);
     },
   },
 };

@@ -18,7 +18,7 @@
           .catch(() => {})
       "
     >
-      <el-tab-pane label="Integraciones" name="integrations" class="space-y-2">
+      <el-tab-pane label="Integraciones" name="integrations" class="space-y-2" v-if="hasModule(['a98b98e6-b2d5-42a3-853d-9516f64eade8'])">
         <Notification
           class="w-full"
           type="info"
@@ -43,6 +43,7 @@
                 label="Seleccione una cuenta"
                 class="col-span-4"
                 prop="accountingCatalog"
+                v-if="hasModule('a98b98e6-b2d5-42a3-853d-9516f64eade8')"
               >
                 <el-select
                   v-model="integrationSettingForm.accountingCatalog"
@@ -55,6 +56,7 @@
                   filterable
                   default-first-option
                   :remote-method="findAccount"
+                  @focus="filteredCatalog = []"
                 >
                   <el-option
                     v-for="c in filteredCatalog"
@@ -189,6 +191,9 @@ export default {
           }
         );
       });
+    },
+       hasModule(modules) {
+      return hasModule(modules, this.$auth.user);
     },
   },
 };

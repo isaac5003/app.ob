@@ -682,6 +682,7 @@
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item
                     @click.native="openInvoicePreview(scope.row)"
+                    v-if="scope.row.status.id != '4'"
                   >
                     <i class="el-icon-view"></i> Vista previa
                   </el-dropdown-item>
@@ -689,7 +690,9 @@
                     @click.native="
                       $router.push(`/invoices/edit?ref=${scope.row.id}`)
                     "
-                    v-if="scope.row.status.id == '1'"
+                    v-if="
+                      scope.row.status.id == '1' || scope.row.status.id == '4'
+                    "
                   >
                     <i class="el-icon-edit-outline"></i> Editar documento
                   </el-dropdown-item>
@@ -747,15 +750,13 @@
                     class="text-red-500 font-semibold"
                     @click.native="voidDocument(scope.row)"
                     v-if="
-                      scope.row.status.id === '2' ||
-                      scope.row.status.id === '5' ||
-                      scope.row.status.id != '3' ||
-                      (isLastInvoice(
-                        scope.row.sequence,
-                        scope.row.documentType.id,
-                        scope.row.authorization
-                      ) &&
-                        scope.row.status.id != '3')
+                      (scope.row.status.id == 1 &&
+                        isLastInvoice(
+                          scope.row.sequence,
+                          scope.row.documentType.id,
+                          scope.row.authorization
+                        )) ||
+                      scope.row.status.id == 2
                     "
                   >
                     <i class="el-icon-circle-close"></i>
@@ -953,7 +954,6 @@ export default {
     async openInvoicePreview({ id }) {
       const { data } = await this.$axios.get(`/invoices/${id}`);
       this.selectedInvoice = data.data;
-      console.log(this.selectedInvoice);
       this.showInvoicePreview = true;
     },
     voidDocument({ id }) {

@@ -196,7 +196,7 @@ export default {
     },
     reportCustomers(fileType) {
       const report = () => this.$axios.get("/customers/report/general");
-      // const bussinesInfo = () => this.$axios.get("/business/info");
+
       switch (fileType) {
         case "pdf":
           Promise.all([report()]).then((res) => {
@@ -205,7 +205,7 @@ export default {
             const { name, nrc, nit } = report.data.company;
             const nameReport = report.data.name;
             const values = [];
-            const emptyRow = [{}, {}, {}, {}, {}];
+            const emptyRow = [{}, {}, {}, {}, {}, {}, {}];
 
             for (const c of customersData) {
               values.push(emptyRow);
@@ -213,6 +213,8 @@ export default {
                 {
                   text: c.name,
                 },
+                  { text: c.contactName },
+                  { text: c.contactPhone },
                 {
                   text: c.customerType.name,
                 },
@@ -228,6 +230,9 @@ export default {
               ]);
             }
             const docDefinition = {
+               info: {
+                title: nameReport,
+              },
               pageSize: "LETTER",
               pageOrientation: "portrait",
               pageMargins: [20, 60, 20, 40],
@@ -239,12 +244,20 @@ export default {
                   layout: "noBorders",
                   table: {
                     headerRows: 1,
-                    widths: ["auto", "15%", "15%", "10%", "10%"],
+                    widths: ["auto", "15%", "9%", "13%", "17%", "9%", "7%"],
                     heights: -5,
                     body: [
                       [
                         {
                           text: "NOMBRE",
+                          style: "tableHeader",
+                        },
+                         {
+                          text: "CONTACTO",
+                          style: "tableHeader",
+                        },
+                        {
+                          text: "TELEFONO",
                           style: "tableHeader",
                         },
                         {
@@ -259,6 +272,7 @@ export default {
                           text: "NRC",
                           style: "tableHeader",
                         },
+                       
                         {
                           text: "ESTADO",
                           style: "tableHeader",
@@ -306,7 +320,7 @@ export default {
 
             const sheet = XLSX.utils.aoa_to_sheet(document);
             const workbook = XLSX.utils.book_new();
-            const fileName = "report";
+            const fileName = nameReport;
             XLSX.utils.book_append_sheet(workbook, sheet, fileName);
             XLSX.writeFile(workbook, `${fileName}.xlsx`);
             this.generating = false;
@@ -510,7 +524,7 @@ export default {
 
               const docDefinition = {
                 info: {
-                  title: `reporte_perfil_cliente_${customerData.name}`,
+                  title: nameReport,
                 },
                 pageSize: "LETTER",
                 pageOrientation: "portrait",
@@ -646,7 +660,7 @@ export default {
 
           break;
         case "excel":
-          Promise.all([bussinesInfo(), customer(), branches()])
+          Promise.all([report()])
             .then((res) => {
               const [report] = res;
               const customerData = report.data.customer;
@@ -741,7 +755,7 @@ export default {
 
               const sheet = XLSX.utils.aoa_to_sheet(document);
               const workbook = XLSX.utils.book_new();
-              const fileName = `reporte_cliente_${customerData.shortName}`;
+              const fileName = nameReport;
               XLSX.utils.book_append_sheet(workbook, sheet, fileName);
               XLSX.writeFile(workbook, `${fileName}.xlsx`);
               this.generating = false;

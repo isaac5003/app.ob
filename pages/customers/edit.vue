@@ -9,6 +9,7 @@
   >
     <el-form
       :model="customersEditForm"
+      :rules="customersEditFormRuler"
       status-icon
       ref="customersEditForm"
       @submit.native.prevent="
@@ -359,6 +360,7 @@
           label="Integraciones"
           name="integrations"
           class="space-y-2"
+          v-if="hasModule(['a98b98e6-b2d5-42a3-853d-9516f64eade8'])"
         >
           <Notification
             class="w-full"
@@ -368,7 +370,8 @@
           />
 
           <div class="grid grid-cols-12 gap-4">
-            <el-form-item label="Seleccione una cuenta" class="col-span-4">
+            <el-form-item label="Seleccione una cuenta" class="col-span-4"
+            v-if="hasModule('a98b98e6-b2d5-42a3-853d-9516f64eade8')">
               <el-select
                 filterable
                 remote
@@ -379,6 +382,7 @@
                 class="w-full"
                 :remote-method="findAccount"
                 :loading="loadingAccount"
+                @focus="filteredCatalog = []"
               >
                 <el-option
                   v-for="a in filteredCatalog"
@@ -412,6 +416,7 @@ import {
   selectValidation,
   checkBeforeLeave,
   checkBeforeEnter,
+  hasModule
 } from "../../tools";
 import Notification from "../../components/Notification";
 
@@ -552,6 +557,19 @@ export default {
         city: "",
         accountingCatalog: "",
       },
+      customersEditFormRuler: {
+        name: inputValidation(true, 5, 100),
+        shortName: inputValidation(true, 3, 15),
+        address1: inputValidation(true, 5, 150),
+        giro: inputValidation(true, 5, 150),
+        nit: inputValidation(true, 5, 150),
+        country: selectValidation(true),
+        state: selectValidation(true),
+        city: selectValidation(true),
+        customerType: selectValidation(true),
+        customerTypeNatural: selectValidation(true),
+        customerTaxerType: selectValidation(true),
+      },
       customer: null,
       filteredCatalog: [],
       loadingAccount: false,
@@ -678,6 +696,9 @@ export default {
       } else {
         this.filteredCatalog = [];
       }
+    },
+        hasModule(modules) {
+      return hasModule(modules, this.$auth.user);
     },
   },
   computed: {

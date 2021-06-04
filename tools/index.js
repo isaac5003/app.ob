@@ -382,7 +382,7 @@ function checkBeforeLeave(self, storagekey, next) {
  * @param {string} storagekey Nombre de la llave a usar en el LocalStorage
  * @param {string} form Name of the object where to store
  */
-function checkBeforeEnter(self, storagekey, form) {
+function checkBeforeEnter(self, storagekey, form, formName = false) {
   const stored = localStorage.getItem(storagekey);
   if (stored) {
     self
@@ -398,7 +398,15 @@ function checkBeforeEnter(self, storagekey, form) {
         }
       )
       .then(() => {
-        self[form] = JSON.parse(stored);
+        const value = JSON.parse(stored);
+        if (Array.isArray(form)) {
+          for (arr of form) {
+            self[arr] = value[arr];
+          }
+        } else {
+          const name = formName ? formName : form;
+          self[name] = value
+        }
       })
       .catch(() => {
         localStorage.removeItem(storagekey);
@@ -411,7 +419,12 @@ function hasModule(module, user) {
     (a) => a.id == user.workspace.company.id
   );
   const branch = company.branches.find((b) => b.id == user.workspace.branch.id);
-  return branch.modules.map((m) => m.id).includes(module);
+  const modules = branch.modules.map((m) => m.id);
+  if (Array.isArray(module)) {
+    return modules.map(m => module.includes(m)).some(m => m)
+  } else {
+    return modules.includes(module);
+  }
 }
 
 const getHeader = (name, nit, nrc, lastDay, docName, dateType = 'date', preTitle = null, postTitle = null) => {
@@ -593,6 +606,18 @@ const fixDate = (date) => {
   return format(endOfMonth(zonedTimeToUtc(date)), 'yyyy-MM-dd')
 }
 
+function parseErrors(errors) {
+  if (Array.isArray(errors)) {
+    let list = "";
+    for (const e of errors.filter((e) => e)) {
+      list += `<li>${e}</li>`;
+    }
+    return `<ul class="list-outside list-disc">${list}</ul>`;
+  } else {
+    return errors
+  }
+}
+
 module.exports = {
   getIcon,
   inputValidation,
@@ -605,5 +630,6 @@ module.exports = {
   calculatedAmount,
   getHeader,
   getFooter,
-  fixDate
+  fixDate,
+  parseErrors
 };
