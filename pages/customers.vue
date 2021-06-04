@@ -16,7 +16,7 @@ export default {
   },
   components: { LayoutSubmenu },
   fetch() {
-   if (!hasModule(["f6000cbb-1e6d-4f7d-a7cc-cadd78d23076"], this.$auth.user)) {
+   if (!hasModule(["a98b98e6-b2d5-42a3-853d-9516f64eade8"], this.$auth.user)) {
      this.menu = this.menu.slice(0, -1);    }
  },
  
