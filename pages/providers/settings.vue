@@ -32,7 +32,7 @@
           label="Integraciones"
           name="integrations"
           class="space-y-2"
-          v-if="hasModule()"
+          v-if="hasModule(['a98b98e6-b2d5-42a3-853d-9516f64eade8'])"
         >
           <Notification
             class="w-full"
@@ -41,7 +41,8 @@
             message="En esta sección se realizan las configuraciones de integración con otros modulos de manera general. Estas configuraciones se aplicarán a todos los servicios que no tengan una configuración individual."
           />
           <div class="grid grid-cols-12 gap-4">
-            <el-form-item label="Seleccione una cuenta" class="col-span-4">
+            <el-form-item label="Seleccione una cuenta" class="col-span-4"
+            v-if="hasModule('a98b98e6-b2d5-42a3-853d-9516f64eade8')">
               <el-select
                 v-model="integrationSettingForm.accountingCatalog"
                 placeholder="Ingrese el codigo o nombre de la cuenta"
@@ -190,8 +191,8 @@ export default {
         );
       });
     },
-     hasModule() {
-      return hasModule(["f6000cbb-1e6d-4f7d-a7cc-cadd78d23076"], this.$auth.user);
+     hasModule(modules) {
+      return hasModule(modules, this.$auth.user);
    },
   },
 };
