@@ -358,6 +358,7 @@
           label="Integraciones"
           name="integrations"
           class="space-y-2"
+          v-if="hasModule()"
         >
           <Notification
             class="w-full"
@@ -406,6 +407,7 @@
 
 <script>
 import LayoutContent from "../../components/layout/Content";
+import {hasModule} from "../../tools/index.js"
 import {
   inputValidation,
   selectValidation,
@@ -567,6 +569,7 @@ this.catalogs = catalog.data.data;
     };
   },
   methods: {
+   
     setStorage(providerEditForm) {
       localStorage.setItem(storagekey, JSON.stringify(providerEditForm));
     },
@@ -687,6 +690,9 @@ this.catalogs = catalog.data.data;
         this.filteredCatalog = [];
       }
     },
+     hasModule() {
+      return hasModule(["f6000cbb-1e6d-4f7d-a7cc-cadd78d23076"], this.$auth.user);
+   },
   },
   computed: {
     states() {

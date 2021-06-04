@@ -32,6 +32,7 @@
           label="Integraciones"
           name="integrations"
           class="space-y-2"
+          v-if="hasModule()"
         >
           <Notification
             class="w-full"
@@ -83,6 +84,7 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
+import {hasModule} from "../../tools/index.js"
 
 export default {
   name: "CustomerSettings",
@@ -188,6 +190,9 @@ export default {
         );
       });
     },
+     hasModule() {
+      return hasModule(["f6000cbb-1e6d-4f7d-a7cc-cadd78d23076"], this.$auth.user);
+   },
   },
 };
 </script>
