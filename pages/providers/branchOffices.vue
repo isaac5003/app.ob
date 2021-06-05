@@ -1,5 +1,6 @@
 <template>
   <layout-content
+    v-loading="pageloading"
     page-title="Sucursales"
     :breadcrumb="[
       { name: 'Proveedores', to: '/providers' },
@@ -426,7 +427,6 @@
                   maxlength="150"
                   show-word-limit
                 >
-                  <el-option> </el-option>
                 </el-input>
               </el-form-item>
               <el-form-item label="Dirección 2" class="col-span-6">
@@ -439,7 +439,6 @@
                   maxlength="150"
                   show-word-limit
                 >
-                  <el-option> </el-option>
                 </el-input>
               </el-form-item>
             </div>
@@ -470,7 +469,12 @@
               <el-form-item
                 label="Correo electronico"
                 class="col-span-4"
-                prop="email"
+                :prop="`items.${i}.emails`"
+                :rules="{
+                  type: 'email',
+                  message: 'Ingresa una direccion de correo valida.',
+                  trigger: 'blur',
+                }"
               >
                 <el-input
                   v-model="item.emails"
