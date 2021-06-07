@@ -1,5 +1,6 @@
 <template>
   <layout-content
+    v-loading="pageloading"
     page-title="Sucursales"
     :breadcrumb="[
       { name: 'Clientes', to: '/customers' },
@@ -209,7 +210,7 @@
           </div>
           <!-- Contactos -->
           <h1 class="text-blue-500">Contacto</h1>
-          <div class="grid grid-cols-12 gap-4 ">
+          <div class="grid grid-cols-12 gap-4">
             <el-form-item
               label="Nombre de contacto"
               class="col-span-4"
@@ -425,9 +426,7 @@
                   size="small"
                   maxlength="150"
                   show-word-limit
-                >
-                  <el-option> </el-option>
-                </el-input>
+                />
               </el-form-item>
               <el-form-item label="Dirección 2" class="col-span-6">
                 <el-input
@@ -437,10 +436,7 @@
                   class="w-full"
                   size="small"
                   maxlength="150"
-                  show-word-limit
-                >
-                  <el-option> </el-option>
-                </el-input>
+                />
               </el-form-item>
             </div>
             <!-- Contactos -->
@@ -470,7 +466,12 @@
               <el-form-item
                 label="Correo electronico"
                 class="col-span-4"
-                prop="email"
+                :prop="`items.${i}.emails`"
+                :rules="{
+                  type: 'email',
+                  message: 'Ingresa una direccion de correo valida.',
+                  trigger: 'change',
+                }"
               >
                 <el-input
                   v-model="item.emails"
@@ -656,7 +657,7 @@
 
                 <el-dropdown-item
                   :divided="true"
-                  class=" font-semibold  text-red-500"
+                  class="font-semibold text-red-500"
                   @click.native="deleteBranch(scope.row.id)"
                   v-if="!scope.row.default"
                 >
@@ -690,6 +691,7 @@ import {
   selectValidation,
   checkBeforeLeave,
   checkBeforeEnter,
+  parseErrors,
 } from "../../tools";
 import Notification from "../../components/Notification";
 
@@ -912,10 +914,10 @@ export default {
                   this.fetchBranches();
                 })
                 .catch((err) => {
-                  console.error(err);
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {
@@ -949,6 +951,7 @@ export default {
         .get(`/customers/${this.$route.query.ref}/branches`, { params })
         .then((res) => {
           this.branches = res.data;
+          this.pageloading = false;
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
@@ -980,7 +983,8 @@ export default {
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {
@@ -1075,7 +1079,8 @@ export default {
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
@@ -1139,10 +1144,10 @@ export default {
                     this.showBranchOffices = false;
                   })
                   .catch((err) => {
-                    instance.confirmButtonLoading = false;
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {

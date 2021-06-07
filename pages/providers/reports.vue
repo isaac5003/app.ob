@@ -7,7 +7,7 @@
       { name: 'Reportes', to: null },
     ]"
   >
-      <div class="flex justify-center" v-if="errorMessage">
+    <div class="flex justify-center" v-if="errorMessage">
       <Notification
         class="w-1/2"
         type="danger"
@@ -76,7 +76,10 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-12 gap-4" v-if="requirementForm == 'proveedores'">
+      <div
+        class="grid grid-cols-12 gap-4"
+        v-if="requirementForm == 'proveedores'"
+      >
         <div class="col-span-5">
           <el-form-item label="Clientes" prop="customers">
             <el-select
@@ -177,7 +180,7 @@ export default {
         }
       }
     },
- generateReport(formName, { reportType, radio, providers }) {
+    generateReport(formName, { reportType, radio, providers }) {
       this.$refs[formName].validate((valid) => {
         if (!valid) {
           return false;
@@ -194,7 +197,7 @@ export default {
         }
       });
     },
-  reportProviders(fileType) {
+    reportProviders(fileType) {
       const report = () => this.$axios.get("/providers/report/general");
 
       switch (fileType) {
@@ -213,8 +216,8 @@ export default {
                 {
                   text: c.name,
                 },
-                  { text: c.contactName },
-                  { text: c.contactPhone },
+                { text: c.contactName },
+                { text: c.contactPhone },
                 {
                   text: c.customerType.name,
                 },
@@ -225,12 +228,12 @@ export default {
                   text: c.nrc,
                 },
                 {
-                  text: c.isActiveCustomer ? "Activo" : "Inactivo",
+                  text: c.isActiveProvider ? "Activo" : "Inactivo",
                 },
               ]);
             }
             const docDefinition = {
-               info: {
+              info: {
                 title: nameReport,
               },
               pageSize: "LETTER",
@@ -252,7 +255,7 @@ export default {
                           text: "NOMBRE",
                           style: "tableHeader",
                         },
-                         {
+                        {
                           text: "CONTACTO",
                           style: "tableHeader",
                         },
@@ -272,7 +275,7 @@ export default {
                           text: "NRC",
                           style: "tableHeader",
                         },
-                       
+
                         {
                           text: "ESTADO",
                           style: "tableHeader",
@@ -307,7 +310,7 @@ export default {
                 c.customerType.name,
                 c.nit,
                 c.nrc,
-                c.isActiveCustomer ? "Activo" : "Inactivo",
+                c.isActiveProvider ? "Activo" : "Inactivo",
               ]);
             }
             const document = [
@@ -366,7 +369,7 @@ export default {
                   text: "Estado:",
                 },
                 {
-                  text: customerData.isActiveCustomer ? "Activo" : "Inactivo",
+                  text: customerData.isActiveProvider ? "Activo" : "Inactivo",
                 },
               ]);
 
@@ -678,7 +681,7 @@ export default {
                 `Identificador:`,
                 customerData.shortName,
                 `Estado:`,
-                customerData.isActiveCustomer ? "Activo" : "Inactivo",
+                customerData.isActiveProvider ? "Activo" : "Inactivo",
               ]);
               valuesGeneral.push([
                 "Contacto:",
@@ -767,7 +770,7 @@ export default {
           break;
       }
     },
-       cancel() {
+    cancel() {
       this.$confirm("¿Estás seguro que deseas salir?", "Confirmación", {
         confirmButtonText: "Si, salir",
         cancelButtonText: "Cancelar",

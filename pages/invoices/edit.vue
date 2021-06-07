@@ -560,7 +560,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 1 &&
-                        salesEditForm.documentType != 3
+                      salesEditForm.documentType != 3
                     "
                     >{{
                       calcSujeta(salesEditForm.documentType, scope.row)
@@ -579,7 +579,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 2 &&
-                        salesEditForm.documentType != 3
+                      salesEditForm.documentType != 3
                     "
                     >{{
                       calcExenta(salesEditForm.documentType, scope.row)
@@ -598,7 +598,7 @@
                   <span
                     v-if="
                       scope.row.sellingType == 3 ||
-                        salesEditForm.documentType == 3
+                      salesEditForm.documentType == 3
                     "
                     >{{
                       calcGravada(salesEditForm.documentType, scope.row)
@@ -705,6 +705,7 @@ import {
   checkBeforeLeave,
   checkBeforeEnter,
   amountValidate,
+  parseErrors,
 } from "../../tools";
 import Notification from "../../components/Notification";
 
@@ -803,7 +804,6 @@ export default {
           });
       })
       .catch((err) => {
-        console.error(err);
         this.errorMessage = err.response.data.message;
       });
 
@@ -1135,7 +1135,8 @@ export default {
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {

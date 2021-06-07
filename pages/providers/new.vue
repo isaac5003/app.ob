@@ -299,7 +299,7 @@
                 class="col-span-2"
                 v-if="
                   providerNewForm.customerType == 1 ||
-                    providerNewForm.customerTypeNatural == 2
+                  providerNewForm.customerTypeNatural == 2
                 "
               >
                 <el-form-item label="NRC" prop="nrc">
@@ -317,7 +317,7 @@
               class="grid grid-cols-12 gap-4"
               v-if="
                 providerNewForm.customerType == 1 ||
-                  providerNewForm.customerTypeNatural == 2
+                providerNewForm.customerTypeNatural == 2
               "
             >
               <div class="col-span-4">
@@ -381,6 +381,7 @@ import {
   selectValidation,
   checkBeforeLeave,
   checkBeforeEnter,
+  parseErrors,
 } from "../../tools";
 import Notification from "../../components/Notification";
 
@@ -584,7 +585,8 @@ export default {
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {

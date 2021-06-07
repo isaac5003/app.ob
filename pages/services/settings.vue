@@ -87,7 +87,7 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import { getIcon, hasModule, selectValidation } from "../../tools";
+import { getIcon, hasModule, selectValidation, parseErrors} from "../../tools";
 
 export default {
   name: "ServiceSettings",
@@ -171,10 +171,11 @@ export default {
                     });
                     this.pageloading = false;
                   })
-                  .catch((err) => {
+                .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message:parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {

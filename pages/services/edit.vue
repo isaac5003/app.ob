@@ -181,7 +181,7 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import { hasModule } from "../../tools/index.js";
+import { hasModule, parseErrors } from "../../tools/index.js";
 import {
   checkBeforeEnter,
   checkBeforeLeave,
@@ -339,7 +339,8 @@ export default {
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
@@ -367,7 +368,6 @@ export default {
       return hasModule(modules, this.$auth.user);
     },
     changeIva(sellingTypeValue) {
-      console.log(sellingTypeValue);
       if (sellingTypeValue !== 3) {
         this.servicesEditForm.incIva = false;
       } else {

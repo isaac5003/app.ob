@@ -773,6 +773,7 @@ import {
   checkBeforeLeave,
   checkBeforeEnter,
   amountValidate,
+  parseErrors,
 } from "../../tools";
 import Notification from "../../components/Notification";
 
@@ -1190,7 +1191,8 @@ export default {
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
