@@ -3160,6 +3160,20 @@ export default {
           show: false,
         },
         //Campo para Detalles
+        charge_quantity: {
+          x: "",
+          y: "",
+          l: "",
+          value: "charge_quantity",
+          show: false,
+        },
+        charge_description: {
+          x: "",
+          y: "",
+          l: "",
+          value: "charge_description",
+          show: false,
+        },
       },
     };
   },
