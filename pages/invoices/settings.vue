@@ -40,12 +40,12 @@
           <el-form-item class="col-span-3">
             <span class="font-semibold">Encabezado</span>
           </el-form-item>
-          <el-form-item class="col-span-3">
+          <el-form-item class="col-span-3" prop="fontSizeHeader">
             <div class="inline-flex space-x-2">
               <div class="flex-1 text-xs">Tamaño de texto</div>
               <div class="flex-1">
                 <el-input-number
-                  v-model="num"
+                  v-model="invoiceModel.fontSizeHeader"
                   :min="1"
                   :max="10"
                   class="w-full"
@@ -245,13 +245,15 @@
             </div>
           </div>
           <div class="col-span-4">
-            <el-checkbox v-model="checked">Fecha</el-checkbox>
+            <el-checkbox v-model="invoiceModel.invoice_date.show"
+              >Fecha</el-checkbox
+            >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Media de X" prop="invoice_date.x">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.invoice_date.x"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -266,57 +268,7 @@
                 <el-form-item label="Media de Y">
                   <template>
                     <el-input-number
-                      v-model="num"
-                      controls-position="right"
-                      :min="1"
-                      :max="10"
-                      style="width: 90%"
-                      size="small"
-                    >
-                    </el-input-number>
-                  </template>
-                </el-form-item>
-              </div>
-              <div class="col-span-2">
-                <el-form-item label="Media de X">
-                  <template>
-                    <el-input-number
-                      v-model="num"
-                      controls-position="right"
-                      :min="1"
-                      :max="10"
-                      style="width: 90%"
-                      size="small"
-                    >
-                    </el-input-number>
-                  </template>
-                </el-form-item>
-              </div>
-            </div>
-          </div>
-          <div class="col-span-4">
-            <el-checkbox v-model="checked">Dirección</el-checkbox>
-            <div class="grid grid-cols-6">
-              <div class="col-span-2">
-                <el-form-item label="Media de X">
-                  <template>
-                    <el-input-number
-                      v-model="num"
-                      controls-position="right"
-                      :min="1"
-                      :max="10"
-                      style="width: 90%"
-                      size="small"
-                    >
-                    </el-input-number>
-                  </template>
-                </el-form-item>
-              </div>
-              <div class="col-span-2">
-                <el-form-item label="Media de Y">
-                  <template>
-                    <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.invoice_date.y"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -331,7 +283,59 @@
                 <el-form-item label="Media de L">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.invoice_date.l"
+                      controls-position="right"
+                      :min="1"
+                      :max="10"
+                      style="width: 90%"
+                      size="small"
+                    >
+                    </el-input-number>
+                  </template>
+                </el-form-item>
+              </div>
+            </div>
+          </div>
+          <div class="col-span-4">
+            <el-checkbox v-model="invoiceModel.customer_address1.show"
+              >Dirección 1</el-checkbox
+            >
+            <div class="grid grid-cols-6">
+              <div class="col-span-2">
+                <el-form-item label="Media de X">
+                  <template>
+                    <el-input-number
+                      v-model="invoiceModel.customer_address1.x"
+                      controls-position="right"
+                      :min="1"
+                      :max="10"
+                      style="width: 90%"
+                      size="small"
+                    >
+                    </el-input-number>
+                  </template>
+                </el-form-item>
+              </div>
+              <div class="col-span-2">
+                <el-form-item label="Media de Y">
+                  <template>
+                    <el-input-number
+                      v-model="invoiceModel.customer_address1.y"
+                      controls-position="right"
+                      :min="1"
+                      :max="10"
+                      style="width: 90%"
+                      size="small"
+                    >
+                    </el-input-number>
+                  </template>
+                </el-form-item>
+              </div>
+              <div class="col-span-2">
+                <el-form-item label="Media de L">
+                  <template>
+                    <el-input-number
+                      v-model="invoiceModel.customer_address1.l"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -345,16 +349,18 @@
             </div>
           </div>
         </div>
-        <!--nrc retencion giro  -->
+        <!--nrc nit giro  -->
         <div class="grid grid-cols-12 gap-8">
           <div class="col-span-4">
-            <el-checkbox v-model="checked">NRC</el-checkbox>
+            <el-checkbox v-model="invoiceModel.customer_address2.show"
+              >Dirección 2</el-checkbox
+            >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
                 <el-form-item label="Media de X">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.customer_address2.x"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -369,7 +375,7 @@
                 <el-form-item label="Media de Y">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.customer_address2.y"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -384,7 +390,7 @@
                 <el-form-item label="Media de L">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.customer_address2.l"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -398,13 +404,15 @@
             </div>
           </div>
           <div class="col-span-4">
-            <el-checkbox v-model="checked">Nota de remisión</el-checkbox>
+            <el-checkbox v-model="invoiceModel.customer_nrc.show"
+              >NRC</el-checkbox
+            >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
                 <el-form-item label="Media de X">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.customer_nrc.x"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -419,7 +427,7 @@
                 <el-form-item label="Media de Y">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.customer_nrc.y"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -431,10 +439,10 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Media de L">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.customer_nrc.l"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -448,13 +456,15 @@
             </div>
           </div>
           <div class="col-span-4">
-            <el-checkbox v-model="checked">Giro</el-checkbox>
+            <el-checkbox v-model="invoiceModel.customer_nit.show"
+              >NIT</el-checkbox
+            >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
                 <el-form-item label="Media de X">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.customer_nit.x"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -469,7 +479,7 @@
                 <el-form-item label="Media de Y">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.customer_nit.y"
                       :min="1"
                       :max="10"
                       controls-position="right"
@@ -484,7 +494,7 @@
                 <el-form-item label="Media de L">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.customer_nit.l"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -499,17 +509,17 @@
           </div>
         </div>
         <!-- Condiones de la opracion  ventas a cuenta -->
-        <div class="grid grid-cols-12 border-b-2 gap-8">
+        <div class="grid grid-cols-12 gap-8">
           <div class="col-span-4">
-            <el-checkbox v-model="checked"
-              >Condiciones de la operacion</el-checkbox
+            <el-checkbox v-model="invoiceModel.customer_city.show"
+              >Ciudad</el-checkbox
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
                 <el-form-item label="Media de X">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.customer_city.x"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -524,7 +534,7 @@
                 <el-form-item label="Media de Y">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.customer_city.y"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -539,7 +549,7 @@
                 <el-form-item label="Media de L">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.customer_city.l"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -553,13 +563,15 @@
             </div>
           </div>
           <div class="col-span-4">
-            <el-checkbox v-model="checked">Ventas a cuenta de</el-checkbox>
+            <el-checkbox v-model="invoiceModel.customer_giro.show"
+              >Giro</el-checkbox
+            >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
                 <el-form-item label="Media de X">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.customer_giro.x"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -574,7 +586,7 @@
                 <el-form-item label="Media de Y">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.customer_giro.y"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -586,10 +598,169 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
+                <el-form-item label="Media de L">
+                  <template>
+                    <el-input-number
+                      v-model="invoiceModel.customer_giro.l"
+                      controls-position="right"
+                      :min="1"
+                      :max="10"
+                      style="width: 90%"
+                      size="small"
+                    >
+                    </el-input-number>
+                  </template>
+                </el-form-item>
+              </div>
+            </div>
+          </div>
+          <div class="col-span-4">
+            <el-checkbox v-model="invoiceModel.customer_state.show"
+              >Estado</el-checkbox
+            >
+            <div class="grid grid-cols-6">
+              <div class="col-span-2">
                 <el-form-item label="Media de X">
                   <template>
                     <el-input-number
-                      v-model="num"
+                      v-model="invoiceModel.customer_state.x"
+                      controls-position="right"
+                      :min="1"
+                      :max="10"
+                      style="width: 90%"
+                      size="small"
+                    >
+                    </el-input-number>
+                  </template>
+                </el-form-item>
+              </div>
+              <div class="col-span-2">
+                <el-form-item label="Media de Y">
+                  <template>
+                    <el-input-number
+                      v-model="invoiceModel.customer_state.y"
+                      controls-position="right"
+                      :min="1"
+                      :max="10"
+                      style="width: 90%"
+                      size="small"
+                    >
+                    </el-input-number>
+                  </template>
+                </el-form-item>
+              </div>
+              <div class="col-span-2">
+                <el-form-item label="Media de L">
+                  <template>
+                    <el-input-number
+                      v-model="invoiceModel.customer_state.l"
+                      controls-position="right"
+                      :min="1"
+                      :max="10"
+                      style="width: 90%"
+                      size="small"
+                    >
+                    </el-input-number>
+                  </template>
+                </el-form-item>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- ultima fila -->
+        <div class="grid grid-cols-12 border-b-2 gap-8">
+          <div class="col-span-4">
+            <el-checkbox v-model="invoiceModel.seller_name.show"
+              >Ventas a cuenta de</el-checkbox
+            >
+            <div class="grid grid-cols-6">
+              <div class="col-span-2">
+                <el-form-item label="Media de X">
+                  <template>
+                    <el-input-number
+                      v-model="invoiceModel.seller_name.x"
+                      controls-position="right"
+                      :min="1"
+                      :max="10"
+                      style="width: 90%"
+                      size="small"
+                    >
+                    </el-input-number>
+                  </template>
+                </el-form-item>
+              </div>
+              <div class="col-span-2">
+                <el-form-item label="Media de Y">
+                  <template>
+                    <el-input-number
+                      v-model="invoiceModel.seller_name.y"
+                      controls-position="right"
+                      :min="1"
+                      :max="10"
+                      style="width: 90%"
+                      size="small"
+                    >
+                    </el-input-number>
+                  </template>
+                </el-form-item>
+              </div>
+              <div class="col-span-2">
+                <el-form-item label="Media de L">
+                  <template>
+                    <el-input-number
+                      v-model="invoiceModel.seller_name.l"
+                      controls-position="right"
+                      :min="1"
+                      :max="10"
+                      style="width: 90%"
+                      size="small"
+                    >
+                    </el-input-number>
+                  </template>
+                </el-form-item>
+              </div>
+            </div>
+          </div>
+          <div class="col-span-4">
+            <el-checkbox v-model="invoiceModel.payment_condition.show"
+              >Condiciones de la operacion</el-checkbox
+            >
+            <div class="grid grid-cols-6">
+              <div class="col-span-2">
+                <el-form-item label="Media de X">
+                  <template>
+                    <el-input-number
+                      v-model="invoiceModel.payment_condition.x"
+                      controls-position="right"
+                      :min="1"
+                      :max="10"
+                      style="width: 90%"
+                      size="small"
+                    >
+                    </el-input-number>
+                  </template>
+                </el-form-item>
+              </div>
+              <div class="col-span-2">
+                <el-form-item label="Media de Y">
+                  <template>
+                    <el-input-number
+                      v-model="invoiceModel.payment_condition.y"
+                      controls-position="right"
+                      :min="1"
+                      :max="10"
+                      style="width: 90%"
+                      size="small"
+                    >
+                    </el-input-number>
+                  </template>
+                </el-form-item>
+              </div>
+              <div class="col-span-2">
+                <el-form-item label="Media de L">
+                  <template>
+                    <el-input-number
+                      v-model="invoiceModel.payment_condition.l"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -623,11 +794,11 @@
               ></el-input-number>
             </div>
           </el-form-item>
-          <el-form-item class="col-span-3 col-start-10">
+          <el-form-item class="col-span-3 col-start-10" prop="fontSizeDetails">
             <div class="inline-flex space-x-2">
               <span class="flex-1 text-xs">Tamaño de texto</span>
               <el-input-number
-                v-model="num"
+                v-model="invoiceModel.fontSizeDetails"
                 :min="1"
                 :max="10"
                 class="w-full"
@@ -952,12 +1123,12 @@
             <span class="font-semibold">Totales</span>
           </div>
 
-          <el-form-item class="col-span-3 col-start-10">
+          <el-form-item class="col-span-3 col-start-10" prop="fontSizeTotals">
             <div class="inline-flex space-x-2">
               <div class="flex-1 text-xs">Tamaño de texto</div>
               <div class="flex-1">
                 <el-input-number
-                  v-model="num"
+                  v-model="invoiceModel.fontSizeTotals"
                   :min="1"
                   :max="10"
                   class="w-full"
@@ -2890,6 +3061,9 @@ export default {
       },
       invoiceModel: {
         configuration: "positions",
+        fontSizeHeader: "",
+        fontSizeDetails: "",
+        fontSizeTotals: "",
         resolution: {
           width: "",
           height: "",
@@ -2915,6 +3089,77 @@ export default {
           value: "customer_name",
           show: false,
         },
+        invoice_date: {
+          x: "",
+          y: "",
+          l: "",
+          value: "invoice_date",
+          show: false,
+        },
+        customer_address1: {
+          x: "",
+          y: "",
+          l: "",
+          value: "customer_address1",
+          show: false,
+        },
+        customer_address2: {
+          x: "",
+          y: "",
+          l: "",
+          value: "customer_address2",
+          show: false,
+        },
+        customer_nrc: {
+          x: "",
+          y: "",
+          l: "",
+          value: "customer_nrc",
+          show: false,
+        },
+        customer_nit: {
+          x: "",
+          y: "",
+          l: "",
+          value: "customer_nit",
+          show: false,
+        },
+        customer_city: {
+          x: "",
+          y: "",
+          l: "",
+          value: "customer_city",
+          show: false,
+        },
+        customer_giro: {
+          x: "",
+          y: "",
+          l: "",
+          value: "customer_giro",
+          show: false,
+        },
+        customer_state: {
+          x: "",
+          y: "",
+          l: "",
+          value: "customer_state",
+          show: false,
+        },
+        seller_name: {
+          x: "",
+          y: "",
+          l: "",
+          value: "seller_name",
+          show: false,
+        },
+        payment_condition: {
+          x: "",
+          y: "",
+          l: "",
+          value: "payment_condition",
+          show: false,
+        },
+        //Campo para Detalles
       },
     };
   },
