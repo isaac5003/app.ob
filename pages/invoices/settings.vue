@@ -91,7 +91,7 @@
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X" prop="invoice_authorization">
+                <el-form-item label="Medida de X" prop="invoice_authorization">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.invoice_authorization.x"
@@ -106,7 +106,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.invoice_authorization.y"
@@ -121,7 +121,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de L">
+                <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.invoice_authorization.l"
@@ -143,7 +143,7 @@
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.invoice_number.x"
@@ -158,7 +158,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.invoice_number.y"
@@ -173,7 +173,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de L">
+                <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.invoice_number.l"
@@ -198,7 +198,7 @@
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_name.x"
@@ -213,7 +213,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_name.y"
@@ -228,7 +228,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de L">
+                <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_name.l"
@@ -250,7 +250,7 @@
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X" prop="invoice_date.x">
+                <el-form-item label="Medida de X" prop="invoice_date.x">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.invoice_date.x"
@@ -265,7 +265,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.invoice_date.y"
@@ -280,7 +280,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de L">
+                <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.invoice_date.l"
@@ -302,7 +302,7 @@
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_address1.x"
@@ -317,7 +317,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_address1.y"
@@ -332,7 +332,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de L">
+                <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_address1.l"
@@ -357,7 +357,7 @@
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_address2.x"
@@ -372,7 +372,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_address2.y"
@@ -387,7 +387,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de L">
+                <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_address2.l"
@@ -409,7 +409,7 @@
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_nrc.x"
@@ -424,7 +424,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_nrc.y"
@@ -439,7 +439,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de L">
+                <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_nrc.l"
@@ -461,7 +461,7 @@
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_nit.x"
@@ -476,7 +476,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_nit.y"
@@ -491,7 +491,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de L">
+                <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_nit.l"
@@ -516,7 +516,7 @@
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_city.x"
@@ -531,7 +531,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_city.y"
@@ -546,7 +546,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de L">
+                <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_city.l"
@@ -568,7 +568,7 @@
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_giro.x"
@@ -583,7 +583,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_giro.y"
@@ -598,7 +598,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de L">
+                <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_giro.l"
@@ -620,7 +620,7 @@
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_state.x"
@@ -635,7 +635,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_state.y"
@@ -650,7 +650,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de L">
+                <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_state.l"
@@ -675,7 +675,7 @@
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.seller_name.x"
@@ -690,7 +690,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.seller_name.y"
@@ -705,7 +705,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de L">
+                <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.seller_name.l"
@@ -727,7 +727,7 @@
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.payment_condition.x"
@@ -742,7 +742,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.payment_condition.y"
@@ -757,7 +757,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de L">
+                <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.payment_condition.l"
@@ -813,7 +813,7 @@
             <el-checkbox v-model="checked">Cantidad</el-checkbox>
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -864,7 +864,7 @@
 
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -879,7 +879,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -894,7 +894,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -915,7 +915,7 @@
 
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -930,7 +930,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -945,7 +945,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de L">
+                <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -968,7 +968,7 @@
 
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1019,7 +1019,7 @@
 
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1034,7 +1034,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1049,7 +1049,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1070,7 +1070,7 @@
 
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1085,7 +1085,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1100,7 +1100,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de L">
+                <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1145,7 +1145,7 @@
 
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1196,7 +1196,7 @@
 
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1211,7 +1211,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1226,7 +1226,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1247,7 +1247,7 @@
 
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1262,7 +1262,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1277,7 +1277,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de L">
+                <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1301,7 +1301,7 @@
 
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1352,7 +1352,7 @@
 
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1367,7 +1367,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1382,7 +1382,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1403,7 +1403,7 @@
 
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1418,7 +1418,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1433,7 +1433,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de L">
+                <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1457,7 +1457,7 @@
 
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1508,7 +1508,7 @@
 
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1523,7 +1523,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1538,7 +1538,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1559,7 +1559,7 @@
 
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1574,7 +1574,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1589,7 +1589,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de L">
+                <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1613,7 +1613,7 @@
 
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1664,7 +1664,7 @@
 
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1679,7 +1679,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1694,7 +1694,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1715,7 +1715,7 @@
 
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1730,7 +1730,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1745,7 +1745,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de L">
+                <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1769,7 +1769,7 @@
 
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1820,7 +1820,7 @@
 
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1835,7 +1835,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1850,7 +1850,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1871,7 +1871,7 @@
 
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1886,7 +1886,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1901,7 +1901,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de L">
+                <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1925,7 +1925,7 @@
 
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1975,7 +1975,7 @@
             <el-checkbox v-model="checked">Venta total</el-checkbox>
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -1990,7 +1990,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -2005,7 +2005,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -2026,7 +2026,7 @@
 
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Media de X">
+                <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -2041,7 +2041,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de Y">
+                <el-form-item label="Medida de Y">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -2056,7 +2056,7 @@
                 </el-form-item>
               </div>
               <div class="col-span-2">
-                <el-form-item label="Media de L">
+                <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
                       v-model="num"
@@ -3160,6 +3160,8 @@ export default {
           show: false,
         },
         //Campo para Detalles
+        position_y: 115,
+        heigth: 85,
         charge_quantity: {
           x: "",
           y: "",
