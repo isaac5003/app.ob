@@ -779,12 +779,12 @@
           <el-form-item class="col-span-3">
             <span class="font-semibold">Detalles</span>
           </el-form-item>
-          <el-form-item class="col-span-3" >
+          <el-form-item class="col-span-3">
             <div class="inline-flex space-x-2">
               <div class="flex-1 text-xs">Tamaño de texto</div>
               <div class="flex-1">
                 <el-input-number
-                  v-model="invoiceModel.fontSizeHeader"
+                  v-model="invoiceModel.fontSizeDetails"
                   :min="1"
                   :max="10"
                   class="w-full"
@@ -798,7 +798,7 @@
               <div class="flex-1 text-xs">Alto</div>
               <div class="flex-1">
                 <el-input-number
-                  v-model="invoiceModel.resolution.height"
+                  v-model="invoiceModel.heigth"
                   :min="1"
                   :max="10"
                   class="w-full"
@@ -812,7 +812,7 @@
               <div class="flex-1 text-xs">Ancho</div>
               <div class="flex-1">
                 <el-input-number
-                  v-model="invoiceModel.resolution.width"
+                  v-model="invoiceModel.position_y"
                   :min="1"
                   :max="10"
                   class="w-full"
