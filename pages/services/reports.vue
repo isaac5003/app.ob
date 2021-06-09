@@ -114,7 +114,6 @@
               v-model="reportForm.initialCost"
               size="small"
               autocomplete="off"
-              @change="setStorage(reportForm)"
               style="width: 101%"
             />
           </el-form-item>
@@ -128,8 +127,6 @@
               :step="0.01"
               v-model="reportForm.finalCost"
               size="small"
-              autocomplete="off"
-              @change="setStorage(reportForm)"
               style="width: 101%"
             />
           </el-form-item>
@@ -160,7 +157,6 @@ import Notification from "../../components/Notification";
 import {
   getIcon,
   hasModule,
-  checkBeforeLeave,
   selectValidation,
   getHeader,
   getFooter,
@@ -170,15 +166,10 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import XLSX from "xlsx";
-
-const storagekey = "report";
 export default {
-  name: "CustomerSettings",
+  name: "ServicesReport",
   components: { LayoutContent, Notification },
   fetchOnServer: false,
-  beforeRouteLeave(to, from, next) {
-    checkBeforeLeave(this, storagekey, next);
-  },
   data() {
     return {
       generating: false,
@@ -227,9 +218,6 @@ export default {
     };
   },
   methods: {
-    setStorage(reportForm) {
-      localStorage.setItem(storagekey, JSON.stringify(reportForm));
-    },
     showRequeriments(id) {
       if (!id) {
         this.requirementForm = null;
