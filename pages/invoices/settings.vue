@@ -83,7 +83,7 @@
             </div>
           </el-form-item>
         </div>
-        <!-- Numero de factura y tamaño de texto  -->
+        <!-- Correlativo, Secuencia, Fecha  -->
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-4">
             <el-checkbox v-model="invoiceModel.invoice_authorization.show"
@@ -242,11 +242,11 @@
             </div>
           </div>
         </div>
-        <!-- senores, fecha y Direccion  -->
+        <!-- Cliente, Direccion 1 y Direccion 2 -->
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-4">
             <el-checkbox v-model="invoiceModel.customer_name.show"
-              >Señor (es)</el-checkbox
+              >Cliente</el-checkbox
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
@@ -298,7 +298,7 @@
           </div>
           <div class="col-span-4">
             <el-checkbox v-model="invoiceModel.invoice_date.show"
-              >Fecha</el-checkbox
+              >Dirección 1</el-checkbox
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
@@ -350,7 +350,7 @@
           </div>
           <div class="col-span-4">
             <el-checkbox v-model="invoiceModel.customer_address1.show"
-              >Dirección 1</el-checkbox
+              >Dirección 2</el-checkbox
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
@@ -401,11 +401,11 @@
             </div>
           </div>
         </div>
-        <!--nrc nit giro  -->
+        <!--NRC NIT DUI  -->
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-4">
             <el-checkbox v-model="invoiceModel.customer_address2.show"
-              >Dirección 2</el-checkbox
+              >NRC</el-checkbox
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
@@ -457,7 +457,7 @@
           </div>
           <div class="col-span-4">
             <el-checkbox v-model="invoiceModel.customer_nrc.show"
-              >NRC</el-checkbox
+              >NIT</el-checkbox
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
@@ -509,7 +509,7 @@
           </div>
           <div class="col-span-4">
             <el-checkbox v-model="invoiceModel.customer_nit.show"
-              >NIT</el-checkbox
+              >DUI</el-checkbox
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
@@ -560,11 +560,11 @@
             </div>
           </div>
         </div>
-        <!-- Condiones de la opracion  ventas a cuenta -->
+        <!-- Departamento Ciudad Giro-->
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-4">
             <el-checkbox v-model="invoiceModel.customer_city.show"
-              >Ciudad</el-checkbox
+              >Departamento</el-checkbox
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
@@ -616,7 +616,7 @@
           </div>
           <div class="col-span-4">
             <el-checkbox v-model="invoiceModel.customer_giro.show"
-              >Giro</el-checkbox
+              >Ciudad</el-checkbox
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
@@ -668,7 +668,7 @@
           </div>
           <div class="col-span-4">
             <el-checkbox v-model="invoiceModel.customer_state.show"
-              >Estado</el-checkbox
+              >Giro</el-checkbox
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
@@ -719,7 +719,7 @@
             </div>
           </div>
         </div>
-        <!-- ultima fila -->
+        <!-- Ventas a cuenta de, Condición de pago -->
         <div class="grid grid-cols-12 border-b-2 gap-4">
           <div class="col-span-4">
             <el-checkbox v-model="invoiceModel.seller_name.show"
@@ -775,7 +775,7 @@
           </div>
           <div class="col-span-4">
             <el-checkbox v-model="invoiceModel.payment_condition.show"
-              >Condiciones de la operacion</el-checkbox
+              >Condición de pago</el-checkbox
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
@@ -1121,10 +1121,12 @@
             </div>
           </el-form-item>
         </div>
-        <!-- Son, Suma, IVA -->
+        <!-- Venta total (Text), Suma, IVA -->
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-4">
-            <el-checkbox v-model="invoiceModel.son.show">Son</el-checkbox>
+            <el-checkbox v-model="invoiceModel.son.show"
+              >Venta total (Text)</el-checkbox
+            >
             <div class="grid grid-cols-6">
               <div class="col-span-3">
                 <el-form-item label="Medida de X">
