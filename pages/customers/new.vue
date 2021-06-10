@@ -60,6 +60,7 @@
                 prop="isProvider"
                 class="col-span-3"
                 label="¿Es tambien proveedor? "
+                v-if="hasModule(['f6000cbb-1e6d-4f7d-a7cc-cadd78d23076'])"
               >
                 <el-radio-group
                   v-model="customersNewForm.isProvider"
@@ -395,6 +396,7 @@ import {
   checkBeforeLeave,
   checkBeforeEnter,
   parseErrors,
+  hasModule,
 } from "../../tools";
 import Notification from "../../components/Notification";
 
@@ -617,6 +619,9 @@ export default {
           }
         );
       });
+    },
+    hasModule(module) {
+      return hasModule(module, this.$auth.user);
     },
   },
   computed: {
