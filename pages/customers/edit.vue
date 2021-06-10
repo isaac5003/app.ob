@@ -31,7 +31,8 @@
             <el-form-item
               label="Nombre o razón social"
               prop="name"
-              class="col-span-7"
+              class="col-span-6"
+              v-if="true"
             >
               <el-input
                 clearable
@@ -63,18 +64,27 @@
               />
             </el-form-item>
             <el-form-item
-              label="Es tambien proveedor"
               prop="isProvider"
-              class="col-span-2"
-              v-if="false"
+              class="col-span-3"
+              label="¿Es tambien proveedor? "
             >
               <el-radio-group
                 v-model="customersEditForm.isProvider"
                 class="w-full"
                 @change="setStorage(customersEditForm)"
               >
-                <el-radio :label="true">Si</el-radio>
-                <el-radio :label="false">No</el-radio>
+                <el-row :gutter="15">
+                  <el-col :span="8">
+                    <el-radio border :label="true" size="small" class="w-full"
+                      >Si</el-radio
+                    >
+                  </el-col>
+                  <el-col :span="8">
+                    <el-radio border :label="false" size="small" class="w-full"
+                      >no</el-radio
+                    >
+                  </el-col>
+                </el-row>
               </el-radio-group>
             </el-form-item>
           </div>

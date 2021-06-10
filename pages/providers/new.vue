@@ -25,7 +25,7 @@
               <el-form-item
                 label="Nombre o razón social"
                 prop="name"
-                class="col-span-7"
+                class="col-span-6"
               >
                 <el-input
                   clearable
@@ -57,18 +57,27 @@
                 />
               </el-form-item>
               <el-form-item
-                label="Es tambien proveedor"
-                prop="isCustomer"
-                class="col-span-2"
-                v-if="false"
+                prop="isCostumers"
+                class="col-span-3"
+                label="¿Es tambien cliente?"
               >
                 <el-radio-group
-                  v-model="providerNewForm.isCustomer"
+                  v-model="providerNewForm.isCostumer"
                   class="w-full"
                   @change="setStorage(providerNewForm)"
                 >
-                  <el-radio :label="true">Si</el-radio>
-                  <el-radio :label="false">No</el-radio>
+                  <el-row :gutter="15">
+                    <el-col :span="8">
+                      <el-radio :label="true" size="small" class="w-full"
+                        >Si</el-radio
+                      >
+                    </el-col>
+                    <el-col :span="8">
+                      <el-radio :label="false" size="small" class="w-full"
+                        >no</el-radio
+                      >
+                    </el-col>
+                  </el-row>
                 </el-radio-group>
               </el-form-item>
             </div>
