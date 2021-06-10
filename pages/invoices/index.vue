@@ -360,7 +360,13 @@
                     :value="item.id"
                   >
                     <div
-                      class="flex flex-row justify-between items-end py-1 leading-normal"
+                      class="
+                        flex flex-row
+                        justify-between
+                        items-end
+                        py-1
+                        leading-normal
+                      "
                     >
                       <div class="flex flex-col">
                         <span class="text-xs text-gray-500">{{
@@ -382,7 +388,13 @@
                     :value="item.id"
                   >
                     <div
-                      class="flex flex-row justify-between items-end py-1 leading-normal"
+                      class="
+                        flex flex-row
+                        justify-between
+                        items-end
+                        py-1
+                        leading-normal
+                      "
                     >
                       <div class="flex flex-col">
                         <span class="text-xs text-gray-500">{{
@@ -1266,7 +1278,7 @@ export default {
 
                     // Agrega los detalles
                     let acumRows = 0;
-                    for (const detail of invoice.data.invoice.details) {
+                    for (const detail of invoice.data.data.details) {
                       const acumHeight = acumRows * 5;
                       const position_x = 1;
                       const position_y =
@@ -1297,7 +1309,7 @@ export default {
                         conf.details.description.position[0] + position_x,
                         position_y
                       );
-                      const documentType = invoice.data.invoice.documentType;
+                      const documentType = invoice.data.data.documentType;
                       // Price
                       pdfDocument.text(
                         sellingType.id == 3 || documentType.id == 3
