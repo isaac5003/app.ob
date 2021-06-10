@@ -3309,7 +3309,6 @@ export default {
       });
     },
     sumitModelInvoice(formName, modelInvoice) {
-      console.log(modelInvoice);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
