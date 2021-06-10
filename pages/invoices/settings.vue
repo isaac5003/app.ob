@@ -297,64 +297,12 @@
             </div>
           </div>
           <div class="col-span-4">
-            <el-checkbox v-model="invoiceModel.invoice_date.show"
+            <el-checkbox v-model="invoiceModel.customer_address1.show"
               >Dirección 1</el-checkbox
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
-                <el-form-item label="Medida de X" prop="invoice_date.x">
-                  <template>
-                    <el-input-number
-                      v-model="invoiceModel.invoice_date.x"
-                      controls-position="right"
-                      :min="1"
-                      :max="10"
-                      style="width: 90%"
-                      size="small"
-                    >
-                    </el-input-number>
-                  </template>
-                </el-form-item>
-              </div>
-              <div class="col-span-2">
-                <el-form-item label="Medida de Y">
-                  <template>
-                    <el-input-number
-                      v-model="invoiceModel.invoice_date.y"
-                      controls-position="right"
-                      :min="1"
-                      :max="10"
-                      style="width: 90%"
-                      size="small"
-                    >
-                    </el-input-number>
-                  </template>
-                </el-form-item>
-              </div>
-              <div class="col-span-2">
-                <el-form-item label="Medida de L">
-                  <template>
-                    <el-input-number
-                      v-model="invoiceModel.invoice_date.l"
-                      controls-position="right"
-                      :min="1"
-                      :max="10"
-                      style="width: 90%"
-                      size="small"
-                    >
-                    </el-input-number>
-                  </template>
-                </el-form-item>
-              </div>
-            </div>
-          </div>
-          <div class="col-span-4">
-            <el-checkbox v-model="invoiceModel.customer_address1.show"
-              >Dirección 2</el-checkbox
-            >
-            <div class="grid grid-cols-6">
-              <div class="col-span-2">
-                <el-form-item label="Medida de X">
+                <el-form-item label="Medida de X" prop="customer_address1.x">
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_address1.x"
@@ -400,12 +348,9 @@
               </div>
             </div>
           </div>
-        </div>
-        <!--NRC NIT DUI  -->
-        <div class="grid grid-cols-12 gap-4">
           <div class="col-span-4">
             <el-checkbox v-model="invoiceModel.customer_address2.show"
-              >NRC</el-checkbox
+              >Dirección 2</el-checkbox
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
@@ -455,9 +400,12 @@
               </div>
             </div>
           </div>
+        </div>
+        <!--NRC NIT DUI  -->
+        <div class="grid grid-cols-12 gap-4">
           <div class="col-span-4">
             <el-checkbox v-model="invoiceModel.customer_nrc.show"
-              >NIT</el-checkbox
+              >NRC</el-checkbox
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
@@ -509,7 +457,7 @@
           </div>
           <div class="col-span-4">
             <el-checkbox v-model="invoiceModel.customer_nit.show"
-              >DUI</el-checkbox
+              >NIT</el-checkbox
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
@@ -532,9 +480,9 @@
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_nit.y"
+                      controls-position="right"
                       :min="1"
                       :max="10"
-                      controls-position="right"
                       style="width: 90%"
                       size="small"
                     >
@@ -559,12 +507,116 @@
               </div>
             </div>
           </div>
+          <div class="col-span-4">
+            <el-checkbox v-model="invoiceModel.customer_dui.show"
+              >DUI</el-checkbox
+            >
+            <div class="grid grid-cols-6">
+              <div class="col-span-2">
+                <el-form-item label="Medida de X">
+                  <template>
+                    <el-input-number
+                      v-model="invoiceModel.customer_dui.x"
+                      controls-position="right"
+                      :min="1"
+                      :max="10"
+                      style="width: 90%"
+                      size="small"
+                    >
+                    </el-input-number>
+                  </template>
+                </el-form-item>
+              </div>
+              <div class="col-span-2">
+                <el-form-item label="Medida de Y">
+                  <template>
+                    <el-input-number
+                      v-model="invoiceModel.customer_dui.y"
+                      :min="1"
+                      :max="10"
+                      controls-position="right"
+                      style="width: 90%"
+                      size="small"
+                    >
+                    </el-input-number>
+                  </template>
+                </el-form-item>
+              </div>
+              <div class="col-span-2">
+                <el-form-item label="Medida de L">
+                  <template>
+                    <el-input-number
+                      v-model="invoiceModel.customer_dui.l"
+                      controls-position="right"
+                      :min="1"
+                      :max="10"
+                      style="width: 90%"
+                      size="small"
+                    >
+                    </el-input-number>
+                  </template>
+                </el-form-item>
+              </div>
+            </div>
+          </div>
         </div>
         <!-- Departamento Ciudad Giro-->
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-4">
-            <el-checkbox v-model="invoiceModel.customer_city.show"
+            <el-checkbox v-model="invoiceModel.customer_state.show"
               >Departamento</el-checkbox
+            >
+            <div class="grid grid-cols-6">
+              <div class="col-span-2">
+                <el-form-item label="Medida de X">
+                  <template>
+                    <el-input-number
+                      v-model="invoiceModel.customer_state.x"
+                      controls-position="right"
+                      :min="1"
+                      :max="10"
+                      style="width: 90%"
+                      size="small"
+                    >
+                    </el-input-number>
+                  </template>
+                </el-form-item>
+              </div>
+              <div class="col-span-2">
+                <el-form-item label="Medida de Y">
+                  <template>
+                    <el-input-number
+                      v-model="invoiceModel.customer_state.y"
+                      controls-position="right"
+                      :min="1"
+                      :max="10"
+                      style="width: 90%"
+                      size="small"
+                    >
+                    </el-input-number>
+                  </template>
+                </el-form-item>
+              </div>
+              <div class="col-span-2">
+                <el-form-item label="Medida de L">
+                  <template>
+                    <el-input-number
+                      v-model="invoiceModel.customer_state.l"
+                      controls-position="right"
+                      :min="1"
+                      :max="10"
+                      style="width: 90%"
+                      size="small"
+                    >
+                    </el-input-number>
+                  </template>
+                </el-form-item>
+              </div>
+            </div>
+          </div>
+          <div class="col-span-4">
+            <el-checkbox v-model="invoiceModel.customer_city.show"
+              >Ciudad</el-checkbox
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
@@ -616,7 +668,7 @@
           </div>
           <div class="col-span-4">
             <el-checkbox v-model="invoiceModel.customer_giro.show"
-              >Ciudad</el-checkbox
+              >Giro</el-checkbox
             >
             <div class="grid grid-cols-6">
               <div class="col-span-2">
@@ -654,58 +706,6 @@
                   <template>
                     <el-input-number
                       v-model="invoiceModel.customer_giro.l"
-                      controls-position="right"
-                      :min="1"
-                      :max="10"
-                      style="width: 90%"
-                      size="small"
-                    >
-                    </el-input-number>
-                  </template>
-                </el-form-item>
-              </div>
-            </div>
-          </div>
-          <div class="col-span-4">
-            <el-checkbox v-model="invoiceModel.customer_state.show"
-              >Giro</el-checkbox
-            >
-            <div class="grid grid-cols-6">
-              <div class="col-span-2">
-                <el-form-item label="Medida de X">
-                  <template>
-                    <el-input-number
-                      v-model="invoiceModel.customer_state.x"
-                      controls-position="right"
-                      :min="1"
-                      :max="10"
-                      style="width: 90%"
-                      size="small"
-                    >
-                    </el-input-number>
-                  </template>
-                </el-form-item>
-              </div>
-              <div class="col-span-2">
-                <el-form-item label="Medida de Y">
-                  <template>
-                    <el-input-number
-                      v-model="invoiceModel.customer_state.y"
-                      controls-position="right"
-                      :min="1"
-                      :max="10"
-                      style="width: 90%"
-                      size="small"
-                    >
-                    </el-input-number>
-                  </template>
-                </el-form-item>
-              </div>
-              <div class="col-span-2">
-                <el-form-item label="Medida de L">
-                  <template>
-                    <el-input-number
-                      v-model="invoiceModel.customer_state.l"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -1124,7 +1124,7 @@
         <!-- Venta total (Text), Suma, IVA -->
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-4">
-            <el-checkbox v-model="invoiceModel.son.show"
+            <el-checkbox v-model="invoiceModel.venta_total_text.show"
               >Venta total (Text)</el-checkbox
             >
             <div class="grid grid-cols-6">
@@ -1132,7 +1132,7 @@
                 <el-form-item label="Medida de X">
                   <template>
                     <el-input-number
-                      v-model="invoiceModel.son.x"
+                      v-model="invoiceModel.venta_total_text.x"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -1147,7 +1147,7 @@
                 <el-form-item label="Medida Y">
                   <template>
                     <el-input-number
-                      v-model="invoiceModel.son.y"
+                      v-model="invoiceModel.venta_total_text.y"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -1422,43 +1422,17 @@
               </div>
             </div>
           </div>
-          <div class="col-span-4">
-            <el-checkbox v-model="invoiceModel.venta_total_text.show"
-              >Venta total text</el-checkbox
-            >
-            <div class="grid grid-cols-6">
-              <div class="col-span-3">
-                <el-form-item label="Medida de X">
-                  <template>
-                    <el-input-number
-                      v-model="invoiceModel.venta_total_text.x"
-                      controls-position="right"
-                      :min="1"
-                      :max="10"
-                      style="width: 90%"
-                      size="small"
-                    >
-                    </el-input-number>
-                  </template>
-                </el-form-item>
-              </div>
-              <div class="col-span-3">
-                <el-form-item label="Medida de Y">
-                  <template>
-                    <el-input-number
-                      v-model="invoiceModel.venta_total_text.y"
-                      controls-position="right"
-                      :min="1"
-                      :max="10"
-                      style="width: 90%"
-                      size="small"
-                    >
-                    </el-input-number>
-                  </template>
-                </el-form-item>
-              </div>
-            </div>
-          </div>
+        </div>
+        <div class="flex flex-row justify-end">
+          <el-button
+            type="primary"
+            size="small"
+            @click.native="sumitModelInvoice('invoiceModel', invoiceModel)"
+            >Guardar
+          </el-button>
+          <el-button size="small" @click="closeDialog = false"
+            >Cerrar</el-button
+          >
         </div>
       </el-form>
     </el-dialog>
@@ -2472,13 +2446,6 @@ export default {
           value: "customer_name",
           show: false,
         },
-        invoice_date: {
-          x: "",
-          y: "",
-          l: "",
-          value: "invoice_date",
-          show: false,
-        },
         customer_address1: {
           x: "",
           y: "",
@@ -2507,6 +2474,20 @@ export default {
           value: "customer_nit",
           show: false,
         },
+        customer_dui: {
+          x: "",
+          y: "",
+          l: "",
+          value: "customer_dui",
+          show: false,
+        },
+        customer_state: {
+          x: "",
+          y: "",
+          l: "",
+          value: "customer_state",
+          show: false,
+        },
         customer_city: {
           x: "",
           y: "",
@@ -2519,13 +2500,6 @@ export default {
           y: "",
           l: "",
           value: "customer_giro",
-          show: false,
-        },
-        customer_state: {
-          x: "",
-          y: "",
-          l: "",
-          value: "customer_state",
           show: false,
         },
         seller_name: {
@@ -2588,10 +2562,10 @@ export default {
           type: "text",
         },
         //TOTALES
-        son: {
+        venta_total_text: {
           x: "",
           y: "",
-          value: "son",
+          value: "venta_total_text",
           show: false,
         },
         sum: {
@@ -2634,12 +2608,6 @@ export default {
           x: "",
           y: "",
           value: "venta_total",
-          show: false,
-        },
-        venta_total_text: {
-          x: "",
-          y: "",
-          value: "venta_total_text",
           show: false,
         },
       },
