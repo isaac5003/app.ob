@@ -100,6 +100,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.invoice_authorization.show"
                     >
                     </el-input-number>
                   </template>
@@ -115,6 +116,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.invoice_authorization.show"
                     >
                     </el-input-number>
                   </template>
@@ -130,6 +132,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.invoice_authorization.show"
                     >
                     </el-input-number>
                   </template>
@@ -152,6 +155,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.invoice_number.show"
                     >
                     </el-input-number>
                   </template>
@@ -167,6 +171,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.invoice_number.show"
                     >
                     </el-input-number>
                   </template>
@@ -182,6 +187,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.invoice_number.show"
                     >
                     </el-input-number>
                   </template>
@@ -204,6 +210,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.invoice_date.show"
                     >
                     </el-input-number>
                   </template>
@@ -219,6 +226,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.invoice_date.show"
                     >
                     </el-input-number>
                   </template>
@@ -234,6 +242,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.invoice_date.show"
                     >
                     </el-input-number>
                   </template>
@@ -259,6 +268,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_name.show"
                     >
                     </el-input-number>
                   </template>
@@ -274,6 +284,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_name.show"
                     >
                     </el-input-number>
                   </template>
@@ -289,6 +300,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_name.show"
                     >
                     </el-input-number>
                   </template>
@@ -311,6 +323,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_address1.show"
                     >
                     </el-input-number>
                   </template>
@@ -326,6 +339,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_address1.show"
                     >
                     </el-input-number>
                   </template>
@@ -341,6 +355,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_address1.show"
                     >
                     </el-input-number>
                   </template>
@@ -363,6 +378,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_address2.show"
                     >
                     </el-input-number>
                   </template>
@@ -378,6 +394,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_address2.show"
                     >
                     </el-input-number>
                   </template>
@@ -393,6 +410,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_address2.show"
                     >
                     </el-input-number>
                   </template>
@@ -418,6 +436,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_nrc.show"
                     >
                     </el-input-number>
                   </template>
@@ -433,6 +452,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_nrc.show"
                     >
                     </el-input-number>
                   </template>
@@ -448,6 +468,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_nrc.show"
                     >
                     </el-input-number>
                   </template>
@@ -470,6 +491,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_nit.show"
                     >
                     </el-input-number>
                   </template>
@@ -485,6 +507,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_nit.show"
                     >
                     </el-input-number>
                   </template>
@@ -500,6 +523,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_nit.show"
                     >
                     </el-input-number>
                   </template>
@@ -522,6 +546,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_dui.show"
                     >
                     </el-input-number>
                   </template>
@@ -537,6 +562,7 @@
                       controls-position="right"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_dui.show"
                     >
                     </el-input-number>
                   </template>
@@ -552,6 +578,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_dui.show"
                     >
                     </el-input-number>
                   </template>
@@ -577,6 +604,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_state.show"
                     >
                     </el-input-number>
                   </template>
@@ -592,6 +620,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_state.show"
                     >
                     </el-input-number>
                   </template>
@@ -607,6 +636,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_state.show"
                     >
                     </el-input-number>
                   </template>
@@ -629,6 +659,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_city.show"
                     >
                     </el-input-number>
                   </template>
@@ -644,6 +675,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_city.show"
                     >
                     </el-input-number>
                   </template>
@@ -659,6 +691,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_city.show"
                     >
                     </el-input-number>
                   </template>
@@ -681,6 +714,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_giro.show"
                     >
                     </el-input-number>
                   </template>
@@ -696,6 +730,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_giro.show"
                     >
                     </el-input-number>
                   </template>
@@ -711,6 +746,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.customer_giro.show"
                     >
                     </el-input-number>
                   </template>
@@ -736,6 +772,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.seller_name.show"
                     >
                     </el-input-number>
                   </template>
@@ -751,6 +788,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.seller_name.show"
                     >
                     </el-input-number>
                   </template>
@@ -766,6 +804,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.seller_name.show"
                     >
                     </el-input-number>
                   </template>
@@ -788,6 +827,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.payment_condition.show"
                     >
                     </el-input-number>
                   </template>
@@ -803,6 +843,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.payment_condition.show"
                     >
                     </el-input-number>
                   </template>
@@ -818,6 +859,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.payment_condition.show"
                     >
                     </el-input-number>
                   </template>
@@ -891,6 +933,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.charge_quantity.show"
                     >
                     </el-input-number>
                   </template>
@@ -906,6 +949,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.charge_quantity.show"
                     >
                     </el-input-number>
                   </template>
@@ -928,6 +972,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.charge_description.show"
                     >
                     </el-input-number>
                   </template>
@@ -943,6 +988,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.charge_description.show"
                     >
                     </el-input-number>
                   </template>
@@ -965,6 +1011,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.price.show"
                     >
                     </el-input-number>
                   </template>
@@ -980,6 +1027,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.price.show"
                     >
                     </el-input-number>
                   </template>
@@ -1004,6 +1052,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.sujeto.show"
                     >
                     </el-input-number>
                   </template>
@@ -1019,6 +1068,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.sujeto.show"
                     >
                     </el-input-number>
                   </template>
@@ -1041,6 +1091,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.exento.show"
                     >
                     </el-input-number>
                   </template>
@@ -1056,6 +1107,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.exento.show"
                     >
                     </el-input-number>
                   </template>
@@ -1078,6 +1130,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.afecto.show"
                     >
                     </el-input-number>
                   </template>
@@ -1093,6 +1146,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.afecto.show"
                     >
                     </el-input-number>
                   </template>
@@ -1138,6 +1192,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.venta_total_text.show"
                     >
                     </el-input-number>
                   </template>
@@ -1153,6 +1208,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.venta_total_text.show"
                     >
                     </el-input-number>
                   </template>
@@ -1174,6 +1230,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.sum.show"
                     >
                     </el-input-number>
                   </template>
@@ -1189,6 +1246,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.sum.show"
                     >
                     </el-input-number>
                   </template>
@@ -1209,6 +1267,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.iva.show"
                     >
                     </el-input-number>
                   </template>
@@ -1224,6 +1283,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.iva.show"
                     >
                     </el-input-number>
                   </template>
@@ -1249,6 +1309,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.subtotal.show"
                     >
                     </el-input-number>
                   </template>
@@ -1264,6 +1325,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.subtotal.show"
                     >
                     </el-input-number>
                   </template>
@@ -1286,6 +1348,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.iva_retenido.show"
                     >
                     </el-input-number>
                   </template>
@@ -1301,6 +1364,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.iva_retenido.show"
                     >
                     </el-input-number>
                   </template>
@@ -1323,6 +1387,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.ventas_no_sujetas.show"
                     >
                     </el-input-number>
                   </template>
@@ -1338,6 +1403,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.ventas_no_sujetas.show"
                     >
                     </el-input-number>
                   </template>
@@ -1363,6 +1429,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.ventas_exentas.show"
                     >
                     </el-input-number>
                   </template>
@@ -1378,6 +1445,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.ventas_exentas.show"
                     >
                     </el-input-number>
                   </template>
@@ -1400,6 +1468,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.venta_total.show"
                     >
                     </el-input-number>
                   </template>
@@ -1415,6 +1484,7 @@
                       :max="10"
                       style="width: 90%"
                       size="small"
+                      :disabled="!invoiceModel.venta_total.show"
                     >
                     </el-input-number>
                   </template>
@@ -2254,7 +2324,12 @@
                       ></el-input-number>
                     </el-form-item>
                     <div class="col-span-2 float-right">
-                      <el-link @click="closeDialog = true">
+                      <el-link
+                        @click="
+                          (closeDialog = true),
+                            saveIdCorrelative(correlative.documentType.id)
+                        "
+                      >
                         Configuración
                         <i class="el-icon-setting"></i>
                       </el-link>
@@ -2410,6 +2485,7 @@ export default {
         invoicesZone: "",
       },
       invoiceModel: {
+        idDocument: "",
         configuration: "positions",
         fontSizeHeader: "",
         fontSizeDetails: "",
@@ -3233,7 +3309,158 @@ export default {
       });
     },
     sumitModelInvoice(formName, modelInvoice) {
-      console.log(formName, modelInvoice);
+      console.log(modelInvoice);
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+        this.$confirm(
+          "¿Estás seguro que deseas guardar la configuración?",
+          "Confirmación",
+          {
+            confirmButtonText: "Si, guardar",
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                this.$axios
+                  .put(
+                    `/invoices/documents/documentlayout/${modelInvoice.idDocument}`,
+                    {
+                      configuration: modelInvoice.configuration,
+                      resolution: [
+                        modelInvoice.resolution.width,
+                        modelInvoice.resolution.height,
+                      ],
+                      fontSizeHeader: modelInvoice.fontSizeHeader,
+                      fontSizeDetails: modelInvoice.fontSizeDetails,
+                      fontSizeTotals: modelInvoice.fontSizeTotals,
+                      header: [
+                        {
+                          ...modelInvoice.invoice_authorization,
+                        },
+                        {
+                          ...modelInvoice.invoice_number,
+                        },
+                        {
+                          ...modelInvoice.invoice_date,
+                        },
+                        {
+                          ...modelInvoice.customer_name,
+                        },
+                        {
+                          ...modelInvoice.customer_address1,
+                        },
+                        {
+                          ...modelInvoice.customer_address2,
+                        },
+                        {
+                          ...modelInvoice.customer_nrc,
+                        },
+                        {
+                          ...modelInvoice.customer_nit,
+                        },
+                        {
+                          ...modelInvoice.customer_dui,
+                        },
+                        {
+                          ...modelInvoice.customer_state,
+                        },
+                        {
+                          ...modelInvoice.customer_city,
+                        },
+                        {
+                          ...modelInvoice.customer_giro,
+                        },
+                        {
+                          ...modelInvoice.seller_name,
+                        },
+                        {
+                          ...modelInvoice.payment_condition,
+                        },
+                      ],
+                      details: {
+                        position_y: modelInvoice.position_y,
+                        heigth: modelInvoice.height,
+                        quantity: {
+                          ...modelInvoice.charge_quantity,
+                        },
+                        description: {
+                          ...modelInvoice.charge_description,
+                        },
+                        price: {
+                          ...modelInvoice.price,
+                        },
+                        sujeto: {
+                          ...modelInvoice.sujeto,
+                        },
+                        exento: {
+                          ...modelInvoice.exento,
+                        },
+                        afecto: {
+                          ...modelInvoice.afecto,
+                        },
+                      },
+                      totals: [
+                        {
+                          ...modelInvoice.venta_total_text,
+                        },
+                        {
+                          ...modelInvoice.sum,
+                        },
+                        {
+                          ...modelInvoice.iva,
+                        },
+                        {
+                          ...modelInvoice.subtotal,
+                        },
+                        {
+                          ...modelInvoice.iva_retenido,
+                        },
+                        {
+                          ...modelInvoice.ventas_no_sujetas,
+                        },
+                        {
+                          ...modelInvoice.ventas_exentas,
+                        },
+                        {
+                          ...modelInvoice.venta_total,
+                        },
+                      ],
+                    }
+                  )
+
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Exito",
+                      message: res.data.message,
+                    });
+                  })
+                  .catch((err) => {
+                    instance.confirmButtonLoading = false;
+                    this.$notify.error({
+                      title: "Error",
+                      message: err.response.data.message,
+                    });
+                  })
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = "Si, actualizar";
+                    done();
+                  });
+              } else {
+                instance.confirmButtonLoading = false;
+                done();
+              }
+            },
+          }
+        );
+      });
+    },
+    saveIdCorrelative(index) {
+      this.invoiceModel.idDocument = index;
     },
   },
   computed: {
