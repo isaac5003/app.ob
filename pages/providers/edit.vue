@@ -61,13 +61,13 @@
               />
             </el-form-item>
             <el-form-item
-              prop="isCostumers"
+              prop="isCustomer"
               class="col-span-3"
               label="¿Es también cliente?"
               v-if="hasModule('9ff0b6f4-9c58-475b-b2dd-5eea6d7b66aa')"
             >
               <el-radio-group
-                v-model="providerEditForm.isCostumer"
+                v-model="providerEditForm.isCustomer"
                 class="w-full"
                 @change="setStorage(providerEditForm)"
               >
@@ -559,7 +559,7 @@ export default {
       providerEditForm: {
         name: "",
         shortName: "",
-        isCostumer: true,
+        isCustomer: true,
         dui: "",
         nit: "",
         nrc: "",
