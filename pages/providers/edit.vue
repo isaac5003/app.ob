@@ -64,7 +64,7 @@
               prop="isCostumers"
               class="col-span-3"
               label="¿Es tambien cliente?"
-              v-if="hasModule('f6000cbb-1e6d-4f7d-a7cc-cadd78d23076')"
+              v-if="hasModule('9ff0b6f4-9c58-475b-b2dd-5eea6d7b66aa')"
             >
               <el-radio-group
                 v-model="providerEditForm.isCostumer"
