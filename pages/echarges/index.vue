@@ -198,8 +198,8 @@ export default {
     Promise.all([documentTypes(), customers()])
       .then((res) => {
         const [documentTypes, customers] = res;
-        this.documentTypes = documentTypes.data.documentTypes;
-        this.customers = customers.data.customers;
+        this.documentTypes = documentTypes.data;
+        this.customers = customers.data.data;
         this.pageloading = false;
       })
       .catch((err) => {

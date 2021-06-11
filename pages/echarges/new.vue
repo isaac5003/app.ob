@@ -1,9 +1,9 @@
 <template>
   <layout-content
     v-loading="loading"
-    page-title="Nuevo Cobro"
+    page-title="Nuevo Cobro electrónico"
     :breadcrumb="[
-      { name: 'Cobros electrónicos', to: '/echarges' },
+      { name: 'Cobros', to: '/echarges' },
 
       { name: 'Nuevo cobro electrónico', to: null },
     ]"
@@ -33,7 +33,7 @@
         </div>
 
         <!-- n° Correlativo -->
-        <div class="col-span-2 col-start-7 ">
+        <div class="col-span-2 col-start-7">
           <el-form-item label="N° de correlativo">
             <el-input
               size="small"
@@ -56,7 +56,7 @@
               size="small"
               autocomplete="off"
               :precision="2"
-              style="width:100%"
+              style="width: 100%"
             >
             </el-input-number>
           </el-form-item>
