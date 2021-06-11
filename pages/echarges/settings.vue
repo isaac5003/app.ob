@@ -3,7 +3,7 @@
     v-loading="pageloading"
     page-title="Configuraciones"
     :breadcrumb="[
-      { name: 'Cobros ', to: '/echarges' },
+      { name: 'Cobros electrónicos', to: '/echarges' },
       { name: 'Configuraciones', to: null },
     ]"
   >
@@ -79,8 +79,19 @@
 
       <el-tab-pane label="Pasarelas de pago" name="payment">
         <template>
-          <el-tabs :tab-position="tabPosition">
-            <el-tab-pane label="Wompi">
+          <el-tabs
+            :tab-position="tabPosition"
+            v-model="utab"
+            @tab-click="
+              $router
+                .replace({
+                  path: `/echarges/settings`,
+                  query: { tab, utab },
+                })
+                .catch(() => {})
+            "
+          >
+            <el-tab-pane label="Wompi" name="wompi">
               <el-form>
                 <div class="grid grid-cols-12 gap-4">
                   <el-form-item label=" APP ID " class="col-span-4">
@@ -139,7 +150,7 @@ export default {
       //pageloading: true,
       tabPosition: "left",
       tab: "document",
-      utab: "invoicing",
+      utab: "wompi",
       documentForm: {
         body: "",
         farewell: "",

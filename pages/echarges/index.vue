@@ -1,10 +1,10 @@
 <template>
   <layout-content
     v-loading="pageloading"
-    page-title="Listado de cobros electrónicos"
+    page-title="Listado de cobros"
     :breadcrumb="[
-      { name: 'Cobros electronicos', to: '/echarges' },
-      { name: 'Listado de cobros electrónicos', to: null },
+      { name: 'Cobros electrónicos', to: '/echarges' },
+      { name: 'Listado de cobros', to: null },
     ]"
   >
     <div class="flex flex-col space-4">

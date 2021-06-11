@@ -3,7 +3,7 @@
     v-loading="loading"
     page-title="Editar cobro"
     :breadcrumb="[
-      { name: 'Cobros', to: '/echarges' },
+      { name: 'Cobros electrónicos', to: '/echarges' },
 
       { name: ' Editar cobro', to: null },
     ]"
