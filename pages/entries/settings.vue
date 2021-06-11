@@ -1363,99 +1363,6 @@
           <el-button size="small">Cancelar</el-button>
         </div>
       </el-tab-pane>
-
-      <!-- tab de Integraciones  -->
-      <el-tab-pane label="Integraciones" name="integraciones">
-        <div class="grid grid-cols-12">
-          <div class="col-span-12">
-            <Notification class="mb-4 w-full" type="info" title="Información" />
-          </div>
-        </div>
-
-        <div class="flex flex-col space-y-2">
-          <el-form
-            label-position="top"
-            :model="integrationSettingForm"
-            :rules="integrationSettingFormRules"
-            ref="integrationSettingForm"
-            @submit.native.prevent="
-              submitSettingsIntegrations(
-                'integrationSettingForm',
-                integrationSettingForm
-              )
-            "
-          >
-            <div class="flex flex-col space-y-2">
-              <div class="grid grid-cols-12 gap-4">
-                <el-form-item
-                  label="Cuenta para pagos de contado"
-                  class="col-span-4"
-                  prop="accountingCatalog"
-                >
-                  <el-select
-                    v-model="integrationSettingForm.accountingCatalog"
-                    placeholder="Ingrese el codigo o el  Nombre de la cuenta"
-                    size="small"
-                    :loading="loadingAccount"
-                    remote
-                    class="w-full"
-                    clearable
-                    filterable
-                    default-first-option
-                    :remote-method="findAccount"
-                    @focus="filteredCatalog = []"
-                  >
-                    <el-option
-                      v-for="c in filteredCatalog"
-                      :key="c.id"
-                      :label="`${c.code}-${c.name}`"
-                      :value="c.id"
-                      :disabled="c.isParent == true"
-                    >
-                    </el-option>
-                  </el-select>
-                </el-form-item>
-                <el-form-item
-                  prop=""
-                  label="Tipo de integración contable"
-                  class="col-span-5"
-                >
-                  <el-radio-group class="w-full">
-                    <el-row :gutter="15">
-                      <el-col :span="8">
-                        <el-radio
-                          border
-                          label="Automatico"
-                          size="small"
-                          class="w-full"
-                          >Automático</el-radio
-                        >
-                      </el-col>
-                      <el-col :span="8">
-                        <el-radio
-                          border
-                          label="Manual"
-                          size="small"
-                          class="w-full"
-                          >Manual</el-radio
-                        >
-                      </el-col>
-                    </el-row>
-                  </el-radio-group>
-                </el-form-item>
-              </div>
-            </div>
-            <div class="flex flex-row justify-end">
-              <el-button type="primary" size="small" native-type="submit"
-                >Guardar</el-button
-              >
-              <el-button size="small" @click="$router.push('/services')"
-                >Cancelar</el-button
-              >
-            </div>
-          </el-form>
-        </div>
-      </el-tab-pane>
     </el-tabs>
   </layout-content>
 </template>
@@ -1498,9 +1405,6 @@ export default {
     const results = () => this.$axios.get("/entries/setting/estado-resultados");
     const signatures = () => this.$axios.get("/entries/setting/signatures");
     const general = () => this.$axios.get("/entries/setting/general");
-    const settingIntegration = () =>
-      this.$axios.get("/entries/setting/integrations");
-
     Promise.all([
       accountCatalogs(),
       accounts(),
@@ -1508,7 +1412,6 @@ export default {
       results(),
       signatures(),
       general(),
-      settingIntegration(),
     ])
       .then((res) => {
         const [
@@ -1530,8 +1433,6 @@ export default {
         this.fiscalPeriodForm.startDate = general.data.data.periodStart;
         this.fiscalPeriodForm.endDate = general.data.data.periodEnd;
         this.specialAccounts = { ...balance.data.data.balanceGeneral.special };
-        this.integrationSettingForm.accountingCatalog =
-          settingIntegration.data.data.catalog;
         this.tablesData = results.data.data.estadoResultados.map((r) => {
           const obj = { ...r };
           if (r.children) {
@@ -1903,9 +1804,6 @@ export default {
       allowNewDisplayNameEstado: false,
       newDisplayNameEstado: "",
       filteredCatalogBalance: [],
-      integrationSettingForm: {
-        accountingCatalog: "",
-      },
       integrationSettingFormRules: {
         accountingCatalog: selectValidation(true),
       },
@@ -2630,73 +2528,6 @@ export default {
           },
         }
       );
-    },
-    // setting intregations
-    submitSettingsIntegrations(formName, { accountingCatalog }) {
-      this.$refs[formName].validate(async (valid) => {
-        if (!valid) {
-          return false;
-        }
-        this.$confirm(
-          "¿Estás seguro que deseas guardar esta configuración?",
-          "Confirmación",
-          {
-            confirmButtonText: "Si, guardar",
-            cancelButtonText: "Cancelar",
-            type: "warning",
-            beforeClose: (action, instance, done) => {
-              if (action === "confirm") {
-                instance.confirmButtonLoading = true;
-                instance.confirmButtonText = "Procesando...";
-                this.$axios
-                  .put("/entries/setting/integrations", {
-                    accountingCatalog,
-                  })
-                  .then((res) => {
-                    this.$notify.success({
-                      title: "Exito",
-                      message: res.data.message,
-                    });
-                    this.pageloading = true;
-                    fetchIntegration();
-                  })
-                  .catch((err) => {
-                    this.$notify.error({
-                      title: "Error",
-                      dangerouslyUseHTMLString: true,
-                      message: parseErrors(err.response.data.message),
-                    });
-                  })
-                  .then((alw) => {
-                    instance.confirmButtonLoading = false;
-                    instance.confirmButtonText = "Si, guardar";
-                    done();
-                  });
-              } else {
-                instance.confirmButtonLoading = false;
-                instance.confirmButtonText = "Si, guardar";
-                done();
-              }
-            },
-          }
-        );
-      });
-    },
-    fetchIntegration() {
-      this.$axios
-        .get("/entries/setting/integrations")
-        .then((res) => {
-          this.integrationSettingForm.accountingCatalog = res.data.data.catalog;
-          this.filteredCatalog = this.catalogs.filter(
-            (c) => c.id == this.integrationSettingForm.accountingCatalog
-          );
-          console.log(this.filteredCatalog);
-          this.pageloading = false;
-        })
-        .catch((err) => {
-          this.errorMessage = err.response.data.message;
-        })
-        .then((alw) => (this.pageloading = false));
     },
   },
   computed: {},
