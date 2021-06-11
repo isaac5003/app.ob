@@ -34,7 +34,7 @@ export default {
     return {
       menu: [
         {
-          name: "Nuevo cobros electronicos",
+          name: "Nuevo cobro electrónico",
           icon: getIcon("plus"),
           path: "/echarges/new",
         },
