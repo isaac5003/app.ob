@@ -32,7 +32,6 @@
               label="Nombre o razón social"
               prop="name"
               class="col-span-6"
-              v-if="true"
             >
               <el-input
                 clearable
