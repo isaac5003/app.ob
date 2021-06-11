@@ -59,8 +59,8 @@
               <el-form-item
                 prop="isProvider"
                 class="col-span-3"
-                label="¿Es tambien proveedor? "
-                v-if="hasModule(['f6000cbb-1e6d-4f7d-a7cc-cadd78d23076'])"
+                label="¿Es también proveedor?"
+                v-if="hasModule('f6000cbb-1e6d-4f7d-a7cc-cadd78d23076')"
               >
                 <el-radio-group
                   v-model="customersNewForm.isProvider"
@@ -79,7 +79,7 @@
                         :label="false"
                         size="small"
                         class="w-full"
-                        >no</el-radio
+                        >No</el-radio
                       >
                     </el-col>
                   </el-row>
@@ -469,7 +469,7 @@ export default {
       customersNewForm: {
         name: "",
         shortName: "",
-        isProvider: false,
+        isProvider: true,
         dui: null,
         nit: "",
         nrc: "",

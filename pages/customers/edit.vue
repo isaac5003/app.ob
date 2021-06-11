@@ -66,7 +66,7 @@
             <el-form-item
               prop="isProvider"
               class="col-span-3"
-              label="¿Es tambien proveedor? "
+              label="¿Es también proveedor? "
               v-if="hasModule('f6000cbb-1e6d-4f7d-a7cc-cadd78d23076')"
             >
               <el-radio-group
@@ -82,7 +82,7 @@
                   </el-col>
                   <el-col :span="8">
                     <el-radio border :label="false" size="small" class="w-full"
-                      >no</el-radio
+                      >No</el-radio
                     >
                   </el-col>
                 </el-row>
