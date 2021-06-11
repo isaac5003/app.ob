@@ -67,7 +67,22 @@
               v-for="item in following"
               :key="item.id"
               @click="getFollow(item.id)"
-              class="flex justify-between px-6 py-2 items-center text-justify leading-1 rounded-md focus:outline-none border focus:border-blue-600 focus:bg-blue-100 border-gray-400 cursor-pointer"
+              class="
+                flex
+                justify-between
+                px-6
+                py-2
+                items-center
+                text-justify
+                leading-1
+                rounded-md
+                focus:outline-none
+                border
+                focus:border-blue-600
+                focus:bg-blue-100
+                border-gray-400
+                cursor-pointer
+              "
             >
               <div class="">
                 <span class="font-semibold">{{ item.follow }}</span>
@@ -274,7 +289,13 @@
                   :value="c.id"
                 >
                   <div
-                    class="flex flex-row justify-between items-end py-1 leading-normal"
+                    class="
+                      flex flex-row
+                      justify-between
+                      items-end
+                      py-1
+                      leading-normal
+                    "
                   >
                     <div class="flex flex-col">
                       <span class="text-xs text-gray-500">{{
@@ -295,7 +316,13 @@
                   :value="c.id"
                 >
                   <div
-                    class="flex flex-row justify-between items-end py-1 leading-normal"
+                    class="
+                      flex flex-row
+                      justify-between
+                      items-end
+                      py-1
+                      leading-normal
+                    "
                   >
                     <div class="flex flex-col">
                       <span class="text-xs text-gray-500">{{
@@ -474,8 +501,8 @@ export default {
     Promise.all([customers(), documentTypes(), paymentConditions()])
       .then((res) => {
         const [customers, documentTypes, paymentConditions] = res;
-        this.customers = customers.data.customers;
-        this.documentTypes = documentTypes.data.documentTypes;
+        this.customers = customers.data.data;
+        this.documentTypes = documentTypes.data.data;
         this.paymentConditions = paymentConditions.data.paymentConditions;
       })
       .catch((err) => {
