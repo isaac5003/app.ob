@@ -59,7 +59,7 @@
               <el-form-item
                 prop="isCostumers"
                 class="col-span-3"
-                label="¿Es tambien cliente?"
+                label="¿Es también cliente?"
                 v-if="hasModule('9ff0b6f4-9c58-475b-b2dd-5eea6d7b66aa')"
               >
                 <el-radio-group
@@ -69,13 +69,17 @@
                 >
                   <el-row :gutter="15">
                     <el-col :span="8">
-                      <el-radio :label="true" size="small" class="w-full"
+                      <el-radio border :label="true" size="small" class="w-full"
                         >Si</el-radio
                       >
                     </el-col>
                     <el-col :span="8">
-                      <el-radio :label="false" size="small" class="w-full"
-                        >no</el-radio
+                      <el-radio
+                        border
+                        :label="false"
+                        size="small"
+                        class="w-full"
+                        >No</el-radio
                       >
                     </el-col>
                   </el-row>
@@ -462,7 +466,7 @@ export default {
       providerNewForm: {
         name: "",
         shortName: "",
-        isCustomer: false,
+        isCustomer: true,
         dui: null,
         nit: "",
         nrc: "",
