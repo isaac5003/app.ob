@@ -2810,7 +2810,7 @@
               <el-button type="primary" size="small" native-type="submit"
                 >Guardar</el-button
               >
-              <el-button size="small" @click="$router.push('/services')"
+              <el-button size="small" @click="$router.push('/invoices')"
                 >Cancelar</el-button
               >
             </div>
