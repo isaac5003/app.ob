@@ -19,9 +19,6 @@ export default {
     if (!hasModule(["a98b98e6-b2d5-42a3-853d-9516f64eade8"], this.$auth.user)) {
       this.menu = this.menu.slice(0, -1);
     }
-    if (!hasModule(["9ff0b6f4-9c58-475b-b2dd-5eea6d7b66aa"], this.$auth.user)) {
-      this.menu = this.menu.slice(0, -1);
-    }
   },
 
   data() {
