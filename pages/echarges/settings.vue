@@ -160,9 +160,10 @@ export default {
       this.utab = this.$route.query.utab;
     }
   },
+  fetchOnServer: false,
   data() {
     return {
-      //pageloading: true,
+      // pageloading: false,
       tab: "document",
       utab: "invoicing",
       documentForm: {

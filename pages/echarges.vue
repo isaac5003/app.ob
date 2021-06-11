@@ -21,18 +21,23 @@ export default {
   },
   components: { LayoutSubmenu },
   fetch() {
-    if (!hasModule("cfb8addb-541b-482f-8fa1-dfe5db03fdf4", this.$auth.user)) {
-      this.menu.unshift({
-        name: "Nuevo cobro",
-        icon: getIcon("plus"),
-        path: "/echarges/new",
-      });
-    }
+    // if (!hasModule("cfb8addb-541b-482f-8fa1-dfe5db03fdf4", this.$auth.user)) {
+    //   this.menu.unshift({
+    //     name: "Nuevo cobro",
+    //     icon: getIcon("plus"),
+    //     path: "/echarges/new",
+    //   });
+    // }
   },
   fetchOnServer: false,
   data() {
     return {
       menu: [
+        {
+          name: "Nuevo cobro electrónico",
+          icon: getIcon("plus"),
+          path: "/echarges/new",
+        },
         {
           name: "Listado de cobros",
           icon: getIcon("menu"),
