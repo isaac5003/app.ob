@@ -3,7 +3,7 @@
     v-loading="pageloading"
     page-title="Configuraciones"
     :breadcrumb="[
-      { name: 'Cobros electrónicos', to: '/echarges' },
+      { name: 'Cobros ', to: '/echarges' },
       { name: 'Configuraciones', to: null },
     ]"
   >
@@ -77,63 +77,37 @@
         </el-form>
       </el-tab-pane>
 
-      <el-tab-pane label="Pasarela de pago" name="payment">
-        <el-form
-          :model="paymentForm"
-          :rules="paymentFormmRules"
-          ref="paymentForm"
-        >
-          <div class="grid grid-cols-12 gap-4">
-            <div class="col-span-6">
-              <el-form-item
-                label="Cliente ID"
-                prop="clientId"
-                class="col-span-4"
-              >
-                <el-input
-                  v-model="paymentForm.clientId"
-                  type="textarea"
-                  autocomplete="off"
-                  maxlength="500"
-                  minlength="5"
-                  size="small"
-                  show-word-limit
-                  clearable
-                  placeholder=""
-                >
-                </el-input>
-              </el-form-item>
-            </div>
-            <div class="col-span-6">
-              <el-form-item
-                label="Codigo de cliente"
-                prop="clientSecret"
-                class="col-span-4"
-              >
-                <el-input
-                  v-model="paymentForm.clientSecret"
-                  type="textarea"
-                  size="small"
-                  class="w-full"
-                  autocomplete="off"
-                  maxlength="500"
-                  minlength="5"
-                  show-word-limit
-                  filterable
-                  clearable
-                  placeholder=""
-                >
-                </el-input>
-              </el-form-item>
-            </div>
-          </div>
-          <div class="flex justify-end mt-4">
-            <el-button type="primary" size="small">Guardar</el-button>
-            <el-button size="small" @click="$router.push('/echarges')"
-              >Cancelar</el-button
-            >
-          </div>
-        </el-form>
+      <el-tab-pane label="Pasarelas de pago" name="payment">
+        <template>
+          <el-tabs :tab-position="tabPosition">
+            <el-tab-pane label="Wompi">
+              <el-form>
+                <div class="grid grid-cols-12 gap-4">
+                  <el-form-item label=" APP ID " class="col-span-4">
+                    <el-input
+                      class="w-full"
+                      size="small"
+                      placeholder="Escribe el id app"
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item label="API Secret" class="col-span-4">
+                    <el-input
+                      class="w-full"
+                      size="small"
+                      placeholder="Escribe la api secret"
+                    ></el-input>
+                  </el-form-item>
+                </div>
+                <div class="flex justify-end mt-4">
+                  <el-button type="primary" size="small">Guardar</el-button>
+                  <el-button size="small" @click="$router.push('/echarges')"
+                    >Cancelar</el-button
+                  >
+                </div>
+              </el-form>
+            </el-tab-pane>
+          </el-tabs>
+        </template>
       </el-tab-pane>
     </el-tabs>
   </layout-content>
@@ -163,6 +137,7 @@ export default {
   data() {
     return {
       //pageloading: true,
+      tabPosition: "left",
       tab: "document",
       utab: "invoicing",
       documentForm: {

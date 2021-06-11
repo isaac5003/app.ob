@@ -1,10 +1,10 @@
 <template>
   <layout-content
     v-loading="pageloading"
-    page-title="Listado de cobros electronicos"
+    page-title="Listado de cobros electrónicos"
     :breadcrumb="[
       { name: 'Cobros electronicos', to: '/echarges' },
-      { name: 'Listado de cobros electronicos', to: null },
+      { name: 'Listado de cobros electrónicos', to: null },
     ]"
   >
     <div class="flex flex-col space-4">
@@ -89,12 +89,20 @@
         </div>
       </el-form>
       <div class="flex flex-col space-y-2">
-        <el-table :data="charges" stripe size="mini" v-loading="tableloading">
+        <el-table
+          :data="charges"
+          stripe
+          size="mini"
+          v-loading="tableloading"
+          ref="multipleTable"
+          @selection-change="handleSelectionChange"
+        >
+          <el-table-column type="selection" width="50" />
           <el-table-column prop="index" width="40" />
           <el-table-column
-            label="Serie"
+            label="Correlativo"
             prop="sequence"
-            width="80"
+            width="120"
             sortable="custom"
           >
           </el-table-column>
@@ -114,7 +122,7 @@
           <el-table-column
             label="Cliente"
             prop="customerName"
-            min-width="350"
+            min-width="220"
             sortable="custom"
           />
           <el-table-column label="Estado" width="110" sortable="custom">
@@ -147,7 +155,26 @@
               <span>{{ scope.row.total | formatMoney }}</span>
             </template>
           </el-table-column>
-          <el-table-column label width="70" align="center">
+          <el-table-column label width="110" align="center">
+            <template slot="header" v-if="multipleSelection.length > 0">
+              <el-dropdown trigger="click" szie="mini">
+                <el-button type="primary" size="mini">
+                  <span> {{ multipleSelection.length }} Filas</span>
+                  <i class="el-icon-more"></i>
+                </el-button>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item>
+                    <i class="el-icon-check"></i>Activar seleccionados
+                  </el-dropdown-item>
+                  <el-dropdown-item>
+                    <i class="el-icon-close"></i>Desactivar seleccionados
+                  </el-dropdown-item>
+                  <el-dropdown-item :divided="true" class="font-semibold">
+                    <i class="el-icon-delete"></i> Eliminar seleccionados
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </template>
             <template slot-scope="scope">
               <el-dropdown trigger="click" szie="mini">
                 <el-button icon="el-icon-more" size="mini" />
@@ -155,11 +182,21 @@
                   <el-dropdown-item v-if="scope.row.status.id == 1">
                     <i class="el-icon-s-promotion"></i> Enviar cobro
                   </el-dropdown-item>
+                  <el-dropdown-item
+                    @click.native="
+                      $router.push(`/echarges/edit?ref=${scope.row.id}`)
+                    "
+                  >
+                    <i class="el-icon-edit-outline"></i> Editar cobros
+                  </el-dropdown-item>
                   <el-dropdown-item v-if="scope.row.status.id == 2">
                     <i class="el-icon-s-promotion"></i>Reennviar cobro
                   </el-dropdown-item>
                   <el-dropdown-item>
                     <i class="el-icon-tickets"></i> Bitacora de cobros
+                  </el-dropdown-item>
+                  <el-dropdown-item :divided="true" class="font-semibold">
+                    <i class="el-icon-delete"></i> Eliminar cobro
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
@@ -199,7 +236,7 @@ export default {
       .then((res) => {
         const [documentTypes, customers] = res;
         this.documentTypes = documentTypes.data.documentTypes;
-        this.customers = customers.data.customers;
+        this.customers = customers.data.data;
         this.pageloading = false;
       })
       .catch((err) => {
@@ -249,7 +286,13 @@ export default {
           total: 2345.65,
         },
       ],
+      multipleSelection: [],
     };
+  },
+  methods: {
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
   },
   computed: {
     activeCustomers() {

@@ -1,11 +1,11 @@
 <template>
   <layout-content
     v-loading="loading"
-    page-title="Nuevo Cobro"
+    page-title="Editar cobro"
     :breadcrumb="[
       { name: 'Cobros', to: '/echarges' },
 
-      { name: 'Nuevo cobro', to: null },
+      { name: ' Editar cobro', to: null },
     ]"
   >
     <el-form :model="eChargesNewForm" :rules="eChargesNewFormRules" status-icon>
