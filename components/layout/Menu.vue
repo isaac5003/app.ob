@@ -84,10 +84,26 @@
           </el-form>
           <div
             slot="reference"
-            class="flex items-center justify-center rounded-full w-9 h-9 bg-gray-100 cursor-pointer"
+            class="
+              flex
+              items-center
+              justify-center
+              rounded-full
+              w-9
+              h-9
+              bg-gray-100
+              cursor-pointer
+            "
           >
             <span
-              class="text-gray-900 font-bold text-lg uppercase tracking-tight leading-none"
+              class="
+                text-gray-900
+                font-bold
+                text-lg
+                uppercase
+                tracking-tight
+                leading-none
+              "
               >{{ initials }}</span
             >
           </div>
@@ -101,7 +117,25 @@
           :to="item.path"
           active-class="text-blue-900 bg-yellow-500"
           :exact="item.exact"
-          class="group flex items-center rounded text-white h-10 w-10 cursor-pointer space-x-4 p-2 transition transform duration-300 hover:w-50 hover:text-blue-900 hover:bg-yellow-500 hover:shadow-md"
+          class="
+            group
+            flex
+            items-center
+            rounded
+            text-white
+            h-10
+            w-10
+            cursor-pointer
+            space-x-4
+            p-2
+            transition
+            transform
+            duration-300
+            hover:w-50
+            hover:text-blue-900
+            hover:bg-yellow-500
+            hover:shadow-md
+          "
         >
           <svg
             class="w-6 h-6"
@@ -128,7 +162,18 @@
         <nuxt-link
           to="/business"
           tag="div"
-          class="w-8 h-8 border-2 bg-blue-100 rounded-full cursor-pointer text-blue-900 flex items-center justify-center"
+          class="
+            w-8
+            h-8
+            border-2
+            bg-blue-100
+            rounded-full
+            cursor-pointer
+            text-blue-900
+            flex
+            items-center
+            justify-center
+          "
           active-class="border-yellow-500"
         >
           <svg
@@ -237,7 +282,10 @@ export default {
           path: "/providers",
           name: "Proveedores",
           icon: getIcon("truck"),
-
+          exact: false,
+        },
+        {
+          always: false,
           id: "a98b98e6-b2d5-42a3-853d-9516f64eade8",
           path: "/receivable",
           name: "Cuentas por cobrar",
