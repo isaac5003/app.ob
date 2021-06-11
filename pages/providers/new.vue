@@ -25,7 +25,7 @@
               <el-form-item
                 label="Nombre o razón social"
                 prop="name"
-                class="col-span-7"
+                class="col-span-6"
               >
                 <el-input
                   clearable
@@ -57,18 +57,32 @@
                 />
               </el-form-item>
               <el-form-item
-                label="Es tambien proveedor"
                 prop="isCustomer"
-                class="col-span-2"
-                v-if="false"
+                class="col-span-3"
+                label="¿Es también cliente?"
+                v-if="hasModule('9ff0b6f4-9c58-475b-b2dd-5eea6d7b66aa')"
               >
                 <el-radio-group
                   v-model="providerNewForm.isCustomer"
                   class="w-full"
                   @change="setStorage(providerNewForm)"
                 >
-                  <el-radio :label="true">Si</el-radio>
-                  <el-radio :label="false">No</el-radio>
+                  <el-row :gutter="15">
+                    <el-col :span="8">
+                      <el-radio border :label="true" size="small" class="w-full"
+                        >Si</el-radio
+                      >
+                    </el-col>
+                    <el-col :span="8">
+                      <el-radio
+                        border
+                        :label="false"
+                        size="small"
+                        class="w-full"
+                        >No</el-radio
+                      >
+                    </el-col>
+                  </el-row>
                 </el-radio-group>
               </el-form-item>
             </div>
@@ -382,6 +396,7 @@ import {
   checkBeforeLeave,
   checkBeforeEnter,
   parseErrors,
+  hasModule,
 } from "../../tools";
 import Notification from "../../components/Notification";
 
@@ -451,7 +466,7 @@ export default {
       providerNewForm: {
         name: "",
         shortName: "",
-        isCustomer: false,
+        isCustomer: true,
         dui: null,
         nit: "",
         nrc: "",
@@ -601,6 +616,9 @@ export default {
           }
         );
       });
+    },
+    hasModule(modules) {
+      return hasModule(modules, this.$auth.user);
     },
   },
   computed: {

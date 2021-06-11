@@ -16,10 +16,11 @@ export default {
   },
   components: { LayoutSubmenu },
   fetch() {
-   if (!hasModule(["a98b98e6-b2d5-42a3-853d-9516f64eade8"], this.$auth.user)) {
-     this.menu = this.menu.slice(0, -1);    }
- },
- 
+    if (!hasModule(["a98b98e6-b2d5-42a3-853d-9516f64eade8"], this.$auth.user)) {
+      this.menu = this.menu.slice(0, -1);
+    }
+  },
+
   data() {
     return {
       menu: [
