@@ -16,7 +16,7 @@ export default {
   name: "Receivable",
   middleware: "access",
   meta: {
-    id: "9ff0b6f4-9c58-475b-b2dd-5eea6d7b66aa",
+    id: "9c5dbbf2-ba8a-443d-b1ac-8bf23ea9a8e5",
   },
   components: { LayoutSubmenu },
   data() {
