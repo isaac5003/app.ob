@@ -17,24 +17,24 @@
       </div>
       <div class="flex flex-col flex-1">
         <span class="uppercase font-semibold" :class="`${colors.textDarker}`">
-          {{
-          title
-          }}
+          {{ title }}
         </span>
-        <span :class="`${colors.textDark}`">{{ message }}</span>
+        <span :class="`${colors.textDark}`" v-html="message"></span>
       </div>
       <el-button
         v-if="link"
         :type="type"
         size="small"
         @click="$router.push(link.path)"
-      >{{ link.title }}</el-button>
+        >{{ link.title }}</el-button
+      >
       <el-button
         v-if="action"
         :type="type"
         size="small"
         @click="action.function()"
-      >{{ action.title }}</el-button>
+        >{{ action.title }}</el-button
+      >
     </div>
   </div>
 </template>

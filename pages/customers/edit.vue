@@ -9,6 +9,7 @@
   >
     <el-form
       :model="customersEditForm"
+      :rules="customersEditFormRuler"
       status-icon
       ref="customersEditForm"
       @submit.native.prevent="
@@ -318,7 +319,7 @@
             class="grid grid-cols-12 gap-4"
             v-if="
               customersEditForm.customerType == 1 ||
-                customersEditForm.customerTypeNatural == 2
+              customersEditForm.customerTypeNatural == 2
             "
           >
             <el-form-item
@@ -359,6 +360,7 @@
           label="Integraciones"
           name="integrations"
           class="space-y-2"
+          v-if="hasModule(['a98b98e6-b2d5-42a3-853d-9516f64eade8'])"
         >
           <Notification
             class="w-full"
@@ -368,7 +370,11 @@
           />
 
           <div class="grid grid-cols-12 gap-4">
-            <el-form-item label="Seleccione una cuenta" class="col-span-4">
+            <el-form-item
+              label="Seleccione una cuenta"
+              class="col-span-4"
+              v-if="hasModule('a98b98e6-b2d5-42a3-853d-9516f64eade8')"
+            >
               <el-select
                 filterable
                 remote
@@ -379,6 +385,7 @@
                 class="w-full"
                 :remote-method="findAccount"
                 :loading="loadingAccount"
+                @focus="filteredCatalog = []"
               >
                 <el-option
                   v-for="a in filteredCatalog"
@@ -412,6 +419,8 @@ import {
   selectValidation,
   checkBeforeLeave,
   checkBeforeEnter,
+  hasModule,
+  parseErrors,
 } from "../../tools";
 import Notification from "../../components/Notification";
 
@@ -460,24 +469,24 @@ export default {
           catalog,
         ] = res;
 
-        this.customerTypes = customerTypes.data.types;
-        this.customerTypeNaturals = customerTypeNaturals.data.typeNaturals;
-        this.customerTaxerTypes = customerTaxerTypes.data.taxerTypes;
-        const customer = customerData.data.customer;
+        this.customerTypes = customerTypes.data.data;
+        this.customerTypeNaturals = customerTypeNaturals.data.data;
+        this.customerTaxerTypes = customerTaxerTypes.data.data;
+        const customer = customerData.data.data;
         const branch = customer.customerBranches[0];
         this.customer = customer;
 
-        this.countries = countries.data.countries;
-        this.rawStates = states.data.states;
-        this.rawCities = cities.data.cities;
-        this.catalogs = catalog.data.accountingCatalog;
+        this.countries = countries.data.data;
+        this.rawStates = states.data.data;
+        this.rawCities = cities.data.data;
+        this.catalogs = catalog.data.data;
 
-        const phone = branch.contactInfo.phones
-          ? branch.contactInfo.phones[0]
+        const phone = branch.contactInfo.phone
+          ? branch.contactInfo.phone[0]
           : branch.contactInfo.cellphone;
         const email = branch.contactInfo.emails
           ? branch.contactInfo.emails[0]
-          : branch.contactInfo.email;
+          : branch.contactInfo.emails;
         this.customersEditForm = {
           ...customer,
           customerType:
@@ -510,7 +519,7 @@ export default {
       })
       .catch((err) => {
         console.error(err);
-        this.$message.error(err.data.message);
+        this.$message.error(err.response.data.message);
         this.$router.push("/customers");
       })
       .then((alw) => (this.pageloading = false));
@@ -551,6 +560,19 @@ export default {
         state: "",
         city: "",
         accountingCatalog: "",
+      },
+      customersEditFormRuler: {
+        name: inputValidation(true, 5, 100),
+        shortName: inputValidation(true, 3, 15),
+        address1: inputValidation(true, 5, 150),
+        giro: inputValidation(true, 5, 150),
+        nit: inputValidation(true, 5, 150),
+        country: selectValidation(true),
+        state: selectValidation(true),
+        city: selectValidation(true),
+        customerType: selectValidation(true),
+        customerTypeNatural: selectValidation(true),
+        customerTaxerType: selectValidation(true),
       },
       customer: null,
       filteredCatalog: [],
@@ -648,7 +670,8 @@ export default {
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
@@ -671,13 +694,16 @@ export default {
         this.$axios
           .get("/entries/catalog", { params: { search: query.toLowerCase() } })
           .then((res) => {
-            this.filteredCatalog = res.data.accountingCatalog;
+            this.filteredCatalog = res.data.data;
             this.loadingAccount = false;
           })
           .catch((err) => (this.errorMessage = err.response.data.message));
       } else {
         this.filteredCatalog = [];
       }
+    },
+    hasModule(modules) {
+      return hasModule(modules, this.$auth.user);
     },
   },
   computed: {

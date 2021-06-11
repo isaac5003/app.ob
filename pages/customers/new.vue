@@ -19,7 +19,7 @@
     >
       <div class="flex flex-col">
         <div class="flex flex-col space-y-2">
-          <span class="text-sm font-semibold">Informacion general</span>
+          <span class="text-sm font-semibold">Información general</span>
           <div class="flex flex-col">
             <div class="grid grid-cols-12 gap-4">
               <el-form-item
@@ -217,7 +217,7 @@
           </div>
         </div>
         <div class="flex flex-col space-y-2">
-          <span class="text-sm font-semibold">Informacion general</span>
+          <span class="text-sm font-semibold">Información tributaria</span>
           <div class="flex flex-col">
             <div class="grid grid-cols-12 gap-4">
               <el-form-item
@@ -381,6 +381,7 @@ import {
   selectValidation,
   checkBeforeLeave,
   checkBeforeEnter,
+  parseErrors,
 } from "../../tools";
 import Notification from "../../components/Notification";
 
@@ -391,7 +392,10 @@ export default {
   head: {
     titleTemplate: `%s | Nuevo cliente`,
   },
-  components: { LayoutContent, Notification },
+  components: {
+    LayoutContent,
+    Notification,
+  },
   fetch() {
     const customerTypes = () => this.$axios.get(`/customers/types`);
     const customerTypeNaturals = () =>
@@ -419,12 +423,12 @@ export default {
           cities,
         ] = res;
 
-        this.customerTypes = customerTypes.data.types;
-        this.customerTypeNaturals = customerTypeNaturals.data.typeNaturals;
-        this.customerTaxerTypes = customerTaxerTypes.data.taxerTypes;
-        this.countries = countries.data.countries;
-        this.rawStates = states.data.states;
-        this.rawCities = cities.data.cities;
+        this.customerTypes = customerTypes.data.data;
+        this.customerTypeNaturals = customerTypeNaturals.data.data;
+        this.customerTaxerTypes = customerTaxerTypes.data.data;
+        this.countries = countries.data.data;
+        this.rawStates = states.data.data;
+        this.rawCities = cities.data.data;
       })
       .catch((err) => {
         this.$message.error(err.response.data.message);
@@ -463,7 +467,7 @@ export default {
         address2: "",
         phone: "",
         email: "",
-        country:1,
+        country: 1,
         state: "",
         city: "",
       },
@@ -484,6 +488,7 @@ export default {
         nrc: inputValidation(true, 3),
         customerTaxerType: selectValidation(true),
         giro: inputValidation(true, 5, 150),
+        customerTypeNatural: selectValidation(true),
       },
     };
   },
@@ -583,7 +588,8 @@ export default {
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {

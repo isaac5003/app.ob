@@ -9,12 +9,12 @@
   >
     <!-- dialogo adddetalledepartida-->
     <el-dialog
+      @close="closeDialog('newEntryDetailForm')"
       title="Agregar detalle de partida"
       :visible.sync="showAddEntryDetail"
       width="550px"
       :close-on-click-modal="false"
       :append-to-body="true"
-      @open="resetForm('newEntryDetailForm')"
     >
       <el-form
         :model="newEntryDetailForm"
@@ -31,13 +31,17 @@
                 v-model="newEntryDetailForm.accountingCatalog"
                 clearable
                 filterable
+                remote
                 default-first-option
                 size="small"
                 class="w-full"
-                placeholder="Seleccionar"
+                placeholder="Escribe el número o nombre de la cuenta"
+                :remote-method="findAccount"
+                :loading="loadingAccount"
+                @focus="filterCatalog = []"
               >
                 <el-option
-                  v-for="aC in accountingCatalog"
+                  v-for="aC in filteredCatalog"
                   :key="aC.id"
                   :label="`${aC.code} - ${aC.name}`"
                   :value="aC.id"
@@ -113,6 +117,7 @@
     </el-dialog>
     <!-- dialogo editdetalledepartida-->
     <el-dialog
+      @close="closeDialog('editEntryDetailForm')"
       title="Editar detalle de partida"
       :visible.sync="showEditEntryDetail"
       width="550px"
@@ -132,15 +137,19 @@
             <el-form-item label="Cuenta contable" prop="accountingCatalog">
               <el-select
                 v-model="editEntryDetailForm.accountingCatalog"
-                clearable
                 filterable
+                remote
                 default-first-option
-                size="small"
+                clearable
+                placeholder="Escribe el numero o nombre de la cuenta"
+                :remote-method="findAccount"
+                :loading="loadingAccount"
                 class="w-full"
-                placeholder="Seleccionar"
+                size="small"
+                @focus="filterCatalog = []"
               >
                 <el-option
-                  v-for="aC in accountingCatalog"
+                  v-for="aC in filteredCatalog"
                   :key="aC.id"
                   :label="`${aC.code} - ${aC.name}`"
                   :value="aC.id"
@@ -393,7 +402,6 @@
     </div>
   </layout-content>
 </template>
-
 <script>
 import LayoutContent from "../../components/layout/Content";
 import {
@@ -401,6 +409,7 @@ import {
   selectValidation,
   checkBeforeLeave,
   checkBeforeEnter,
+  parseErrors,
 } from "../../tools";
 import Notification from "../../components/Notification";
 const storagekey = "edit-entries";
@@ -410,23 +419,24 @@ export default {
   fetch() {
     const entryTypes = () => this.$axios.get(`/entries/types`);
     const entry = () => this.$axios.get(`/entries/${this.$route.query.ref}`);
-
-    Promise.all([entryTypes(), entry()])
+    const accountingCatalog = () => this.$axios.get("/entries/catalog");
+    Promise.all([entryTypes(), entry(), accountingCatalog()])
       .then((res) => {
-        const [entryTypes, entry] = res;
-        this.accountingEntryTypes = entryTypes.data.entryTypes;
+        const [entryTypes, entry, accountingCatalog] = res;
+        this.accountingEntryTypes = entryTypes.data.data;
+        this.accountingCatalog = accountingCatalog.data.data;
         this.editEntryForm = {
-          ...entry.data.entry,
-          accountingEntryType: entry.data.entry.accountingEntryType.id,
+          ...entry.data.data,
+          accountingEntryType: entry.data.data.accountingEntryType.id,
         };
-        this.accountingEntryDetails = entry.data.entry.accountingEntryDetails.map(
+        this.accountingEntryDetails = entry.data.data.accountingEntryDetails.map(
           (d) => {
             return {
               ...d,
               accountingCatalog: d.accountingCatalog.id,
               code: d.accountingCatalog.code,
               order: !d.order
-                ? entry.data.entry.accountingEntryDetails.indexOf(d) + 1
+                ? entry.data.data.accountingEntryDetails.indexOf(d) + 1
                 : d.order,
             };
           }
@@ -528,6 +538,7 @@ export default {
       showEditEntryDetail: false,
       showAddEntryDetail: false,
       loading: false,
+      loadingAccount: false,
       editEntryForm: {
         accountingEntryType: "",
         title: "",
@@ -612,6 +623,7 @@ export default {
           },
         ],
       },
+      filteredCatalog: [],
       accountingEntryTypes: [],
       accountingEntryDetails: [],
       editingEntryDetail: "",
@@ -655,18 +667,8 @@ export default {
       });
       return result;
     },
-    async getAccountingCatalog() {
-      await this.$axios
-        .get("/entries/catalog")
-        .then((res) => {
-          this.accountingCatalog = res.data.accountingCatalog;
-        })
-        .catch((err) => {
-          this.errorMessage = err.response.data.message;
-        });
-    },
+
     openAddEntryDetail() {
-      this.getAccountingCatalog();
       this.showAddEntryDetail = true;
     },
     resetForm(formName) {
@@ -675,27 +677,48 @@ export default {
       }
     },
     openEditEntryDetail(index, details) {
-      this.getAccountingCatalog();
       this.editingEntryDetail = index;
       this.editEntryDetailForm = { ...details };
+      this.filteredCatalog = this.accountingCatalog.filter(
+        (ac) => ac.id == details.accountingCatalog
+      );
       this.showEditEntryDetail = true;
     },
     addToEntryDetails(formName, data) {
+      console.log(data);
       this.$refs[formName].validate(async (valid) => {
         if (!valid) {
           return false;
         }
-
         this.accountingEntryDetails.push({
           ...data,
-
-          code: this.accountingCatalog.find(
-            (c) => c.id == this.newEntryDetailForm.accountingCatalog
-          ).code,
+          code: this.filteredCatalog.find((c) => c.id == data.accountingCatalog)
+            .code,
         });
         this.showAddEntryDetail = false;
         this.checkEntry();
       });
+    },
+    closeDialog(formName) {
+      if (this.$refs[formName]) {
+        this.$refs[formName].resetFields();
+        this.filteredCatalog = [];
+      }
+    },
+    findAccount(query) {
+      if (query != "") {
+        this.loadingAccount = true;
+        this.$axios
+          .get("/entries/catalog", { params: { search: query.toLowerCase() } })
+          .then((res) => {
+            this.filteredCatalog = res.data.data;
+
+            this.loadingAccount = false;
+          })
+          .catch((err) => (this.errorMessage = err.response.data.message));
+      } else {
+        this.filteredCatalog = [];
+      }
     },
     updateDetail(index, formName, form) {
       this.$refs[formName].validate(async (valid) => {
@@ -705,10 +728,10 @@ export default {
 
         this.accountingEntryDetails.splice(index, 1, {
           ...form,
-          code: this.accountingCatalog.find(
-            (c) => c.id == form.accountingCatalog
-          ).code,
+          code: this.filteredCatalog.find((c) => c.id == form.accountingCatalog)
+            .code,
         });
+        this.accountingEntryDetails;
         this.showEditEntryDetail = false;
         this.checkEntry();
       });
@@ -773,7 +796,8 @@ export default {
                     .catch((err) => {
                       this.$notify.error({
                         title: "Error",
-                        message: err.response.data.message,
+                        dangerouslyUseHTMLString: true,
+                        message: parseErrors(err.response.data.message),
                       });
                     })
                     .then((alw) => {
@@ -843,6 +867,5 @@ export default {
       });
     },
   },
-  computed: {},
 };
 </script>

@@ -383,7 +383,13 @@
                       @change="setStorage(salesNewForm)"
                     >
                       <div
-                        class="flex flex-row justify-between items-end py-1 leading-normal"
+                        class="
+                          flex flex-row
+                          justify-between
+                          items-end
+                          py-1
+                          leading-normal
+                        "
                       >
                         <div class="flex flex-col">
                           <span class="text-xs text-gray-500">{{
@@ -652,14 +658,12 @@
                       @click="openEditDetail(scope.$index, scope.row)"
                       size="small"
                       icon="el-icon-edit"
-                      circle
                     ></el-button>
                     <el-button
                       type="danger"
                       @click="deleteDetail(scope.$index)"
                       size="small"
                       icon="el-icon-delete"
-                      circle
                     ></el-button>
                   </div>
                 </template>
@@ -769,6 +773,7 @@ import {
   checkBeforeLeave,
   checkBeforeEnter,
   amountValidate,
+  parseErrors,
 } from "../../tools";
 import Notification from "../../components/Notification";
 
@@ -778,6 +783,7 @@ export default {
   name: "InvoicesNew",
   components: { LayoutContent, Notification },
   fetch() {
+    this.loading = true;
     const sellers = () => {
       return this.$axios.get("/invoices/sellers", { params: { active: true } });
     };
@@ -798,22 +804,21 @@ export default {
     Promise.all([sellers(), paymentsConditions(), customers(), documents()])
       .then((res) => {
         const [sellers, paymentConditions, customers, documents] = res;
-
-        this.sellers = sellers.data.sellers;
-        this.paymentConditions = paymentConditions.data.paymentConditions;
-        this.customers = customers.data.customers;
-        this.documentTypes = documents.data.documents.map(
-          (d) => d.documentType
-        );
+        this.sellers = sellers.data.data;
+        this.paymentConditions = paymentConditions.data.data;
+        this.customers = customers.data.data;
+        this.documentTypes = documents.data.data
+          .filter((d) => d.active == true)
+          .map((d) => d.documentType);
         this.loading = false;
-        this.salesNewForm.documentType = 1;
+        this.salesNewForm.documentType = this.documentTypes[0].id;
         this.validateDocumentType(
           this.salesNewForm.documentType,
           this.tributary
         );
+        this.loading = false;
       })
       .catch((err) => {
-        console.log(err);
         this.errorMessage = err.response.data.message;
       });
   },
@@ -916,7 +921,7 @@ export default {
       this.$axios
         .get("/services", { params: { active: true } })
         .then((res) => {
-          this.services = res.data.services;
+          this.services = res.data.data;
           this.showAddService = true;
         })
         .catch((err) => {
@@ -963,9 +968,9 @@ export default {
         Promise.all([branches(), tributary()])
           .then((res) => {
             const [branches, tributary, taxerType] = res;
-            this.branches = branches.data.branches;
+            this.branches = branches.data.data;
 
-            this.tributary = tributary.data.customer;
+            this.tributary = tributary.data.data;
             this.loading = false;
             this.validateDocumentType(
               this.salesNewForm.documentType,
@@ -973,14 +978,13 @@ export default {
             );
 
             this.branch = {};
-            this.salesNewForm.customerBranch = branches.data.branches.find(
+            this.salesNewForm.customerBranch = branches.data.data.find(
               (b) => b.default
             ).id;
 
             this.selectBranch(this.salesNewForm.customerBranch, this.branches);
           })
           .catch((err) => {
-            console.log(err);
             this.errorMessage = err.response.data.message;
           });
       } else {
@@ -993,12 +997,13 @@ export default {
     validateDocumentType(id, tributary) {
       if (id) {
         this.$axios
-          .get("/invoices/documents", { params: { type: id } })
+          .get("/invoices/documents")
           .then((res) => {
-            this.documentInfo = res.data.documents;
-            this.salesNewForm.authorization =
-              res.data.documents[0].authorization;
-            this.salesNewForm.sequence = res.data.documents[0].current;
+            this.documentInfo = res.data.data.find(
+              (d) => d.documentType.id == id
+            );
+            this.salesNewForm.authorization = this.documentInfo.authorization;
+            this.salesNewForm.sequence = this.documentInfo.current;
           })
           .catch((err) => {
             this.errorMessage = err.response.data.message;
@@ -1110,21 +1115,23 @@ export default {
                         formData.invoicesPaymentsCondition,
                       invoicesSeller: formData.invoicesSellers,
                       sum:
-                        formData.documentType == 1 ? this.sumasCF : this.sumas,
-                      iva: this.taxes,
-                      subtotal: this.subtotal,
-                      ivaRetenido: this.ivaRetenido,
-                      ventasExentas: this.ventasExentas,
-                      ventasNoSujetas: this.ventasNoSujetas,
-                      ventaTotal: this.ventaTotal,
+                        formData.documentType == 1
+                          ? this.sumasCF.toFixed(2)
+                          : this.sumas.toFixed(2),
+                      iva: this.taxes.toFixed(2),
+                      subtotal: this.subtotal.toFixed(2),
+                      ivaRetenido: this.ivaRetenido.toFixed(2),
+                      ventasExentas: this.ventasExentas.toFixed(2),
+                      ventasNoSujetas: this.ventasNoSujetas.toFixed(2),
+                      ventaTotal: this.ventaTotal.toFixed(2),
                     },
                     details: details.map((d) => {
                       return {
                         chargeDescription: d.chargeDescription,
-                        quantity: d.quantity,
-                        unitPrice: d.unitPrice,
+                        quantity: d.quantity.toFixed(2),
+                        unitPrice: d.unitPrice.toFixed(2),
                         incTax: d.incTax,
-                        ventaPrice: d.ventaPrice,
+                        ventaPrice: d.ventaPrice.toFixed(2),
                         service: d.service,
                         sellingType: d.sellingType,
                       };
@@ -1149,13 +1156,32 @@ export default {
                         }
                       )
                         .then(() => {
-                          this.resetForm("salesNewForm");
-                          this.salesNewForm.documentType = 1;
+                          this.salesNewForm.documentType =
+                            formData.documentType;
+                          this.$refs[formName].fields
+                            .find((f) => f.prop == "customer")
+                            .resetField();
+                          this.$refs[formName].fields
+                            .find((f) => f.prop == "customerBranch")
+                            .resetField();
+                          this.$refs[formName].fields
+                            .find((f) => f.prop == "invoicesPaymentsCondition")
+                            .resetField();
+                          this.$refs[formName].fields
+                            .find((f) => f.prop == "invoicesSellers")
+                            .resetField();
+                          this.$refs[formName].fields
+                            .find((f) => f.prop == "invoiceDate")
+                            .resetField();
                           this.salesNewForm.customerBranch = "";
                           this.details = [];
                           this.branches = [];
                           this.branch = {};
                           this.tributary = {};
+                          this.validateDocumentType(
+                            formData.documentType,
+                            null
+                          );
                         })
                         .catch(() => {
                           this.$router.push("/invoices");
@@ -1165,7 +1191,8 @@ export default {
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
@@ -1185,7 +1212,6 @@ export default {
     },
 
     calcUnitPrice(documentType, { unitPrice, incTax, sellingType }) {
-      console.log(unitPrice, incTax, sellingType);
       if (sellingType == 1 || sellingType == 2) {
         return unitPrice;
       } else {

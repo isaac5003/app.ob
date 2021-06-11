@@ -1,5 +1,6 @@
 <template>
   <layout-content
+    v-loading="pageloading"
     page-title="Configuraciones"
     :breadcrumb="[
       { name: 'Servicios', to: '/services' },
@@ -17,40 +18,60 @@
           .catch(() => {})
       "
     >
-      <el-tab-pane label="Integraciones" name="integrations" class="space-y-2">
+      <el-tab-pane label="Integraciones" name="integrations" class="space-y-2" v-if="hasModule(['a98b98e6-b2d5-42a3-853d-9516f64eade8'])">
         <Notification
           class="w-full"
           type="info"
           title="Integraciones"
           message="En esta sección se realizan las configuraciones de integración con otros modulos de manera general. Estas configuraciones se aplicarán a todos los servicios que no tengan una configuración individual."
         />
-        <el-form label-position="top">
-          <div class="grid grid-cols-12 gap-4">
-            <el-form-item label="Seleccione una cuenta" class="col-span-4">
-              <el-select
-                v-model="cogIfo"
-                placeholder="Seleccione una cuenta"
-                size="small"
-                clearable
-                filterable
-                class="w-full"
+        <el-form
+          label-position="top"
+          :model="integrationSettingForm"
+          :rules="integrationSettingFormRuler"
+          ref="integratioSettingForm"
+          @submit.native.prevent="
+            submitSettingsIntegrations(
+              'integratioSettingForm',
+              integrationSettingForm
+            )
+          "
+        >
+          <div class="flex flex-col space-y-2">
+            <div class="grid grid-cols-12 gap-4">
+              <el-form-item
+                label="Seleccione una cuenta"
+                class="col-span-4"
+                prop="accountingCatalog"
+                v-if="hasModule('a98b98e6-b2d5-42a3-853d-9516f64eade8')"
               >
-                <el-option
-                  v-for="c in cogSetting"
-                  :key="c.id"
-                  :label="c.name"
-                  :value="c.id"
+                <el-select
+                  v-model="integrationSettingForm.accountingCatalog"
+                  placeholder="Ingrese el codigo o el  Nombre de la cuenta"
+                  size="small"
+                  :loading="loadingAccount"
+                  remote
+                  class="w-full"
+                  clearable
+                  filterable
+                  default-first-option
+                  :remote-method="findAccount"
+                  @focus="filteredCatalog = []"
                 >
-                </el-option>
-              </el-select>
-            </el-form-item>
+                  <el-option
+                    v-for="c in filteredCatalog"
+                    :key="c.id"
+                    :label="`${c.code}-${c.name}`"
+                    :value="c.id"
+                    :disabled="c.isParent == true"
+                  >
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </div>
           </div>
           <div class="flex flex-row justify-end">
-            <el-button
-              type="primary"
-              size="small"
-              native-type="submit"
-              :loading="generating"
+            <el-button type="primary" size="small" native-type="submit"
               >Guardar</el-button
             >
             <el-button size="small" @click="$router.push('/services')"
@@ -66,34 +87,115 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
+import { getIcon, hasModule, selectValidation, parseErrors} from "../../tools";
+
 export default {
-  name: "CustomerSettings",
+  name: "ServiceSettings",
   components: { LayoutContent, Notification },
-  fetch() {},
+  fetch() {
+    const catalog = () => this.$axios.get("/entries/catalog");
+    const settingIntegration = () =>
+      this.$axios.get("/services/setting/integrations");
+    Promise.all([catalog(), settingIntegration()])
+      .then((res) => {
+        const [catalog, settingIntegration] = res;
+        this.catalogs = catalog.data.data;
+        this.integrationSettingForm.accountingCatalog =
+          settingIntegration.data.integrations.catalog;
+        this.filteredCatalog = this.catalogs.filter(
+          (c) => c.id == this.integrationSettingForm.accountingCatalog
+        );
+        this.pageloading = false;
+      })
+      .catch((err) => {
+        this.errorMessage = err.response.data.message
+          ? err.response.message
+          : "Comunicate con el adminstrador del Sistema";
+      });
+  },
   fetchOnServer: false,
   data() {
     return {
+      loadingAccount: false,
+      pageloading: true,
       tab: "integrations",
-      cogIfo: "",
-      cogSetting: [
-        {
-          id: 1,
-          name: "Gerson, Project management",
-        },
-        {
-          id: 2,
-          name: "Bryan, devJunior",
-        },
-        {
-          id: 3,
-          name: "Issac, DevJunior",
-        },
-        {
-          id: 4,
-          name: "Jorge, designer",
-        },
-      ],
+      catalogs: [],
+      filteredCatalog: [],
+      integrationSettingForm: {
+        accountingCatalog: "",
+      },
+      integrationSettingFormRuler: {
+        accountingCatalog: selectValidation(true),
+      },
     };
+  },
+  methods: {
+    findAccount(query) {
+      if (query !== "") {
+        this.loadingAccount = true;
+        this.$axios
+          .get("entries/catalog", { params: { search: query.toLowerCase() } })
+          .then((res) => {
+            this.filteredCatalog = res.data.data;
+            this.loadingAccount = false;
+          })
+          .catch((err) => (this.errorMessage = err.response.data.message));
+      } else {
+        this.filteredCatalog = [];
+      }
+    },
+    submitSettingsIntegrations(formName, { accountingCatalog }) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+        this.$confirm(
+          "¿Estás seguro que deseas guardar esta configuración?",
+          "Confirmación",
+          {
+            confirmButtonText: "Si, guardar",
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                this.$axios
+                  .put("/services/setting/integrations", {
+                    accountingCatalog,
+                  })
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Exito",
+                      message: res.data.message,
+                    });
+                    this.pageloading = false;
+                  })
+                .catch((err) => {
+                    this.$notify.error({
+                      title: "Error",
+                      dangerouslyUseHTMLString: true,
+                      message:parseErrors(err.response.data.message),
+                    });
+                  })
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = "Si, guardar";
+                    done();
+                  });
+              } else {
+                instance.confirmButtonLoading = false;
+                instance.confirmButtonText = "Si, guardar";
+                done();
+              }
+            },
+          }
+        );
+      });
+    },
+       hasModule(modules) {
+      return hasModule(modules, this.$auth.user);
+    },
   },
 };
 </script>

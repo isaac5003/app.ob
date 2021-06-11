@@ -223,7 +223,7 @@
       <!-- La tabla tiene las medidas exacta, la suma de las colummnas tiene 960-->
       <el-table
         @sort-change="sortBy"
-        :data="entries.entries"
+        :data="entries.data"
         stripe
         size="mini"
         ref="multipleTable"
@@ -248,8 +248,12 @@
             <span>{{ scope.row.date }}</span>
           </template>
         </el-table-column>
-        <el-table-column sortable="custom" label="Titulo" prop="title" <<<<<<<
-        HEAD min-width="315" ======= min-width="360" >>>>>>> master />
+        <el-table-column
+          sortable="custom"
+          label="Titulo"
+          prop="title"
+          min-width="300"
+        />
         <el-table-column
           label="Cargo"
           width="110"
@@ -367,7 +371,7 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import { getHeader, getFooter } from "../../tools";
+import { getHeader, getFooter, parseErrors } from "../../tools";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -379,10 +383,11 @@ export default {
     const entryType = () => this.$axios.get("/entries/types");
     Promise.all([entries(), entryType()])
       .then((res) => {
+        this.loading = false;
         const [entries, entryType] = res;
         this.entries = entries.data;
-        // this.count = entries.data.count;
-        this.entryType = entryType.data.entryTypes;
+        this.entryType = entryType.data.data;
+        this.loading = false;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message
@@ -400,7 +405,7 @@ export default {
       },
       selecEntries: {},
       showInvoicePreview: false,
-      loading: false,
+      loading: true,
       errorMessage: "",
       searchValue: "",
       entryType: [],
@@ -416,7 +421,7 @@ export default {
       },
 
       entries: {
-        entries: [],
+        data: [],
         count: 0,
       },
     };
@@ -498,7 +503,8 @@ export default {
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {
@@ -550,13 +556,14 @@ export default {
             if (action === "confirm") {
               instance.confirmButtonLoading = true;
               instance.confirmButtonText = "Procesando...";
-              const entry = () => this.$axios.get(`/entries/${id}`);
-              const bussinesInfo = () => this.$axios.get("/business/info");
-              Promise.all([entry(), bussinesInfo()])
+              const report = () =>
+                this.$axios.get(`/entries/report/print-entry/${id}`);
+
+              Promise.all([report()])
                 .then((res) => {
-                  const [entry, bussinesInfo] = res;
-                  const accountingEntry = entry.data.entry;
-                  const { name, nit, nrc } = bussinesInfo.data.info;
+                  const [report] = res;
+                  const accountingEntry = report.data.entry;
+                  const { name, nit, nrc } = report.data.company;
 
                   let totalAbono = 0;
                   let totalCargo = 0;
@@ -628,7 +635,7 @@ export default {
                   const docDefinition = {
                     info: {
                       title: `partida_contable_${this.$dateFns.format(
-                        new Date(accountingEntry.rawDate),
+                        new Date(accountingEntry.date),
                         "yyyyMMdd"
                       )}`,
                     },
@@ -650,7 +657,7 @@ export default {
                         layout: "noBorders",
                         table: {
                           headerRows: 1,
-                          widths: ["11%", "auto", "auto", "10%", "10%"],
+                          widths: ["10%", "30%", "20%", "20%", "20%"],
                           heights: -5,
                           body: [
                             [
@@ -693,7 +700,7 @@ export default {
                   pdfMake.createPdf(docDefinition).open();
                 })
                 .catch((err) => {
-                  console.log(err);
+                  console.error(err);
                   this.errorMessage = err.response.data.message;
                 })
                 .then((alw) => {
@@ -713,7 +720,7 @@ export default {
 
     async openPreviewEntry({ id }) {
       const { data } = await this.$axios.get(`/entries/${id}`);
-      this.selecEntries = data.entry;
+      this.selecEntries = data.data;
       this.showInvoicePreview = true;
     },
   },
