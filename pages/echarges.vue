@@ -1,7 +1,7 @@
 <template>
   <div class="flex">
     <layout-submenu
-      page-name="Cobros electrónicos"
+      page-name="Cobros electronicos"
       :menu="menu"
       icon="collection"
     />
