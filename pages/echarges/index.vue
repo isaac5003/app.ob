@@ -97,8 +97,7 @@
           ref="multipleTable"
           @selection-change="handleSelectionChange"
         >
-          <el-table-column type="selection" width="50" />
-          <el-table-column prop="index" width="40" />
+          <el-table-column type="selection" width="45" />
           <el-table-column
             label="Correlativo"
             prop="sequence"
@@ -122,10 +121,10 @@
           <el-table-column
             label="Cliente"
             prop="customerName"
-            min-width="220"
+            min-width="275"
             sortable="custom"
           />
-          <el-table-column label="Estado" width="110" sortable="custom">
+          <el-table-column label="Estado" width="130" sortable="custom">
             <template slot-scope="scope">
               <el-tag
                 size="small"
@@ -159,7 +158,6 @@
             <template slot="header" v-if="multipleSelection.length > 0">
               <el-dropdown trigger="click" szie="mini">
                 <el-button type="primary" size="mini">
-                  <span> {{ multipleSelection.length }} Filas</span>
                   <i class="el-icon-more"></i>
                 </el-button>
                 <el-dropdown-menu slot="dropdown">
