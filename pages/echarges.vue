@@ -34,7 +34,7 @@ export default {
     return {
       menu: [
         {
-          name: " Nuevo cobro",
+          name: "Nuevo cobro",
           icon: getIcon("document-text"),
           path: "/echarges/new",
         },
