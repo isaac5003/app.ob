@@ -126,7 +126,7 @@
                 <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
-                      v-model="invoiceModel.invoice_authorization.l"
+                      v-model="invoiceModel.invoice_authorization.length"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -181,7 +181,7 @@
                 <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
-                      v-model="invoiceModel.invoice_number.l"
+                      v-model="invoiceModel.invoice_number.length"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -236,7 +236,7 @@
                 <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
-                      v-model="invoiceModel.invoice_date.l"
+                      v-model="invoiceModel.invoice_date.length"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -294,7 +294,7 @@
                 <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
-                      v-model="invoiceModel.customer_name.l"
+                      v-model="invoiceModel.customer_name.length"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -349,7 +349,7 @@
                 <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
-                      v-model="invoiceModel.customer_address1.l"
+                      v-model="invoiceModel.customer_address1.length"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -404,7 +404,7 @@
                 <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
-                      v-model="invoiceModel.customer_address2.l"
+                      v-model="invoiceModel.customer_address2.length"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -462,7 +462,7 @@
                 <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
-                      v-model="invoiceModel.customer_nrc.l"
+                      v-model="invoiceModel.customer_nrc.length"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -517,7 +517,7 @@
                 <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
-                      v-model="invoiceModel.customer_nit.l"
+                      v-model="invoiceModel.customer_nit.length"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -572,7 +572,7 @@
                 <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
-                      v-model="invoiceModel.customer_dui.l"
+                      v-model="invoiceModel.customer_dui.length"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -630,7 +630,7 @@
                 <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
-                      v-model="invoiceModel.customer_state.l"
+                      v-model="invoiceModel.customer_state.length"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -685,7 +685,7 @@
                 <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
-                      v-model="invoiceModel.customer_city.l"
+                      v-model="invoiceModel.customer_city.length"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -740,7 +740,7 @@
                 <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
-                      v-model="invoiceModel.customer_giro.l"
+                      v-model="invoiceModel.customer_giro.length"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -798,7 +798,7 @@
                 <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
-                      v-model="invoiceModel.seller_name.l"
+                      v-model="invoiceModel.seller_name.length"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -853,7 +853,7 @@
                 <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
-                      v-model="invoiceModel.payment_condition.l"
+                      v-model="invoiceModel.payment_condition.length"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -943,7 +943,7 @@
                 <el-form-item label="Medida L">
                   <template>
                     <el-input-number
-                      v-model="invoiceModel.charge_quantity.l"
+                      v-model="invoiceModel.charge_quantity.length"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -982,7 +982,7 @@
                 <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
-                      v-model="invoiceModel.charge_description.l"
+                      v-model="invoiceModel.charge_description.length"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -1021,7 +1021,7 @@
                 <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
-                      v-model="invoiceModel.price.l"
+                      v-model="invoiceModel.price.length"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -1062,7 +1062,7 @@
                 <el-form-item label="Medida L">
                   <template>
                     <el-input-number
-                      v-model="invoiceModel.sujeto.l"
+                      v-model="invoiceModel.sujeto.length"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -1101,7 +1101,7 @@
                 <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
-                      v-model="invoiceModel.exento.l"
+                      v-model="invoiceModel.exento.length"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -1140,7 +1140,7 @@
                 <el-form-item label="Medida de L">
                   <template>
                     <el-input-number
-                      v-model="invoiceModel.afecto.l"
+                      v-model="invoiceModel.afecto.length"
                       controls-position="right"
                       :min="1"
                       :max="10"
@@ -2370,6 +2370,7 @@ import {
   hasModule,
   inputValidation,
   selectValidation,
+  parseErrors,
 } from "../../tools";
 
 export default {
@@ -2497,98 +2498,98 @@ export default {
         invoice_authorization: {
           x: "",
           y: "",
-          l: "",
+          length: "",
           value: "invoice_authorization",
           show: false,
         },
         invoice_number: {
           x: "",
           y: "",
-          l: "",
+          length: "",
           value: "invoice_number",
           show: false,
         },
         invoice_date: {
           x: "",
           y: "",
-          l: "",
+          length: "",
           value: "invoice_date",
           show: false,
         },
         customer_name: {
           x: "",
           y: "",
-          l: "",
+          length: "",
           value: "customer_name",
           show: false,
         },
         customer_address1: {
           x: "",
           y: "",
-          l: "",
+          length: "",
           value: "customer_address1",
           show: false,
         },
         customer_address2: {
           x: "",
           y: "",
-          l: "",
+          length: "",
           value: "customer_address2",
           show: false,
         },
         customer_nrc: {
           x: "",
           y: "",
-          l: "",
+          length: "",
           value: "customer_nrc",
           show: false,
         },
         customer_nit: {
           x: "",
           y: "",
-          l: "",
+          length: "",
           value: "customer_nit",
           show: false,
         },
         customer_dui: {
           x: "",
           y: "",
-          l: "",
+          length: "",
           value: "customer_dui",
           show: false,
         },
         customer_state: {
           x: "",
           y: "",
-          l: "",
+          length: "",
           value: "customer_state",
           show: false,
         },
         customer_city: {
           x: "",
           y: "",
-          l: "",
+          length: "",
           value: "customer_city",
           show: false,
         },
         customer_giro: {
           x: "",
           y: "",
-          l: "",
+          length: "",
           value: "customer_giro",
           show: false,
         },
         seller_name: {
           x: "",
           y: "",
-          l: "",
+          length: "",
           value: "seller_name",
           show: false,
         },
         payment_condition: {
           x: "",
           y: "",
-          l: "",
+          length: "",
           value: "payment_condition",
           show: false,
         },
@@ -2597,42 +2598,42 @@ export default {
         height: "",
         charge_quantity: {
           x: "",
-          l: "",
+          length: "",
           value: "charge_quantity",
           show: false,
           type: "text",
         },
         charge_description: {
           x: "",
-          l: "",
+          length: "",
           value: "charge_description",
           show: false,
           type: "text",
         },
         price: {
           x: "",
-          l: "",
+          length: "",
           value: "unit_price",
           show: false,
           type: "text",
         },
         sujeto: {
           x: "",
-          l: "",
+          length: "",
           value: "venta_sujeta",
           show: false,
           type: "text",
         },
         exento: {
           x: "",
-          l: "",
+          length: "",
           value: "venta_excenta",
           show: false,
           type: "text",
         },
         afecto: {
           x: "",
-          l: "",
+          length: "",
           value: "venta_afecta",
           show: false,
           type: "text",
@@ -3313,6 +3314,80 @@ export default {
         if (!valid) {
           return false;
         }
+        const headerNames = [
+          "invoice_authorization",
+          "invoice_number",
+          "invoice_date",
+          "customer_name",
+          "customer_address1",
+          "customer_address2",
+          "customer_nrc",
+          "customer_nit",
+          "customer_dui",
+          "customer_state",
+          "customer_city",
+          "customer_giro",
+          "seller_name",
+          "payment_condition",
+        ];
+
+        const header = [];
+        for (const h of headerNames) {
+          const found = { ...modelInvoice[h] };
+          if (found && found.show) {
+            delete found.show;
+            header.push(found);
+          }
+        }
+
+        console.log(header);
+
+        const detailsFields = {
+          quantity: "charge_quantity",
+          description: "charge_description",
+          price: "price",
+          sujeto: "sujeto",
+          exento: "exento",
+          afecto: "afecto",
+        };
+
+        const details = {};
+        const detailsValues = Object.values(detailsFields);
+
+        for (const d of detailsValues) {
+          const found = { ...modelInvoice[d] };
+          if (found && found.show) {
+            delete found.show;
+            const objectKey = Object.keys(detailsFields).find(
+              (key) => detailsFields[key] === d
+            );
+            details[objectKey] = found;
+          }
+        }
+        console.log(details);
+
+        const detailTotals = [
+          "venta_total_text",
+          "sum",
+          "iva",
+          "subtotal",
+          "iva_retenido",
+          "ventas_no_sujetas",
+          "ventas_exentas",
+          "venta_total",
+        ];
+
+        const totals = [];
+        for (const t of detailTotals) {
+          const found = { ...modelInvoice[t] };
+          if (found && found.show) {
+            delete found.show;
+            totals.push(found);
+          }
+        }
+
+        console.log(totals);
+
         this.$confirm(
           "¿Estás seguro que deseas guardar la configuración?",
           "Confirmación",
@@ -3336,98 +3411,13 @@ export default {
                       fontSizeHeader: modelInvoice.fontSizeHeader,
                       fontSizeDetails: modelInvoice.fontSizeDetails,
                       fontSizeTotals: modelInvoice.fontSizeTotals,
-                      header: [
-                        {
-                          ...modelInvoice.invoice_authorization,
-                        },
-                        {
-                          ...modelInvoice.invoice_number,
-                        },
-                        {
-                          ...modelInvoice.invoice_date,
-                        },
-                        {
-                          ...modelInvoice.customer_name,
-                        },
-                        {
-                          ...modelInvoice.customer_address1,
-                        },
-                        {
-                          ...modelInvoice.customer_address2,
-                        },
-                        {
-                          ...modelInvoice.customer_nrc,
-                        },
-                        {
-                          ...modelInvoice.customer_nit,
-                        },
-                        {
-                          ...modelInvoice.customer_dui,
-                        },
-                        {
-                          ...modelInvoice.customer_state,
-                        },
-                        {
-                          ...modelInvoice.customer_city,
-                        },
-                        {
-                          ...modelInvoice.customer_giro,
-                        },
-                        {
-                          ...modelInvoice.seller_name,
-                        },
-                        {
-                          ...modelInvoice.payment_condition,
-                        },
-                      ],
+                      header: [...header],
                       details: {
                         position_y: modelInvoice.position_y,
                         heigth: modelInvoice.height,
-                        quantity: {
-                          ...modelInvoice.charge_quantity,
-                        },
-                        description: {
-                          ...modelInvoice.charge_description,
-                        },
-                        price: {
-                          ...modelInvoice.price,
-                        },
-                        sujeto: {
-                          ...modelInvoice.sujeto,
-                        },
-                        exento: {
-                          ...modelInvoice.exento,
-                        },
-                        afecto: {
-                          ...modelInvoice.afecto,
-                        },
+                        ...details,
                       },
-                      totals: [
-                        {
-                          ...modelInvoice.venta_total_text,
-                        },
-                        {
-                          ...modelInvoice.sum,
-                        },
-                        {
-                          ...modelInvoice.iva,
-                        },
-                        {
-                          ...modelInvoice.subtotal,
-                        },
-                        {
-                          ...modelInvoice.iva_retenido,
-                        },
-                        {
-                          ...modelInvoice.ventas_no_sujetas,
-                        },
-                        {
-                          ...modelInvoice.ventas_exentas,
-                        },
-                        {
-                          ...modelInvoice.venta_total,
-                        },
-                      ],
+                      totals: [...totals],
                     }
                   )
 
@@ -3441,7 +3431,8 @@ export default {
                     instance.confirmButtonLoading = false;
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
