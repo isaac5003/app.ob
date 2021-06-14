@@ -2726,10 +2726,21 @@
         </div>
       </el-tab-pane>
       <!-- tab de Integraciones  -->
-      <el-tab-pane label="Integraciones" name="integraciones">
+      <el-tab-pane
+        label="Integraciones"
+        name="integraciones"
+        v-if="hasModule(['a98b98e6-b2d5-42a3-853d-9516f64eade8'])"
+      >
         <div class="grid grid-cols-12">
           <div class="col-span-12">
-            <Notification class="mb-4 w-full" type="info" title="Información" />
+            <Notification
+              class="mb-4 w-full"
+              type="info"
+              title="Información"
+              message=" En esta sección se realizan las configuraciones de integración con
+            otros modulos de manera general. Estas configuraciones se aplicarán
+            a todos los servicios que no tengan una configuración individual."
+            />
           </div>
         </div>
 
@@ -2752,6 +2763,7 @@
                   label="Cuenta para pagos de contado"
                   class="col-span-4"
                   prop="accountingCatalog"
+                  v-if="hasModule('a98b98e6-b2d5-42a3-853d-9516f64eade8')"
                 >
                   <el-select
                     v-model="integrationSettingForm.accountingCatalog"
@@ -2777,9 +2789,10 @@
                   </el-select>
                 </el-form-item>
                 <el-form-item
-                  prop="radio"
+                  prop="registerType"
                   label="Tipo de integración contable"
                   class="col-span-5"
+                  v-if="hasModule('a98b98e6-b2d5-42a3-853d-9516f64eade8')"
                 >
                   <el-radio-group
                     class="w-full"
@@ -2861,11 +2874,9 @@ export default {
     const documents = () => {
       return this.$axios.get("/invoices/documents");
     };
-    const showAuthorization = () => {
-      return this.$axios.get("/invoices/documents");
+    const settingIntegration = () => {
+      return this.$axios.get("/entries/setting/integrations");
     };
-    const settingIntegration = () =>
-      this.$axios.get("/entries/setting/integrations");
     // promesa que recibe los métodos con las peticiones http
     Promise.all([
       accounts(),
@@ -2873,26 +2884,23 @@ export default {
       sellers(),
       payment(),
       documents(),
-      showAuthorization(),
       settingIntegration(),
     ])
       .then((res) => {
-        const [
-          accounts,
-          zones,
-          sellers,
-          payment,
-          documents,
-          settingIntegration,
-        ] = res;
-        this.catalogs = accounts.data.data;
+        const [accounts, zones, sellers, payment, documents, integration] = res;
+        this.accounts = accounts.data.data;
         this.zones = zones.data.data;
         this.sellers = sellers.data.data;
         this.payments = payment.data.data;
         this.correlativeForm.documents = documents.data.data;
         this.integrationSettingForm.accountingCatalog =
-          settingIntegration.data.data.catalog;
-        console.log(this.integrationSettingForm.accountingCatalog);
+          integration.data.data.catalog;
+        this.integrationSettingForm.registerType =
+          integration.data.data.registerType;
+        this.filteredCatalog = this.accounts.filter(
+          (c) => c.id == this.integrationSettingForm.accountingCatalog
+        );
+
         this.pageloading = false;
       })
       .catch((err) => {
@@ -2974,7 +2982,7 @@ export default {
         registerType: "automatic",
       },
       integrationSettingFormRules: {
-        accountingCatalog: selectValidation(true),
+        accountingCatalog: selectValidation(true, "change"),
       },
     };
   },
@@ -3682,13 +3690,16 @@ export default {
           this.filteredCatalog = this.catalogs.filter(
             (c) => c.id == this.integrationSettingForm.accountingCatalog
           );
-          console.log(this.filteredCatalog);
           this.pageloading = false;
         })
         .catch((err) => {
           this.errorMessage = err.response.data.message;
         })
         .then((alw) => (this.pageloading = false));
+    },
+
+    hasModule(modules) {
+      return hasModule(modules, this.$auth.user);
     },
   },
   computed: {
