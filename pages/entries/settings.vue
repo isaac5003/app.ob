@@ -1363,67 +1363,6 @@
           <el-button size="small">Cancelar</el-button>
         </div>
       </el-tab-pane>
-
-      <!-- tab de Integraciones  -->
-      <el-tab-pane label="Integraciones" name="integraciones">
-        <div class="grid grid-cols-12">
-          <div class="col-span-12">
-            <Notification class="mb-4 w-full" type="info" title="Información" />
-          </div>
-        </div>
-
-        <div class="flex flex-col space-y-2">
-          <el-form>
-            <div class="grid grid-cols-12 gap-4">
-              <el-form-item
-                label="Cuenta contable para pagos de contado"
-                class="col-span-4"
-              >
-                <el-select
-                  class="w-full"
-                  size="small"
-                  clearable
-                  filterable
-                ></el-select>
-              </el-form-item>
-              <el-form-item
-                prop=""
-                label="Tipo de integración contable"
-                class="col-span-5"
-              >
-                <el-radio-group class="w-full">
-                  <el-row :gutter="15">
-                    <el-col :span="8">
-                      <el-radio
-                        border
-                        label="Automatico"
-                        size="small"
-                        class="w-full"
-                        >Automático</el-radio
-                      >
-                    </el-col>
-                    <el-col :span="8">
-                      <el-radio
-                        border
-                        label="Manual"
-                        size="small"
-                        class="w-full"
-                        >Manual</el-radio
-                      >
-                    </el-col>
-                  </el-row>
-                </el-radio-group>
-              </el-form-item>
-            </div>
-            <div class="flex justify-end">
-              <el-button type="primary" size="small">Guardar</el-button>
-              <el-button size="small" @click="$router.push('/entries')"
-                >Cancelar</el-button
-              >
-            </div>
-          </el-form>
-        </div>
-      </el-tab-pane>
     </el-tabs>
   </layout-content>
 </template>
@@ -1466,7 +1405,6 @@ export default {
     const results = () => this.$axios.get("/entries/setting/estado-resultados");
     const signatures = () => this.$axios.get("/entries/setting/signatures");
     const general = () => this.$axios.get("/entries/setting/general");
-
     Promise.all([
       accountCatalogs(),
       accounts(),
@@ -1485,6 +1423,7 @@ export default {
           general,
         ] = res;
         this.filteredCatalog = accounts.data.data;
+
         this.accounts = accountCatalogs.data.data;
         this.accountsCount = accountCatalogs.data.count;
         this.catalogs = accounts.data.data;
@@ -1771,8 +1710,7 @@ export default {
           id: 8,
         },
         {
-          name:
-            "Utiidad/Perdida antes de impuesto sobre la renta y las ganancias",
+          name: "Utiidad/Perdida antes de impuesto sobre la renta y las ganancias",
           display:
             "Utiidad/Perdida antes de impuesto sobre la renta y las ganancias",
           showUpdateName: true,
@@ -1809,8 +1747,7 @@ export default {
           id: 10,
         },
         {
-          name:
-            "Utilidad/Perdida antes de contribucion especial a las ganancias",
+          name: "Utilidad/Perdida antes de contribucion especial a las ganancias",
           display:
             "Utilidad/Perdida antes de contribucion especial a las ganancias",
           showUpdateName: true,
