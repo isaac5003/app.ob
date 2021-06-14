@@ -1421,7 +1421,6 @@ export default {
           results,
           signatures,
           general,
-          settingIntegration,
         ] = res;
         this.filteredCatalog = accounts.data.data;
 
@@ -1446,12 +1445,11 @@ export default {
           }
           return obj;
         });
-        this.pageloading = false;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
-      });
-    // .then((alw) => (this.pageloading = false));
+      })
+      .then((alw) => (this.pageloading = false));
 
     //checkBeforeEnter(this, name, value, name.replace(`${storagekey}-`, ""));
   },
@@ -1804,9 +1802,6 @@ export default {
       allowNewDisplayNameEstado: false,
       newDisplayNameEstado: "",
       filteredCatalogBalance: [],
-      integrationSettingFormRules: {
-        accountingCatalog: selectValidation(true),
-      },
     };
   },
   methods: {
