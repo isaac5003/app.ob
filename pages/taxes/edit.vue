@@ -2,14 +2,14 @@ code
 <template>
   <layout-content
     v-loading="pageloading"
-    page-title="Nuevo registro"
+    page-title="Editar registro"
     :breadcrumb="[
       { name: 'IVA', to: '/taxes' },
-      { name: 'Nuevo registro', to: null },
+      { name: 'Editar registro', to: null },
     ]"
   >
     <div class="flex flex-col space-y-2">
-      <el-form label-position="top" :model="ivaNewForm" ref="ivaNewForm">
+      <el-form label-position="top" :model="ivaEditForm" ref="ivaEditForm">
         <div class="grid grid-cols-12 gap-4">
           <el-form-item
             label="Tipo de registro"
@@ -17,11 +17,12 @@ code
             prop="typeRegister"
           >
             <el-select
-              v-model="ivaNewForm.typeRegister"
+              v-model="ivaEditForm.typeRegister"
               class="w-full"
               clearable
               filterable
               size="small"
+              :disabled="true"
             >
               <el-option
                 v-for="item in filetype"
@@ -36,14 +37,15 @@ code
           <el-form-item
             label="Tipo de documento"
             class="col-span-3"
-            v-if="ivaNewForm.taypeDocument != 'credifical'"
+            v-if="ivaEditForm.taypeDocument != 'credifical'"
           >
             <el-select
-              v-model="ivaNewForm.typeDocument"
+              v-model="ivaEditForm.typeDocument"
               class="w-full"
               clearable
               filterable
               size="small"
+              :disabled="true"
             >
               <el-option
                 v-for="item in filetype1"
@@ -56,7 +58,7 @@ code
           </el-form-item>
           <el-form-item label="Tipo de documento" class="col-span-3" v-else>
             <el-select
-              v-model="ivaNewForm.typeDocument"
+              v-model="ivaEditForm.typeDocument"
               class="w-full"
               clearable
               filterable
@@ -89,7 +91,7 @@ code
           <el-form-item
             label="Cliente"
             class="col-span-5"
-            v-if="ivaNewForm.typeRegister != 'credifical'"
+            v-if="ivaEditForm.typeRegister != 'credifical'"
           >
             <el-select class="w-full" clearable filterable size="small">
             </el-select>
@@ -121,7 +123,7 @@ code
         <div class="grid grid-cols-12 gap-4">
           <el-form-item label="Sumas" class="col-span-2" prop="sumas">
             <el-input-number
-              v-model="ivaNewForm.sumas"
+              v-model="ivaEditForm.sumas"
               type="number"
               :min="0.0"
               :step="0.01"
@@ -135,7 +137,7 @@ code
 
           <el-form-item label="IVA" class="col-span-2" prop="iva">
             <el-input-number
-              v-model="ivaNewForm.iva"
+              v-model="ivaEditForm.iva"
               type="number"
               :min="0.0"
               :step="0.01"
@@ -150,11 +152,11 @@ code
           <el-form-item
             label="Subtotal"
             class="col-span-2"
-            v-if="ivaNewForm.subTotal != 'consuFinal'"
+            v-if="ivaEditForm.subTotal != 'consuFinal'"
             prop="subtotal"
           >
             <el-input-number
-              v-model="ivaNewForm.subTotal"
+              v-model="ivaEditForm.subTotal"
               type="number"
               :min="0.0"
               :step="0.01"
@@ -168,10 +170,10 @@ code
           <el-form-item
             label="Iva retenido"
             class="col-span-2"
-            v-if="ivaNewForm.typeRegister != 'credifical'"
+            v-if="ivaEditForm.typeRegister != 'credifical'"
           >
             <el-input-number
-              v-model="ivaNewForm.ivaDetained"
+              v-model="ivaEditForm.ivaDetained"
               type="number"
               :min="0.0"
               :step="0.01"
@@ -220,7 +222,7 @@ export default {
 
   data() {
     return {
-      ivaNewForm: {
+      ivaEditForm: {
         typeRegister: "",
         typeDocument: "",
         subTotal: "",
