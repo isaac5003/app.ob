@@ -34,7 +34,7 @@
        <strong class='text-black'> Medida de A:</strong> se refiere al ancho del campo de una columnnan a campo 
         "
       />
-      <el-form :model="invoiceModel" ref="invoiceModel">
+      <el-form :model="invoiceModel" ref="invoiceModel" v-loading="pageloading">
         <!-- Encabezado y tamaño de texto  -->
         <div class="grid grid-cols-12">
           <el-form-item class="col-span-3">
@@ -47,7 +47,7 @@
                 <el-input-number
                   v-model="invoiceModel.fontSizeHeader"
                   :min="1"
-                  :max="10"
+                  :max="16"
                   class="w-full"
                   size="small"
                 ></el-input-number>
@@ -61,7 +61,6 @@
                 <el-input-number
                   v-model="invoiceModel.resolution.height"
                   :min="1"
-                  :max="10"
                   class="w-full"
                   size="small"
                 ></el-input-number>
@@ -75,7 +74,6 @@
                 <el-input-number
                   v-model="invoiceModel.resolution.width"
                   :min="1"
-                  :max="10"
                   class="w-full"
                   size="small"
                 ></el-input-number>
@@ -97,7 +95,6 @@
                       v-model="invoiceModel.invoice_authorization.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.invoice_authorization.show"
@@ -113,7 +110,6 @@
                       v-model="invoiceModel.invoice_authorization.y"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.invoice_authorization.show"
@@ -129,7 +125,6 @@
                       v-model="invoiceModel.invoice_authorization.length"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.invoice_authorization.show"
@@ -152,7 +147,6 @@
                       v-model="invoiceModel.invoice_number.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.invoice_number.show"
@@ -168,7 +162,6 @@
                       v-model="invoiceModel.invoice_number.y"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.invoice_number.show"
@@ -184,7 +177,6 @@
                       v-model="invoiceModel.invoice_number.length"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.invoice_number.show"
@@ -207,7 +199,6 @@
                       v-model="invoiceModel.invoice_date.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.invoice_date.show"
@@ -223,7 +214,6 @@
                       v-model="invoiceModel.invoice_date.y"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.invoice_date.show"
@@ -239,7 +229,6 @@
                       v-model="invoiceModel.invoice_date.length"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.invoice_date.show"
@@ -2325,6 +2314,7 @@
                     </el-form-item>
                     <div class="col-span-2 float-right">
                       <el-link
+                        :disabled="correlative.id == null"
                         @click="
                           (closeDialog = true),
                             saveIdCorrelative(correlative.documentType.id)
@@ -2381,15 +2371,12 @@ export default {
     if (this.$route.query.tab) {
       this.tab = this.$route.query.tab;
     }
-
     const zones = () => {
       return this.$axios.get("/invoices/zones");
     };
-    // método para hacer la petición a la url de vendedores
     const sellers = () => {
       return this.$axios.get("/invoices/sellers");
     };
-    //método para mostrar data en la tabla de pagos
     const payment = () => {
       return this.$axios.get("/invoices/payment-condition");
     };
@@ -2399,7 +2386,6 @@ export default {
     const showAuthorization = () => {
       return this.$axios.get("/invoices/documents");
     };
-    // promesa que recibe los métodos con las peticiones http
     Promise.all([
       zones(),
       sellers(),
@@ -2423,7 +2409,7 @@ export default {
   fetchOnServer: false,
   data() {
     return {
-      pageloading: false,
+      pageloading: true,
       checked: true,
       input: "",
       num: 1,
@@ -3451,6 +3437,20 @@ export default {
     },
     saveIdCorrelative(index) {
       this.invoiceModel.idDocument = index;
+      this.$axios.get(`/invoices/documents/${index}/layout`).then((res) => {
+        const layout = res.data.data;
+        if (layout !== null) {
+          const { header } = layout;
+          for (const h of header) {
+            this.invoiceModel[h.value] = {
+              ...h,
+              show: true,
+            };
+          }
+
+          this.pageloading = false;
+        }
+      });
     },
   },
   computed: {
