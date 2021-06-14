@@ -81,7 +81,7 @@
     </el-dialog>
 
     <div class="flex flex-col space-4">
-      <el-form>
+      <el-form :model="taxesForm" ref="taxesForm">
         <div class="grid grid-cols-12 gap-4">
           <el-form-item class="col-span-4 col-start-9">
             <el-input
@@ -110,21 +110,76 @@
               v-model="taxesForm.date"
             />
           </el-form-item>
-          <el-form-item label="Cliente:" class="col-span-3">
-            <el-select
-              v-model="taxesForm.customer"
-              class="w-full"
-              size="small"
-              clearable
-            >
-              <el-option
-                v-for="i in customers"
-                :key="i.id"
-                :label="i.name"
-                :value="i.id"
-              />
-            </el-select>
-          </el-form-item>
+          <template>
+            <el-form-item label="Cliente:" class="col-span-4">
+              <el-select
+                v-model="taxesForm.customer"
+                size="small"
+                class="w-full"
+                clearable
+                filterable
+                default-first-option
+                placeholder="Todos los clientes:"
+              >
+                <el-option label="Todos los clientes" value="" />
+                <el-option-group key="ACTIVOS" label="ACTIVOS">
+                  <el-option
+                    style="height: 60px"
+                    v-for="item in activeCustomers"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                    <div
+                      class="
+                        flex flex-row
+                        justify-between
+                        items-end
+                        py-1
+                        leading-normal
+                      "
+                    >
+                      <div class="flex flex-col">
+                        <span class="text-xs text-gray-500">{{
+                          item.shortName
+                        }}</span>
+                        <span>{{ item.name }}</span>
+                      </div>
+                      <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                    </div>
+                  </el-option>
+                </el-option-group>
+                <!-- toda esbien -->
+                <el-option-group key="INACTIVOS" label="INACTIVOS">
+                  <el-option
+                    style="height: 50px"
+                    v-for="item in inactiveCustomers"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                    <div
+                      class="
+                        flex flex-row
+                        justify-between
+                        items-end
+                        py-1
+                        leading-normal
+                      "
+                    >
+                      <div class="flex flex-col">
+                        <span class="text-xs text-gray-500">{{
+                          item.shortName
+                        }}</span>
+                        <span>{{ item.name }}</span>
+                      </div>
+                      <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                    </div>
+                  </el-option>
+                </el-option-group>
+              </el-select>
+            </el-form-item>
+          </template>
           <el-form-item label="Proveedores:" class="col-span-3">
             <el-select
               class="w-full"
@@ -133,14 +188,65 @@
               clearable
               v-model="taxesForm.provider"
             >
-              <el-option
-                v-for="i in providers"
-                :key="i.id"
-                :label="i.name"
-                :value="i.id"
-            /></el-select>
+              <el-option label="Todos los proveedores" value="" />
+              <el-option-group key="ACTIVOS" label="Activos">
+                <el-option
+                  v-for="item in activeProviders"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                  <div
+                    class="
+                      flex flex-row
+                      justify-between
+                      items-end
+                      py-1
+                      leading-normal
+                    "
+                  >
+                    <div class="flex flex-col">
+                      <span class="text-xs text-gray-500">{{
+                        item.shortName
+                      }}</span>
+                      <span>{{ item.name }}</span>
+                    </div>
+                    <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                  </div>
+                </el-option>
+              </el-option-group>
+              <el-option-group key="INACTIVOS" label="INACTIVOS">
+                <el-option
+                  style="height: 50px"
+                  v-for="item in inactiveProviders"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                  <div
+                    class="
+                      flex flex-row
+                      justify-between
+                      items-end
+                      py-1
+                      leading-normal
+                    "
+                  >
+                    <div class="flex flex-col">
+                      <span class="text-xs text-gray-500">{{
+                        item.shortName
+                      }}</span>
+                      <span>{{ item.name }}</span>
+                    </div>
+                    <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                  </div>
+                </el-option>
+              </el-option-group>
+            </el-select>
           </el-form-item>
-          <el-form-item label="Tipo de registro:" class="col-span-2">
+        </div>
+        <div class="grid grid-cols-12 gap-4">
+          <el-form-item label="Tipo de registro:" class="col-span-4">
             <el-select
               class="w-full"
               size="small"
@@ -156,8 +262,6 @@
               />
             </el-select>
           </el-form-item>
-        </div>
-        <div class="grid grid-cols-12 gap-4">
           <el-form-item label="Tipo de documento:" class="col-span-3">
             <el-select
               class="w-full"
@@ -165,6 +269,7 @@
               filterable
               clearable
               v-model="taxesForm.documentType"
+              :disabled="taxesForm.registerType ? false : true"
               ><el-option
                 v-for="i in documentTypes"
                 :key="i.id"
@@ -182,12 +287,12 @@
       :data="taxesList.taxesList"
       @selection-change="selectionChange"
     >
-      <el-table-column type="selection" width="40" />
+      <el-table-column type="selection" width="50" />
       <el-table-column label="#" width="40" prop="id" />
-      <el-table-column label="Fecha" width="110" prop="date"></el-table-column>
+      <el-table-column label="Fecha" width="100" prop="date"></el-table-column>
       <el-table-column
         label="Proveedor/cliente"
-        min-width="180"
+        min-width="210"
         prop="name"
       ></el-table-column>
       <el-table-column
@@ -206,14 +311,11 @@
         prop="registerType"
       ></el-table-column>
       <el-table-column label="IVA" width="50" prop="iva"></el-table-column>
-      <el-table-column label width="110" align="center">
+      <el-table-column label width="80" align="center">
         <!-- dropdpwn selecction -->
         <template slot="header" v-if="selectionData.length">
           <el-dropdown trigger="click" szie="mini" type="primary">
-            <el-button size="mini" type="primary" class="group">
-              <span class="hidden group-hover:inline">
-                {{ selectionData.length }} Filas</span
-              >
+            <el-button size="mini" type="primary">
               <i class="el-icon-more"
             /></el-button>
             <el-dropdown-menu slot="dropdown">
@@ -258,11 +360,25 @@ export default {
     titleTemplate: `%s | IVA`,
   },
   components: { LayoutContent, Notification },
+  fetch() {
+    const customers = () => this.$axios.get("/customers");
+    const providers = () => {
+      return this.$axios.get("/providers");
+    };
+    Promise.all([customers(), providers()]).then((res) => {
+      const [customers, providers] = res;
+      this.customers = customers.data.data;
+      this.providers = providers.data.data;
+    });
+  },
+  fetchOnServer: false,
   data() {
     return {
       showTaxePreview: false,
       taxesPreview: {},
       selectionData: {},
+      customers: [],
+      providers: [],
       taxesForm: {
         search: "",
         date: "",
@@ -271,50 +387,6 @@ export default {
         registerType: "",
         documentType: "",
       },
-      customers: [
-        {
-          id: "1",
-          name: "Cliente 1",
-        },
-        {
-          id: "2",
-          name: "Cliente 2",
-        },
-        {
-          id: "3",
-          name: "Cliente 3",
-        },
-        {
-          id: "4",
-          name: "Cliente 4",
-        },
-        {
-          id: "5",
-          name: "Cliente 5",
-        },
-      ],
-      providers: [
-        {
-          id: "1",
-          name: "Proveedor 1",
-        },
-        {
-          id: "2",
-          name: "Proveedor 2",
-        },
-        {
-          id: "3",
-          name: "Proveedor 3",
-        },
-        {
-          id: "4",
-          name: "Proveedor 4",
-        },
-        {
-          id: "5",
-          name: "Proveedor 5",
-        },
-      ],
       registerTypes: [
         {
           id: "1",
@@ -374,12 +446,25 @@ export default {
   },
   methods: {
     openPreviewEntry(dataTable) {
-      console.log(dataTable);
       this.taxesPreview = dataTable;
       this.showTaxePreview = true;
     },
     selectionChange(selectionData) {
       this.selectionData = selectionData;
+    },
+  },
+  computed: {
+    activeCustomers() {
+      return this.customers.filter((c) => c.isActiveCustomer);
+    },
+    inactiveCustomers() {
+      return this.customers.filter((c) => !c.isActiveCustomer);
+    },
+    activeProviders() {
+      return this.providers.filter((c) => c.isActiveProvider);
+    },
+    inactiveProviders() {
+      return this.providers.filter((c) => !c.isActiveProvider);
     },
   },
 };
