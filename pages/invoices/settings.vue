@@ -2777,16 +2777,19 @@
                   </el-select>
                 </el-form-item>
                 <el-form-item
-                  prop=""
+                  prop="radio"
                   label="Tipo de integración contable"
                   class="col-span-5"
                 >
-                  <el-radio-group class="w-full">
+                  <el-radio-group
+                    class="w-full"
+                    v-model="integrationSettingForm.registerType"
+                  >
                     <el-row :gutter="15">
                       <el-col :span="8">
                         <el-radio
                           border
-                          label="Automatico"
+                          label="automatic"
                           size="small"
                           class="w-full"
                           >Automático</el-radio
@@ -2795,7 +2798,7 @@
                       <el-col :span="8">
                         <el-radio
                           border
-                          label="Manual"
+                          label="manual"
                           size="small"
                           class="w-full"
                           >Manual</el-radio
@@ -2841,7 +2844,9 @@ export default {
     if (this.$route.query.tab) {
       this.tab = this.$route.query.tab;
     }
-
+    const accounts = () => {
+      return this.$axios.get("/entries/catalog");
+    };
     const zones = () => {
       return this.$axios.get("/invoices/zones");
     };
@@ -2859,21 +2864,35 @@ export default {
     const showAuthorization = () => {
       return this.$axios.get("/invoices/documents");
     };
+    const settingIntegration = () =>
+      this.$axios.get("/entries/setting/integrations");
     // promesa que recibe los métodos con las peticiones http
     Promise.all([
+      accounts(),
       zones(),
       sellers(),
       payment(),
       documents(),
       showAuthorization(),
+      settingIntegration(),
     ])
       .then((res) => {
-        const [zones, sellers, payment, documents] = res;
+        const [
+          accounts,
+          zones,
+          sellers,
+          payment,
+          documents,
+          settingIntegration,
+        ] = res;
+        this.catalogs = accounts.data.data;
         this.zones = zones.data.data;
         this.sellers = sellers.data.data;
         this.payments = payment.data.data;
         this.correlativeForm.documents = documents.data.data;
-
+        this.integrationSettingForm.accountingCatalog =
+          settingIntegration.data.data.catalog;
+        console.log(this.integrationSettingForm.accountingCatalog);
         this.pageloading = false;
       })
       .catch((err) => {
@@ -2883,7 +2902,8 @@ export default {
   fetchOnServer: false,
   data() {
     return {
-      pageloading: false,
+      pageloading: true,
+      loadingAccount: false,
       checked: true,
       input: "",
       num: 1,
@@ -2909,6 +2929,8 @@ export default {
       sellers: [],
       payments: [],
       documents: [],
+      catalogs: [],
+      filteredCatalog: [],
 
       showNewZone: false,
       showNewSeller: false,
@@ -2949,6 +2971,10 @@ export default {
       },
       integrationSettingForm: {
         accountingCatalog: "",
+        registerType: "automatic",
+      },
+      integrationSettingFormRules: {
+        accountingCatalog: selectValidation(true),
       },
     };
   },
@@ -3582,6 +3608,87 @@ export default {
           }
         );
       });
+    },
+    findAccount(query) {
+      if (query !== "") {
+        this.loadingAccount = true;
+        this.$axios
+          .get("entries/catalog", { params: { search: query.toLowerCase() } })
+          .then((res) => {
+            this.filteredCatalog = res.data.data;
+            this.loadingAccount = false;
+          })
+          .catch((err) => (this.errorMessage = err.response.data.message));
+      } else {
+        this.filteredCatalog = [];
+      }
+    },
+    submitSettingsIntegrations(formName, { accountingCatalog, registerType }) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+        this.$confirm(
+          "¿Estás seguro que deseas guardar esta configuración?",
+          "Confirmación",
+          {
+            confirmButtonText: "Si, guardar",
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                this.$axios
+                  .put("/entries/setting/integrations", {
+                    accountingCatalog,
+                    registerType,
+                  })
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Exito",
+                      message: res.data.message,
+                    });
+                    this.pageloading = true;
+                    this.fetchIntegration();
+                  })
+                  .catch((err) => {
+                    this.$notify.error({
+                      title: "Error",
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
+                    });
+                  })
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = "Si, guardar";
+                    done();
+                  });
+              } else {
+                instance.confirmButtonLoading = false;
+                instance.confirmButtonText = "Si, guardar";
+                done();
+              }
+            },
+          }
+        );
+      });
+    },
+    fetchIntegration() {
+      this.$axios
+        .get("/entries/setting/integrations")
+        .then((res) => {
+          this.integrationSettingForm.accountingCatalog = res.data.data.catalog;
+          this.filteredCatalog = this.catalogs.filter(
+            (c) => c.id == this.integrationSettingForm.accountingCatalog
+          );
+          console.log(this.filteredCatalog);
+          this.pageloading = false;
+        })
+        .catch((err) => {
+          this.errorMessage = err.response.data.message;
+        })
+        .then((alw) => (this.pageloading = false));
     },
   },
   computed: {
