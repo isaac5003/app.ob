@@ -1,7 +1,6 @@
 code 
 <template>
   <layout-content
-    v-loading="pageloading"
     page-title="Nuevo registro"
     :breadcrumb="[
       { name: 'IVA', to: '/taxes' },
@@ -23,6 +22,7 @@ code
               filterable
               size="small"
             >
+              <el-option label="Tipo de registro" value="" />
               <el-option
                 v-for="item in filetype"
                 :key="item.id"
@@ -36,15 +36,18 @@ code
           <el-form-item
             label="Tipo de documento"
             class="col-span-3"
-            v-if="ivaNewForm.taypeDocument != 'credifical'"
+            prop="typeDocument1"
+            v-if="ivaNewForm.typeRegister != 'credifical'"
           >
             <el-select
-              v-model="ivaNewForm.typeDocument"
+              v-model="ivaNewForm.typeDocument1"
               class="w-full"
               clearable
               filterable
               size="small"
+              :disabled="ivaNewForm.typeRegister ? false : true"
             >
+              <el-option label="Tipo de documento" value="" />
               <el-option
                 v-for="item in filetype1"
                 :key="item.id"
@@ -56,7 +59,7 @@ code
           </el-form-item>
           <el-form-item label="Tipo de documento" class="col-span-3" v-else>
             <el-select
-              v-model="ivaNewForm.typeDocument"
+              v-model="ivaNewForm.typeDocument2"
               class="w-full"
               clearable
               filterable
@@ -91,11 +94,132 @@ code
             class="col-span-5"
             v-if="ivaNewForm.typeRegister != 'credifical'"
           >
-            <el-select class="w-full" clearable filterable size="small">
+            <el-select
+              class="w-full"
+              clearable
+              filterable
+              size="small"
+              v-model="ivaNewForm.customers"
+              :disabled="ivaNewForm.typeRegister ? false : true"
+            >
+              <el-option label="Todos los clientes" value="" />
+              <el-option-group key="ACTIVOS" label="ACTIVOS">
+                <el-option
+                  v-for="item in activeCustomers"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                  <div
+                    class="
+                      flex flex-row
+                      justify-between
+                      items-end
+                      py-1
+                      leading-normal
+                    "
+                  >
+                    <div class="flex flex-col">
+                      <span class="text-xs text-gray-500">{{
+                        item.shortName
+                      }}</span>
+                      <span>{{ item.name }}</span>
+                    </div>
+                    <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                  </div>
+                </el-option>
+              </el-option-group>
+              <el-option-group key="INACTIVOS" label="INACTIVOS">
+                <el-option
+                  style="height: 50px"
+                  v-for="item in inactiveCustomers"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                  <div
+                    class="
+                      flex flex-row
+                      justify-between
+                      items-end
+                      py-1
+                      leading-normal
+                    "
+                  >
+                    <div class="flex flex-col">
+                      <span class="text-xs text-gray-500">{{
+                        item.shortName
+                      }}</span>
+                      <span>{{ item.name }}</span>
+                    </div>
+                    <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                  </div>
+                </el-option>
+              </el-option-group>
             </el-select>
           </el-form-item>
-          <el-form-item label="Proveedor" class="col-span-5" v-else>
-            <el-select class="w-full" clearable filterable size="small">
+          <el-form-item label="Proveedores:" class="col-span-5" v-else>
+            <el-select
+              class="w-full"
+              size="small"
+              filterable
+              clearable
+              v-model="ivaNewForm.providers"
+            >
+              <el-option label="Todos los proveedores" value="" />
+              <el-option-group key="ACTIVOS" label="Activos">
+                <el-option
+                  v-for="item in activeProviders"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                  <div
+                    class="
+                      flex flex-row
+                      justify-between
+                      items-end
+                      py-1
+                      leading-normal
+                    "
+                  >
+                    <div class="flex flex-col">
+                      <span class="text-xs text-gray-500">{{
+                        item.shortName
+                      }}</span>
+                      <span>{{ item.name }}</span>
+                    </div>
+                    <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                  </div>
+                </el-option>
+              </el-option-group>
+              <el-option-group key="INACTIVOS" label="INACTIVOS">
+                <el-option
+                  style="height: 50px"
+                  v-for="item in inactiveProviders"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                  <div
+                    class="
+                      flex flex-row
+                      justify-between
+                      items-end
+                      py-1
+                      leading-normal
+                    "
+                  >
+                    <div class="flex flex-col">
+                      <span class="text-xs text-gray-500">{{
+                        item.shortName
+                      }}</span>
+                      <span>{{ item.name }}</span>
+                    </div>
+                    <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                  </div>
+                </el-option>
+              </el-option-group>
             </el-select>
           </el-form-item>
           <el-form-item
@@ -135,26 +259,26 @@ code
 
           <el-form-item label="IVA" class="col-span-2" prop="iva">
             <el-input-number
-              v-model="ivaNewForm.iva"
+              :value="taxes"
               type="number"
               :min="0.0"
+              :max="0.13"
               :step="0.01"
               size="small"
               autocomplete="off"
               :precision="2"
-              :disabled="true"
               style="width: 100%"
             >
             </el-input-number>
           </el-form-item>
           <el-form-item
             label="Subtotal"
+            prop="subtotal"
             class="col-span-2"
             v-if="ivaNewForm.subTotal != 'consuFinal'"
-            prop="subtotal"
           >
             <el-input-number
-              v-model="ivaNewForm.subTotal"
+              :value="subTotal"
               type="number"
               :min="0.0"
               :step="0.01"
@@ -162,18 +286,21 @@ code
               autocomplete="off"
               :precision="2"
               style="width: 100%"
+              :disabled="true"
             >
             </el-input-number>
           </el-form-item>
           <el-form-item
             label="Iva retenido"
+            prop="ivaDetained"
             class="col-span-2"
             v-if="ivaNewForm.typeRegister != 'credifical'"
           >
             <el-input-number
-              v-model="ivaNewForm.ivaDetained"
+              :value="taxesDetained"
               type="number"
               :min="0.0"
+              :max="0.13"
               :step="0.01"
               size="small"
               autocomplete="off"
@@ -183,7 +310,12 @@ code
             </el-input-number>
           </el-form-item>
           <el-form-item label="Total" class="col-span-2">
-            <el-input style="width: 100%" size="small" :disabled="true">
+            <el-input
+              style="width: 100%"
+              size="small"
+              :disabled="true"
+              :value="totals"
+            >
             </el-input>
           </el-form-item>
         </div>
@@ -217,15 +349,33 @@ export default {
     titleTemplate: `%s | Nuevo registro`,
   },
   components: { LayoutContent },
-
+  fetch() {
+    const customers = () => this.$axios.get("/customers");
+    const providers = () => {
+      return this.$axios.get("/providers");
+    };
+    Promise.all([customers(), providers()]).then((res) => {
+      const [customers, providers] = res;
+      this.customers = customers.data.data;
+      this.providers = providers.data.data;
+    });
+  },
+  fetchOnServer: false,
   data() {
     return {
       ivaNewForm: {
         typeRegister: "",
-        typeDocument: "",
+        typeDocument1: "",
+        typeDocument2: "",
+        sumas: "",
+        iva: "",
         subTotal: "",
         ivaDetained: "",
+        providers: "",
+        totals: "",
       },
+      customers: [],
+      providers: [],
 
       filetype: [
         { name: "Débito Fiscal", id: "deviFilcal" },
@@ -245,5 +395,39 @@ export default {
     };
   },
   methods: {},
+
+  computed: {
+    activeCustomers() {
+      return this.customers.filter((c) => c.isActiveCustomer);
+    },
+    inactiveCustomers() {
+      return this.customers.filter((c) => !c.isActiveCustomer);
+    },
+    activeProviders() {
+      return this.providers.filter((c) => c.isActiveProvider);
+    },
+    inactiveProviders() {
+      return this.providers.filter((c) => !c.isActiveProvider);
+    },
+
+    taxes() {
+      const taxes = this.ivaNewForm.sumas * 0.13;
+
+      return taxes;
+    },
+    taxesDetained() {
+      const taxesDetained = this.ivaNewForm.ivaDetained - 0.13;
+
+      return taxesDetained;
+    },
+    subTotal() {
+      const subtotal = this.taxes + this.ivaNewForm.sumas;
+      return subtotal;
+    },
+    totals() {
+      const totals = this.subTotal;
+      return totals;
+    },
+  },
 };
 </script>
