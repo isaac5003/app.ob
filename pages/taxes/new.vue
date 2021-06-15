@@ -345,8 +345,6 @@ import {
   selectValidation,
 } from "../../tools";
 
-const storagekey = "new-taxes";
-
 export default {
   name: "TaxesNew",
   head: {
