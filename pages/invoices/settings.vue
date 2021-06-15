@@ -254,7 +254,6 @@
                       v-model="invoiceModel.customer_name.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_name.show"
@@ -270,7 +269,6 @@
                       v-model="invoiceModel.customer_name.y"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_name.show"
@@ -286,7 +284,6 @@
                       v-model="invoiceModel.customer_name.length"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_name.show"
@@ -309,7 +306,6 @@
                       v-model="invoiceModel.customer_address1.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_address1.show"
@@ -325,7 +321,6 @@
                       v-model="invoiceModel.customer_address1.y"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_address1.show"
@@ -341,7 +336,6 @@
                       v-model="invoiceModel.customer_address1.length"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_address1.show"
@@ -364,7 +358,6 @@
                       v-model="invoiceModel.customer_address2.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_address2.show"
@@ -380,7 +373,6 @@
                       v-model="invoiceModel.customer_address2.y"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_address2.show"
@@ -396,7 +388,6 @@
                       v-model="invoiceModel.customer_address2.length"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_address2.show"
@@ -422,7 +413,6 @@
                       v-model="invoiceModel.customer_nrc.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_nrc.show"
@@ -438,7 +428,6 @@
                       v-model="invoiceModel.customer_nrc.y"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_nrc.show"
@@ -454,7 +443,6 @@
                       v-model="invoiceModel.customer_nrc.length"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_nrc.show"
@@ -477,7 +465,6 @@
                       v-model="invoiceModel.customer_nit.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_nit.show"
@@ -493,7 +480,6 @@
                       v-model="invoiceModel.customer_nit.y"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_nit.show"
@@ -509,7 +495,6 @@
                       v-model="invoiceModel.customer_nit.length"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_nit.show"
@@ -532,7 +517,6 @@
                       v-model="invoiceModel.customer_dui.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_dui.show"
@@ -547,7 +531,6 @@
                     <el-input-number
                       v-model="invoiceModel.customer_dui.y"
                       :min="1"
-                      :max="10"
                       controls-position="right"
                       style="width: 90%"
                       size="small"
@@ -564,7 +547,6 @@
                       v-model="invoiceModel.customer_dui.length"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_dui.show"
@@ -590,7 +572,6 @@
                       v-model="invoiceModel.customer_state.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_state.show"
@@ -606,7 +587,6 @@
                       v-model="invoiceModel.customer_state.y"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_state.show"
@@ -622,7 +602,6 @@
                       v-model="invoiceModel.customer_state.length"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_state.show"
@@ -645,7 +624,6 @@
                       v-model="invoiceModel.customer_city.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_city.show"
@@ -661,7 +639,6 @@
                       v-model="invoiceModel.customer_city.y"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_city.show"
@@ -677,7 +654,6 @@
                       v-model="invoiceModel.customer_city.length"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_city.show"
@@ -700,7 +676,6 @@
                       v-model="invoiceModel.customer_giro.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_giro.show"
@@ -716,7 +691,6 @@
                       v-model="invoiceModel.customer_giro.y"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_giro.show"
@@ -732,7 +706,6 @@
                       v-model="invoiceModel.customer_giro.length"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.customer_giro.show"
@@ -758,7 +731,6 @@
                       v-model="invoiceModel.seller_name.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.seller_name.show"
@@ -774,7 +746,6 @@
                       v-model="invoiceModel.seller_name.y"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.seller_name.show"
@@ -790,7 +761,6 @@
                       v-model="invoiceModel.seller_name.length"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.seller_name.show"
@@ -813,7 +783,6 @@
                       v-model="invoiceModel.payment_condition.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.payment_condition.show"
@@ -829,7 +798,6 @@
                       v-model="invoiceModel.payment_condition.y"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.payment_condition.show"
@@ -845,7 +813,6 @@
                       v-model="invoiceModel.payment_condition.length"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.payment_condition.show"
@@ -869,7 +836,7 @@
                 <el-input-number
                   v-model="invoiceModel.fontSizeDetails"
                   :min="1"
-                  :max="10"
+                  :max="16"
                   class="w-full"
                   size="small"
                 ></el-input-number>
@@ -881,9 +848,8 @@
               <div class="flex-1 text-xs">Alto</div>
               <div class="flex-1">
                 <el-input-number
-                  v-model="invoiceModel.height"
+                  v-model="invoiceModel.heigth"
                   :min="1"
-                  :max="10"
                   class="w-full"
                   size="small"
                 ></el-input-number>
@@ -897,7 +863,6 @@
                 <el-input-number
                   v-model="invoiceModel.position_y"
                   :min="1"
-                  :max="10"
                   class="w-full"
                   size="small"
                 ></el-input-number>
@@ -1156,7 +1121,7 @@
                 <el-input-number
                   v-model="invoiceModel.fontSizeTotals"
                   :min="1"
-                  :max="10"
+                  :max="16"
                   class="w-full"
                   size="small"
                 ></el-input-number>
@@ -1178,7 +1143,6 @@
                       v-model="invoiceModel.venta_total_text.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.venta_total_text.show"
@@ -1194,7 +1158,6 @@
                       v-model="invoiceModel.venta_total_text.y"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.venta_total_text.show"
@@ -1216,7 +1179,6 @@
                       v-model="invoiceModel.sum.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.sum.show"
@@ -1232,7 +1194,6 @@
                       v-model="invoiceModel.sum.y"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.sum.show"
@@ -1253,7 +1214,6 @@
                       v-model="invoiceModel.iva.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.iva.show"
@@ -1269,7 +1229,6 @@
                       v-model="invoiceModel.iva.y"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.iva.show"
@@ -1295,7 +1254,6 @@
                       v-model="invoiceModel.subtotal.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.subtotal.show"
@@ -1311,7 +1269,6 @@
                       v-model="invoiceModel.subtotal.y"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.subtotal.show"
@@ -1334,7 +1291,6 @@
                       v-model="invoiceModel.iva_retenido.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.iva_retenido.show"
@@ -1350,7 +1306,6 @@
                       v-model="invoiceModel.iva_retenido.y"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.iva_retenido.show"
@@ -1373,7 +1328,6 @@
                       v-model="invoiceModel.ventas_no_sujetas.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.ventas_no_sujetas.show"
@@ -1389,7 +1343,6 @@
                       v-model="invoiceModel.ventas_no_sujetas.y"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.ventas_no_sujetas.show"
@@ -1415,7 +1368,6 @@
                       v-model="invoiceModel.ventas_exentas.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.ventas_exentas.show"
@@ -1431,7 +1383,6 @@
                       v-model="invoiceModel.ventas_exentas.y"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.ventas_exentas.show"
@@ -1454,7 +1405,6 @@
                       v-model="invoiceModel.venta_total.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.venta_total.show"
@@ -1470,7 +1420,6 @@
                       v-model="invoiceModel.venta_total.y"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.venta_total.show"
@@ -2581,7 +2530,7 @@ export default {
         },
         //Campo para Detalles
         position_y: "",
-        height: "",
+        heigth: "",
         charge_quantity: {
           x: "",
           length: "",
@@ -3326,8 +3275,6 @@ export default {
           }
         }
 
-        console.log(header);
-
         const detailsFields = {
           quantity: "charge_quantity",
           description: "charge_description",
@@ -3350,7 +3297,6 @@ export default {
             details[objectKey] = found;
           }
         }
-        console.log(details);
 
         const detailTotals = [
           "venta_total_text",
@@ -3371,8 +3317,6 @@ export default {
             totals.push(found);
           }
         }
-
-        console.log(totals);
 
         this.$confirm(
           "¿Estás seguro que deseas guardar la configuración?",
@@ -3400,7 +3344,7 @@ export default {
                       header: [...header],
                       details: {
                         position_y: modelInvoice.position_y,
-                        heigth: modelInvoice.height,
+                        heigth: modelInvoice.heigth,
                         ...details,
                       },
                       totals: [...totals],
@@ -3440,10 +3384,50 @@ export default {
       this.$axios.get(`/invoices/documents/${index}/layout`).then((res) => {
         const layout = res.data.data;
         if (layout !== null) {
-          const { header } = layout;
+          const { header, details, totals } = layout;
           for (const h of header) {
             this.invoiceModel[h.value] = {
               ...h,
+              show: true,
+            };
+          }
+
+          const detailsFields = [
+            "position_y",
+            "heigth",
+            "quantity",
+            "description",
+            "price",
+            "sujeto",
+            "exento",
+            "afecto",
+          ];
+
+          for (const d of detailsFields) {
+            if (details[d]) {
+              this.invoiceModel[d] =
+                typeof details[d] == "object"
+                  ? d == "quantity"
+                    ? (this.invoiceModel["charge_quantity"] = {
+                        ...details[d],
+                        show: true,
+                      })
+                    : d == "description"
+                    ? (this.invoiceModel["charge_description"] = {
+                        ...details[d],
+                        show: true,
+                      })
+                    : {
+                        ...details[d],
+                        show: true,
+                      }
+                  : details[d];
+            }
+          }
+
+          for (const t of totals) {
+            this.invoiceModel[t.value] = {
+              ...t,
               show: true,
             };
           }
