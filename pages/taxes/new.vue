@@ -259,6 +259,7 @@ code
 
           <el-form-item label="IVA" class="col-span-2" prop="iva">
             <el-input-number
+              v-model="ivaNewForm.iva"
               :value="taxes"
               type="number"
               :min="0.0"
@@ -268,6 +269,7 @@ code
               autocomplete="off"
               :precision="2"
               style="width: 100%"
+              :disabled="true"
             >
             </el-input-number>
           </el-form-item>
@@ -278,6 +280,7 @@ code
             v-if="ivaNewForm.subTotal != 'consuFinal'"
           >
             <el-input-number
+              v-model="ivaNewForm.subTotal"
               :value="subTotal"
               type="number"
               :min="0.0"
@@ -311,6 +314,7 @@ code
           </el-form-item>
           <el-form-item label="Total" class="col-span-2">
             <el-input
+              v-model="ivaNewForm.totals"
               style="width: 100%"
               size="small"
               :disabled="true"
@@ -368,7 +372,7 @@ export default {
         typeDocument1: "",
         typeDocument2: "",
         sumas: "",
-        iva: "",
+        iva: 0.13,
         subTotal: "",
         ivaDetained: "",
         providers: "",
@@ -422,10 +426,12 @@ export default {
     },
     subTotal() {
       const subtotal = this.taxes + this.ivaNewForm.sumas;
+      this.ivaNewForm.subTotal = this.taxes + this.ivaNewForm.sumas;
       return subtotal;
     },
     totals() {
       const totals = this.subTotal;
+      this.ivaNewForm.totals = this.subTotal;
       return totals;
     },
   },
