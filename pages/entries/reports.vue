@@ -2047,20 +2047,18 @@ export default {
       }
     },
     getAccountingCatalog(fileType, preview) {
-      const catalog = () => this.$axios.get("/entries/catalog");
-      const bussinesInfo = () => this.$axios.get("/business/info");
+      const report = this.$axios.get("/entries/report/accounting-catalog");
       switch (fileType) {
         case "pdf":
-          Promise.all([catalog(), bussinesInfo()]).then((res) => {
-            const [catalog, bussinesInfo] = res;
-            const catalogReport = catalog.data.data;
-
-            const { name, nit, nrc } = bussinesInfo.data.info;
+          Promise.all([report]).then((res) => {
+            const [report] = res;
+            const catalogReport = report.data.accounts;
+            const { name, nit, nrc } = report.data.company;
+            const title = report.data.name;
             const values = catalogReport.map((c) => {
               return [
                 { bold: c.isParent, text: c.code },
                 { bold: c.isParent, text: c.name },
-
                 {
                   bold: c.isParent,
                   text: c.isParent ? "N" : "S",
@@ -2079,7 +2077,7 @@ export default {
               pageSize: "LETTER",
               pageOrientation: "portrait",
               pageMargins: [20, 60, 20, 40],
-              header: getHeader(name, nit, nrc, null, "CATALOGO DE CUENTAS"),
+              header: getHeader(name, nit, nrc, null, title),
               footer: getFooter(),
               content: [
                 {
@@ -2123,11 +2121,12 @@ export default {
           });
           break;
         case "excel":
-          Promise.all([catalog(), bussinesInfo()]).then((res) => {
-            const [catalog, bussinesInfo] = res;
-            const { name, nit, nrc } = bussinesInfo.data.info;
+          Promise.all([report]).then((res) => {
+            const [report] = res;
+            const { name, nit, nrc } = report.data.company;
+            const title = report.data.name;
             const data = [];
-            for (const acc of catalog.data.data) {
+            for (const acc of report.data.accounts) {
               data.push([
                 acc.code,
                 acc.name,
@@ -2136,7 +2135,7 @@ export default {
             }
             const document = [
               [name],
-              ["CATALOGO DE CUENTAS", `NIT: ${nit}`, `NRC: ${nrc}`],
+              [title, `NIT: ${nit}`, `NRC: ${nrc}`],
               [""],
               ...data,
             ];

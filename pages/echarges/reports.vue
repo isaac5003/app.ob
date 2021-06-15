@@ -3,7 +3,7 @@
     v-loading="loading"
     page-title="Reportes"
     :breadcrumb="[
-      { name: 'Cobros', to: '/echarges' },
+      { name: 'Cobros electrónicos', to: '/echarges' },
       { name: 'Reportes', to: null },
     ]"
   >
