@@ -80,7 +80,7 @@
       <el-tab-pane label="Pasarelas de pago" name="payment">
         <template>
           <el-tabs
-            :tab-position="tabPosition"
+            tab-position="left"
             v-model="utab"
             @tab-click="
               $router
@@ -145,10 +145,9 @@ export default {
       this.utab = this.$route.query.utab;
     }
   },
+  fetchOnServer: false,
   data() {
     return {
-      //pageloading: true,
-      tabPosition: "left",
       tab: "document",
       utab: "wompi",
       documentForm: {

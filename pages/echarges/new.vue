@@ -1,7 +1,7 @@
 <template>
   <layout-content
     v-loading="loading"
-    page-title="Nuevo Cobro"
+    page-title="Nuevo Cobro electrónico"
     :breadcrumb="[
       { name: 'Cobros electronicos', to: '/echarges' },
       { name: 'Nuevo cobro', to: null },
@@ -55,6 +55,21 @@
               size="small"
               autocomplete="off"
               :precision="2"
+              style="width: 100%"
+            >
+            </el-input-number>
+          </el-form-item>
+        </div>
+        <!-- Fecha documento -->
+        <div class="col-span-2">
+          <el-form-item label="Fecha de cobro" prop="date">
+            <el-date-picker
+              v-model="eChargesNewForm.date"
+              size="small"
+              class="w-full"
+              type="date"
+              placeholder=""
+              :picker-options="pickerOptions"
               style="width: 100%"
             >
             </el-input-number>
