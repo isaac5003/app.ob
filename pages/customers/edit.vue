@@ -31,7 +31,7 @@
             <el-form-item
               label="Nombre o razón social"
               prop="name"
-              class="col-span-7"
+              class="col-span-6"
             >
               <el-input
                 clearable
@@ -63,18 +63,28 @@
               />
             </el-form-item>
             <el-form-item
-              label="Es tambien proveedor"
               prop="isProvider"
-              class="col-span-2"
-              v-if="false"
+              class="col-span-3"
+              label="¿Es también proveedor? "
+              v-if="hasModule('f6000cbb-1e6d-4f7d-a7cc-cadd78d23076')"
             >
               <el-radio-group
                 v-model="customersEditForm.isProvider"
                 class="w-full"
                 @change="setStorage(customersEditForm)"
               >
-                <el-radio :label="true">Si</el-radio>
-                <el-radio :label="false">No</el-radio>
+                <el-row :gutter="15">
+                  <el-col :span="8">
+                    <el-radio border :label="true" size="small" class="w-full"
+                      >Si</el-radio
+                    >
+                  </el-col>
+                  <el-col :span="8">
+                    <el-radio border :label="false" size="small" class="w-full"
+                      >No</el-radio
+                    >
+                  </el-col>
+                </el-row>
               </el-radio-group>
             </el-form-item>
           </div>
@@ -370,8 +380,11 @@
           />
 
           <div class="grid grid-cols-12 gap-4">
-            <el-form-item label="Seleccione una cuenta" class="col-span-4"
-            v-if="hasModule('a98b98e6-b2d5-42a3-853d-9516f64eade8')">
+            <el-form-item
+              label="Seleccione una cuenta"
+              class="col-span-4"
+              v-if="hasModule('a98b98e6-b2d5-42a3-853d-9516f64eade8')"
+            >
               <el-select
                 filterable
                 remote
@@ -416,7 +429,8 @@ import {
   selectValidation,
   checkBeforeLeave,
   checkBeforeEnter,
-  hasModule
+  hasModule,
+  parseErrors,
 } from "../../tools";
 import Notification from "../../components/Notification";
 
@@ -666,7 +680,8 @@ export default {
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
@@ -697,7 +712,7 @@ export default {
         this.filteredCatalog = [];
       }
     },
-        hasModule(modules) {
+    hasModule(modules) {
       return hasModule(modules, this.$auth.user);
     },
   },

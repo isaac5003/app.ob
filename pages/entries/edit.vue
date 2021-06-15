@@ -409,6 +409,7 @@ import {
   selectValidation,
   checkBeforeLeave,
   checkBeforeEnter,
+  parseErrors,
 } from "../../tools";
 import Notification from "../../components/Notification";
 const storagekey = "edit-entries";
@@ -795,7 +796,8 @@ export default {
                     .catch((err) => {
                       this.$notify.error({
                         title: "Error",
-                        message: err.response.data.message,
+                        dangerouslyUseHTMLString: true,
+                        message: parseErrors(err.response.data.message),
                       });
                     })
                     .then((alw) => {

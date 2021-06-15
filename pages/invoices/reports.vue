@@ -114,7 +114,13 @@
                       :value="item.id"
                     >
                       <div
-                        class="flex flex-row justify-between items-end py-1 leading-normal"
+                        class="
+                          flex flex-row
+                          justify-between
+                          items-end
+                          py-1
+                          leading-normal
+                        "
                       >
                         <div class="flex flex-col">
                           <span class="text-xs text-gray-500">{{
@@ -136,7 +142,13 @@
                       :value="item.id"
                     >
                       <div
-                        class="flex flex-row justify-between items-end py-1 leading-normal"
+                        class="
+                          flex flex-row
+                          justify-between
+                          items-end
+                          py-1
+                          leading-normal
+                        "
                       >
                         <div class="flex flex-col">
                           <span class="text-xs text-gray-500">{{
@@ -325,7 +337,7 @@
             </div>
             <template>
               <div class="col-span-4">
-                <el-form-item label="Cliente:">
+                <el-form-item label="Cliente:" prop="customer">
                   <el-select
                     v-model="filterForm.customer"
                     size="small"
@@ -344,7 +356,13 @@
                         :value="item.id"
                       >
                         <div
-                          class="flex flex-row justify-between items-end py-1 leading-normal"
+                          class="
+                            flex flex-row
+                            justify-between
+                            items-end
+                            py-1
+                            leading-normal
+                          "
                         >
                           <div class="flex flex-col">
                             <span class="text-xs text-gray-500">{{
@@ -366,7 +384,13 @@
                         :value="item.id"
                       >
                         <div
-                          class="flex flex-row justify-between items-end py-1 leading-normal"
+                          class="
+                            flex flex-row
+                            justify-between
+                            items-end
+                            py-1
+                            leading-normal
+                          "
                         >
                           <div class="flex flex-col">
                             <span class="text-xs text-gray-500">{{
@@ -386,9 +410,9 @@
             </template>
             <template>
               <div class="col-span-2">
-                <el-form-item label="Tipo fact:">
+                <el-form-item label="Tipo fact:" prop="documentType">
                   <el-select
-                    v-model="filterForm.invoiceType"
+                    v-model="filterForm.documentType"
                     size="small"
                     clearable
                     placeholder="Todos los tipos:"
@@ -656,6 +680,7 @@ export default {
             const [report] = res;
             const { name, nit, nrc } = report.data.company;
             const general = report.data.invoices;
+            const titleName = report.data.name;
 
             const values = [];
             const emptyRow = [{}, {}, {}, {}, {}, {}, {}, {}, {}];
@@ -768,13 +793,7 @@ export default {
 
             const docDefinition = {
               info: {
-                title: `detallesdocs_${this.$dateFns.format(
-                  new Date(startDate),
-                  "yyyyMMdd"
-                )}_detallesdocs_${this.$dateFns.format(
-                  new Date(endDate),
-                  "yyyyMMdd"
-                )}`,
+                title: titleName,
               },
               pageSize: "LETTER",
               pageOrientation: "landscape",
@@ -973,6 +992,7 @@ export default {
             const [report] = res;
             const { name, nit, nrc } = report.data.company;
             const general = report.data.invoices;
+            const titleName = report.data.name;
 
             const values = [];
             const emptyRow = [{}, {}, {}, {}, {}];
@@ -1009,13 +1029,7 @@ export default {
 
             const docDefinition = {
               info: {
-                title: `detallesdocs_${this.$dateFns.format(
-                  new Date(startDate),
-                  "yyyyMMdd"
-                )}_detallesdocs_${this.$dateFns.format(
-                  new Date(endDate),
-                  "yyyyMMdd"
-                )}`,
+                title: titleName,
               },
               pageSize: "LETTER",
               pageOrientation: "landscape",
@@ -1081,7 +1095,7 @@ export default {
           });
           break;
         case "excel":
-       Promise.all([report()]).then((res) => {
+          Promise.all([report()]).then((res) => {
             const [report] = res;
             const { name, nit, nrc } = report.data.company;
             const general = report.data.invoices;
@@ -1089,17 +1103,13 @@ export default {
             const data = [];
 
             for (const r of general) {
-              data.push([""]);
-            
-                data.push([
-                  r.code,
-                  r.customer,
-                  r.date,
-                  r.documentNumber,
-                  r.total,
-                ]);
-              
-              data.push([""]);
+              data.push([
+                r.code,
+                r.customer,
+                r.date,
+                r.documentNumber,
+                r.total,
+              ]);
             }
             const document = [
               [name],

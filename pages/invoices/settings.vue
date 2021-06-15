@@ -2725,6 +2725,114 @@
           >
         </div>
       </el-tab-pane>
+      <!-- tab de Integraciones  -->
+      <el-tab-pane
+        label="Integraciones"
+        name="integraciones"
+        v-if="hasModule(['a98b98e6-b2d5-42a3-853d-9516f64eade8'])"
+      >
+        <div class="grid grid-cols-12">
+          <div class="col-span-12">
+            <Notification
+              class="mb-4 w-full"
+              type="info"
+              title="Información"
+              message=" En esta sección se realizan las configuraciones de integración con
+            otros modulos de manera general. Estas configuraciones se aplicarán
+            a todos los servicios que no tengan una configuración individual."
+            />
+          </div>
+        </div>
+
+        <div class="flex flex-col space-y-2">
+          <el-form
+            label-position="top"
+            :model="integrationSettingForm"
+            :rules="integrationSettingFormRules"
+            ref="integrationSettingForm"
+            @submit.native.prevent="
+              submitSettingsIntegrations(
+                'integrationSettingForm',
+                integrationSettingForm
+              )
+            "
+          >
+            <div class="flex flex-col space-y-2">
+              <div class="grid grid-cols-12 gap-4">
+                <el-form-item
+                  label="Cuenta para pagos de contado"
+                  class="col-span-4"
+                  prop="accountingCatalog"
+                  v-if="hasModule('a98b98e6-b2d5-42a3-853d-9516f64eade8')"
+                >
+                  <el-select
+                    v-model="integrationSettingForm.accountingCatalog"
+                    placeholder="Ingrese el codigo o el  Nombre de la cuenta"
+                    size="small"
+                    :loading="loadingAccount"
+                    remote
+                    class="w-full"
+                    clearable
+                    filterable
+                    default-first-option
+                    :remote-method="findAccount"
+                    @focus="filteredCatalog = []"
+                  >
+                    <el-option
+                      v-for="c in filteredCatalog"
+                      :key="c.id"
+                      :label="`${c.code}-${c.name}`"
+                      :value="c.id"
+                      :disabled="c.isParent == true"
+                    >
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item
+                  prop="registerType"
+                  label="Tipo de integración contable"
+                  class="col-span-5"
+                  v-if="hasModule('a98b98e6-b2d5-42a3-853d-9516f64eade8')"
+                >
+                  <el-radio-group
+                    class="w-full"
+                    v-model="integrationSettingForm.registerType"
+                  >
+                    <el-row :gutter="15">
+                      <el-col :span="8">
+                        <el-radio
+                          border
+                          label="automatic"
+                          size="small"
+                          class="w-full"
+                          >Automático</el-radio
+                        >
+                      </el-col>
+                      <el-col :span="8">
+                        <el-radio
+                          border
+                          label="manual"
+                          size="small"
+                          class="w-full"
+                          >Manual</el-radio
+                        >
+                      </el-col>
+                    </el-row>
+                  </el-radio-group>
+                </el-form-item>
+              </div>
+            </div>
+            <div class="flex flex-row justify-end">
+              <el-button type="primary" size="small" native-type="submit"
+                >Guardar</el-button
+              >
+              <el-button size="small" @click="$router.push('/invoices')"
+                >Cancelar</el-button
+              >
+            </div>
+          </el-form>
+        </div>
+      </el-tab-pane>
     </el-tabs>
   </layout-content>
 </template>
@@ -2738,6 +2846,7 @@ import {
   hasModule,
   inputValidation,
   selectValidation,
+  parseErrors,
 } from "../../tools";
 
 export default {
@@ -2748,7 +2857,9 @@ export default {
     if (this.$route.query.tab) {
       this.tab = this.$route.query.tab;
     }
-
+    const accounts = () => {
+      return this.$axios.get("/entries/catalog");
+    };
     const zones = () => {
       return this.$axios.get("/invoices/zones");
     };
@@ -2763,23 +2874,32 @@ export default {
     const documents = () => {
       return this.$axios.get("/invoices/documents");
     };
-    const showAuthorization = () => {
-      return this.$axios.get("/invoices/documents");
+    const settingIntegration = () => {
+      return this.$axios.get("/entries/setting/integrations");
     };
     // promesa que recibe los métodos con las peticiones http
     Promise.all([
+      accounts(),
       zones(),
       sellers(),
       payment(),
       documents(),
-      showAuthorization(),
+      settingIntegration(),
     ])
       .then((res) => {
-        const [zones, sellers, payment, documents] = res;
+        const [accounts, zones, sellers, payment, documents, integration] = res;
+        this.accounts = accounts.data.data;
         this.zones = zones.data.data;
         this.sellers = sellers.data.data;
         this.payments = payment.data.data;
         this.correlativeForm.documents = documents.data.data;
+        this.integrationSettingForm.accountingCatalog =
+          integration.data.data.catalog;
+        this.integrationSettingForm.registerType =
+          integration.data.data.registerType;
+        this.filteredCatalog = this.accounts.filter(
+          (c) => c.id == this.integrationSettingForm.accountingCatalog
+        );
 
         this.pageloading = false;
       })
@@ -2790,7 +2910,8 @@ export default {
   fetchOnServer: false,
   data() {
     return {
-      pageloading: false,
+      pageloading: true,
+      loadingAccount: false,
       checked: true,
       input: "",
       num: 1,
@@ -2816,6 +2937,8 @@ export default {
       sellers: [],
       payments: [],
       documents: [],
+      catalogs: [],
+      filteredCatalog: [],
 
       showNewZone: false,
       showNewSeller: false,
@@ -2853,6 +2976,13 @@ export default {
       editSellerForm: {
         name: "",
         invoicesZone: "",
+      },
+      integrationSettingForm: {
+        accountingCatalog: "",
+        registerType: "automatic",
+      },
+      integrationSettingFormRules: {
+        accountingCatalog: selectValidation(true, "change"),
       },
     };
   },
@@ -2916,7 +3046,8 @@ export default {
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {
@@ -2956,7 +3087,8 @@ export default {
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {
@@ -2998,7 +3130,8 @@ export default {
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {
@@ -3036,7 +3169,8 @@ export default {
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {
@@ -3074,7 +3208,8 @@ export default {
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {
@@ -3112,7 +3247,8 @@ export default {
                 .catch((err) => {
                   this.$notify.error({
                     title: "Error",
-                    message: err.response.data.message,
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
                   });
                 })
                 .then((alw) => {
@@ -3162,7 +3298,8 @@ export default {
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
@@ -3212,7 +3349,8 @@ export default {
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
@@ -3266,7 +3404,8 @@ export default {
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
@@ -3317,7 +3456,8 @@ export default {
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
@@ -3396,7 +3536,8 @@ export default {
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
@@ -3456,10 +3597,10 @@ export default {
                     this.pageloading = true;
                   })
                   .catch((err) => {
-                    instance.confirmButtonLoading = false;
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
@@ -3475,6 +3616,90 @@ export default {
           }
         );
       });
+    },
+    findAccount(query) {
+      if (query !== "") {
+        this.loadingAccount = true;
+        this.$axios
+          .get("entries/catalog", { params: { search: query.toLowerCase() } })
+          .then((res) => {
+            this.filteredCatalog = res.data.data;
+            this.loadingAccount = false;
+          })
+          .catch((err) => (this.errorMessage = err.response.data.message));
+      } else {
+        this.filteredCatalog = [];
+      }
+    },
+    submitSettingsIntegrations(formName, { accountingCatalog, registerType }) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+        this.$confirm(
+          "¿Estás seguro que deseas guardar esta configuración?",
+          "Confirmación",
+          {
+            confirmButtonText: "Si, guardar",
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                this.$axios
+                  .put("/entries/setting/integrations", {
+                    accountingCatalog,
+                    registerType,
+                  })
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Exito",
+                      message: res.data.message,
+                    });
+                    this.pageloading = true;
+                    this.fetchIntegration();
+                  })
+                  .catch((err) => {
+                    this.$notify.error({
+                      title: "Error",
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
+                    });
+                  })
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = "Si, guardar";
+                    done();
+                  });
+              } else {
+                instance.confirmButtonLoading = false;
+                instance.confirmButtonText = "Si, guardar";
+                done();
+              }
+            },
+          }
+        );
+      });
+    },
+    fetchIntegration() {
+      this.$axios
+        .get("/entries/setting/integrations")
+        .then((res) => {
+          this.integrationSettingForm.accountingCatalog = res.data.data.catalog;
+          this.filteredCatalog = this.catalogs.filter(
+            (c) => c.id == this.integrationSettingForm.accountingCatalog
+          );
+          this.pageloading = false;
+        })
+        .catch((err) => {
+          this.errorMessage = err.response.data.message;
+        })
+        .then((alw) => (this.pageloading = false));
+    },
+
+    hasModule(modules) {
+      return hasModule(modules, this.$auth.user);
     },
   },
   computed: {

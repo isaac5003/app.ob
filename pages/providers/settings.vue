@@ -6,7 +6,7 @@
       { name: 'Configuraciones', to: null },
     ]"
   >
-      <el-form
+    <el-form
       label-position="top"
       :model="integrationSettingForm"
       ref="integrationSettingForm"
@@ -41,8 +41,11 @@
             message="En esta sección se realizan las configuraciones de integración con otros modulos de manera general. Estas configuraciones se aplicarán a todos los servicios que no tengan una configuración individual."
           />
           <div class="grid grid-cols-12 gap-4">
-            <el-form-item label="Seleccione una cuenta" class="col-span-4"
-            v-if="hasModule('a98b98e6-b2d5-42a3-853d-9516f64eade8')">
+            <el-form-item
+              label="Seleccione una cuenta"
+              class="col-span-4"
+              v-if="hasModule('a98b98e6-b2d5-42a3-853d-9516f64eade8')"
+            >
               <el-select
                 v-model="integrationSettingForm.accountingCatalog"
                 placeholder="Ingrese el codigo o nombre de la cuenta"
@@ -85,7 +88,7 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import {hasModule} from "../../tools/index.js"
+import { hasModule, parseErrors } from "../../tools/index.js";
 
 export default {
   name: "CustomerSettings",
@@ -175,7 +178,8 @@ export default {
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
@@ -191,9 +195,9 @@ export default {
         );
       });
     },
-     hasModule(modules) {
+    hasModule(modules) {
       return hasModule(modules, this.$auth.user);
-   },
+    },
   },
 };
 </script>
