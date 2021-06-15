@@ -1,7 +1,7 @@
 <template>
   <div class="flex">
     <layout-submenu
-      page-name="Cobros electrónicos"
+      page-name="Cobros electronicos"
       :menu="menu"
       icon="collection"
     />
@@ -34,8 +34,8 @@ export default {
     return {
       menu: [
         {
-          name: "Nuevo cobro electrónico",
-          icon: getIcon("plus"),
+          name: "Nuevo cobro",
+          icon: getIcon("document-text"),
           path: "/echarges/new",
         },
         {
