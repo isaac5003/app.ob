@@ -8,7 +8,7 @@ code
     ]"
   >
     <div class="flex flex-col space-y-2">
-      <el-form label-position="top" :model="ivaNewForm" ref="ivaNewForm">
+      <el-form label-position="top" :model="taxesNewForm" ref="taxesNewForm">
         <div class="grid grid-cols-12 gap-4">
           <el-form-item
             label="Tipo de registro"
@@ -16,7 +16,7 @@ code
             prop="typeRegister"
           >
             <el-select
-              v-model="ivaNewForm.typeRegister"
+              v-model="taxesNewForm.typeRegister"
               class="w-full"
               clearable
               filterable
@@ -37,15 +37,15 @@ code
             label="Tipo de documento"
             class="col-span-3"
             prop="typeDocument1"
-            v-if="ivaNewForm.typeRegister != 'credifical'"
+            v-if="taxesNewForm.typeRegister != 'credifical'"
           >
             <el-select
-              v-model="ivaNewForm.typeDocument1"
+              v-model="taxesNewForm.typeDocument1"
               class="w-full"
               clearable
               filterable
               size="small"
-              :disabled="ivaNewForm.typeRegister ? false : true"
+              :disabled="taxesNewForm.typeRegister ? false : true"
             >
               <el-option label="Tipo de documento" value="" />
               <el-option
@@ -59,7 +59,7 @@ code
           </el-form-item>
           <el-form-item label="Tipo de documento" class="col-span-3" v-else>
             <el-select
-              v-model="ivaNewForm.typeDocument2"
+              v-model="taxesNewForm.typeDocument2"
               class="w-full"
               clearable
               filterable
@@ -92,15 +92,15 @@ code
           <el-form-item
             label="Cliente"
             class="col-span-5"
-            v-if="ivaNewForm.typeRegister != 'credifical'"
+            v-if="taxesNewForm.typeRegister != 'credifical'"
           >
             <el-select
               class="w-full"
               clearable
               filterable
               size="small"
-              v-model="ivaNewForm.customers"
-              :disabled="ivaNewForm.typeRegister ? false : true"
+              v-model="taxesNewForm.customers"
+              :disabled="taxesNewForm.typeRegister ? false : true"
             >
               <el-option label="Todos los clientes" value="" />
               <el-option-group key="ACTIVOS" label="ACTIVOS">
@@ -164,10 +164,10 @@ code
               size="small"
               filterable
               clearable
-              v-model="ivaNewForm.providers"
+              v-model="taxesNewForm.providers"
             >
               <el-option label="Todos los proveedores" value="" />
-              <el-option-group key="ACTIVOS" label="Activos">
+              <el-option-group key="ACTIVOS" label="ACTIVOS">
                 <el-option
                   v-for="item in activeProviders"
                   :key="item.id"
@@ -245,7 +245,7 @@ code
         <div class="grid grid-cols-12 gap-4">
           <el-form-item label="Sumas" class="col-span-2" prop="sumas">
             <el-input-number
-              v-model="ivaNewForm.sumas"
+              v-model="taxesNewForm.sumas"
               type="number"
               :min="0.0"
               :step="0.01"
@@ -259,11 +259,10 @@ code
 
           <el-form-item label="IVA" class="col-span-2" prop="iva">
             <el-input-number
-              v-model="ivaNewForm.iva"
+              v-model="taxesNewForm.iva"
               :value="taxes"
               type="number"
               :min="0.0"
-              :max="0.13"
               :step="0.01"
               size="small"
               autocomplete="off"
@@ -277,10 +276,10 @@ code
             label="Subtotal"
             prop="subtotal"
             class="col-span-2"
-            v-if="ivaNewForm.subTotal != 'consuFinal'"
+            v-if="taxesNewForm.subTotal != 'consuFinal'"
           >
             <el-input-number
-              v-model="ivaNewForm.subTotal"
+              v-model="taxesNewForm.subTotal"
               :value="subTotal"
               type="number"
               :min="0.0"
@@ -297,13 +296,13 @@ code
             label="Iva retenido"
             prop="ivaDetained"
             class="col-span-2"
-            v-if="ivaNewForm.typeRegister != 'credifical'"
+            v-if="taxesNewForm.typeRegister != 'credifical'"
           >
             <el-input-number
+              v-model="taxesNewForm.ivaDetained"
               :value="taxesDetained"
               type="number"
               :min="0.0"
-              :max="0.13"
               :step="0.01"
               size="small"
               autocomplete="off"
@@ -314,9 +313,10 @@ code
           </el-form-item>
           <el-form-item label="Total" class="col-span-2">
             <el-input
-              v-model="ivaNewForm.totals"
+              v-model="taxesNewForm.totals"
               style="width: 100%"
               size="small"
+              :minlength="0.01"
               :disabled="true"
               :value="totals"
             >
@@ -365,12 +365,12 @@ export default {
   fetchOnServer: false,
   data() {
     return {
-      ivaNewForm: {
+      taxesNewForm: {
         typeRegister: "",
         typeDocument1: "",
         typeDocument2: "",
         sumas: "",
-        iva: 0.13,
+        iva: "",
         subTotal: "",
         ivaDetained: "",
         providers: "",
@@ -413,24 +413,26 @@ export default {
     },
 
     taxes() {
-      const taxes = this.ivaNewForm.sumas * 0.13;
-
+      const taxes = this.taxesNewForm.sumas * 0.13;
+      this.taxesNewForm.iva = this.taxesNewForm.sumas * 0.13;
       return taxes;
     },
     taxesDetained() {
-      const taxesDetained = this.ivaNewForm.ivaDetained - 0.13;
-
+      const taxesDetained =
+        this.taxesNewForm.subTotal - this.taxesNewForm.ivaDetained;
       return taxesDetained;
     },
     subTotal() {
-      const subtotal = this.taxes + this.ivaNewForm.sumas;
-      this.ivaNewForm.subTotal = this.taxes + this.ivaNewForm.sumas;
+      const subtotal = this.taxes + this.taxesNewForm.sumas;
+      this.taxesNewForm.subTotal = this.taxes + this.taxesNewForm.sumas;
       return subtotal;
     },
     totals() {
       const totals = this.subTotal;
-      this.ivaNewForm.totals = this.subTotal;
-      return totals;
+      const totalDetained = this.taxesDetained;
+      this.taxesNewForm.totals = this.subTotal;
+      this.taxesNewForm.totals = this.taxesDetained;
+      return totals, totalDetained;
     },
   },
 };

@@ -180,7 +180,7 @@
               </el-select>
             </el-form-item>
           </template>
-          <el-form-item label="Proveedores:" class="col-span-3">
+          <el-form-item label="Proveedores:" class="col-span-4">
             <el-select
               class="w-full"
               size="small"
@@ -189,7 +189,7 @@
               v-model="taxesForm.provider"
             >
               <el-option label="Todos los proveedores" value="" />
-              <el-option-group key="ACTIVOS" label="Activos">
+              <el-option-group key="ACTIVOS" label="ACTIVOS">
                 <el-option
                   v-for="item in activeProviders"
                   :key="item.id"

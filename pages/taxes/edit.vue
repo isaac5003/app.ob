@@ -1,7 +1,6 @@
 code 
 <template>
   <layout-content
-    v-loading="pageloading"
     page-title="Editar registro"
     :breadcrumb="[
       { name: 'IVA', to: '/taxes' },
@@ -9,7 +8,7 @@ code
     ]"
   >
     <div class="flex flex-col space-y-2">
-      <el-form label-position="top" :model="ivaEditForm" ref="ivaEditForm">
+      <el-form label-position="top" :model="taxesEditForm" ref="taxesEditForm">
         <div class="grid grid-cols-12 gap-4">
           <el-form-item
             label="Tipo de registro"
@@ -17,13 +16,14 @@ code
             prop="typeRegister"
           >
             <el-select
-              v-model="ivaEditForm.typeRegister"
+              v-model="taxesEditForm.typeRegister"
               class="w-full"
               clearable
               filterable
               size="small"
               :disabled="true"
             >
+              <el-option label="Tipo de registro" value="" />
               <el-option
                 v-for="item in filetype"
                 :key="item.id"
@@ -37,16 +37,18 @@ code
           <el-form-item
             label="Tipo de documento"
             class="col-span-3"
-            v-if="ivaEditForm.taypeDocument != 'credifical'"
+            prop="typeDocument1"
+            v-if="taxesEditForm.typeRegister != 'credifical'"
           >
             <el-select
-              v-model="ivaEditForm.typeDocument"
+              v-model="taxesEditForm.typeDocument1"
               class="w-full"
               clearable
               filterable
               size="small"
               :disabled="true"
             >
+              <el-option label="Tipo de documento" value="" />
               <el-option
                 v-for="item in filetype1"
                 :key="item.id"
@@ -58,7 +60,7 @@ code
           </el-form-item>
           <el-form-item label="Tipo de documento" class="col-span-3" v-else>
             <el-select
-              v-model="ivaEditForm.typeDocument"
+              v-model="taxesEditForm.typeDocument2"
               class="w-full"
               clearable
               filterable
@@ -91,13 +93,134 @@ code
           <el-form-item
             label="Cliente"
             class="col-span-5"
-            v-if="ivaEditForm.typeRegister != 'credifical'"
+            v-if="taxesEditForm.typeRegister != 'credifical'"
           >
-            <el-select class="w-full" clearable filterable size="small">
+            <el-select
+              class="w-full"
+              clearable
+              filterable
+              size="small"
+              v-model="taxesEditForm.customers"
+              :disabled="taxesEditForm.typeRegister ? false : true"
+            >
+              <el-option label="Todos los clientes" value="" />
+              <el-option-group key="ACTIVOS" label="ACTIVOS">
+                <el-option
+                  v-for="item in activeCustomers"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                  <div
+                    class="
+                      flex flex-row
+                      justify-between
+                      items-end
+                      py-1
+                      leading-normal
+                    "
+                  >
+                    <div class="flex flex-col">
+                      <span class="text-xs text-gray-500">{{
+                        item.shortName
+                      }}</span>
+                      <span>{{ item.name }}</span>
+                    </div>
+                    <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                  </div>
+                </el-option>
+              </el-option-group>
+              <el-option-group key="INACTIVOS" label="INACTIVOS">
+                <el-option
+                  style="height: 50px"
+                  v-for="item in inactiveCustomers"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                  <div
+                    class="
+                      flex flex-row
+                      justify-between
+                      items-end
+                      py-1
+                      leading-normal
+                    "
+                  >
+                    <div class="flex flex-col">
+                      <span class="text-xs text-gray-500">{{
+                        item.shortName
+                      }}</span>
+                      <span>{{ item.name }}</span>
+                    </div>
+                    <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                  </div>
+                </el-option>
+              </el-option-group>
             </el-select>
           </el-form-item>
-          <el-form-item label="Proveedor" class="col-span-5" v-else>
-            <el-select class="w-full" clearable filterable size="small">
+          <el-form-item label="Proveedores:" class="col-span-5" v-else>
+            <el-select
+              class="w-full"
+              size="small"
+              filterable
+              clearable
+              v-model="taxesEditForm.providers"
+            >
+              <el-option label="Todos los proveedores" value="" />
+              <el-option-group key="ACTIVOS" label="ACTIVOS">
+                <el-option
+                  v-for="item in activeProviders"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                  <div
+                    class="
+                      flex flex-row
+                      justify-between
+                      items-end
+                      py-1
+                      leading-normal
+                    "
+                  >
+                    <div class="flex flex-col">
+                      <span class="text-xs text-gray-500">{{
+                        item.shortName
+                      }}</span>
+                      <span>{{ item.name }}</span>
+                    </div>
+                    <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                  </div>
+                </el-option>
+              </el-option-group>
+              <el-option-group key="INACTIVOS" label="INACTIVOS">
+                <el-option
+                  style="height: 50px"
+                  v-for="item in inactiveProviders"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                  <div
+                    class="
+                      flex flex-row
+                      justify-between
+                      items-end
+                      py-1
+                      leading-normal
+                    "
+                  >
+                    <div class="flex flex-col">
+                      <span class="text-xs text-gray-500">{{
+                        item.shortName
+                      }}</span>
+                      <span>{{ item.name }}</span>
+                    </div>
+                    <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                  </div>
+                </el-option>
+              </el-option-group>
             </el-select>
           </el-form-item>
           <el-form-item
@@ -123,7 +246,7 @@ code
         <div class="grid grid-cols-12 gap-4">
           <el-form-item label="Sumas" class="col-span-2" prop="sumas">
             <el-input-number
-              v-model="ivaEditForm.sumas"
+              v-model="taxesEditForm.sumas"
               type="number"
               :min="0.0"
               :step="0.01"
@@ -137,26 +260,28 @@ code
 
           <el-form-item label="IVA" class="col-span-2" prop="iva">
             <el-input-number
-              v-model="ivaEditForm.iva"
+              v-model="taxesEditForm.iva"
+              :value="taxes"
               type="number"
               :min="0.0"
               :step="0.01"
               size="small"
               autocomplete="off"
               :precision="2"
-              :disabled="true"
               style="width: 100%"
+              :disabled="true"
             >
             </el-input-number>
           </el-form-item>
           <el-form-item
             label="Subtotal"
-            class="col-span-2"
-            v-if="ivaEditForm.subTotal != 'consuFinal'"
             prop="subtotal"
+            class="col-span-2"
+            v-if="taxesEditForm.subTotal != 'consuFinal'"
           >
             <el-input-number
-              v-model="ivaEditForm.subTotal"
+              v-model="taxesEditForm.subTotal"
+              :value="subTotal"
               type="number"
               :min="0.0"
               :step="0.01"
@@ -164,16 +289,19 @@ code
               autocomplete="off"
               :precision="2"
               style="width: 100%"
+              :disabled="true"
             >
             </el-input-number>
           </el-form-item>
           <el-form-item
             label="Iva retenido"
+            prop="ivaDetained"
             class="col-span-2"
-            v-if="ivaEditForm.typeRegister != 'credifical'"
+            v-if="taxesEditForm.typeRegister != 'credifical'"
           >
             <el-input-number
-              v-model="ivaEditForm.ivaDetained"
+              v-model="taxesEditForm.ivaDetained"
+              :value="taxesDetained"
               type="number"
               :min="0.0"
               :step="0.01"
@@ -185,7 +313,14 @@ code
             </el-input-number>
           </el-form-item>
           <el-form-item label="Total" class="col-span-2">
-            <el-input style="width: 100%" size="small" :disabled="true">
+            <el-input
+              v-model="taxesEditForm.totals"
+              style="width: 100%"
+              size="small"
+              :minlength="0.01"
+              :disabled="true"
+              :value="totals"
+            >
             </el-input>
           </el-form-item>
         </div>
@@ -211,23 +346,39 @@ import {
   selectValidation,
 } from "../../tools";
 
-const storagekey = "new-taxes";
-
 export default {
-  name: "TaxesNew",
+  name: "TaxesEdit",
   head: {
     titleTemplate: `%s | Nuevo registro`,
   },
   components: { LayoutContent },
-
+  fetch() {
+    const customers = () => this.$axios.get("/customers");
+    const providers = () => {
+      return this.$axios.get("/providers");
+    };
+    Promise.all([customers(), providers()]).then((res) => {
+      const [customers, providers] = res;
+      this.customers = customers.data.data;
+      this.providers = providers.data.data;
+    });
+  },
+  fetchOnServer: false,
   data() {
     return {
-      ivaEditForm: {
+      taxesEditForm: {
         typeRegister: "",
-        typeDocument: "",
+        typeDocument1: "",
+        typeDocument2: "",
+        sumas: "",
+        iva: "",
         subTotal: "",
         ivaDetained: "",
+        providers: "",
+        totals: "",
       },
+      customers: [],
+      providers: [],
 
       filetype: [
         { name: "Débito Fiscal", id: "deviFilcal" },
@@ -247,5 +398,43 @@ export default {
     };
   },
   methods: {},
+
+  computed: {
+    activeCustomers() {
+      return this.customers.filter((c) => c.isActiveCustomer);
+    },
+    inactiveCustomers() {
+      return this.customers.filter((c) => !c.isActiveCustomer);
+    },
+    activeProviders() {
+      return this.providers.filter((c) => c.isActiveProvider);
+    },
+    inactiveProviders() {
+      return this.providers.filter((c) => !c.isActiveProvider);
+    },
+
+    taxes() {
+      const taxes = this.taxesEditForm.sumas * 0.13;
+      this.taxesEditForm.iva = this.taxesEditForm.sumas * 0.13;
+      return taxes;
+    },
+    taxesDetained() {
+      const taxesDetained =
+        this.taxesEditForm.subTotal - this.taxesEditForm.ivaDetained;
+      return taxesDetained;
+    },
+    subTotal() {
+      const subtotal = this.taxes + this.taxesEditForm.sumas;
+      this.taxesEditForm.subTotal = this.taxes + this.taxesEditForm.sumas;
+      return subtotal;
+    },
+    totals() {
+      const totals = this.subTotal;
+      const totalDetained = this.taxesDetained;
+      this.taxesEditForm.totals = this.subTotal;
+      this.taxesEditForm.totals = this.taxesDetained;
+      return totals, totalDetained;
+    },
+  },
 };
 </script>
