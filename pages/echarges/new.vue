@@ -11,7 +11,7 @@
       <!-- firstRow -->
       <div class="grid grid-cols-12 gap-4">
         <!-- cliente -->
-        <div class="col-span-5">
+        <div class="col-span-4">
           <el-form-item label="Cliente" prop="customer">
             <el-select
               v-model="eChargesNewForm.customer"
@@ -30,9 +30,21 @@
             </el-select>
           </el-form-item>
         </div>
-
+        <!-- correo -->
+        <div class="col-span-4">
+          <el-form-item label="Correo" prop="email">
+            <el-input
+              clearable
+              type="text"
+              size="small"
+              placeholder=""
+              v-model="eChargesNewForm.email"
+            >
+            </el-input>
+          </el-form-item>
+        </div>
         <!-- n° Correlativo -->
-        <div class="col-span-2 col-start-9">
+        <div class="col-span-2">
           <el-form-item label="N° de correlativo">
             <el-input
               size="small"
@@ -45,7 +57,7 @@
           </el-form-item>
         </div>
         <!-- total -->
-        <div class="col-span-2 col-start-11">
+        <div class="col-span-2">
           <el-form-item label="Total" prop="total">
             <el-input-number
               type="number"
@@ -61,7 +73,7 @@
           </el-form-item>
         </div>
       </div>
-      <!-- thirdRow -->
+      <!-- secondRow -->
       <div class="grid grid-cols-12">
         <!--Descripcion -->
         <div class="col-span-12">
@@ -124,17 +136,17 @@ export default {
       loading: false,
       eChargesNewForm: {
         customer: "",
-        date: "",
         sequence: "",
         description: "",
         total: "",
+        email: "",
       },
       customers: [],
       eChargesNewFormRules: {
         customer: selectValidation(true),
-        date: selectValidation(true),
         description: inputValidation(true, 5, 500),
         total: inputValidation(true),
+        email: inputValidation(false, null, null, "email"),
       },
       pickerOptions: {
         shortcuts: [
