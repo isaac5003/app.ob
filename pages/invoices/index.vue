@@ -1266,7 +1266,7 @@ export default {
 
                       const splitText = pdfDocument.splitTextToSize(
                         value,
-                        header.lenght
+                        header.length
                       );
 
                       pdfDocument.text(
@@ -1301,7 +1301,7 @@ export default {
                       // Description
                       const splitDescription = pdfDocument.splitTextToSize(
                         chargeDescription,
-                        conf.details.description.lenght
+                        conf.details.description.length
                       );
                       acumRows = acumRows + splitDescription.length;
                       pdfDocument.text(
@@ -1413,7 +1413,7 @@ export default {
                       }
                       const splitText = pdfDocument.splitTextToSize(
                         value,
-                        total.lenght
+                        total.length
                       );
                       pdfDocument.text(
                         splitText,
