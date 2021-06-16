@@ -2318,6 +2318,11 @@
           >
             <div class="flex flex-col space-y-2">
               <div class="grid grid-cols-12 gap-4">
+                <el-form-item class="mt-3">
+                  <el-switch
+                    v-model="integrationSettingForm.active"
+                  ></el-switch>
+                </el-form-item>
                 <el-form-item
                   label="Cuenta para pagos de contado"
                   class="col-span-4"
@@ -2336,6 +2341,7 @@
                     default-first-option
                     :remote-method="findAccount"
                     @focus="filteredCatalog = []"
+                    :disabled="!integrationSettingForm.active"
                   >
                     <el-option
                       v-for="c in filteredCatalog"
@@ -2356,6 +2362,7 @@
                   <el-radio-group
                     class="w-full"
                     v-model="integrationSettingForm.registerType"
+                    :disabled="!integrationSettingForm.active"
                   >
                     <el-row :gutter="15">
                       <el-col :span="8">
@@ -2364,6 +2371,7 @@
                           label="automatic"
                           size="small"
                           class="w-full"
+                          :disabled="true"
                           >Automático</el-radio
                         >
                       </el-col>
@@ -2382,10 +2390,17 @@
               </div>
             </div>
             <div class="flex flex-row justify-end">
-              <el-button type="primary" size="small" native-type="submit"
+              <el-button
+                :disabled="!integrationSettingForm.active"
+                type="primary"
+                size="small"
+                native-type="submit"
                 >Guardar</el-button
               >
-              <el-button size="small" @click="$router.push('/invoices')"
+              <el-button
+                :disabled="!integrationSettingForm.active"
+                size="small"
+                @click="$router.push('/invoices')"
                 >Cancelar</el-button
               >
             </div>
@@ -2736,7 +2751,8 @@ export default {
       },
       integrationSettingForm: {
         accountingCatalog: "",
-        registerType: "automatic",
+        registerType: "manual",
+        active: false,
       },
       integrationSettingFormRules: {
         accountingCatalog: selectValidation(true, "change"),
