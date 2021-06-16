@@ -15,60 +15,104 @@
     >
       <div class="flex flex-col space-y-6">
         <div class="grid grid-cols-12 gap-4">
-          <div class="col-span-3 flex flex-col">
+          <div class="col-span-2 flex flex-col">
             <span class="text-gray-700 font-bold text-xs">Cliente</span>
             <span class="">
-              {{ taxesPreview ? taxesPreview.name : "" }}
+              {{
+                Object.keys(taxesPreview).length > 0
+                  ? taxesPreview.customer.name
+                  : ""
+              }}
             </span>
           </div>
           <div class="col-span-2 flex flex-col">
             <span class="text-gray-700 font-bold text-xs">Fecha</span>
-            <span class="">{{ taxesPreview ? taxesPreview.date : "" }} </span>
+            <span class=""
+              >{{
+                Object.keys(taxesPreview).length > 0
+                  ? taxesPreview.invoiceDate
+                  : ""
+              }}
+            </span>
           </div>
           <div class="col-span-2 flex flex-col">
             <span class="text-gray-700 font-bold text-xs"
               >Tipo de registro</span
             >
             <span class="">
-              {{ taxesPreview ? taxesPreview.registerType : "" }}</span
+              {{
+                Object.keys(taxesPreview).length > 0
+                  ? taxesPreview.registerType
+                  : ""
+              }}</span
             >
           </div>
-          <div class="col-span-2 flex flex-col">
+          <div class="col-span-3 flex flex-col">
             <span class="text-gray-700 font-bold text-xs"
               >Tipo de Documento</span
             >
             <span class="">
-              {{ taxesPreview ? taxesPreview.documentType : "" }}</span
+              {{
+                Object.keys(taxesPreview).length > 0
+                  ? taxesPreview.documentType.name
+                  : ""
+              }}</span
             >
           </div>
           <div class="col-span-3 flex flex-col">
             <span class="text-gray-700 font-bold text-xs"
               >N° de Autorización</span
             >
-            <span class=""> {{ taxesPreview ? taxesPreview.number : "" }}</span>
+            <span class="">
+              {{
+                Object.keys(taxesPreview).length > 0
+                  ? taxesPreview.authorization
+                  : ""
+              }}</span
+            >
           </div>
         </div>
 
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-3 flex flex-col">
             <span class="text-gray-700 font-bold text-xs">Correlativo</span>
-            <span class=""> 245800 </span>
+            <span class="">
+              {{
+                Object.keys(taxesPreview).length > 0
+                  ? taxesPreview.sequence
+                  : ""
+              }}
+            </span>
           </div>
           <div class="col-span-2 flex flex-col">
             <span class="text-gray-700 font-bold text-xs">IVA</span>
-            <span class="">{{ taxesPreview ? taxesPreview.iva : "" }} </span>
+            <span class=""
+              >{{
+                Object.keys(taxesPreview).length > 0 ? taxesPreview.iva : ""
+              }}
+            </span>
           </div>
           <div class="col-span-2 flex flex-col">
             <span class="text-gray-700 font-bold text-xs">Sub Total</span>
-            <span class=""> $584</span>
+            <span class="">{{
+              Object.keys(taxesPreview).length > 0
+                ? `$ ${taxesPreview.subtotal}`
+                : ""
+            }}</span>
           </div>
           <div class="col-span-2 flex flex-col">
-            <span class="text-gray-700 font-bold text-xs">Otros</span>
-            <span class=""> $2</span>
+            <span class="text-gray-700 font-bold text-xs">IVA retenido</span>
+            <span class=""> $0</span>
           </div>
           <div class="col-span-3 flex flex-col">
             <span class="text-gray-700 font-bold text-xs">Total</span>
-            <span class=""> $586</span>
+            <span class="">
+              {{
+                Object.keys(taxesPreview).length > 0
+                  ? `$ ${taxesPreview.ventaTotal}`
+                  : ""
+              }}</span
+            >
           </div>
         </div>
       </div>
@@ -89,7 +133,8 @@
               placeholder="Buscar..."
               size="small"
               v-model="taxesForm.search"
-              clearable
+              v-debounce:500ms="fetchTaxes"
+              @change="fetchTaxes()"
             ></el-input>
           </el-form-item>
         </div>
@@ -284,11 +329,11 @@
       stripe
       size="mini"
       ref="multipleTable"
-      :data="taxesList.taxesList"
+      :data="taxesList.data"
       @selection-change="selectionChange"
     >
       <el-table-column type="selection" width="50" />
-      <el-table-column label="#" width="40" prop="id" />
+      <el-table-column label="#" width="40" prop="index" />
       <el-table-column label="Fecha" width="100" prop="date"></el-table-column>
       <el-table-column
         label="Proveedor/cliente"
@@ -297,8 +342,8 @@
       ></el-table-column>
       <el-table-column
         label="N° autorización"
-        width="130"
-        prop="number"
+        width="120"
+        prop="authorization"
       ></el-table-column>
       <el-table-column
         label="Tipo de documento"
@@ -307,10 +352,14 @@
       ></el-table-column>
       <el-table-column
         label="Tipo de registro"
-        width="150"
+        width="130"
         prop="registerType"
       ></el-table-column>
-      <el-table-column label="IVA" width="50" prop="iva"></el-table-column>
+      <el-table-column label="IVA" width="70" prop="iva">
+        <template slot-scope="scope">
+          <span>{{ scope.row.iva | formatMoney }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label width="80" align="center">
         <!-- dropdpwn selecction -->
         <template slot="header" v-if="selectionData.length">
@@ -325,21 +374,24 @@
             </el-dropdown-menu>
           </el-dropdown>
         </template>
-
         <!-- dropdown 1 -->
         <template slot-scope="scope">
           <el-dropdown trigger="click" szie="mini">
             <el-button icon="el-icon-more" size="mini" />
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item @click.native="openPreviewEntry(scope.row)">
+              <el-dropdown-item @click.native="openPreviewEntry(scope.row.id)">
                 <i class="el-icon-view"></i> Vista previa
               </el-dropdown-item>
               <el-dropdown-item @click.native="$router.push(`/taxes/edit`)">
                 <i class="el-icon-edit-outline"></i> Editar
               </el-dropdown-item>
               <el-dropdown-item
+                v-if="
+                  scope.row.origin == '53a36e54-bab2-4824-9e43-b40efab8bab9'
+                "
                 :divided="true"
                 class="text-red-500 font-semibold"
+                @click.native="deleteTaxe(scope.row.id)"
               >
                 <i class="el-icon-delete"></i> Eliminar
               </el-dropdown-item>
@@ -348,12 +400,24 @@
         </template>
       </el-table-column>
     </el-table>
+    <div class="flex justify-end">
+      <el-pagination
+        @size-change="handleSizeChange"
+        :current-page.sync="page.page"
+        :page-sizes="[5, 10, 15, 25, 50, 100]"
+        :page-size="page.size"
+        layout="total, sizes, prev, pager, next"
+        :total="parseInt(taxesList.count)"
+        :pager-count="5"
+      />
+    </div>
   </layout-content>
 </template>
 
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
+import { parseErrors } from "../../tools";
 export default {
   name: "IVAIndex",
   head: {
@@ -365,15 +429,22 @@ export default {
     const providers = () => {
       return this.$axios.get("/providers");
     };
-    Promise.all([customers(), providers()]).then((res) => {
-      const [customers, providers] = res;
+    const taxes = () => this.$axios.get("/taxes", { params: this.page });
+    Promise.all([customers(), providers(), taxes()]).then((res) => {
+      const [customers, providers, taxes] = res;
       this.customers = customers.data.data;
       this.providers = providers.data.data;
+      this.taxesList = taxes.data;
+      console.log(taxes.data.data);
     });
   },
   fetchOnServer: false,
   data() {
     return {
+      page: {
+        limit: 10,
+        page: 1,
+      },
       showTaxePreview: false,
       taxesPreview: {},
       selectionData: {},
@@ -420,37 +491,114 @@ export default {
         },
       ],
       taxesList: {
-        taxesList: [
-          {
-            id: "1",
-            date: "08/04/2021",
-            name: "AP TECHNOLOGY S.A de C.V",
-            number: "69875105",
-            documentType: "Nota de Crédito",
-            registerType: "Crédito Fiscal",
-            iva: "10%",
-          },
-          {
-            id: "2",
-            date: "08/04/2021",
-            name: "OPTICA LA REALEZA S.A de C.V",
-            number: "35698965",
-            documentType: "Nota de Crédito",
-            registerType: "Crédito Fiscal",
-            iva: "5%",
-          },
-        ],
+        data: [],
         count: 0,
       },
     };
   },
   methods: {
-    openPreviewEntry(dataTable) {
-      this.taxesPreview = dataTable;
+    handleSizeChange(val) {
+      this.page.limit = val;
+      //this.fetchEntries();
+    },
+    async openPreviewEntry(id) {
+      console.log(id);
+      const { data } = await this.$axios.get(`/taxes/${id}`);
+      this.taxesPreview = data.data;
+      console.log(this.taxesPreview);
       this.showTaxePreview = true;
     },
     selectionChange(selectionData) {
       this.selectionData = selectionData;
+    },
+    fetchTaxes() {
+      let params = this.page;
+      /* if (this.filterBy.dateRange !== null) {
+        params = {
+          ...params,
+          startDate: this.filterBy.dateRange[0],
+          endDate: this.filterBy.dateRange[1],
+        };
+      }
+      if (this.filterBy.entryType != "") {
+        params = {
+          ...params,
+          entryType: this.filterBy.entryType,
+        };
+      } */
+      if (this.taxesForm.search != "") {
+        params = {
+          ...params,
+          search: this.taxesForm.search.toLowerCase(),
+        };
+      }
+      /* if (this.filterBy.squared != false) {
+        params = {
+          ...params,
+          squared: this.filterBy.squared,
+        };
+      }
+      if (this.filterBy.accounted != false) {
+        params = {
+          ...params,
+          accounted: this.filterBy.accounted,
+        };
+      }
+      if (this.filterBy.order) {
+        params = {
+          ...params,
+          prop: this.filterBy.prop,
+          order: this.filterBy.order,
+        };
+      } */
+      this.$axios
+        .get("/taxes/", { params })
+        .then((res) => {
+          console.log(res);
+          this.taxesList = res.data;
+        })
+        .catch((err) => {
+          this.errorMessage = err.response.data.message;
+        });
+    },
+    deleteTaxe(id) {
+      this.$confirm(
+        `¿Estás seguro que deseas eliminar este registro?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, eliminar`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .delete(`/taxes/${id}`)
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchTaxes();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, eliminar`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
     },
   },
   computed: {
