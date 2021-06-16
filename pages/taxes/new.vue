@@ -1,5 +1,4 @@
-code 
-<template>
+ <template>
   <layout-content
     page-title="Nuevo registro"
     :breadcrumb="[
@@ -7,8 +6,12 @@ code
       { name: 'Nuevo registro', to: null },
     ]"
   >
-    <div class="flex flex-col space-y-2">
-      <el-form label-position="top" :model="taxesNewForm" ref="taxesNewForm">
+    <div class="flex flex-col space-4">
+      <el-form
+        :model="taxesNewForm"
+        ref="taxesNewForm"
+        @submit.prevent.native="newTaxe('taxesNewForm', taxesNewForm)"
+      >
         <div class="grid grid-cols-12 gap-4">
           <el-form-item
             label="Tipo de registro"
@@ -16,15 +19,14 @@ code
             prop="typeRegister"
           >
             <el-select
-              v-model="taxesNewForm.typeRegister"
+              v-model="taxesNewForm.registerType"
               class="w-full"
               clearable
               filterable
               size="small"
             >
-              <el-option label="Tipo de registro" value="" />
               <el-option
-                v-for="item in filetype"
+                v-for="item in registerType"
                 :key="item.id"
                 :label="item.name"
                 :value="item.id"
@@ -32,63 +34,25 @@ code
               </el-option>
             </el-select>
           </el-form-item>
-
-          <el-form-item
-            label="Tipo de documento"
-            class="col-span-3"
-            prop="typeDocument1"
-            v-if="taxesNewForm.typeRegister != 'credifical'"
-          >
+          <el-form-item label="Tipo de documento" class="col-span-3">
             <el-select
-              v-model="taxesNewForm.typeDocument1"
-              class="w-full"
-              clearable
-              filterable
-              size="small"
-              :disabled="taxesNewForm.typeRegister ? false : true"
-            >
-              <el-option label="Tipo de documento" value="" />
-              <el-option
-                v-for="item in filetype1"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-              >
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="Tipo de documento" class="col-span-3" v-else>
-            <el-select
-              v-model="taxesNewForm.typeDocument2"
+              v-model="taxesNewForm.documentType"
               class="w-full"
               clearable
               filterable
               size="small"
             >
               <el-option
-                v-for="item in filetype2"
+                v-for="item in documentTypes"
                 :key="item.id"
                 :label="item.name"
                 :value="item.id"
               >
               </el-option>
             </el-select>
-          </el-form-item>
-          <el-form-item
-            class="col-span-3 col-start-10"
-            prop="dateRange"
-            label="Fecha de ingreso del registro"
-          >
-            <el-date-picker
-              type="month"
-              format="MMMM yyyy"
-              placeholder="Selecciona un mes"
-              size="small"
-              style="width: 100%"
-            />
           </el-form-item>
         </div>
-        <div class="class grid grid-cols-12 gap-4">
+        <div class="grid grid-cols-12 gap-4">
           <el-form-item
             label="Cliente"
             class="col-span-5"
@@ -100,7 +64,6 @@ code
               filterable
               size="small"
               v-model="taxesNewForm.customers"
-              :disabled="taxesNewForm.typeRegister ? false : true"
             >
               <el-option label="Todos los clientes" value="" />
               <el-option-group key="ACTIVOS" label="ACTIVOS">
@@ -227,25 +190,35 @@ code
             label="Fecha de emisión del documento"
           >
             <el-date-picker
-              type="month"
-              format="MMMM yyyy"
-              placeholder="Selecciona un mes"
+              v-model="taxesNewForm.date"
               size="small"
+              class="w-full"
+              type="date"
+              placeholder="Selecciona un mes"
+              :picker-options="pickerOptions"
               style="width: 100%"
+              format="yyyy-MM-dd"
             />
           </el-form-item>
           <el-form-item label="N° de autorización" class="col-span-2">
-            <el-input size="small" placeholder="000000" readonly> </el-input>
+            <el-input
+              placeholder="000000"
+              v-model="taxesNewForm.authorization"
+              size="small"
+            ></el-input>
           </el-form-item>
           <el-form-item label="N° de correlativo" class="col-span-2">
-            <el-input size="small" placeholder="000000" readonly> </el-input>
+            <el-input
+              placeholder="000000"
+              v-model="taxesNewForm.sequence"
+              size="small"
+            ></el-input>
           </el-form-item>
         </div>
-
         <div class="grid grid-cols-12 gap-4">
           <el-form-item label="Sumas" class="col-span-2" prop="sumas">
             <el-input-number
-              v-model="taxesNewForm.sumas"
+              v-model="taxesNewForm.sum"
               type="number"
               :min="0.0"
               :step="0.01"
@@ -294,12 +267,12 @@ code
           </el-form-item>
           <el-form-item
             label="Iva retenido"
-            prop="ivaDetained"
+            prop="ivaRetenido"
             class="col-span-2"
             v-if="taxesNewForm.typeRegister != 'credifical'"
           >
             <el-input-number
-              v-model="taxesNewForm.ivaDetained"
+              v-model="taxesNewForm.ivaRetenido"
               :value="taxesDetained"
               type="number"
               :min="0.0"
@@ -312,15 +285,17 @@ code
             </el-input-number>
           </el-form-item>
           <el-form-item label="Total" class="col-span-2">
-            <el-input
+            <el-input-number
               v-model="taxesNewForm.totals"
               style="width: 100%"
               size="small"
               :minlength="0.01"
+              :step="0.01"
               :disabled="true"
               :value="totals"
+              :precision="2"
             >
-            </el-input>
+            </el-input-number>
           </el-form-item>
         </div>
         <div class="flex flex-row justify-end">
@@ -366,34 +341,66 @@ export default {
   data() {
     return {
       taxesNewForm: {
-        typeRegister: "",
-        typeDocument1: "",
-        typeDocument2: "",
-        sumas: "",
+        registerType: "",
+        documentType: "",
+        date: "",
+        sum: "",
         iva: "",
         subTotal: "",
-        ivaDetained: "",
+        ivaRetenido: "",
         providers: "",
         totals: "",
+        authorization: "",
+        sequence: "",
       },
       customers: [],
       providers: [],
-
-      filetype: [
-        { name: "Débito Fiscal", id: "deviFilcal" },
-        { name: "Credito fiscal", id: "credifical" },
+      documentTypes: [
+        {
+          id: 1,
+          name: "FCF - Consumidor Final",
+        },
+        {
+          id: 2,
+          name: "CFC - Crédito Fiscal",
+        },
       ],
-      filetype1: [
-        { name: "Credito fiscal", id: "crediFilcal" },
-        { name: "Consumidor final", id: "consuiFinal" },
-        { name: "Nota de debito", id: "notadevi" },
-        { name: "Factura de exportación", id: "factExport" },
+      registerType: [
+        {
+          id: "purchases",
+          name: "Crédito Fiscal",
+        },
+        {
+          id: "invoices",
+          name: "Débito Fiscal",
+        },
       ],
-      filetype2: [
-        { name: "Credito fiscal", id: "crediFilcal1" },
-        { name: "Consumidor final", id: "consuFinal" },
-        { name: "Otros", id: "others" },
-      ],
+      pickerOptions: {
+        shortcuts: [
+          {
+            text: "Ahora",
+            onClick(picker) {
+              picker.$emit("pick", new Date());
+            },
+          },
+          {
+            text: "Ayer",
+            onClick(picker) {
+              const date = new Date();
+              date.setTime(date.getTime() - 3600 * 1000 * 24);
+              picker.$emit("pick", date);
+            },
+          },
+          {
+            text: "Mañana",
+            onClick(picker) {
+              const date = new Date();
+              date.setTime(date.getTime() + 3600 * 1000 * 24);
+              picker.$emit("pick", date);
+            },
+          },
+        ],
+      },
     };
   },
   methods: {},
@@ -411,20 +418,19 @@ export default {
     inactiveProviders() {
       return this.providers.filter((c) => !c.isActiveProvider);
     },
-
     taxes() {
-      const taxes = this.taxesNewForm.sumas * 0.13;
-      this.taxesNewForm.iva = this.taxesNewForm.sumas * 0.13;
+      const taxes = this.taxesNewForm.sum * 0.13;
+      this.taxesNewForm.iva = this.taxesNewForm.sum * 0.13;
       return taxes;
     },
     taxesDetained() {
       const taxesDetained =
-        this.taxesNewForm.subTotal - this.taxesNewForm.ivaDetained;
+        this.taxesNewForm.subTotal - this.taxesNewForm.ivaRetenido;
       return taxesDetained;
     },
     subTotal() {
-      const subtotal = this.taxes + this.taxesNewForm.sumas;
-      this.taxesNewForm.subTotal = this.taxes + this.taxesNewForm.sumas;
+      const subtotal = this.taxes + this.taxesNewForm.sum;
+      this.taxesNewForm.subTotal = this.taxes + this.taxesNewForm.sum;
       return subtotal;
     },
     totals() {
@@ -433,6 +439,9 @@ export default {
       this.taxesNewForm.totals = this.subTotal;
       this.taxesNewForm.totals = this.taxesDetained;
       return totals, totalDetained;
+    },
+    newTaxe(formName, dataTaxe) {
+      console.log(formName, dataTaxe);
     },
   },
 };

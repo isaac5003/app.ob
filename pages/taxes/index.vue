@@ -404,7 +404,9 @@
               <el-dropdown-item @click.native="openPreviewEntry(scope.row.id)">
                 <i class="el-icon-view"></i> Vista previa
               </el-dropdown-item>
-              <el-dropdown-item @click.native="$router.push(`/taxes/edit`)">
+              <el-dropdown-item
+                @click.native="$router.push(`/taxes/edit?ref=${scope.row.id}`)"
+              >
                 <i class="el-icon-edit-outline"></i> Editar
               </el-dropdown-item>
               <el-dropdown-item
