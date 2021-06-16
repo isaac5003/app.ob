@@ -153,10 +153,22 @@
                 <i class="el-icon-warning"></i>
                 {{ scope.row.status.name }}
               </el-tag>
+              <el-tag size="small" v-else-if="scope.row.status.id == '2'">
+                <i class="el-icon-success"></i>
+                {{ scope.row.status.name }}</el-tag
+              >
               <el-tag
                 size="small"
-                type="warning"
-                v-else-if="scope.row.status.id == '2'"
+                type="success"
+                v-else-if="scope.row.status.id == '3'"
+              >
+                <i class="el-icon-success"></i>
+                {{ scope.row.status.name }}</el-tag
+              >
+              <el-tag
+                size="small"
+                type="danger"
+                v-else-if="scope.row.status.id == '4'"
               >
                 <i class="el-icon-success"></i>
                 {{ scope.row.status.name }}</el-tag
@@ -201,7 +213,10 @@
               <el-dropdown trigger="click" szie="mini">
                 <el-button icon="el-icon-more" size="mini" />
                 <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item v-if="scope.row.status.id == 1">
+                  <el-dropdown-item
+                    v-if="scope.row.status.id == 1"
+                    @click.native="sendEcharge(scope.row.id)"
+                  >
                     <i class="el-icon-s-promotion"></i> Enviar cobro
                   </el-dropdown-item>
                   <el-dropdown-item
@@ -209,12 +224,17 @@
                       $router.push(`/echarges/edit?ref=${scope.row.id}`)
                     "
                     v-if="
-                      scope.row.origin == '09a5c668-ab54-441e-9fb2-d24b36ae202e'
+                      scope.row.origin ==
+                        '09a5c668-ab54-441e-9fb2-d24b36ae202e' &&
+                        scope.row.status.id != 4
                     "
                   >
                     <i class="el-icon-edit-outline"></i> Editar cobro
                   </el-dropdown-item>
-                  <el-dropdown-item v-if="scope.row.status.id == 2">
+                  <el-dropdown-item
+                    v-if="scope.row.status.id == 2"
+                    @click.native="sendEcharge(scope.row.id)"
+                  >
                     <i class="el-icon-s-promotion"></i>Reennviar cobro
                   </el-dropdown-item>
                   <!-- <el-dropdown-item>
@@ -224,15 +244,15 @@
                     :divided="true"
                     class="font-semibold"
                     @click.native="voidDocument(scope.row)"
-                    v-if="scope.row.active"
+                    v-if="scope.row.status.id != 4"
                   >
-                    <i class="el-icon-close"></i> Anular cobro
+                    <i class="el-icon-close"></i> Desactivar cobro
                   </el-dropdown-item>
                   <el-dropdown-item
                     :divided="true"
                     class="font-semibold"
                     @click.native="voidDocument(scope.row)"
-                    v-else
+                    v-if="scope.row.status.id == 4"
                   >
                     <i class="el-icon-check"></i> Activar cobro
                   </el-dropdown-item>
@@ -261,7 +281,7 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import { numeroALetras, calculatedAmount } from "../../tools";
+import { numeroALetras, calculatedAmount, parseErrors } from "../../tools";
 import jsPDF from "jspdf";
 export default {
   name: "EChargesIndex",
@@ -357,7 +377,11 @@ export default {
           this.echarges = res.data;
         })
         .catch((err) => {
-          this.errorMessage = err.response.data.message;
+          this.$notify.error({
+            title: "Error",
+            dangerouslyUseHTMLString: true,
+            message: parseErrors(err.response.data.message),
+          });
         })
         .then((alw) => (this.tableloading = false));
     },
@@ -368,7 +392,7 @@ export default {
       this.fetchEcharges();
     },
     voidDocument(charge) {
-      const activeAction = charge.active ? "anular" : "activar";
+      const activeAction = charge.status.id == 4 ? "activar" : "desactivar";
       this.$confirm(
         `¿Estás seguro que deseas ${activeAction} este cobro?`,
         "Confirmación",
@@ -382,7 +406,7 @@ export default {
               instance.confirmButtonText = "Procesando...";
               this.$axios
                 .put(`/echarges/status/${charge.id}`, {
-                  active: !charge.active,
+                  status: charge.status.id == 4 ? 2 : 4,
                 })
                 .then((res) => {
                   this.$notify.success({
@@ -408,6 +432,24 @@ export default {
           },
         }
       );
+    },
+
+    sendEcharge(id) {
+      this.$axios
+        .post(`/echarges/send/${id}`)
+        .then((res) => {
+          this.$notify.success({
+            title: "Éxito",
+            message: res.data.message,
+          });
+        })
+        .catch((err) => {
+          this.$notify.error({
+            title: "Error",
+            dangerouslyUseHTMLString: true,
+            message: parseErrors(err.response.data.message),
+          });
+        });
     },
   },
   computed: {

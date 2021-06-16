@@ -7,14 +7,22 @@
       { name: 'Nuevo cobro', to: null },
     ]"
   >
-    <el-form :model="eChargesNewForm" :rules="eChargesNewFormRules" status-icon>
+    <el-form
+      :model="eChargesNewForm"
+      :rules="eChargesNewFormRules"
+      status-icon
+      @submit.native.prevent="
+        submitNewEcharge('eChargesNewForm', eChargesNewForm)
+      "
+      ref="eChargesNewForm"
+    >
       <!-- firstRow -->
       <div class="grid grid-cols-12 gap-4">
         <!-- invoice -->
         <el-form-item
           class="col-span-3"
           label="Ventas"
-          prop="invoices"
+          prop="invoice"
           v-if="hasModule('cfb8addb-541b-482f-8fa1-dfe5db03fdf4')"
         >
           <el-select
@@ -83,7 +91,7 @@
         </div>
         <!-- authorization -->
         <div class="col-span-2 col-start-7">
-          <el-form-item label="N° de autorización">
+          <el-form-item label="N° de autorización" prop="authorization">
             <el-input
               v-model="eChargesNewForm.authorization"
               size="small"
@@ -150,22 +158,27 @@
           </el-form-item>
         </div>
       </div>
+      <div class="flex justify-end">
+        <el-button type="primary" size="small" native-type="submit"
+          >Guardar</el-button
+        >
+        <el-button size="small" @click="$router.push('/echarges')"
+          >Cancelar</el-button
+        >
+      </div>
     </el-form>
     <!-- boton guardar cancelar -->
-    <div class="flex justify-end">
-      <el-button type="primary" size="small" native-type="submit"
-        >Guardar</el-button
-      >
-      <el-button size="small" @click="$router.push('/echarges')"
-        >Cancelar</el-button
-      >
-    </div>
   </layout-content>
 </template>
 
 <script>
 import LayoutContent from "../../components/layout/Content";
-import { inputValidation, selectValidation, hasModule } from "../../tools";
+import {
+  inputValidation,
+  selectValidation,
+  hasModule,
+  parseErrors,
+} from "../../tools";
 import Notification from "../../components/Notification";
 
 export default {
@@ -203,6 +216,8 @@ export default {
         description: "",
         total: "",
         email: "",
+        authorization: "",
+        notify: "",
       },
       customers: [],
       rawInvoices: [],
@@ -223,7 +238,6 @@ export default {
       this.$axios
         .get(`/invoices/${id}`)
         .then(({ data }) => {
-          console.log(data);
           let description = "";
           for (const d of data.data.details) {
             description += `(${d.quantity}) - ${d.chargeDescription}\n`;
@@ -234,8 +248,99 @@ export default {
             2
           );
           this.eChargesNewForm.description = description;
+          this.eChargesNewForm.customer = data.data.customer.id;
         })
         .catch();
+    },
+    submitNewEcharge(formName, formData) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+        const save = () => {
+          this.$confirm(
+            "¿Estás seguro que deseas guardar este nuevo cobro?",
+            "Confirmación",
+            {
+              confirmButtonText: "Si, guardar",
+              cancelButtonText: "Cancelar",
+              type: "warning",
+              beforeClose: (action, instance, done) => {
+                if (action === "confirm") {
+                  instance.confirmButtonLoading = true;
+                  instance.confirmButtonText = "Procesando...";
+                  this.$axios
+                    .post("/echarges", {
+                      ...formData,
+                    })
+                    .then((res) => {
+                      this.$notify.success({
+                        title: "Exito",
+                        message: res.data.message,
+                      });
+                      // localStorage.removeItem(storagekey);
+                      setTimeout(() => {
+                        this.$confirm(
+                          "¿Deseas crear un nuevo cobro?",
+                          "Confirmación",
+                          {
+                            confirmButtonText: "Si, porfavor",
+                            cancelButtonText: "No, gracias",
+                            type: "warning",
+                            closeOnClickModal: false,
+                            closeOnPressEscape: false,
+                          }
+                        )
+                          .then(() => {
+                            this.$refs[formName].resetFields();
+                          })
+                          .catch(() => {
+                            this.$router.push("/echarges");
+                          });
+                      }, 1000);
+                    })
+                    .catch((err) => {
+                      instance.confirmButtonLoading = false;
+                      instance.confirmButtonText = "Si, guardar";
+                      this.$notify.error({
+                        title: "Error",
+                        dangerouslyUseHTMLString: true,
+                        message: parseErrors(err.response.data.message),
+                      });
+                    })
+                    .then((alw) => {
+                      instance.confirmButtonLoading = false;
+                      instance.confirmButtonText = "Si, guardar";
+                      done();
+                    });
+                } else {
+                  done();
+                }
+              },
+            }
+          );
+        };
+
+        this.$confirm("¿Deseas notificar este cobro?", "Confirmación", {
+          type: "warning",
+          distinguishCancelAndClose: true,
+          confirmButtonText: "Si, porfavor",
+          cancelButtonText: "No, gracias",
+        })
+          .then(() => {
+            formData.notify = true;
+
+            save();
+          })
+          .catch((action) => {
+            if (action === "cancel") {
+              formData.notify = false;
+              save();
+            } else {
+              return false;
+            }
+          });
+      });
     },
   },
   computed: {
