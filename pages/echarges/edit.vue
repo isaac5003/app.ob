@@ -11,6 +11,10 @@
       :model="eChargesEditForm"
       :rules="eChargesEditFormRules"
       status-icon
+      @submit.native.prevent="
+        submitEditEcharge('eChargesEditForm', eChargesEditForm)
+      "
+      ref="eChargesEditForm"
     >
       <!-- firstRow -->
       <div class="grid grid-cols-12 gap-4">
@@ -19,7 +23,10 @@
           class="col-span-3"
           label="Ventas"
           prop="invoices"
-          v-if="hasModule('cfb8addb-541b-482f-8fa1-dfe5db03fdf4')"
+          v-if="
+            hasModule('cfb8addb-541b-482f-8fa1-dfe5db03fdf4') &&
+              eChargesEditForm.origin != '09a5c668-ab54-441e-9fb2-d24b36ae202e'
+          "
         >
           <el-select
             v-model="eChargesEditForm.invoice"
@@ -154,22 +161,27 @@
           </el-form-item>
         </div>
       </div>
+      <!-- boton guardar cancelar -->
+      <div class="flex justify-end">
+        <el-button type="primary" size="small" native-type="submit"
+          >Guardar</el-button
+        >
+        <el-button size="small" @click="$router.push('/echarges')"
+          >Cancelar</el-button
+        >
+      </div>
     </el-form>
-    <!-- boton guardar cancelar -->
-    <div class="flex justify-end">
-      <el-button type="primary" size="small" native-type="submit"
-        >Guardar</el-button
-      >
-      <el-button size="small" @click="$router.push('/echarges')"
-        >Cancelar</el-button
-      >
-    </div>
   </layout-content>
 </template>
 
 <script>
 import LayoutContent from "../../components/layout/Content";
-import { inputValidation, selectValidation, hasModule } from "../../tools";
+import {
+  inputValidation,
+  selectValidation,
+  hasModule,
+  parseErrors,
+} from "../../tools";
 import Notification from "../../components/Notification";
 
 export default {
@@ -183,12 +195,15 @@ export default {
     };
 
     const invoices = () => this.$axios.get("/invoices");
+    const echarge = () => this.$axios.get(`/echarges/${this.$route.query.ref}`);
 
-    Promise.all([customers(), invoices()])
+    Promise.all([customers(), invoices(), echarge()])
       .then((res) => {
-        const [customers, invoices] = res;
-        this.customers = customers.data.customers;
+        const [customers, invoices, echarge] = res;
+        this.customers = customers.data.data;
         this.rawInvoices = invoices.data.data;
+        this.eChargesEditForm = echarge.data.data;
+        this.eChargesEditForm.customer = echarge.data.data.customer.id;
         this.loading = false;
       })
       .catch((err) => {
@@ -238,8 +253,62 @@ export default {
             data.data.ventaTotal
           ).toFixed(2);
           this.eChargesEditForm.description = description;
+          this.eChargesEditForm.customer = data.data.customer.id;
         })
         .catch();
+    },
+    submitEditEcharge(formName, formData) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+
+        this.$confirm(
+          "¿Estás seguro que deseas guardar este nuevo cobro?",
+          "Confirmación",
+          {
+            confirmButtonText: "Si, guardar",
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                this.$axios
+                  .put(`/echarges/${formData.id}`, {
+                    ...formData,
+                  })
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Exito",
+                      message: res.data.message,
+                    });
+                    // localStorage.removeItem(storagekey);
+                    setTimeout(() => {
+                      this.$router.push("/echarges");
+                    }, 300);
+                  })
+                  .catch((err) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = "Si, guardar";
+                    this.$notify.error({
+                      title: "Error",
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.message),
+                    });
+                  })
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = "Si, guardar";
+                    done();
+                  });
+              } else {
+                done();
+              }
+            },
+          }
+        );
+      });
     },
   },
   computed: {
