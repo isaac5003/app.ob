@@ -884,7 +884,6 @@
                       v-model="invoiceModel.charge_quantity.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.charge_quantity.show"
@@ -900,7 +899,6 @@
                       v-model="invoiceModel.charge_quantity.length"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.charge_quantity.show"
@@ -923,7 +921,6 @@
                       v-model="invoiceModel.charge_description.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.charge_description.show"
@@ -939,7 +936,6 @@
                       v-model="invoiceModel.charge_description.length"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.charge_description.show"
@@ -962,7 +958,6 @@
                       v-model="invoiceModel.price.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.price.show"
@@ -978,7 +973,6 @@
                       v-model="invoiceModel.price.length"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.price.show"
@@ -1003,7 +997,6 @@
                       v-model="invoiceModel.sujeto.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.sujeto.show"
@@ -1019,7 +1012,6 @@
                       v-model="invoiceModel.sujeto.length"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.sujeto.show"
@@ -1042,7 +1034,6 @@
                       v-model="invoiceModel.exento.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.exento.show"
@@ -1058,7 +1049,6 @@
                       v-model="invoiceModel.exento.length"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.exento.show"
@@ -1081,7 +1071,6 @@
                       v-model="invoiceModel.afecto.x"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.afecto.show"
@@ -1097,7 +1086,6 @@
                       v-model="invoiceModel.afecto.length"
                       controls-position="right"
                       :min="1"
-                      :max="10"
                       style="width: 90%"
                       size="small"
                       :disabled="!invoiceModel.afecto.show"
@@ -1170,7 +1158,6 @@
           </div>
           <div class="col-span-4">
             <el-checkbox v-model="invoiceModel.sum.show">Suma</el-checkbox>
-
             <div class="grid grid-cols-6">
               <div class="col-span-3">
                 <el-form-item label="Medida de X">
@@ -2408,6 +2395,7 @@
     </el-tabs>
   </layout-content>
 </template>
+
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
@@ -3458,7 +3446,6 @@ export default {
             totals.push(found);
           }
         }
-
         this.$confirm(
           "¿Estás seguro que deseas guardar la configuración?",
           "Confirmación",
@@ -3497,6 +3484,7 @@ export default {
                       title: "Exito",
                       message: res.data.message,
                     });
+                    this.closeDialog = false;
                   })
                   .catch((err) => {
                     instance.confirmButtonLoading = false;
@@ -3526,11 +3514,32 @@ export default {
         const layout = res.data.data;
         if (layout !== null) {
           const { header, details, totals } = layout;
+
+          this.invoiceModel.fontSizeHeader = layout.fontSizeHeader;
+          this.invoiceModel.fontSizeDetails = layout.fontSizeDetails;
+          this.invoiceModel.fontSizeTotals = layout.fontSizeTotals;
+
           for (const h of header) {
-            this.invoiceModel[h.value] = {
-              ...h,
-              show: true,
-            };
+            let value = {};
+            if (h.hasOwnProperty("position")) {
+              const x = h.position[0][0];
+              const y = h.position[0][1];
+              const length = h.lenght;
+              delete h.position;
+              value = {
+                ...h,
+                x,
+                y,
+                length,
+                show: true,
+              };
+            } else {
+              value = {
+                ...h,
+                show: true,
+              };
+            }
+            this.invoiceModel[h.value] = value;
           }
 
           const detailsFields = [
@@ -3546,31 +3555,52 @@ export default {
 
           for (const d of detailsFields) {
             if (details[d]) {
+              let value = {};
+              if (details[d].hasOwnProperty("position")) {
+                const x = details[d].position[0];
+                delete details[d].position;
+                value = {
+                  ...details[d],
+                  x,
+                  length: 10,
+                  show: true,
+                };
+              } else {
+                value = {
+                  ...details[d],
+                  show: true,
+                };
+              }
               this.invoiceModel[d] =
                 typeof details[d] == "object"
                   ? d == "quantity"
-                    ? (this.invoiceModel["charge_quantity"] = {
-                        ...details[d],
-                        show: true,
-                      })
+                    ? (this.invoiceModel["charge_quantity"] = value)
                     : d == "description"
-                    ? (this.invoiceModel["charge_description"] = {
-                        ...details[d],
-                        show: true,
-                      })
-                    : {
-                        ...details[d],
-                        show: true,
-                      }
+                    ? (this.invoiceModel["charge_description"] = value)
+                    : value
                   : details[d];
             }
           }
 
           for (const t of totals) {
-            this.invoiceModel[t.value] = {
-              ...t,
-              show: true,
-            };
+            let value = {};
+            if (t.hasOwnProperty("position")) {
+              const x = t.position[0];
+              const y = t.position[1];
+              delete t.position;
+              value = {
+                ...t,
+                x,
+                y,
+                show: true,
+              };
+            } else {
+              value = {
+                ...t,
+                show: true,
+              };
+            }
+            this.invoiceModel[t.value] = value;
           }
 
           this.pageloading = false;
@@ -3657,7 +3687,6 @@ export default {
         })
         .then((alw) => (this.pageloading = false));
     },
-
     hasModule(modules) {
       return hasModule(modules, this.$auth.user);
     },
