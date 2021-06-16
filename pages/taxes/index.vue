@@ -1,5 +1,6 @@
 <template>
   <layout-content
+    v-loading="loading"
     page-title="Listado de IVA"
     :breadcrumb="[
       { name: 'IVA', to: '/taxes' },
@@ -300,11 +301,11 @@
               size="small"
               filterable
               clearable
-              v-model="taxesForm.documentType"
+              v-model="taxesForm.registerType"
               @change="fetchTaxes"
             >
               <el-option
-                v-for="i in documentType"
+                v-for="i in registerType"
                 :key="i.id"
                 :label="i.name"
                 :value="i.id"
@@ -319,6 +320,7 @@
               clearable
               v-model="taxesForm.documentType"
               :disabled="taxesForm.registerType ? false : true"
+              @change="fetchTaxes"
               ><el-option
                 v-for="i in documentTypes"
                 :key="i.id"
@@ -341,35 +343,41 @@
       <el-table-column label="#" width="40" prop="index" />
       <el-table-column
         label="Fecha"
-        width="100"
+        width="90"
         prop="date"
         sortable="custom"
       ></el-table-column>
       <el-table-column
         label="Proveedor/cliente"
-        min-width="210"
+        min-width="190"
         prop="name"
         sortable="custom"
       ></el-table-column>
       <el-table-column
         label="N° autorización"
-        width="120"
+        width="140"
         prop="authorization"
         sortable="custom"
       ></el-table-column>
       <el-table-column
         label="Tipo de documento"
-        width="150"
+        width="165"
         prop="documentType"
         sortable="custom"
       ></el-table-column>
       <el-table-column
         label="Tipo de registro"
-        width="130"
+        width="140"
         prop="registerType"
         sortable="custom"
-      ></el-table-column>
-      <el-table-column label="IVA" width="70" prop="iva" sortable="custom">
+      >
+        <template slot-scope="scope">
+          <span>{{
+            scope.row.registerType == "invoices" ? "Venta" : "Compra"
+          }}</span>
+        </template></el-table-column
+      >
+      <el-table-column label="IVA" width="65" prop="iva" sortable="custom">
         <template slot-scope="scope">
           <span>{{ scope.row.iva | formatMoney }}</span>
         </template>
@@ -444,22 +452,19 @@ export default {
     const providers = () => {
       return this.$axios.get("/providers");
     };
-    const documentTypes = () => this.$axios.get("/invoices/document-types");
     const taxes = () => this.$axios.get("/taxes", { params: this.page });
-    Promise.all([customers(), providers(), taxes(), documentTypes()]).then(
-      (res) => {
-        const [customers, providers, taxes, documentTypes] = res;
-        this.customers = customers.data.data;
-        this.providers = providers.data.data;
-        this.taxesList = taxes.data;
-        this.documentType = documentTypes.data.data;
-        console.log(documentTypes.data.data);
-      }
-    );
+    Promise.all([customers(), providers(), taxes()]).then((res) => {
+      const [customers, providers, taxes] = res;
+      this.customers = customers.data.data;
+      this.providers = providers.data.data;
+      this.taxesList = taxes.data;
+      this.loading = false;
+    });
   },
   fetchOnServer: false,
   data() {
     return {
+      loading: true,
       page: {
         limit: 10,
         page: 1,
@@ -479,7 +484,26 @@ export default {
         prop: "",
         order: null,
       },
-      documentType: [],
+      documentTypes: [
+        {
+          id: 1,
+          name: "FCF - Consumidor Final",
+        },
+        {
+          id: 2,
+          name: "CFC - Crédito Fiscal",
+        },
+      ],
+      registerType: [
+        {
+          id: "purchases",
+          name: "Crédito Fiscal",
+        },
+        {
+          id: "invoices",
+          name: "Débito Fiscal",
+        },
+      ],
       taxesList: {
         data: [],
         count: 0,
@@ -534,18 +558,12 @@ export default {
           documentType: this.taxesForm.documentType,
         };
       }
-      /*  if (this.filterBy.squared != false) {
+      if (this.taxesForm.registerType != "") {
         params = {
           ...params,
-          squared: this.filterBy.squared,
+          registerType: this.taxesForm.registerType,
         };
-      } */
-      /*  if (this.filterBy.accounted != false) {
-        params = {
-          ...params,
-          accounted: this.filterBy.accounted,
-        };
-      } */
+      }
       if (this.taxesForm.order) {
         params = {
           ...params,
