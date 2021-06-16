@@ -35,7 +35,7 @@ export default {
       menu: [
         {
           name: "Nuevo cobro",
-          icon: getIcon("document-text"),
+          icon: getIcon("plus"),
           path: "/echarges/new",
         },
         {
