@@ -377,7 +377,7 @@
           }}</span>
         </template></el-table-column
       >
-      <el-table-column label="IVA" width="65" prop="iva" sortable="custom">
+      <el-table-column label="IVA" width="70" prop="iva" sortable="custom">
         <template slot-scope="scope">
           <span>{{ scope.row.iva | formatMoney }}</span>
         </template>
