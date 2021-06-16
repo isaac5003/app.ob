@@ -349,7 +349,7 @@
       ></el-table-column>
       <el-table-column
         label="Proveedor/cliente"
-        min-width="190"
+        min-width="180"
         prop="name"
         sortable="custom"
       ></el-table-column>
