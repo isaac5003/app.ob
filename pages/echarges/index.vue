@@ -21,6 +21,7 @@
               end-placeholder="Fecha final"
               format="dd/MM/yyyy"
               value-format="yyyy-MM-dd"
+              @change="fetchEcharges"
             />
           </el-form-item>
           <el-form-item label="Cliente:" class="col-span-4">
@@ -32,6 +33,7 @@
               filterable
               default-first-option
               placeholder="Seleccionar:"
+              @change="fetchEcharges"
             >
               <el-option label="Todos los clientes" value="" />
               <el-option-group key="ACTIVOS" label="ACTIVOS">
@@ -52,20 +54,22 @@
               </el-option-group>
             </el-select>
           </el-form-item>
-          <el-form-item label="Tipo de documento:" class="col-span-2">
+          <el-form-item label="Tipo de cobro:" class="col-span-2">
             <el-select
-              v-model="filter.documentType"
+              v-model="filter.echargeType"
               size="small"
               clearable
               placeholder="Seleccionar:"
               class="w-full"
+              @change="fetchEcharges"
             >
               <el-option label="Todos los tipos" value="" />
+              <el-option label="CE" value="CE" />
               <el-option
                 v-for="item in documentTypes"
                 :key="item.id"
-                :label="`${item.code} - ${item.name}`"
-                :value="item.id"
+                :label="item.code"
+                :value="item.code"
               />
             </el-select>
           </el-form-item>
@@ -76,6 +80,7 @@
               clearable
               placeholder="Seleccionar"
               class="w-full"
+              @change="fetchEcharges"
             >
               <el-option label="Todos los estados" value="" />
               <el-option
@@ -90,14 +95,17 @@
       </el-form>
       <div class="flex flex-col space-y-2">
         <el-table
-          :data="charges"
+          :data="echarges.data"
           stripe
-          size="mini"
+          size="small"
           v-loading="tableloading"
           ref="multipleTable"
           @selection-change="handleSelectionChange"
+          class="w-full"
+          @sort-change="sortBy"
         >
           <el-table-column type="selection" width="45" />
+          <el-table-column label="#" width="40" prop="index" />
           <el-table-column
             label="Correlativo"
             prop="sequence"
@@ -107,8 +115,8 @@
           </el-table-column>
           <el-table-column
             label="Tipo"
-            prop="documentType"
-            width="100"
+            prop="echargeType"
+            width="80"
             sortable="custom"
           >
           </el-table-column>
@@ -117,14 +125,25 @@
             prop="date"
             width="100"
             sortable="custom"
-          />
+          >
+            <template slot-scope="scope">
+              <span>{{
+                  $dateFns.format(scope.row.createdAt, "dd/MM/yyyy"),
+              }}</span>
+            </template></el-table-column
+          >
           <el-table-column
             label="Cliente"
             prop="customerName"
             min-width="275"
             sortable="custom"
           />
-          <el-table-column label="Estado" width="130" sortable="custom">
+          <el-table-column
+            label="Estado"
+            prop="status"
+            width="130"
+            sortable="custom"
+          >
             <template slot-scope="scope">
               <el-tag
                 size="small"
@@ -149,15 +168,20 @@
             width="80"
             align="right"
             sortable="custom"
+            prop="total"
           >
             <template slot-scope="scope">
               <span>{{ scope.row.total | formatMoney }}</span>
             </template>
           </el-table-column>
-          <el-table-column label width="110" align="center">
+          <el-table-column label width="90" align="center">
+            <!-- dropdpwn selecction -->
             <template slot="header" v-if="multipleSelection.length > 0">
               <el-dropdown trigger="click" szie="mini">
-                <el-button type="primary" size="mini">
+                <el-button type="primary" size="mini" class="group">
+                  <span class="hidden group-hover:inline">
+                    {{ multipleSelection.length }} Filas</span
+                  >
                   <i class="el-icon-more"></i>
                 </el-button>
                 <el-dropdown-menu slot="dropdown">
@@ -184,35 +208,51 @@
                     @click.native="
                       $router.push(`/echarges/edit?ref=${scope.row.id}`)
                     "
+                    v-if="
+                      scope.row.origin == '09a5c668-ab54-441e-9fb2-d24b36ae202e'
+                    "
                   >
-                    <i class="el-icon-edit-outline"></i> Editar cobros
+                    <i class="el-icon-edit-outline"></i> Editar cobro
                   </el-dropdown-item>
                   <el-dropdown-item v-if="scope.row.status.id == 2">
                     <i class="el-icon-s-promotion"></i>Reennviar cobro
                   </el-dropdown-item>
-                  <el-dropdown-item>
+                  <!-- <el-dropdown-item>
                     <i class="el-icon-tickets"></i> Bitacora de cobros
+                  </el-dropdown-item> -->
+                  <el-dropdown-item
+                    :divided="true"
+                    class="font-semibold"
+                    @click.native="voidDocument(scope.row)"
+                    v-if="scope.row.active"
+                  >
+                    <i class="el-icon-close"></i> Anular cobro
                   </el-dropdown-item>
-                  <el-dropdown-item :divided="true" class="font-semibold">
-                    <i class="el-icon-delete"></i> Eliminar cobro
+                  <el-dropdown-item
+                    :divided="true"
+                    class="font-semibold"
+                    @click.native="voidDocument(scope.row)"
+                    v-else
+                  >
+                    <i class="el-icon-check"></i> Activar cobro
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </template>
           </el-table-column>
         </el-table>
-        <!-- <div class="flex justify-end">
+        <div class="flex justify-end">
           <el-pagination
             @size-change="handleSizeChange"
-            @current-change="fetchInvoices"
+            @current-change="fetchEcharges"
             :current-page.sync="page.page"
             :page-sizes="[5, 10, 15, 25, 50, 100]"
             :page-size="page.size"
             layout="total, sizes, prev, pager, next"
-            :total="parseInt(invoices.count)"
+            :total="parseInt(echarges.count)"
             :pager-count="5"
           />
-        </div>  -->
+        </div>
       </div>
     </div>
   </layout-content>
@@ -229,12 +269,16 @@ export default {
   fetch() {
     const documentTypes = () => this.$axios.get("/invoices/document-types");
     const customers = () => this.$axios.get("/customers");
+    const echarges = () => this.$axios.get("/echarges");
+    const echargesStatuses = () => this.$axios.get("/echarges/status");
 
-    Promise.all([documentTypes(), customers()])
+    Promise.all([documentTypes(), customers(), echarges(), echargesStatuses()])
       .then((res) => {
-        const [documentTypes, customers] = res;
-        this.documentTypes = documentTypes.data;
+        const [documentTypes, customers, echarges, status] = res;
+        this.documentTypes = documentTypes.data.data;
         this.customers = customers.data.data;
+        this.echarges = echarges.data;
+        this.statuses = status.data.data;
         this.pageloading = false;
       })
       .catch((err) => {
@@ -256,40 +300,114 @@ export default {
       filter: {
         dateRange: "",
         customer: "",
-        documentType: "",
+        echargeType: "",
         service: "",
         status: "",
       },
-      charges: [
-        {
-          sequence: 1,
-          date: "03/02/2021",
-          documentType: "FCF",
-          customerName: "BRYAN STEVE AVALOS",
-          status: {
-            id: 1,
-            name: "Sin solicitar",
-          },
-          total: 2345.65,
-        },
-        {
-          sequence: 2,
-          date: "03/02/2021",
-          documentType: "FCF",
-          customerName: "BRYAN STEVE AVALOS",
-          status: {
-            id: 2,
-            name: "Solicitado",
-          },
-          total: 2345.65,
-        },
-      ],
+      echarges: { data: [], count: "" },
       multipleSelection: [],
+      page: {
+        page: 1,
+        limit: 10,
+      },
     };
   },
   methods: {
+    handleSizeChange(val) {
+      this.page.limit = val;
+      this.fetchEcharges();
+    },
+
     handleSelectionChange(val) {
       this.multipleSelection = val;
+    },
+
+    fetchEcharges() {
+      this.tableloading = true;
+      let params = this.page;
+      if (this.filter.status !== "") {
+        params = { ...params, status: this.filter.status };
+      }
+      // if (this.filter.searchValue != "") {
+      //   params = { ...params, search: this.filter.searchValue.toLowerCase() };
+      // }
+      if (this.filter.customer !== "") {
+        params = { ...params, customer: this.filter.customer };
+      }
+      if (this.filter.echargeType !== "") {
+        params = { ...params, echargesType: this.filter.echargeType };
+      }
+      if (this.filter.dateRange !== null) {
+        params = {
+          ...params,
+          startDate: this.filter.dateRange[0],
+          endDate: this.filter.dateRange[1],
+        };
+      }
+      if (this.filter.order) {
+        params = {
+          ...params,
+          prop: this.filter.prop,
+          order: this.filter.order,
+        };
+      }
+      this.$axios
+        .get("/echarges", { params })
+        .then((res) => {
+          this.echarges = res.data;
+        })
+        .catch((err) => {
+          this.errorMessage = err.response.data.message;
+        })
+        .then((alw) => (this.tableloading = false));
+    },
+
+    sortBy({ column, prop, order }) {
+      this.filter.prop = prop;
+      this.filter.order = order;
+      this.fetchEcharges();
+    },
+    voidDocument(charge) {
+      const activeAction = charge.active ? "anular" : "activar";
+      this.$confirm(
+        `¿Estás seguro que deseas ${activeAction} este cobro?`,
+        "Confirmación",
+        {
+          confirmButtonText: `Si, ${activeAction}`,
+          cancelButtonText: "Cancelar",
+          type: "warning",
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = "Procesando...";
+              this.$axios
+                .put(`/echarges/status/${charge.id}`, {
+                  active: !charge.active,
+                })
+                .then((res) => {
+                  this.$notify.success({
+                    title: "Éxito",
+                    message: res.data.message,
+                  });
+                  this.fetchEcharges();
+                })
+                .catch((err) => {
+                  this.$notify.error({
+                    title: "Error",
+                    dangerouslyUseHTMLString: true,
+                    message: parseErrors(err.response.data.message),
+                  });
+                })
+                .then((alw) => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = `Si, ${activeAction}`;
+                  done();
+                });
+            }
+            done();
+          },
+        }
+      );
     },
   },
   computed: {
