@@ -11,35 +11,67 @@
       <!-- firstRow -->
       <div class="grid grid-cols-12 gap-4">
         <!-- cliente -->
-        <div class="col-span-4">
-          <el-form-item label="Cliente" prop="customer">
-            <el-select
-              v-model="eChargesNewForm.customer"
-              class="w-full"
-              size="small"
-              clearable
-              placeholder="Seleccionar"
+        <!-- <el-form-item class="col-span-3" label="Cliente" prop="customer">
+          <el-select
+            v-model="eChargesNewForm.customer"
+            class="w-full"
+            size="small"
+            clearable
+            placeholder="Seleccionar"
+          >
+            <el-option
+              v-for="c in customers"
+              :key="c.is"
+              :label="c.name"
+              :value="c.id"
             >
-              <el-option
-                v-for="c in customers"
-                :key="c.is"
-                :label="c.name"
-                :value="c.id"
+            </el-option>
+          </el-select>
+        </el-form-item> -->
+        <el-form-item class="col-span-3" label="Ventas" prop="invoices">
+          <el-select
+            v-model="eChargesNewForm.invoices"
+            class="w-full"
+            size="small"
+            clearable
+            placeholder="Seleccionar"
+          >
+            <el-option
+              v-for="c in invoices"
+              :key="c.id"
+              :label="`${c.authorization} - ${c.sequence}`"
+              :value="c.id"
+            >
+              <div
+                class="
+                  flex flex-row
+                  justify-between
+                  items-end
+                  py-1
+                  leading-normal
+                "
               >
-              </el-option>
-            </el-select>
+                <span>{{ c.authorization }} - {{ c.sequence }}</span>
+                <span class="text-xs text-gray-500">{{ c.status.name }}</span>
+              </div>
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <!-- correo -->
+        <div class="col-span-3">
+          <el-form-item class="col-span-12" label="Introduzca el correo:">
+            <el-input
+              v-model="eChargesNewForm.email"
+              size="small"
+              class="w-full"
+              type="email"
+              placeholder="example@openbox.cloud"
+            ></el-input>
           </el-form-item>
         </div>
-        <!-- correo -->
-        <div class="col-span-4">
-          <el-form-item label="Correo" prop="email">
-            <el-input
-              clearable
-              type="text"
-              size="small"
-              placeholder=""
-              v-model="eChargesNewForm.email"
-            >
+        <div class="col-span-2 col-start-7">
+          <el-form-item label="N° de autorización">
+            <el-input size="small" placeholder="" :disabled="true" readonly>
             </el-input>
           </el-form-item>
         </div>
@@ -68,6 +100,7 @@
               autocomplete="off"
               :precision="2"
               style="width: 100%"
+              :disabled="true"
             >
             </el-input-number>
           </el-form-item>
@@ -86,6 +119,7 @@
               maxlength="500"
               minlength="5"
               show-word-limit
+              :disabled="true"
             >
             </el-input>
           </el-form-item>
@@ -106,7 +140,7 @@
 
 <script>
 import LayoutContent from "../../components/layout/Content";
-import { inputValidation, selectValidation } from "../../tools";
+import { inputValidation, selectValidation, hasModule } from "../../tools";
 import Notification from "../../components/Notification";
 
 export default {
@@ -118,16 +152,19 @@ export default {
         params: { active: true },
       });
     };
-    Promise.all([customers()])
+
+    const invoices = () => this.$axios.get("/invoices");
+
+    Promise.all([customers(), invoices()])
       .then((res) => {
-        const [customers] = res;
-
+        const [customers, invoices] = res;
         this.customers = customers.data.customers;
-
+        this.rawInvoices = invoices.data.data;
         this.loading = false;
       })
       .catch((err) => {
         this.errorMessage = err.response.data.message;
+        console.log(this.errorMessage);
       });
   },
   fetchOnServer: false,
@@ -136,12 +173,14 @@ export default {
       loading: false,
       eChargesNewForm: {
         customer: "",
+        invoices: "",
         sequence: "",
         description: "",
         total: "",
         email: "",
       },
       customers: [],
+      rawInvoices: [],
       eChargesNewFormRules: {
         customer: selectValidation(true),
         description: inputValidation(true, 5, 500),
@@ -175,6 +214,18 @@ export default {
         ],
       },
     };
+  },
+  methods: {
+    hasModule(module) {
+      return hasModule(module, this.$auth.user);
+    },
+  },
+  computed: {
+    invoices() {
+      return this.rawInvoices.filter(
+        (i) => i.status.d == 1 || i.status.id == 2
+      );
+    },
   },
 };
 </script>

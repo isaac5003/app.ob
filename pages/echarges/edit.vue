@@ -12,7 +12,7 @@
       <!-- firstRow -->
       <div class="grid grid-cols-12 gap-4">
         <!-- cliente -->
-        <div class="col-span-5">
+        <div class="col-span-4">
           <el-form-item label="Cliente" prop="customer">
             <el-select
               v-model="eChargesNewForm.customer"
@@ -31,7 +31,18 @@
             </el-select>
           </el-form-item>
         </div>
-
+        <div class="col-span-4">
+          <el-form-item label="Correo" prop="email">
+            <el-input
+              clearable
+              type="text"
+              size="small"
+              placeholder=""
+              v-model="eChargesNewForm.email"
+            >
+            </el-input>
+          </el-form-item>
+        </div>
         <!-- n° Correlativo -->
         <div class="col-span-2 col-start-9">
           <el-form-item label="N° de correlativo">
@@ -131,6 +142,7 @@ export default {
         total: "",
       },
       customers: [],
+
       eChargesNewFormRules: {
         customer: selectValidation(true),
         date: selectValidation(true),
