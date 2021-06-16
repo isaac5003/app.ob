@@ -143,6 +143,7 @@
             <el-date-picker
               style="width: 100%"
               size="small"
+              v-model="taxesForm.date"
               type="daterange"
               align="left"
               unlink-panels
@@ -152,7 +153,7 @@
               :editable="false"
               format="dd/MM/yyyy"
               value-format="yyyy-MM-dd"
-              v-model="taxesForm.date"
+              @change="fetchTaxes"
             />
           </el-form-item>
           <template>
@@ -165,6 +166,7 @@
                 filterable
                 default-first-option
                 placeholder="Todos los clientes:"
+                @change="fetchTaxes"
               >
                 <el-option label="Todos los clientes" value="" />
                 <el-option-group key="ACTIVOS" label="ACTIVOS">
@@ -232,6 +234,7 @@
               filterable
               clearable
               v-model="taxesForm.provider"
+              @change="fetchTaxes"
             >
               <el-option label="Todos los proveedores" value="" />
               <el-option-group key="ACTIVOS" label="ACTIVOS">
@@ -297,10 +300,11 @@
               size="small"
               filterable
               clearable
-              v-model="taxesForm.registerType"
+              v-model="taxesForm.documentType"
+              @change="fetchTaxes"
             >
               <el-option
-                v-for="i in registerTypes"
+                v-for="i in documentType"
                 :key="i.id"
                 :label="i.name"
                 :value="i.id"
@@ -326,36 +330,46 @@
       </el-form>
     </div>
     <el-table
+      @sort-change="sortBy"
+      :data="taxesList.data"
       stripe
       size="mini"
       ref="multipleTable"
-      :data="taxesList.data"
       @selection-change="selectionChange"
     >
       <el-table-column type="selection" width="50" />
       <el-table-column label="#" width="40" prop="index" />
-      <el-table-column label="Fecha" width="100" prop="date"></el-table-column>
+      <el-table-column
+        label="Fecha"
+        width="100"
+        prop="date"
+        sortable="custom"
+      ></el-table-column>
       <el-table-column
         label="Proveedor/cliente"
         min-width="210"
         prop="name"
+        sortable="custom"
       ></el-table-column>
       <el-table-column
         label="N° autorización"
         width="120"
         prop="authorization"
+        sortable="custom"
       ></el-table-column>
       <el-table-column
         label="Tipo de documento"
         width="150"
         prop="documentType"
+        sortable="custom"
       ></el-table-column>
       <el-table-column
         label="Tipo de registro"
         width="130"
         prop="registerType"
+        sortable="custom"
       ></el-table-column>
-      <el-table-column label="IVA" width="70" prop="iva">
+      <el-table-column label="IVA" width="70" prop="iva" sortable="custom">
         <template slot-scope="scope">
           <span>{{ scope.row.iva | formatMoney }}</span>
         </template>
@@ -403,6 +417,7 @@
     <div class="flex justify-end">
       <el-pagination
         @size-change="handleSizeChange"
+        @current-change="fetchTaxes"
         :current-page.sync="page.page"
         :page-sizes="[5, 10, 15, 25, 50, 100]"
         :page-size="page.size"
@@ -429,14 +444,18 @@ export default {
     const providers = () => {
       return this.$axios.get("/providers");
     };
+    const documentTypes = () => this.$axios.get("/invoices/document-types");
     const taxes = () => this.$axios.get("/taxes", { params: this.page });
-    Promise.all([customers(), providers(), taxes()]).then((res) => {
-      const [customers, providers, taxes] = res;
-      this.customers = customers.data.data;
-      this.providers = providers.data.data;
-      this.taxesList = taxes.data;
-      console.log(taxes.data.data);
-    });
+    Promise.all([customers(), providers(), taxes(), documentTypes()]).then(
+      (res) => {
+        const [customers, providers, taxes, documentTypes] = res;
+        this.customers = customers.data.data;
+        this.providers = providers.data.data;
+        this.taxesList = taxes.data;
+        this.documentType = documentTypes.data.data;
+        console.log(documentTypes.data.data);
+      }
+    );
   },
   fetchOnServer: false,
   data() {
@@ -457,39 +476,10 @@ export default {
         provider: "",
         registerType: "",
         documentType: "",
+        prop: "",
+        order: null,
       },
-      registerTypes: [
-        {
-          id: "1",
-          name: "Débito Fiscal",
-        },
-        {
-          id: "2",
-          name: "Cédito Fiscal",
-        },
-      ],
-      documentTypes: [
-        {
-          id: "1",
-          name: "Cédito Fiscal",
-        },
-        {
-          id: "2",
-          name: "Consumidor Final",
-        },
-        {
-          id: "3",
-          name: "Nota de Crédito",
-        },
-        {
-          id: "4",
-          name: "Factura de Exportación",
-        },
-        {
-          id: "5",
-          name: "Otros",
-        },
-      ],
+      documentType: [],
       taxesList: {
         data: [],
         count: 0,
@@ -513,44 +503,56 @@ export default {
     },
     fetchTaxes() {
       let params = this.page;
-      /* if (this.filterBy.dateRange !== null) {
+      if (this.taxesForm.date !== null) {
         params = {
           ...params,
-          startDate: this.filterBy.dateRange[0],
-          endDate: this.filterBy.dateRange[1],
+          startDate: this.taxesForm.date[0],
+          endDate: this.taxesForm.date[1],
         };
       }
-      if (this.filterBy.entryType != "") {
+      if (this.taxesForm.customer != "") {
         params = {
           ...params,
-          entryType: this.filterBy.entryType,
+          customer: this.taxesForm.customer,
         };
-      } */
+      }
+      if (this.taxesForm.provider != "") {
+        params = {
+          ...params,
+          customer: this.taxesForm.provider,
+        };
+      }
       if (this.taxesForm.search != "") {
         params = {
           ...params,
           search: this.taxesForm.search.toLowerCase(),
         };
       }
-      /* if (this.filterBy.squared != false) {
+      if (this.taxesForm.documentType != "") {
+        params = {
+          ...params,
+          documentType: this.taxesForm.documentType,
+        };
+      }
+      /*  if (this.filterBy.squared != false) {
         params = {
           ...params,
           squared: this.filterBy.squared,
         };
-      }
-      if (this.filterBy.accounted != false) {
+      } */
+      /*  if (this.filterBy.accounted != false) {
         params = {
           ...params,
           accounted: this.filterBy.accounted,
         };
-      }
-      if (this.filterBy.order) {
+      } */
+      if (this.taxesForm.order) {
         params = {
           ...params,
-          prop: this.filterBy.prop,
-          order: this.filterBy.order,
+          prop: this.taxesForm.prop,
+          order: this.taxesForm.order,
         };
-      } */
+      }
       this.$axios
         .get("/taxes/", { params })
         .then((res) => {
@@ -560,6 +562,11 @@ export default {
         .catch((err) => {
           this.errorMessage = err.response.data.message;
         });
+    },
+    sortBy({ column, prop, order }) {
+      this.taxesForm.prop = prop;
+      this.taxesForm.order = order;
+      this.fetchTaxes();
     },
     deleteTaxe(id) {
       this.$confirm(
