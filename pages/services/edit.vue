@@ -1,4 +1,4 @@
-<template>
+ <template>
   <layout-content
     v-loading="pageloading"
     page-title="Editar servicio"
@@ -43,6 +43,7 @@
                 minlength="5"
                 maxlength="60"
                 show-word-limit
+                @change="setStorage(servicesEditForm)"
               />
             </el-form-item>
             <el-form-item label="Costo" prop="cost" class="col-span-2">
@@ -55,6 +56,7 @@
                 size="small"
                 autocomplete="off"
                 style="width: 100%"
+                @change="setStorage(servicesEditForm)"
               />
             </el-form-item>
             <el-form-item label=" " prop="incRenta" class="col-span-2 mt-4">
@@ -77,6 +79,10 @@
                 ref="sellingType"
                 v-model="servicesEditForm.sellingType"
                 class="w-full"
+                @change="
+                  setStorage(servicesEditForm),
+                    changeIva(servicesEditForm.sellingType)
+                "
               >
                 <el-row :gutter="15">
                   <el-col :span="8" v-for="(s, k) in sellingTypes" :key="k">
@@ -97,6 +103,7 @@
                 class="w-full"
                 border
                 size="small"
+                :disabled="servicesEditForm.sellingType !== 3"
                 >Inc. IVA</el-checkbox
               >
             </el-form-item>
@@ -111,6 +118,7 @@
               maxlength="5000"
               show-word-limit
               class="mt-1"
+              @change="setStorage(servicesEditForm)"
             />
           </el-form-item>
         </el-tab-pane>
@@ -119,7 +127,7 @@
           label="Integraciones"
           name="integrations"
           class="space-y-2"
-           v-if="hasModule(['a98b98e6-b2d5-42a3-853d-9516f64eade8'])"
+          v-if="hasModule(['a98b98e6-b2d5-42a3-853d-9516f64eade8'])"
         >
           <Notification
             class="w-full"
@@ -173,7 +181,7 @@
 <script>
 import LayoutContent from "../../components/layout/Content";
 import Notification from "../../components/Notification";
-import {hasModule} from  "../../tools/index.js"
+import { hasModule, parseErrors } from "../../tools/index.js";
 import {
   checkBeforeEnter,
   checkBeforeLeave,
@@ -223,7 +231,7 @@ export default {
         this.errorMessage = err.response.data.message;
       })
       .then((alw) => (this.pageloading = false));
-    checkBeforeEnter(this, storagekey, "servicesNewForm");
+    checkBeforeEnter(this, storagekey, "servicesEditForm");
   },
   fetchOnServer: false,
   data() {
@@ -255,6 +263,9 @@ export default {
     };
   },
   methods: {
+    setStorage(servicesEditForm) {
+      localStorage.setItem(storagekey, JSON.stringify(servicesEditForm));
+    },
     findAccount(query) {
       if (query !== "") {
         this.loadingAccount = true;
@@ -328,12 +339,14 @@ export default {
                   .catch((err) => {
                     this.$notify.error({
                       title: "Error",
-                      message: err.response.data.message,
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
                     });
                   })
                   .then((alw) => {
                     instance.confirmButtonLoading = false;
                     instance.confirmButtonText = "Si, actualizar";
+                    localStorage.removeItem(storagekey);
                     done();
                   });
               } else {
@@ -353,6 +366,13 @@ export default {
     },
     hasModule(modules) {
       return hasModule(modules, this.$auth.user);
+    },
+    changeIva(sellingTypeValue) {
+      if (sellingTypeValue !== 3) {
+        this.servicesEditForm.incIva = false;
+      } else {
+        this.servicesEditForm.incIva = false;
+      }
     },
   },
 };
