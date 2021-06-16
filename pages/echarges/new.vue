@@ -10,31 +10,20 @@
     <el-form :model="eChargesNewForm" :rules="eChargesNewFormRules" status-icon>
       <!-- firstRow -->
       <div class="grid grid-cols-12 gap-4">
-        <!-- cliente -->
-        <!-- <el-form-item class="col-span-3" label="Cliente" prop="customer">
+        <!-- invoice -->
+        <el-form-item
+          class="col-span-3"
+          label="Ventas"
+          prop="invoices"
+          v-if="hasModule('cfb8addb-541b-482f-8fa1-dfe5db03fdf4')"
+        >
           <el-select
-            v-model="eChargesNewForm.customer"
+            v-model="eChargesNewForm.invoice"
             class="w-full"
             size="small"
             clearable
             placeholder="Seleccionar"
-          >
-            <el-option
-              v-for="c in customers"
-              :key="c.is"
-              :label="c.name"
-              :value="c.id"
-            >
-            </el-option>
-          </el-select>
-        </el-form-item> -->
-        <el-form-item class="col-span-3" label="Ventas" prop="invoices">
-          <el-select
-            v-model="eChargesNewForm.invoices"
-            class="w-full"
-            size="small"
-            clearable
-            placeholder="Seleccionar"
+            @change="getInvoiceDetails(eChargesNewForm.invoice)"
           >
             <el-option
               v-for="c in invoices"
@@ -57,33 +46,61 @@
             </el-option>
           </el-select>
         </el-form-item>
+        <!-- cliente -->
+        <el-form-item class="col-span-3" label="Cliente" prop="customer" v-else>
+          <el-select
+            v-model="eChargesNewForm.customer"
+            class="w-full"
+            size="small"
+            clearable
+            placeholder="Seleccionar"
+          >
+            <el-option
+              v-for="c in customers"
+              :key="c.is"
+              :label="c.name"
+              :value="c.id"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
         <!-- correo -->
         <div class="col-span-3">
-          <el-form-item class="col-span-12" label="Introduzca el correo:">
+          <el-form-item
+            class="col-span-12"
+            label="Introduzca el correo:"
+            prop="email"
+          >
             <el-input
               v-model="eChargesNewForm.email"
               size="small"
               class="w-full"
               type="email"
               placeholder="example@openbox.cloud"
+              clearable
             ></el-input>
           </el-form-item>
         </div>
+        <!-- authorization -->
         <div class="col-span-2 col-start-7">
           <el-form-item label="N° de autorización">
-            <el-input size="small" placeholder="" :disabled="true" readonly>
+            <el-input
+              v-model="eChargesNewForm.authorization"
+              size="small"
+              placeholder=""
+              :readonly="hasModule('cfb8addb-541b-482f-8fa1-dfe5db03fdf4')"
+            >
             </el-input>
           </el-form-item>
         </div>
         <!-- n° Correlativo -->
         <div class="col-span-2">
-          <el-form-item label="N° de correlativo">
+          <el-form-item label="N° de correlativo" prop="sequence">
             <el-input
               size="small"
               placeholder=""
               v-model="eChargesNewForm.sequence"
-              :disabled="true"
-              readonly
+              :readonly="hasModule('cfb8addb-541b-482f-8fa1-dfe5db03fdf4')"
             >
             </el-input>
           </el-form-item>
@@ -91,7 +108,16 @@
         <!-- total -->
         <div class="col-span-2">
           <el-form-item label="Total" prop="total">
+            <!-- invoice -->
+            <el-input
+              v-model="eChargesNewForm.total"
+              size="small"
+              style="width: 100%"
+              readonly
+              v-if="hasModule('cfb8addb-541b-482f-8fa1-dfe5db03fdf4')"
+            />
             <el-input-number
+              v-else
               type="number"
               :min="0"
               :step="0.01"
@@ -100,7 +126,6 @@
               autocomplete="off"
               :precision="2"
               style="width: 100%"
-              :disabled="true"
             >
             </el-input-number>
           </el-form-item>
@@ -119,7 +144,7 @@
               maxlength="500"
               minlength="5"
               show-word-limit
-              :disabled="true"
+              :readonly="hasModule('cfb8addb-541b-482f-8fa1-dfe5db03fdf4')"
             >
             </el-input>
           </el-form-item>
@@ -173,7 +198,7 @@ export default {
       loading: false,
       eChargesNewForm: {
         customer: "",
-        invoices: "",
+        invoice: "",
         sequence: "",
         description: "",
         total: "",
@@ -183,41 +208,34 @@ export default {
       rawInvoices: [],
       eChargesNewFormRules: {
         customer: selectValidation(true),
+        sequence: selectValidation(true),
         description: inputValidation(true, 5, 500),
         total: inputValidation(true),
-        email: inputValidation(false, null, null, "email"),
-      },
-      pickerOptions: {
-        shortcuts: [
-          {
-            text: "Ahora",
-            onClick(picker) {
-              picker.$emit("pick", new Date());
-            },
-          },
-          {
-            text: "Ayer",
-            onClick(picker) {
-              const date = new Date();
-              date.setTime(date.getTime() - 3600 * 1000 * 24);
-              picker.$emit("pick", date);
-            },
-          },
-          {
-            text: "Mañana",
-            onClick(picker) {
-              const date = new Date();
-              date.setTime(date.getTime() + 3600 * 1000 * 24);
-              picker.$emit("pick", date);
-            },
-          },
-        ],
+        email: inputValidation(true, null, null, "email"),
       },
     };
   },
   methods: {
     hasModule(module) {
       return hasModule(module, this.$auth.user);
+    },
+    getInvoiceDetails(id) {
+      this.$axios
+        .get(`/invoices/${id}`)
+        .then(({ data }) => {
+          console.log(data);
+          let description = "";
+          for (const d of data.data.details) {
+            description += `(${d.quantity}) - ${d.chargeDescription}\n`;
+          }
+          this.eChargesNewForm.authorization = data.data.authorization;
+          this.eChargesNewForm.sequence = data.data.sequence;
+          this.eChargesNewForm.total = parseFloat(data.data.ventaTotal).toFixed(
+            2
+          );
+          this.eChargesNewForm.description = description;
+        })
+        .catch();
     },
   },
   computed: {
