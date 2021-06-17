@@ -20,9 +20,9 @@
             <span class="text-gray-700 font-bold text-xs">Cliente</span>
             <span class="">
               {{
-                Object.keys(taxesPreview).length > 0
-                  ? taxesPreview.customer
-                    ? taxesPreview.customer.name
+                taxesPreview
+                  ? taxesPreview.entity
+                    ? taxesPreview.entity.name
                     : ""
                   : ""
               }}
@@ -32,9 +32,7 @@
             <span class="text-gray-700 font-bold text-xs">Fecha</span>
             <span class=""
               >{{
-                Object.keys(taxesPreview).length > 0
-                  ? taxesPreview.invoiceDate
-                  : ""
+                taxesPreview ? (taxesPreview.date ? taxesPreview.date : "") : ""
               }}
             </span>
           </div>
@@ -44,8 +42,10 @@
             >
             <span class="">
               {{
-                Object.keys(taxesPreview).length > 0
+                taxesPreview
                   ? taxesPreview.registerType
+                    ? taxesPreview.registerType
+                    : ""
                   : ""
               }}</span
             >
@@ -56,8 +56,8 @@
             >
             <span class="">
               {{
-                Object.keys(taxesPreview).length > 0
-                  ? taxes.Preview.documentType
+                taxesPreview
+                  ? taxesPreview.documentType
                     ? taxesPreview.documentType.name
                     : ""
                   : ""
@@ -70,8 +70,10 @@
             >
             <span class="">
               {{
-                Object.keys(taxesPreview).length > 0
+                taxesPreview
                   ? taxesPreview.authorization
+                    ? taxesPreview.authorization
+                    : ""
                   : ""
               }}</span
             >
@@ -83,8 +85,10 @@
             <span class="text-gray-700 font-bold text-xs">Correlativo</span>
             <span class="">
               {{
-                Object.keys(taxesPreview).length > 0
+                taxesPreview
                   ? taxesPreview.sequence
+                    ? taxesPreview.sequence
+                    : ""
                   : ""
               }}
             </span>
@@ -93,16 +97,22 @@
             <span class="text-gray-700 font-bold text-xs">IVA</span>
             <span class=""
               >{{
-                Object.keys(taxesPreview).length > 0 ? taxesPreview.iva : ""
+                (taxesPreview
+                  ? taxesPreview.iva
+                    ? taxesPreview.iva
+                    : ""
+                  : "") | formatMoney
               }}
             </span>
           </div>
           <div class="col-span-2 flex flex-col">
             <span class="text-gray-700 font-bold text-xs">Sub Total</span>
             <span class="">{{
-              Object.keys(taxesPreview).length > 0
-                ? `$ ${taxesPreview.subtotal}`
-                : ""
+              (taxesPreview
+                ? taxesPreview.subtotal
+                  ? taxesPreview.subtotal
+                  : ""
+                : "") | formatMoney
             }}</span>
           </div>
           <div class="col-span-2 flex flex-col">
@@ -113,9 +123,11 @@
             <span class="text-gray-700 font-bold text-xs">Total</span>
             <span class="">
               {{
-                Object.keys(taxesPreview).length > 0
-                  ? `$ ${taxesPreview.ventaTotal}`
-                  : ""
+                (taxesPreview
+                  ? taxesPreview.total
+                    ? taxesPreview.total
+                    : ""
+                  : "") | formatMoney
               }}</span
             >
           </div>
@@ -405,7 +417,7 @@
           <el-dropdown trigger="click" szie="mini">
             <el-button icon="el-icon-more" size="mini" />
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item @click.native="openPreviewEntry(scope.row.id)">
+              <el-dropdown-item @click.native="openPreviewTax(scope.row.id)">
                 <i class="el-icon-view"></i> Vista previa
               </el-dropdown-item>
               <el-dropdown-item
@@ -476,7 +488,7 @@ export default {
         page: 1,
       },
       showTaxePreview: false,
-      taxesPreview: {},
+      taxesPreview: "",
       selectionData: {},
       customers: [],
       providers: [],
@@ -521,11 +533,10 @@ export default {
       this.page.limit = val;
       //this.fetchEntries();
     },
-    async openPreviewEntry(id) {
-      console.log(id);
+    async openPreviewTax(id) {
       const { data } = await this.$axios.get(`/taxes/${id}`);
       this.taxesPreview = data.data;
-      console.log(this.taxesPreview);
+
       this.showTaxePreview = true;
     },
     selectionChange(selectionData) {

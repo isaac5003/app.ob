@@ -16,15 +16,6 @@ export default {
   },
   components: { LayoutSubmenu },
   fetch() {
-    console.log(
-      hasModule(
-        [
-          "cf5e4b29-f09c-438a-8d82-2ef482a9a461",
-          "cfb8addb-541b-482f-8fa1-dfe5db03fdf4",
-        ],
-        this.$auth.user
-      )
-    );
     if (
       hasModule(
         [
