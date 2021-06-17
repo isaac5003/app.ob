@@ -1,4 +1,4 @@
- <template>
+<template>
   <layout-content
     page-title="Nuevo registro"
     :breadcrumb="[
@@ -16,7 +16,7 @@
           <el-form-item
             label="Tipo de registro"
             class="col-span-3"
-            prop="typeRegister"
+            prop="registerType"
           >
             <el-select
               v-model="taxesNewForm.registerType"
@@ -24,6 +24,7 @@
               clearable
               filterable
               size="small"
+              @change="entity(taxesNewForm.registerType)"
             >
               <el-option
                 v-for="item in registerType"
@@ -56,19 +57,19 @@
           <el-form-item
             label="Cliente"
             class="col-span-5"
-            v-if="taxesNewForm.typeRegister != 'credifical'"
+            v-if="taxesNewForm.registerType != 'credifical'"
           >
             <el-select
               class="w-full"
               clearable
               filterable
               size="small"
-              v-model="taxesNewForm.customers"
+              v-model="taxesNewForm.entity"
             >
               <el-option label="Todos los clientes" value="" />
               <el-option-group key="ACTIVOS" label="ACTIVOS">
                 <el-option
-                  v-for="item in activeCustomers"
+                  v-for="item in activeEntity"
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"
@@ -95,7 +96,7 @@
               <el-option-group key="INACTIVOS" label="INACTIVOS">
                 <el-option
                   style="height: 50px"
-                  v-for="item in inactiveCustomers"
+                  v-for="item in inactiveEntity"
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"
@@ -186,10 +187,10 @@
             label="Subtotal"
             prop="subtotal"
             class="col-span-2"
-            v-if="taxesNewForm.subTotal != 'consuFinal'"
+            v-if="taxesNewForm.subtotal != 'invoices'"
           >
             <el-input-number
-              v-model="taxesNewForm.subTotal"
+              v-model="taxesNewForm.subtotal"
               :value="subTotal"
               type="number"
               :min="0.0"
@@ -206,7 +207,7 @@
             label="Iva retenido"
             prop="ivaRetenido"
             class="col-span-2"
-            v-if="taxesNewForm.typeRegister != 'credifical'"
+            v-if="taxesNewForm.registerType != 'purchases'"
           >
             <el-input-number
               v-model="taxesNewForm.ivaRetenido"
@@ -223,7 +224,7 @@
           </el-form-item>
           <el-form-item label="Total" class="col-span-2">
             <el-input-number
-              v-model="taxesNewForm.totals"
+              v-model="taxesNewForm.total"
               style="width: 100%"
               size="small"
               :minlength="0.01"
@@ -250,7 +251,7 @@
 
 <script>
 import LayoutContent from "../../components/layout/Content";
-import { parseErrors } from "../../tools";
+import { hasModule, parseErrors } from "../../tools";
 export default {
   name: "TaxesNew",
   head: {
@@ -262,10 +263,18 @@ export default {
     const providers = () => {
       return this.$axios.get("/providers");
     };
+    if (hasModule("cf5e4b29-f09c-438a-8d82-2ef482a9a461", this.$auth.user)) {
+      this.registerType = this.registerType.slice(1);
+    }
+    if (hasModule("cfb8addb-541b-482f-8fa1-dfe5db03fdf4", this.$auth.user)) {
+      this.registerType = this.registerType.slice(0, -1);
+    }
     Promise.all([customers(), providers()]).then((res) => {
       const [customers, providers] = res;
       this.customers = customers.data.data;
       this.providers = providers.data.data;
+      this.taxesNewForm.registerType = this.registerType[0].id;
+      this.entity(this.taxesNewForm.registerType);
     });
   },
   fetchOnServer: false,
@@ -279,9 +288,10 @@ export default {
         date: "",
         sum: "",
         iva: "",
-        subTotal: "",
+        subtotal: "",
         ivaRetenido: "",
-        totals: "",
+        total: "",
+        entity: "",
       },
       customers: [],
       providers: [],
@@ -331,6 +341,8 @@ export default {
           },
         ],
       },
+      inactiveEntity: [],
+      activeEntity: [],
     };
   },
   methods: {
@@ -353,19 +365,7 @@ export default {
                 instance.confirmButtonLoading = true;
                 instance.confirmButtonText = "Procesando...";
                 this.$axios
-                  .post("/taxes", {
-                    registerType: dataTaxe.registerType,
-                    documentType: dataTaxe.documentType,
-                    authorization: dataTaxe.authorization,
-                    sequence: dataTaxe.sequence,
-                    entity: dataTaxe.customers,
-                    date: dataTaxe.date,
-                    sum: dataTaxe.sum,
-                    iva: dataTaxe.iva,
-                    subtotal: dataTaxe.subTotal,
-                    ivaRetenido: dataTaxe.ivaRetenido,
-                    total: dataTaxe.totals,
-                  })
+                  .post("/taxes", { ...dataTaxe })
                   .then((res) => {
                     this.$notify.success({
                       title: "Exito",
@@ -411,21 +411,18 @@ export default {
         );
       });
     },
+    entity(registerType) {
+      if (registerType == "invoices") {
+        this.activeEntity = this.customers.filter((c) => c.isActiveCustomer);
+        this.inactiveEntity = this.customers.filter((c) => !c.isActiveCustomer);
+      } else if (registerType == "purchases") {
+        this.activeEntity = this.providers.filter((c) => c.isActiveCustomer);
+        this.inactiveEntity = this.providers.filter((c) => !c.isActiveCustomer);
+      }
+    },
   },
 
   computed: {
-    activeCustomers() {
-      return this.customers.filter((c) => c.isActiveCustomer);
-    },
-    inactiveCustomers() {
-      return this.customers.filter((c) => !c.isActiveCustomer);
-    },
-    activeProviders() {
-      return this.providers.filter((c) => c.isActiveProvider);
-    },
-    inactiveProviders() {
-      return this.providers.filter((c) => !c.isActiveProvider);
-    },
     taxes() {
       const taxes = this.taxesNewForm.sum * 0.13;
       this.taxesNewForm.iva = this.taxesNewForm.sum * 0.13;
@@ -433,19 +430,19 @@ export default {
     },
     taxesDetained() {
       const taxesDetained =
-        this.taxesNewForm.subTotal - this.taxesNewForm.ivaRetenido;
+        this.taxesNewForm.subtotal - this.taxesNewForm.ivaRetenido;
       return taxesDetained;
     },
     subTotal() {
       const subtotal = this.taxes + this.taxesNewForm.sum;
-      this.taxesNewForm.subTotal = this.taxes + this.taxesNewForm.sum;
+      this.taxesNewForm.subtotal = this.taxes + this.taxesNewForm.sum;
       return subtotal;
     },
     totals() {
       const totals = this.subTotal;
       const totalDetained = this.taxesDetained;
-      this.taxesNewForm.totals = this.subTotal;
-      this.taxesNewForm.totals = this.taxesDetained;
+      this.taxesNewForm.total = this.subTotal;
+      this.taxesNewForm.total = this.taxesDetained;
       return totals, totalDetained;
     },
   },

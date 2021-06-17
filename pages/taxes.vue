@@ -7,7 +7,7 @@
 
 <script>
 import LayoutSubmenu from "../components/layout/Submenu";
-import { getIcon } from "../tools";
+import { getIcon, hasModule } from "../tools";
 export default {
   name: "IVA",
   middleware: "access",
@@ -15,14 +15,35 @@ export default {
     id: "53a36e54-bab2-4824-9e43-b40efab8bab9",
   },
   components: { LayoutSubmenu },
+  fetch() {
+    console.log(
+      hasModule(
+        [
+          "cf5e4b29-f09c-438a-8d82-2ef482a9a461",
+          "cfb8addb-541b-482f-8fa1-dfe5db03fdf4",
+        ],
+        this.$auth.user
+      )
+    );
+    if (
+      hasModule(
+        [
+          "cf5e4b29-f09c-438a-8d82-2ef482a9a461",
+          "cfb8addb-541b-482f-8fa1-dfe5db03fdf4",
+        ],
+        this.$auth.user
+      )
+    ) {
+      this.menu = this.menu.slice(1);
+    }
+  },
   data() {
     return {
       menu: [
-            {
+        {
           name: "Nuevo registro",
           icon: getIcon("plus"),
           path: "/taxes/new",
-         
         },
         {
           name: "Listado de IVA",
@@ -34,7 +55,7 @@ export default {
         //   name: "Reportes",
         //   icon: getIcon("document-text"),
         //   path: "/taxes/reports",
-        // }, 
+        // },
       ],
     };
   },

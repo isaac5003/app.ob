@@ -21,7 +21,9 @@
             <span class="">
               {{
                 Object.keys(taxesPreview).length > 0
-                  ? taxesPreview.customer.name
+                  ? taxesPreview.customer
+                    ? taxesPreview.customer.name
+                    : ""
                   : ""
               }}
             </span>
@@ -55,7 +57,9 @@
             <span class="">
               {{
                 Object.keys(taxesPreview).length > 0
-                  ? taxesPreview.documentType.name
+                  ? taxes.Preview.documentType
+                    ? taxesPreview.documentType.name
+                    : ""
                   : ""
               }}</span
             >
