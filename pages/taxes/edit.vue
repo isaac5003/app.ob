@@ -1,4 +1,3 @@
-code 
 <template>
   <layout-content
     page-title="Editar registro"
@@ -8,24 +7,26 @@ code
     ]"
   >
     <div class="flex flex-col space-y-2">
-      <el-form label-position="top" :model="taxesEditForm" ref="taxesEditForm">
+      <el-form
+        :model="taxesEditForm"
+        ref="taxesEditForm"
+        @submit.prevent.native="newTaxe('taxesEditForm', taxesEditForm)"
+      >
         <div class="grid grid-cols-12 gap-4">
           <el-form-item
             label="Tipo de registro"
             class="col-span-3"
-            prop="typeRegister"
+            prop="registerType"
           >
             <el-select
-              v-model="taxesEditForm.typeRegister"
+              v-model="taxesEditForm.registerType"
               class="w-full"
               clearable
               filterable
               size="small"
-              :disabled="true"
             >
-              <el-option label="Tipo de registro" value="" />
               <el-option
-                v-for="item in filetype"
+                v-for="item in registerType"
                 :key="item.id"
                 :label="item.name"
                 :value="item.id"
@@ -33,63 +34,25 @@ code
               </el-option>
             </el-select>
           </el-form-item>
-
-          <el-form-item
-            label="Tipo de documento"
-            class="col-span-3"
-            prop="typeDocument1"
-            v-if="taxesEditForm.typeRegister != 'credifical'"
-          >
+          <el-form-item label="Tipo de documento" class="col-span-3">
             <el-select
-              v-model="taxesEditForm.typeDocument1"
-              class="w-full"
-              clearable
-              filterable
-              size="small"
-              :disabled="true"
-            >
-              <el-option label="Tipo de documento" value="" />
-              <el-option
-                v-for="item in filetype1"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-              >
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="Tipo de documento" class="col-span-3" v-else>
-            <el-select
-              v-model="taxesEditForm.typeDocument2"
+              v-model="taxesEditForm.documentType"
               class="w-full"
               clearable
               filterable
               size="small"
             >
               <el-option
-                v-for="item in filetype2"
+                v-for="item in documentTypes"
                 :key="item.id"
                 :label="item.name"
                 :value="item.id"
               >
               </el-option>
             </el-select>
-          </el-form-item>
-          <el-form-item
-            class="col-span-3 col-start-10"
-            prop="dateRange"
-            label="Fecha de ingreso del registro"
-          >
-            <el-date-picker
-              type="month"
-              format="MMMM yyyy"
-              placeholder="Selecciona un mes"
-              size="small"
-              style="width: 100%"
-            />
           </el-form-item>
         </div>
-        <div class="class grid grid-cols-12 gap-4">
+        <div class="grid grid-cols-12 gap-4">
           <el-form-item
             label="Cliente"
             class="col-span-5"
@@ -101,7 +64,6 @@ code
               filterable
               size="small"
               v-model="taxesEditForm.customers"
-              :disabled="taxesEditForm.typeRegister ? false : true"
             >
               <el-option label="Todos los clientes" value="" />
               <el-option-group key="ACTIVOS" label="ACTIVOS">
@@ -228,25 +190,35 @@ code
             label="Fecha de emisión del documento"
           >
             <el-date-picker
-              type="month"
-              format="MMMM yyyy"
-              placeholder="Selecciona un mes"
+              v-model="taxesEditForm.date"
               size="small"
+              class="w-full"
+              type="date"
+              placeholder="Selecciona un mes"
+              :picker-options="pickerOptions"
               style="width: 100%"
+              format="yyyy-MM-dd"
             />
           </el-form-item>
           <el-form-item label="N° de autorización" class="col-span-2">
-            <el-input size="small" placeholder="000000" readonly> </el-input>
+            <el-input
+              placeholder="000000"
+              v-model="taxesEditForm.authorization"
+              size="small"
+            ></el-input>
           </el-form-item>
           <el-form-item label="N° de correlativo" class="col-span-2">
-            <el-input size="small" placeholder="000000" readonly> </el-input>
+            <el-input
+              placeholder="000000"
+              v-model="taxesEditForm.sequence"
+              size="small"
+            ></el-input>
           </el-form-item>
         </div>
-
         <div class="grid grid-cols-12 gap-4">
           <el-form-item label="Sumas" class="col-span-2" prop="sumas">
             <el-input-number
-              v-model="taxesEditForm.sumas"
+              v-model="taxesEditForm.sum"
               type="number"
               :min="0.0"
               :step="0.01"
@@ -295,12 +267,12 @@ code
           </el-form-item>
           <el-form-item
             label="Iva retenido"
-            prop="ivaDetained"
+            prop="ivaRetenido"
             class="col-span-2"
             v-if="taxesEditForm.typeRegister != 'credifical'"
           >
             <el-input-number
-              v-model="taxesEditForm.ivaDetained"
+              v-model="taxesEditForm.ivaRetenido"
               :value="taxesDetained"
               type="number"
               :min="0.0"
@@ -313,15 +285,17 @@ code
             </el-input-number>
           </el-form-item>
           <el-form-item label="Total" class="col-span-2">
-            <el-input
+            <el-input-number
               v-model="taxesEditForm.totals"
               style="width: 100%"
               size="small"
               :minlength="0.01"
+              :step="0.01"
               :disabled="true"
               :value="totals"
+              :precision="2"
             >
-            </el-input>
+            </el-input-number>
           </el-form-item>
         </div>
         <div class="flex flex-row justify-end">
@@ -349,7 +323,7 @@ import {
 export default {
   name: "TaxesEdit",
   head: {
-    titleTemplate: `%s | Nuevo registro`,
+    titleTemplate: `%s | Editar registro`,
   },
   components: { LayoutContent },
   fetch() {
@@ -357,43 +331,61 @@ export default {
     const providers = () => {
       return this.$axios.get("/providers");
     };
-    Promise.all([customers(), providers()]).then((res) => {
-      const [customers, providers] = res;
+    const tax = () => {
+      return this.$axios.get(`/taxes/${this.$route.query.ref}`);
+    };
+    Promise.all([customers(), providers(), tax()]).then((res) => {
+      const [customers, providers, tax] = res;
       this.customers = customers.data.data;
       this.providers = providers.data.data;
+      this.taxesEditForm = {
+        ...tax.data.data,
+        customer: tax.data.customer.id,
+        iva: tax.data.iva,
+        date: tax.data.invoiceDate
+          ? tax.data.invoiceDate
+          : tax.data.purchaseDate,
+      };
     });
   },
   fetchOnServer: false,
   data() {
     return {
       taxesEditForm: {
-        typeRegister: "",
-        typeDocument1: "",
-        typeDocument2: "",
-        sumas: "",
+        authorization: "",
+        customer: "",
+        provider: "",
+        documentType: "",
+        date: "",
         iva: "",
-        subTotal: "",
-        ivaDetained: "",
-        providers: "",
-        totals: "",
+        subtotal: "",
+        registerType: "",
+        sequence: "",
+        ventaTotal: "",
+        compraTotal: "",
       },
       customers: [],
       providers: [],
 
-      filetype: [
-        { name: "Débito Fiscal", id: "deviFilcal" },
-        { name: "Credito fiscal", id: "credifical" },
+      documentTypes: [
+        {
+          id: 1,
+          name: "FCF - Consumidor Final",
+        },
+        {
+          id: 2,
+          name: "CFC - Crédito Fiscal",
+        },
       ],
-      filetype1: [
-        { name: "Credito fiscal", id: "crediFilcal" },
-        { name: "Consumidor final", id: "consuiFinal" },
-        { name: "Nota de debito", id: "notadevi" },
-        { name: "Factura de exportación", id: "factExport" },
-      ],
-      filetype2: [
-        { name: "Credito fiscal", id: "crediFilcal1" },
-        { name: "Consumidor final", id: "consuFinal" },
-        { name: "Otros", id: "others" },
+      registerType: [
+        {
+          id: "purchases",
+          name: "Crédito Fiscal",
+        },
+        {
+          id: "invoices",
+          name: "Débito Fiscal",
+        },
       ],
     };
   },
@@ -412,20 +404,19 @@ export default {
     inactiveProviders() {
       return this.providers.filter((c) => !c.isActiveProvider);
     },
-
     taxes() {
-      const taxes = this.taxesEditForm.sumas * 0.13;
-      this.taxesEditForm.iva = this.taxesEditForm.sumas * 0.13;
+      const taxes = this.taxesEditForm.sum * 0.13;
+      this.taxesEditForm.iva = this.taxesEditForm.sum * 0.13;
       return taxes;
     },
     taxesDetained() {
       const taxesDetained =
-        this.taxesEditForm.subTotal - this.taxesEditForm.ivaDetained;
+        this.taxesEditForm.subTotal - this.taxesEditForm.ivaRetenido;
       return taxesDetained;
     },
     subTotal() {
-      const subtotal = this.taxes + this.taxesEditForm.sumas;
-      this.taxesEditForm.subTotal = this.taxes + this.taxesEditForm.sumas;
+      const subtotal = this.taxes + this.taxesEditForm.sum;
+      this.taxesEditForm.subTotal = this.taxes + this.taxesEditForm.sum;
       return subtotal;
     },
     totals() {
