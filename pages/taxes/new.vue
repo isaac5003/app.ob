@@ -25,7 +25,7 @@
               clearable
               filterable
               size="small"
-              @change="entity(taxesNewForm.registerType)"
+              @change="entity('taxesNewForm', taxesNewForm.registerType)"
             >
               <el-option
                 v-for="item in registerType"
@@ -298,7 +298,7 @@ export default {
         this.providers = providers.data.data;
         this.taxesNewForm.registerType = this.registerType[0].id;
         this.invoiceDocumentTypes = invoiceDocTypes.data.data;
-        this.entity(this.taxesNewForm.registerType);
+        this.entity("taxesNewForm", this.taxesNewForm.registerType);
       }
     );
   },
@@ -321,7 +321,7 @@ export default {
       taxesNewFormRules: {
         registerType: selectValidation(true),
         documentType: selectValidation(true),
-        authorization: inputValidation,
+        authorization: inputValidation(true),
         sequence: inputValidation(true),
         date: selectValidation(true),
         sum: amountValidate(true),
@@ -444,15 +444,21 @@ export default {
         );
       });
     },
-    entity(registerType) {
+    entity(formName, registerType) {
       if (registerType == "invoices") {
         this.activeEntity = this.customers.filter((c) => c.isActiveCustomer);
         this.inactiveEntity = this.customers.filter((c) => !c.isActiveCustomer);
-        this.documentType = this.invoiceDocumentTypes;
+        this.documentTypes = this.invoiceDocumentTypes;
+        this.$refs[formName].fields
+          .find((f) => f.prop == "documentType")
+          .resetField();
       } else if (registerType == "purchases") {
         this.activeEntity = this.providers.filter((c) => c.isActiveCustomer);
         this.inactiveEntity = this.providers.filter((c) => !c.isActiveCustomer);
         this.documentTypes = this.purchasesDocumentTypes;
+        this.$refs[formName].fields
+          .find((f) => f.prop == "documentType")
+          .resetField();
       }
     },
   },

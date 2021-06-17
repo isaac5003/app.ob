@@ -21,9 +21,9 @@
             <span class="">
               {{
                 taxesPreview
-                  ? taxesPreview.entity
-                    ? taxesPreview.entity.name
-                    : ""
+                  ? taxesPreview.provider
+                    ? taxesPreview.provider.name
+                    : taxesPreview.customer.name
                   : ""
               }}
             </span>
@@ -32,7 +32,11 @@
             <span class="text-gray-700 font-bold text-xs">Fecha</span>
             <span class=""
               >{{
-                taxesPreview ? (taxesPreview.date ? taxesPreview.date : "") : ""
+                taxesPreview
+                  ? taxesPreview.provider
+                    ? taxesPreview.purchaseDate
+                    : taxesPreview.invoiceDate
+                  : ""
               }}
             </span>
           </div>
@@ -97,11 +101,8 @@
             <span class="text-gray-700 font-bold text-xs">IVA</span>
             <span class=""
               >{{
-                (taxesPreview
-                  ? taxesPreview.iva
-                    ? taxesPreview.iva
-                    : ""
-                  : "") | formatMoney
+                (taxesPreview ? (taxesPreview.iva ? taxesPreview.iva : "") : "")
+                  | formatMoney
               }}
             </span>
           </div>
@@ -318,7 +319,8 @@
               filterable
               clearable
               v-model="taxesForm.registerType"
-              @change="fetchTaxes"
+              ref="taxesForm"
+              @change="entity('taxesForm', taxesForm.registerType)"
             >
               <el-option
                 v-for="i in registerType"
@@ -328,7 +330,11 @@
               />
             </el-select>
           </el-form-item>
-          <el-form-item label="Tipo de documento:" class="col-span-3">
+          <el-form-item
+            label="Tipo de documento:"
+            class="col-span-3"
+            prop="documentType"
+          >
             <el-select
               class="w-full"
               size="small"
@@ -340,7 +346,7 @@
               ><el-option
                 v-for="i in documentTypes"
                 :key="i.id"
-                :label="i.name"
+                :label="`${i.code} - ${i.name}`"
                 :value="i.id"
             /></el-select>
           </el-form-item>
@@ -407,7 +413,7 @@
             /></el-button>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item class="font-semibold">
-                <i class="el-icon-delete"></i> Eliminar
+                <i class="el-icon-delete"></i> Eliminar IVA
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -421,9 +427,12 @@
                 <i class="el-icon-view"></i> Vista previa
               </el-dropdown-item>
               <el-dropdown-item
+                v-if="
+                  scope.row.origin == '53a36e54-bab2-4824-9e43-b40efab8bab9'
+                "
                 @click.native="$router.push(`/taxes/edit?ref=${scope.row.id}`)"
               >
-                <i class="el-icon-edit-outline"></i> Editar
+                <i class="el-icon-edit-outline"></i> Editar IVA
               </el-dropdown-item>
               <el-dropdown-item
                 v-if="
@@ -433,7 +442,7 @@
                 class="text-red-500 font-semibold"
                 @click.native="deleteTaxe(scope.row.id)"
               >
-                <i class="el-icon-delete"></i> Eliminar
+                <i class="el-icon-delete"></i> Eliminar IVA
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -471,11 +480,19 @@ export default {
       return this.$axios.get("/providers");
     };
     const taxes = () => this.$axios.get("/taxes", { params: this.page });
-    Promise.all([customers(), providers(), taxes()]).then((res) => {
-      const [customers, providers, taxes] = res;
+    const invoiceDocumentTypes = () =>
+      this.$axios.get("/invoices/document-types");
+    Promise.all([
+      customers(),
+      providers(),
+      taxes(),
+      invoiceDocumentTypes(),
+    ]).then((res) => {
+      const [customers, providers, taxes, invoiceDocTypes] = res;
       this.customers = customers.data.data;
       this.providers = providers.data.data;
       this.taxesList = taxes.data;
+      this.invoiceDocumentTypes = invoiceDocTypes.data.data;
       this.loading = false;
     });
   },
@@ -502,16 +519,12 @@ export default {
         prop: "",
         order: null,
       },
-      documentTypes: [
-        {
-          id: 1,
-          name: "FCF - Consumidor Final",
-        },
-        {
-          id: 2,
-          name: "CFC - Crédito Fiscal",
-        },
-      ],
+      invoiceDocumentTypes: [],
+      documentTypes: [],
+      taxesList: {
+        data: [],
+        count: 0,
+      },
       registerType: [
         {
           id: "purchases",
@@ -522,10 +535,13 @@ export default {
           name: "Débito Fiscal",
         },
       ],
-      taxesList: {
-        data: [],
-        count: 0,
-      },
+      purchasesDocumentTypes: [
+        {
+          id: 1,
+          name: "Nacional",
+          code: "N",
+        },
+      ],
     };
   },
   methods: {
@@ -536,7 +552,7 @@ export default {
     async openPreviewTax(id) {
       const { data } = await this.$axios.get(`/taxes/${id}`);
       this.taxesPreview = data.data;
-
+      console.log(this.taxesPreview);
       this.showTaxePreview = true;
     },
     selectionChange(selectionData) {
@@ -641,6 +657,19 @@ export default {
           },
         }
       );
+    },
+    entity(formName, registerType) {
+      if (registerType == "invoices") {
+        this.documentTypes = this.invoiceDocumentTypes;
+        this.$refs[formName].fields
+          .find((f) => f.prop == "documentType")
+          .resetField();
+      } else if (registerType == "purchases") {
+        this.documentTypes = this.purchasesDocumentTypes;
+        this.$refs[formName].fields
+          .find((f) => f.prop == "documentType")
+          .resetField();
+      }
     },
   },
   computed: {
