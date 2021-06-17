@@ -121,70 +121,6 @@
               </el-option-group>
             </el-select>
           </el-form-item>
-          <el-form-item label="Proveedores:" class="col-span-5" v-else>
-            <el-select
-              class="w-full"
-              size="small"
-              filterable
-              clearable
-              v-model="taxesNewForm.providers"
-            >
-              <el-option label="Todos los proveedores" value="" />
-              <el-option-group key="ACTIVOS" label="ACTIVOS">
-                <el-option
-                  v-for="item in activeProviders"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                >
-                  <div
-                    class="
-                      flex flex-row
-                      justify-between
-                      items-end
-                      py-1
-                      leading-normal
-                    "
-                  >
-                    <div class="flex flex-col">
-                      <span class="text-xs text-gray-500">{{
-                        item.shortName
-                      }}</span>
-                      <span>{{ item.name }}</span>
-                    </div>
-                    <span class="text-xs text-gray-500">{{ item.nrc }}</span>
-                  </div>
-                </el-option>
-              </el-option-group>
-              <el-option-group key="INACTIVOS" label="INACTIVOS">
-                <el-option
-                  style="height: 50px"
-                  v-for="item in inactiveProviders"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                >
-                  <div
-                    class="
-                      flex flex-row
-                      justify-between
-                      items-end
-                      py-1
-                      leading-normal
-                    "
-                  >
-                    <div class="flex flex-col">
-                      <span class="text-xs text-gray-500">{{
-                        item.shortName
-                      }}</span>
-                      <span>{{ item.name }}</span>
-                    </div>
-                    <span class="text-xs text-gray-500">{{ item.nrc }}</span>
-                  </div>
-                </el-option>
-              </el-option-group>
-            </el-select>
-          </el-form-item>
           <el-form-item
             class="col-span-3"
             label="Fecha de emisión del documento"
@@ -198,6 +134,7 @@
               :picker-options="pickerOptions"
               style="width: 100%"
               format="yyyy-MM-dd"
+              value-format="yyyy-MM-dd"
             />
           </el-form-item>
           <el-form-item label="N° de autorización" class="col-span-2">
@@ -313,13 +250,7 @@
 
 <script>
 import LayoutContent from "../../components/layout/Content";
-import {
-  checkBeforeEnter,
-  checkBeforeLeave,
-  inputValidation,
-  selectValidation,
-} from "../../tools";
-
+import { parseErrors } from "../../tools";
 export default {
   name: "TaxesNew",
   head: {
@@ -343,15 +274,14 @@ export default {
       taxesNewForm: {
         registerType: "",
         documentType: "",
+        authorization: "",
+        sequence: "",
         date: "",
         sum: "",
         iva: "",
         subTotal: "",
         ivaRetenido: "",
-        providers: "",
         totals: "",
-        authorization: "",
-        sequence: "",
       },
       customers: [],
       providers: [],
@@ -403,7 +333,85 @@ export default {
       },
     };
   },
-  methods: {},
+  methods: {
+    newTaxe(formName, dataTaxe) {
+      console.log(dataTaxe);
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+
+        this.$confirm(
+          "¿Estás seguro que deseas guardar este nuevo registro?",
+          "Confirmación",
+          {
+            confirmButtonText: "Si, guardar",
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                this.$axios
+                  .post("/taxes", {
+                    registerType: dataTaxe.registerType,
+                    documentType: dataTaxe.documentType,
+                    authorization: dataTaxe.authorization,
+                    sequence: dataTaxe.sequence,
+                    entity: dataTaxe.customers,
+                    date: dataTaxe.date,
+                    sum: dataTaxe.sum,
+                    iva: dataTaxe.iva,
+                    subtotal: dataTaxe.subTotal,
+                    ivaRetenido: dataTaxe.ivaRetenido,
+                    total: dataTaxe.totals,
+                  })
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Exito",
+                      message: res.data.message,
+                    });
+                    setTimeout(() => {
+                      this.$confirm(
+                        "¿Deseas crear un nuevo servicio?",
+                        "Confirmación",
+                        {
+                          confirmButtonText: "Si, porfavor",
+                          cancelButtonText: "No, gracias",
+                          type: "warning",
+                          closeOnClickModal: false,
+                          closeOnPressEscape: false,
+                        }
+                      )
+                        .then(() => {
+                          this.$refs[formName].resetFields();
+                        })
+                        .catch(() => {
+                          this.$router.push("/services");
+                        });
+                    }, 500);
+                  })
+                  .catch((err) => {
+                    this.$notify.error({
+                      title: "Error",
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
+                    });
+                  })
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = "Si, guardar";
+                    done();
+                  });
+              } else {
+                done();
+              }
+            },
+          }
+        );
+      });
+    },
+  },
 
   computed: {
     activeCustomers() {
@@ -439,9 +447,6 @@ export default {
       this.taxesNewForm.totals = this.subTotal;
       this.taxesNewForm.totals = this.taxesDetained;
       return totals, totalDetained;
-    },
-    newTaxe(formName, dataTaxe) {
-      console.log(formName, dataTaxe);
     },
   },
 };
