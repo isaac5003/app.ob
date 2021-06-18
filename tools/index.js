@@ -1,6 +1,6 @@
-const { format, endOfMonth } = require('date-fns')
-const { es } = require('date-fns/locale')
-const { zonedTimeToUtc } = require('date-fns-tz')
+const { format, endOfMonth } = require("date-fns");
+const { es } = require("date-fns/locale");
+const { zonedTimeToUtc } = require("date-fns-tz");
 
 function getIcon(icon) {
   switch (icon) {
@@ -45,12 +45,12 @@ function getIcon(icon) {
     case "document-add":
       return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>';
     case "receipt-tax":
-      return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z"></path>'
+      return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z"></path>';
     case "truck":
       return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path>';
 
     case "clipboard-list":
-      return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>'
+      return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>';
   }
 }
 
@@ -138,204 +138,214 @@ const numeroALetras = (num, currency) => {
   var data = {
     numero: num,
     enteros: Math.floor(num),
-    centavos: (((Math.round(num * 100)) - (Math.floor(num) * 100))),
-    letrasCentavos: '',
-    letrasMonedaPlural: currency.plural || 'DOLARES',//'PESOS', 'DÃƒÂ³lares', 'BolÃƒÂ­vares', 'etcs'
-    letrasMonedaSingular: currency.singular || 'DOLAR', //'PESO', 'DÃƒÂ³lar', 'Bolivar', 'etc'
-    letrasMonedaCentavoPlural: currency.centPlural || 'CENTAVOS',
-    letrasMonedaCentavoSingular: currency.centSingular || 'CENTAVO'
+    centavos: Math.round(num * 100) - Math.floor(num) * 100,
+    letrasCentavos: "",
+    letrasMonedaPlural: currency.plural || "DOLARES", //'PESOS', 'DÃƒÂ³lares', 'BolÃƒÂ­vares', 'etcs'
+    letrasMonedaSingular: currency.singular || "DOLAR", //'PESO', 'DÃƒÂ³lar', 'Bolivar', 'etc'
+    letrasMonedaCentavoPlural: currency.centPlural || "CENTAVOS",
+    letrasMonedaCentavoSingular: currency.centSingular || "CENTAVO",
   };
 
   if (data.centavos == 100) {
-    data.letrasCentavos = '00/100';
-    data.enteros++
+    data.letrasCentavos = "00/100";
+    data.enteros++;
   } else if (data.centavos > 0) {
-    data.letrasCentavos = `${data.centavos.toString().length == 1 ? '0' : ''}${data.centavos}/100`;
+    data.letrasCentavos = `${data.centavos.toString().length == 1 ? "0" : ""}${
+      data.centavos
+    }/100`;
   } else {
-    data.letrasCentavos = '00/100';
-  };
+    data.letrasCentavos = "00/100";
+  }
 
   if (data.enteros == 0)
-    return 'CERO ' + data.letrasMonedaPlural + ' ' + data.letrasCentavos;
+    return "CERO " + data.letrasMonedaPlural + " " + data.letrasCentavos;
   if (data.enteros == 1)
-    return Millones(data.enteros) + ' ' + data.letrasMonedaSingular + ' ' + data.letrasCentavos;
+    return (
+      Millones(data.enteros) +
+      " " +
+      data.letrasMonedaSingular +
+      " " +
+      data.letrasCentavos
+    );
   else
-    return Millones(data.enteros) + ' ' + data.letrasMonedaPlural + ' ' + data.letrasCentavos;
+    return (
+      Millones(data.enteros) +
+      " " +
+      data.letrasMonedaPlural +
+      " " +
+      data.letrasCentavos
+    );
 
   // CÃ³digo basado en https://gist.github.com/alfchee/e563340276f89b22042a
   function Unidades(num) {
-
     switch (num) {
       case 1:
-        return 'UN';
+        return "UN";
       case 2:
-        return 'DOS';
+        return "DOS";
       case 3:
-        return 'TRES';
+        return "TRES";
       case 4:
-        return 'CUATRO';
+        return "CUATRO";
       case 5:
-        return 'CINCO';
+        return "CINCO";
       case 6:
-        return 'SEIS';
+        return "SEIS";
       case 7:
-        return 'SIETE';
+        return "SIETE";
       case 8:
-        return 'OCHO';
+        return "OCHO";
       case 9:
-        return 'NUEVE';
+        return "NUEVE";
     }
 
-    return '';
-  }//Unidades()
+    return "";
+  } //Unidades()
 
   function Decenas(num) {
-
     var decena = Math.floor(num / 10);
-    var unidad = num - (decena * 10);
+    var unidad = num - decena * 10;
 
     switch (decena) {
       case 1:
         switch (unidad) {
           case 0:
-            return 'DIEZ';
+            return "DIEZ";
           case 1:
-            return 'ONCE';
+            return "ONCE";
           case 2:
-            return 'DOCE';
+            return "DOCE";
           case 3:
-            return 'TRECE';
+            return "TRECE";
           case 4:
-            return 'CATORCE';
+            return "CATORCE";
           case 5:
-            return 'QUINCE';
+            return "QUINCE";
           default:
-            return 'DIECI' + Unidades(unidad);
+            return "DIECI" + Unidades(unidad);
         }
       case 2:
         switch (unidad) {
           case 0:
-            return 'VEINTE';
+            return "VEINTE";
           default:
-            return 'VEINTI' + Unidades(unidad);
+            return "VEINTI" + Unidades(unidad);
         }
       case 3:
-        return DecenasY('TREINTA', unidad);
+        return DecenasY("TREINTA", unidad);
       case 4:
-        return DecenasY('CUARENTA', unidad);
+        return DecenasY("CUARENTA", unidad);
       case 5:
-        return DecenasY('CINCUENTA', unidad);
+        return DecenasY("CINCUENTA", unidad);
       case 6:
-        return DecenasY('SESENTA', unidad);
+        return DecenasY("SESENTA", unidad);
       case 7:
-        return DecenasY('SETENTA', unidad);
+        return DecenasY("SETENTA", unidad);
       case 8:
-        return DecenasY('OCHENTA', unidad);
+        return DecenasY("OCHENTA", unidad);
       case 9:
-        return DecenasY('NOVENTA', unidad);
+        return DecenasY("NOVENTA", unidad);
       case 0:
         return Unidades(unidad);
     }
-  }//Unidades()
+  } //Unidades()
 
   function DecenasY(strSin, numUnidades) {
-    if (numUnidades > 0)
-      return strSin + ' Y ' + Unidades(numUnidades)
+    if (numUnidades > 0) return strSin + " Y " + Unidades(numUnidades);
 
     return strSin;
-  }//DecenasY()
+  } //DecenasY()
 
   function Centenas(num) {
     var centenas = Math.floor(num / 100);
-    var decenas = num - (centenas * 100);
+    var decenas = num - centenas * 100;
 
     switch (centenas) {
       case 1:
-        if (decenas > 0)
-          return 'CIENTO ' + Decenas(decenas);
-        return 'CIEN';
+        if (decenas > 0) return "CIENTO " + Decenas(decenas);
+        return "CIEN";
       case 2:
-        return 'DOSCIENTOS ' + Decenas(decenas);
+        return "DOSCIENTOS " + Decenas(decenas);
       case 3:
-        return 'TRESCIENTOS ' + Decenas(decenas);
+        return "TRESCIENTOS " + Decenas(decenas);
       case 4:
-        return 'CUATROCIENTOS ' + Decenas(decenas);
+        return "CUATROCIENTOS " + Decenas(decenas);
       case 5:
-        return 'QUINIENTOS ' + Decenas(decenas);
+        return "QUINIENTOS " + Decenas(decenas);
       case 6:
-        return 'SEISCIENTOS ' + Decenas(decenas);
+        return "SEISCIENTOS " + Decenas(decenas);
       case 7:
-        return 'SETECIENTOS ' + Decenas(decenas);
+        return "SETECIENTOS " + Decenas(decenas);
       case 8:
-        return 'OCHOCIENTOS ' + Decenas(decenas);
+        return "OCHOCIENTOS " + Decenas(decenas);
       case 9:
-        return 'NOVECIENTOS ' + Decenas(decenas);
+        return "NOVECIENTOS " + Decenas(decenas);
     }
 
     return Decenas(decenas);
-  }//Centenas()
+  } //Centenas()
 
   function Seccion(num, divisor, strSingular, strPlural) {
-    var cientos = Math.floor(num / divisor)
-    var resto = num - (cientos * divisor)
+    var cientos = Math.floor(num / divisor);
+    var resto = num - cientos * divisor;
 
-    var letras = '';
+    var letras = "";
 
     if (cientos > 0)
-      if (cientos > 1)
-        letras = Centenas(cientos) + ' ' + strPlural;
-      else
-        letras = strSingular;
+      if (cientos > 1) letras = Centenas(cientos) + " " + strPlural;
+      else letras = strSingular;
 
-    if (resto > 0)
-      letras += '';
+    if (resto > 0) letras += "";
 
     return letras;
-  }//Seccion()
+  } //Seccion()
 
   function Miles(num) {
     var divisor = 1000;
-    var cientos = Math.floor(num / divisor)
-    var resto = num - (cientos * divisor)
+    var cientos = Math.floor(num / divisor);
+    var resto = num - cientos * divisor;
 
-    var strMiles = Seccion(num, divisor, 'UN MIL', 'MIL');
+    var strMiles = Seccion(num, divisor, "UN MIL", "MIL");
     var strCentenas = Centenas(resto);
 
-    if (strMiles == '')
-      return strCentenas;
+    if (strMiles == "") return strCentenas;
 
-    return strMiles + ' ' + strCentenas;
-  }//Miles()
+    return strMiles + " " + strCentenas;
+  } //Miles()
 
   function Millones(num) {
     var divisor = 1000000;
-    var cientos = Math.floor(num / divisor)
-    var resto = num - (cientos * divisor)
+    var cientos = Math.floor(num / divisor);
+    var resto = num - cientos * divisor;
 
-    var strMillones = Seccion(num, divisor, 'UN MILLON DE', 'MILLONES DE');
+    var strMillones = Seccion(num, divisor, "UN MILLON DE", "MILLONES DE");
     var strMiles = Miles(resto);
 
-    if (strMillones == '')
-      return strMiles;
+    if (strMillones == "") return strMiles;
 
-    return strMillones + ' ' + strMiles;
-  }//Millones()
+    return strMillones + " " + strMiles;
+  } //Millones()
+};
 
-}
-
-const calculatedAmount = (sellingType, documentType, cost, quantity, incTax) => {
-  let sujeta = null
-  let exenta = null
-  let gravada = null
-  const amount = parseFloat(quantity) * parseFloat(cost)
+const calculatedAmount = (
+  sellingType,
+  documentType,
+  cost,
+  quantity,
+  incTax
+) => {
+  let sujeta = null;
+  let exenta = null;
+  let gravada = null;
+  const amount = parseFloat(quantity) * parseFloat(cost);
   switch (sellingType) {
-    case '1':
-      sujeta = amount
+    case "1":
+      sujeta = amount;
       break;
-    case '2':
-      exenta = amount
+    case "2":
+      exenta = amount;
       break;
-    case '3':
+    case "3":
       switch (documentType) {
         case "1":
           gravada = amount * (incTax ? 1 : 1.13);
@@ -346,8 +356,8 @@ const calculatedAmount = (sellingType, documentType, cost, quantity, incTax) => 
       }
       break;
   }
-  return { sujeta, exenta, gravada }
-}
+  return { sujeta, exenta, gravada };
+};
 
 /**
  * Funcion que permite identificar si hay informacion sin guardar
@@ -408,7 +418,7 @@ function checkBeforeEnter(self, storagekey, form, formName = false) {
           }
         } else {
           const name = formName ? formName : form;
-          self[name] = value
+          self[name] = value;
         }
       })
       .catch(() => {
@@ -424,30 +434,48 @@ function hasModule(module, user) {
   const branch = company.branches.find((b) => b.id == user.workspace.branch.id);
   const modules = branch.modules.map((m) => m.id);
   if (Array.isArray(module)) {
-    return modules.map(m => module.includes(m)).some(m => m)
+    return (
+      modules.map((m) => module.includes(m)).filter((m) => m == true).length ==
+      module.length
+    );
   } else {
     return modules.includes(module);
   }
 }
 
-const getHeader = (name, nit, nrc, lastDay, docName, dateType = 'date', preTitle = null, postTitle = null) => {
-  let title = docName
+const getHeader = (
+  name,
+  nit,
+  nrc,
+  lastDay,
+  docName,
+  dateType = "date",
+  preTitle = null,
+  postTitle = null
+) => {
+  let title = docName;
   if (lastDay) {
-    let date = null
+    let date = null;
     switch (dateType) {
-      case 'date':
-        date = format(zonedTimeToUtc(lastDay), 'dd - MMMM - yyyy', { locale: es }).split('-').join('de')
-        title = `${docName} AL ${date}`
+      case "date":
+        date = format(zonedTimeToUtc(lastDay), "dd - MMMM - yyyy", {
+          locale: es,
+        })
+          .split("-")
+          .join("de");
+        title = `${docName} AL ${date}`;
         break;
-      case 'month':
-        date = format(zonedTimeToUtc(lastDay), 'MMMM - yyyy', { locale: es }).split('-').join('de')
-        title = `${docName} PARA EL MES DE ${date}`
-        break
-      case 'period':
-        const fromDate = format(lastDay[0], 'dd/MM/yyyy')
-        const toDate = format(lastDay[1], 'dd/MM/yyyy')
-        title = `${docName} EN EL PERÍODO DEL ${fromDate} AL ${toDate}`
-        break
+      case "month":
+        date = format(zonedTimeToUtc(lastDay), "MMMM - yyyy", { locale: es })
+          .split("-")
+          .join("de");
+        title = `${docName} PARA EL MES DE ${date}`;
+        break;
+      case "period":
+        const fromDate = format(lastDay[0], "dd/MM/yyyy");
+        const toDate = format(lastDay[1], "dd/MM/yyyy");
+        title = `${docName} EN EL PERÍODO DEL ${fromDate} AL ${toDate}`;
+        break;
     }
   }
   return (currentPage, pageCount, pageSize) => {
@@ -458,25 +486,23 @@ const getHeader = (name, nit, nrc, lastDay, docName, dateType = 'date', preTitle
             text: name.toUpperCase(),
             fontSize: 12,
             bold: true,
-          }
+          },
         ],
         margin: [20, 15, 20, 0],
       },
-    ]
+    ];
 
     if (preTitle) {
-      header.push(
-        {
-          columns: [
-            {
-              text: preTitle,
-              fontSize: 10,
-              margin: [0, 5, 0, 0],
-            },
-          ],
-          margin: [20, 0, 20, 0],
-        },
-      )
+      header.push({
+        columns: [
+          {
+            text: preTitle,
+            fontSize: 10,
+            margin: [0, 5, 0, 0],
+          },
+        ],
+        margin: [20, 0, 20, 0],
+      });
     }
 
     if (postTitle) {
@@ -487,7 +513,7 @@ const getHeader = (name, nit, nrc, lastDay, docName, dateType = 'date', preTitle
               text: title.toUpperCase(),
               fontSize: 10,
               margin: [0, 5, 0, 0],
-              width: '70%'
+              width: "70%",
             },
           ],
           margin: [20, 0, 20, 0],
@@ -498,40 +524,47 @@ const getHeader = (name, nit, nrc, lastDay, docName, dateType = 'date', preTitle
               text: postTitle,
               fontSize: 10,
               margin: [0, 5, 0, 0],
-              width: '70%'
+              width: "70%",
             },
             {
               text: [
                 {
-                  text: 'NIT: ',
-                  bold: true
+                  text: "NIT: ",
+                  bold: true,
                 },
                 {
-                  text: nit
+                  text: nit,
                 },
                 {
-                  text: '  NRC: ',
-                  bold: true
+                  text: "  NRC: ",
+                  bold: true,
                 },
                 {
-                  text: nrc
-                }
+                  text: nrc,
+                },
               ],
               fontSize: 9,
-              alignment: 'right',
+              alignment: "right",
               margin: [0, 5, 0, 0],
-              width: '30%'
+              width: "30%",
             },
           ],
           margin: [20, 0, 20, 0],
         },
         {
-          canvas: [{ type: 'line', x1: 20, y1: 5, x2: pageSize.width - 20, y2: 5, lineWidth: 1 }]
+          canvas: [
+            {
+              type: "line",
+              x1: 20,
+              y1: 5,
+              x2: pageSize.width - 20,
+              y2: 5,
+              lineWidth: 1,
+            },
+          ],
         }
-      )
-    }
-
-    else {
+      );
+    } else {
       header.push(
         {
           columns: [
@@ -539,75 +572,90 @@ const getHeader = (name, nit, nrc, lastDay, docName, dateType = 'date', preTitle
               text: title.toUpperCase(),
               fontSize: 10,
               margin: [0, 5, 0, 0],
-              width: '70%'
+              width: "70%",
             },
             {
               text: [
                 {
-                  text: 'NIT: ',
-                  bold: true
+                  text: "NIT: ",
+                  bold: true,
                 },
                 {
-                  text: nit
+                  text: nit,
                 },
                 {
-                  text: '  NRC: ',
-                  bold: true
+                  text: "  NRC: ",
+                  bold: true,
                 },
                 {
-                  text: nrc
-                }
+                  text: nrc,
+                },
               ],
               fontSize: 9,
-              alignment: 'right',
+              alignment: "right",
               margin: [0, 5, 0, 0],
-              width: '30%'
+              width: "30%",
             },
           ],
           margin: [20, 0, 20, 0],
         },
         {
-          canvas: [{ type: 'line', x1: 20, y1: 5, x2: pageSize.width - 20, y2: 5, lineWidth: 1 }]
+          canvas: [
+            {
+              type: "line",
+              x1: 20,
+              y1: 5,
+              x2: pageSize.width - 20,
+              y2: 5,
+              lineWidth: 1,
+            },
+          ],
         }
-      )
-
+      );
     }
 
-
-    return header
-  }
-}
+    return header;
+  };
+};
 
 const getFooter = () => {
   return (currentPage, pageCount, pageSize) => {
     return [
       {
-        canvas: [{ type: 'line', x1: 20, y1: 5, x2: pageSize.width - 20, y2: 5, lineWidth: 1 }]
+        canvas: [
+          {
+            type: "line",
+            x1: 20,
+            y1: 5,
+            x2: pageSize.width - 20,
+            y2: 5,
+            lineWidth: 1,
+          },
+        ],
       },
       {
         columns: [
           {
-            text: format(new Date(), 'dd/MM/yyyy HH:mm:ss'),
+            text: format(new Date(), "dd/MM/yyyy HH:mm:ss"),
             fontSize: 9,
-            margin: [0, 5, 0, 0]
-
+            margin: [0, 5, 0, 0],
           },
           {
             text: `${currentPage.toString()} / ${pageCount}`,
             fontSize: 9,
-            alignment: 'right',
-            margin: [0, 5, 0, 0]
-          }
+            alignment: "right",
+            margin: [0, 5, 0, 0],
+          },
         ],
         margin: [20, 0, 20, 0],
-      }
-    ]
-  }
-}
+      },
+    ];
+  };
+};
 
 const fixDate = (date) => {
-  return format(endOfMonth(zonedTimeToUtc(date)), 'yyyy-MM-dd')
-}
+  return format(endOfMonth(zonedTimeToUtc(date)), "yyyy-MM-dd");
+};
 
 function parseErrors(errors) {
   if (Array.isArray(errors)) {
@@ -617,7 +665,7 @@ function parseErrors(errors) {
     }
     return `<ul class="list-outside list-disc">${list}</ul>`;
   } else {
-    return errors
+    return errors;
   }
 }
 
@@ -634,5 +682,5 @@ module.exports = {
   getHeader,
   getFooter,
   fixDate,
-  parseErrors
+  parseErrors,
 };

@@ -1,4 +1,3 @@
-code 
 <template>
   <layout-content
     page-title="Nuevo registro"
@@ -7,24 +6,29 @@ code
       { name: 'Nuevo registro', to: null },
     ]"
   >
-    <div class="flex flex-col space-y-2">
-      <el-form label-position="top" :model="taxesNewForm" ref="taxesNewForm">
+    <div class="flex flex-col space-4">
+      <el-form
+        :model="taxesNewForm"
+        :rules="taxesNewFormRules"
+        ref="taxesNewForm"
+        @submit.prevent.native="newTaxe('taxesNewForm', taxesNewForm)"
+      >
         <div class="grid grid-cols-12 gap-4">
           <el-form-item
             label="Tipo de registro"
             class="col-span-3"
-            prop="typeRegister"
+            prop="registerType"
           >
             <el-select
-              v-model="taxesNewForm.typeRegister"
+              v-model="taxesNewForm.registerType"
               class="w-full"
               clearable
               filterable
               size="small"
+              @change="entity('taxesNewForm', taxesNewForm.registerType)"
             >
-              <el-option label="Tipo de registro" value="" />
               <el-option
-                v-for="item in filetype"
+                v-for="item in registerType"
                 :key="item.id"
                 :label="item.name"
                 :value="item.id"
@@ -32,80 +36,45 @@ code
               </el-option>
             </el-select>
           </el-form-item>
-
           <el-form-item
             label="Tipo de documento"
             class="col-span-3"
-            prop="typeDocument1"
-            v-if="taxesNewForm.typeRegister != 'credifical'"
+            prop="documentType"
           >
             <el-select
-              v-model="taxesNewForm.typeDocument1"
-              class="w-full"
-              clearable
-              filterable
-              size="small"
-              :disabled="taxesNewForm.typeRegister ? false : true"
-            >
-              <el-option label="Tipo de documento" value="" />
-              <el-option
-                v-for="item in filetype1"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-              >
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="Tipo de documento" class="col-span-3" v-else>
-            <el-select
-              v-model="taxesNewForm.typeDocument2"
+              v-model="taxesNewForm.documentType"
               class="w-full"
               clearable
               filterable
               size="small"
             >
               <el-option
-                v-for="item in filetype2"
+                v-for="item in documentTypes"
                 :key="item.id"
-                :label="item.name"
+                :label="`${item.code} - ${item.name}`"
                 :value="item.id"
               >
               </el-option>
             </el-select>
-          </el-form-item>
-          <el-form-item
-            class="col-span-3 col-start-10"
-            prop="dateRange"
-            label="Fecha de ingreso del registro"
-          >
-            <el-date-picker
-              type="month"
-              format="MMMM yyyy"
-              placeholder="Selecciona un mes"
-              size="small"
-              style="width: 100%"
-            />
           </el-form-item>
         </div>
-        <div class="class grid grid-cols-12 gap-4">
+        <div class="grid grid-cols-12 gap-4">
           <el-form-item
-            label="Cliente"
+            label="Cliente / Proveedor"
             class="col-span-5"
-            v-if="taxesNewForm.typeRegister != 'credifical'"
+            prop="entity"
           >
             <el-select
               class="w-full"
               clearable
               filterable
               size="small"
-              v-model="taxesNewForm.customers"
-              :disabled="taxesNewForm.typeRegister ? false : true"
+              v-model="taxesNewForm.entity"
+              placeholder="Seleccionar"
             >
-              <el-option label="Todos los clientes" value="" />
               <el-option-group key="ACTIVOS" label="ACTIVOS">
                 <el-option
-                  v-for="item in activeCustomers"
+                  v-for="item in activeEntity"
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"
@@ -132,71 +101,7 @@ code
               <el-option-group key="INACTIVOS" label="INACTIVOS">
                 <el-option
                   style="height: 50px"
-                  v-for="item in inactiveCustomers"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                >
-                  <div
-                    class="
-                      flex flex-row
-                      justify-between
-                      items-end
-                      py-1
-                      leading-normal
-                    "
-                  >
-                    <div class="flex flex-col">
-                      <span class="text-xs text-gray-500">{{
-                        item.shortName
-                      }}</span>
-                      <span>{{ item.name }}</span>
-                    </div>
-                    <span class="text-xs text-gray-500">{{ item.nrc }}</span>
-                  </div>
-                </el-option>
-              </el-option-group>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="Proveedores:" class="col-span-5" v-else>
-            <el-select
-              class="w-full"
-              size="small"
-              filterable
-              clearable
-              v-model="taxesNewForm.providers"
-            >
-              <el-option label="Todos los proveedores" value="" />
-              <el-option-group key="ACTIVOS" label="ACTIVOS">
-                <el-option
-                  v-for="item in activeProviders"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                >
-                  <div
-                    class="
-                      flex flex-row
-                      justify-between
-                      items-end
-                      py-1
-                      leading-normal
-                    "
-                  >
-                    <div class="flex flex-col">
-                      <span class="text-xs text-gray-500">{{
-                        item.shortName
-                      }}</span>
-                      <span>{{ item.name }}</span>
-                    </div>
-                    <span class="text-xs text-gray-500">{{ item.nrc }}</span>
-                  </div>
-                </el-option>
-              </el-option-group>
-              <el-option-group key="INACTIVOS" label="INACTIVOS">
-                <el-option
-                  style="height: 50px"
-                  v-for="item in inactiveProviders"
+                  v-for="item in inactiveEntity"
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"
@@ -225,27 +130,47 @@ code
           <el-form-item
             class="col-span-3"
             label="Fecha de emisión del documento"
+            prop="date"
           >
             <el-date-picker
-              type="month"
-              format="MMMM yyyy"
-              placeholder="Selecciona un mes"
+              v-model="taxesNewForm.date"
               size="small"
+              class="w-full"
+              type="date"
+              placeholder="Selecciona un mes"
+              :picker-options="pickerOptions"
               style="width: 100%"
+              format="dd/MM/yyyy"
+              value-format="yyyy-MM-dd"
             />
           </el-form-item>
-          <el-form-item label="N° de autorización" class="col-span-2">
-            <el-input size="small" placeholder="000000" readonly> </el-input>
+          <el-form-item
+            label="N° de autorización"
+            class="col-span-2"
+            prop="authorization"
+          >
+            <el-input
+              placeholder="000000"
+              v-model="taxesNewForm.authorization"
+              size="small"
+            ></el-input>
           </el-form-item>
-          <el-form-item label="N° de correlativo" class="col-span-2">
-            <el-input size="small" placeholder="000000" readonly> </el-input>
+          <el-form-item
+            label="N° de correlativo"
+            class="col-span-2"
+            prop="sequence"
+          >
+            <el-input
+              placeholder="000000"
+              v-model="taxesNewForm.sequence"
+              size="small"
+            ></el-input>
           </el-form-item>
         </div>
-
         <div class="grid grid-cols-12 gap-4">
-          <el-form-item label="Sumas" class="col-span-2" prop="sumas">
+          <el-form-item label="Sumas" class="col-span-2" prop="sum">
             <el-input-number
-              v-model="taxesNewForm.sumas"
+              v-model="taxesNewForm.sum"
               type="number"
               :min="0.0"
               :step="0.01"
@@ -276,10 +201,10 @@ code
             label="Subtotal"
             prop="subtotal"
             class="col-span-2"
-            v-if="taxesNewForm.subTotal != 'consuFinal'"
+            v-if="taxesNewForm.subtotal != 'invoices'"
           >
             <el-input-number
-              v-model="taxesNewForm.subTotal"
+              v-model="taxesNewForm.subtotal"
               :value="subTotal"
               type="number"
               :min="0.0"
@@ -294,12 +219,12 @@ code
           </el-form-item>
           <el-form-item
             label="Iva retenido"
-            prop="ivaDetained"
+            prop="ivaRetenido"
             class="col-span-2"
-            v-if="taxesNewForm.typeRegister != 'credifical'"
+            v-if="taxesNewForm.registerType != 'purchases'"
           >
             <el-input-number
-              v-model="taxesNewForm.ivaDetained"
+              v-model="taxesNewForm.ivaRetenido"
               :value="taxesDetained"
               type="number"
               :min="0.0"
@@ -312,15 +237,17 @@ code
             </el-input-number>
           </el-form-item>
           <el-form-item label="Total" class="col-span-2">
-            <el-input
-              v-model="taxesNewForm.totals"
+            <el-input-number
+              v-model="taxesNewForm.total"
               style="width: 100%"
               size="small"
               :minlength="0.01"
+              :step="0.01"
               :disabled="true"
               :value="totals"
+              :precision="2"
             >
-            </el-input>
+            </el-input-number>
           </el-form-item>
         </div>
         <div class="flex flex-row justify-end">
@@ -339,12 +266,12 @@ code
 <script>
 import LayoutContent from "../../components/layout/Content";
 import {
-  checkBeforeEnter,
-  checkBeforeLeave,
+  amountValidate,
+  hasModule,
   inputValidation,
+  parseErrors,
   selectValidation,
 } from "../../tools";
-
 export default {
   name: "TaxesNew",
   head: {
@@ -353,85 +280,210 @@ export default {
   components: { LayoutContent },
   fetch() {
     const customers = () => this.$axios.get("/customers");
-    const providers = () => {
-      return this.$axios.get("/providers");
-    };
-    Promise.all([customers(), providers()]).then((res) => {
-      const [customers, providers] = res;
-      this.customers = customers.data.data;
-      this.providers = providers.data.data;
-    });
+    const providers = () => this.$axios.get("/providers");
+    const invoiceDocumentTypes = () =>
+      this.$axios.get("/invoices/document-types");
+    //valida si el usuario posee el modulo de facturacion
+    if (hasModule("cf5e4b29-f09c-438a-8d82-2ef482a9a461", this.$auth.user)) {
+      this.registerType = this.registerType.slice(1);
+    }
+    //valida si el usuario posee el modulo de compras
+    if (hasModule("cfb8addb-541b-482f-8fa1-dfe5db03fdf4", this.$auth.user)) {
+      this.registerType = this.registerType.slice(0, -1);
+    }
+    Promise.all([customers(), providers(), invoiceDocumentTypes()]).then(
+      (res) => {
+        const [customers, providers, invoiceDocTypes] = res;
+        this.customers = customers.data.data;
+        this.providers = providers.data.data;
+        this.taxesNewForm.registerType = this.registerType[0].id;
+        this.invoiceDocumentTypes = invoiceDocTypes.data.data;
+        this.entity("taxesNewForm", this.taxesNewForm.registerType);
+      }
+    );
   },
   fetchOnServer: false,
   data() {
     return {
       taxesNewForm: {
-        typeRegister: "",
-        typeDocument1: "",
-        typeDocument2: "",
-        sumas: "",
+        registerType: "",
+        documentType: "",
+        authorization: "",
+        sequence: "",
+        date: "",
+        sum: "",
         iva: "",
-        subTotal: "",
-        ivaDetained: "",
-        providers: "",
-        totals: "",
+        subtotal: "",
+        ivaRetenido: "",
+        total: "",
+        entity: "",
+      },
+      taxesNewFormRules: {
+        registerType: selectValidation(true),
+        documentType: selectValidation(true),
+        authorization: inputValidation(true),
+        sequence: inputValidation(true),
+        date: selectValidation(true),
+        sum: amountValidate(true),
+
+        entity: selectValidation(true),
       },
       customers: [],
       providers: [],
-
-      filetype: [
-        { name: "Débito Fiscal", id: "deviFilcal" },
-        { name: "Credito fiscal", id: "credifical" },
+      documentTypes: [],
+      registerType: [
+        {
+          id: "purchases",
+          name: "Crédito Fiscal",
+        },
+        {
+          id: "invoices",
+          name: "Débito Fiscal",
+        },
       ],
-      filetype1: [
-        { name: "Credito fiscal", id: "crediFilcal" },
-        { name: "Consumidor final", id: "consuiFinal" },
-        { name: "Nota de debito", id: "notadevi" },
-        { name: "Factura de exportación", id: "factExport" },
+      pickerOptions: {
+        shortcuts: [
+          {
+            text: "Ahora",
+            onClick(picker) {
+              picker.$emit("pick", new Date());
+            },
+          },
+          {
+            text: "Ayer",
+            onClick(picker) {
+              const date = new Date();
+              date.setTime(date.getTime() - 3600 * 1000 * 24);
+              picker.$emit("pick", date);
+            },
+          },
+          {
+            text: "Mañana",
+            onClick(picker) {
+              const date = new Date();
+              date.setTime(date.getTime() + 3600 * 1000 * 24);
+              picker.$emit("pick", date);
+            },
+          },
+        ],
+      },
+      inactiveEntity: [],
+      activeEntity: [],
+      purchasesDocumentTypes: [
+        {
+          id: 1,
+          name: "Nacional",
+          code: "N",
+        },
       ],
-      filetype2: [
-        { name: "Credito fiscal", id: "crediFilcal1" },
-        { name: "Consumidor final", id: "consuFinal" },
-        { name: "Otros", id: "others" },
-      ],
+      invoiceDocumentTypes: [],
     };
   },
-  methods: {},
+  methods: {
+    newTaxe(formName, dataTaxe) {
+      this.$refs[formName].validate(async (valid) => {
+        if (!valid) {
+          return false;
+        }
+
+        this.$confirm(
+          "¿Estás seguro que deseas guardar este nuevo registro?",
+          "Confirmación",
+          {
+            confirmButtonText: "Si, guardar",
+            cancelButtonText: "Cancelar",
+            type: "warning",
+            beforeClose: (action, instance, done) => {
+              if (action === "confirm") {
+                instance.confirmButtonLoading = true;
+                instance.confirmButtonText = "Procesando...";
+                this.$axios
+                  .post("/taxes", { ...dataTaxe })
+                  .then((res) => {
+                    this.$notify.success({
+                      title: "Exito",
+                      message: res.data.message,
+                    });
+                    setTimeout(() => {
+                      this.$confirm(
+                        "¿Deseas crear un nuevo registro?",
+                        "Confirmación",
+                        {
+                          confirmButtonText: "Si, porfavor",
+                          cancelButtonText: "No, gracias",
+                          type: "warning",
+                          closeOnClickModal: false,
+                          closeOnPressEscape: false,
+                        }
+                      )
+                        .then(() => {
+                          this.$refs[formName].resetFields();
+                        })
+                        .catch(() => {
+                          this.$router.push("/taxes");
+                        });
+                    }, 500);
+                  })
+                  .catch((err) => {
+                    this.$notify.error({
+                      title: "Error",
+                      dangerouslyUseHTMLString: true,
+                      message: parseErrors(err.response.data.message),
+                    });
+                  })
+                  .then((alw) => {
+                    instance.confirmButtonLoading = false;
+                    instance.confirmButtonText = "Si, guardar";
+                    done();
+                  });
+              } else {
+                done();
+              }
+            },
+          }
+        );
+      });
+    },
+    entity(formName, registerType) {
+      if (registerType == "invoices") {
+        this.activeEntity = this.customers.filter((c) => c.isActiveCustomer);
+        this.inactiveEntity = this.customers.filter((c) => !c.isActiveCustomer);
+        this.documentTypes = this.invoiceDocumentTypes;
+        this.$refs[formName].fields
+          .find((f) => f.prop == "documentType")
+          .resetField();
+      } else if (registerType == "purchases") {
+        this.activeEntity = this.providers.filter((c) => c.isActiveCustomer);
+        this.inactiveEntity = this.providers.filter((c) => !c.isActiveCustomer);
+        this.documentTypes = this.purchasesDocumentTypes;
+        this.$refs[formName].fields
+          .find((f) => f.prop == "documentType")
+          .resetField();
+      }
+    },
+  },
 
   computed: {
-    activeCustomers() {
-      return this.customers.filter((c) => c.isActiveCustomer);
-    },
-    inactiveCustomers() {
-      return this.customers.filter((c) => !c.isActiveCustomer);
-    },
-    activeProviders() {
-      return this.providers.filter((c) => c.isActiveProvider);
-    },
-    inactiveProviders() {
-      return this.providers.filter((c) => !c.isActiveProvider);
-    },
-
     taxes() {
-      const taxes = this.taxesNewForm.sumas * 0.13;
-      this.taxesNewForm.iva = this.taxesNewForm.sumas * 0.13;
+      const taxes = this.taxesNewForm.sum * 0.13;
+      this.taxesNewForm.iva = this.taxesNewForm.sum * 0.13;
       return taxes;
     },
     taxesDetained() {
       const taxesDetained =
-        this.taxesNewForm.subTotal - this.taxesNewForm.ivaDetained;
+        this.taxesNewForm.subtotal - this.taxesNewForm.ivaRetenido;
       return taxesDetained;
     },
     subTotal() {
-      const subtotal = this.taxes + this.taxesNewForm.sumas;
-      this.taxesNewForm.subTotal = this.taxes + this.taxesNewForm.sumas;
+      const subtotal = this.taxes + this.taxesNewForm.sum;
+      this.taxesNewForm.subtotal = this.taxes + this.taxesNewForm.sum;
       return subtotal;
     },
     totals() {
       const totals = this.subTotal;
       const totalDetained = this.taxesDetained;
-      this.taxesNewForm.totals = this.subTotal;
-      this.taxesNewForm.totals = this.taxesDetained;
+      this.taxesNewForm.total = this.subTotal;
+      this.taxesNewForm.total = this.taxesDetained;
       return totals, totalDetained;
     },
   },
