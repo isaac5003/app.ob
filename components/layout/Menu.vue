@@ -46,7 +46,7 @@
                 class="w-full"
                 filterable
                 default-first-option
-                @change="changeWorkSpace.bid = ''"
+                @change="changeWorkSpace.bid = branches[0].id"
               >
                 <el-option
                   v-for="company in companies"
