@@ -21,24 +21,16 @@
             <span class="">
               {{
                 taxesPreview
-                  ? taxesPreview.provider
-                    ? taxesPreview.provider.name
-                    : taxesPreview.customer.name
+                  ? taxesPreview.entity
+                    ? taxesPreview.entity.name
+                    : taxesPreview.entity.name
                   : ""
               }}
             </span>
           </div>
           <div class="col-span-2 flex flex-col">
             <span class="text-gray-700 font-bold text-xs">Fecha</span>
-            <span class=""
-              >{{
-                taxesPreview
-                  ? taxesPreview.provider
-                    ? taxesPreview.purchaseDate
-                    : taxesPreview.invoiceDate
-                  : ""
-              }}
-            </span>
+            <span class="">{{ taxesPreview ? taxesPreview.date : "" }} </span>
           </div>
           <div class="col-span-2 flex flex-col">
             <span class="text-gray-700 font-bold text-xs"
@@ -376,9 +368,9 @@
         sortable="custom"
       ></el-table-column>
       <el-table-column
-        label="N° autorización"
+        label="Correlativo"
         width="140"
-        prop="authorization"
+        prop=""
         sortable="custom"
       ></el-table-column>
       <el-table-column

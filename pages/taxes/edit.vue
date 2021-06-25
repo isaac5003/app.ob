@@ -25,8 +25,8 @@
               clearable
               filterable
               size="small"
+              :disabled="true"
               @change="entity(taxesEditForm.registerType)"
-              disabled
             >
               <el-option
                 v-for="item in registerType"
@@ -61,9 +61,79 @@
         </div>
         <div class="grid grid-cols-12 gap-4">
           <el-form-item
-            label="Cliente / Proveedor"
+            label="Cliente"
             class="col-span-5"
             prop="entity"
+            v-if="taxesEditForm.registerType != 'purchases'"
+          >
+            <el-select
+              v-model="taxesEditForm.entity"
+              placeholder="Seleccionar"
+              class="w-full"
+              size="small"
+              clearable
+              filterable
+            >
+              <el-option-group key="ACTIVOS" label="ACTIVOS">
+                <el-option
+                  v-for="item in activeEntity"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                  <div
+                    class="
+                      flex flex-row
+                      justify-between
+                      items-end
+                      py-1
+                      leading-normal
+                    "
+                  >
+                    <div class="flex flex-col">
+                      <span class="text-xs text-gray-500">{{
+                        item.shortName
+                      }}</span>
+                      <span>{{ item.name }}</span>
+                    </div>
+                    <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                  </div>
+                </el-option>
+              </el-option-group>
+              <el-option-group key="INACTIVOS" label="INACTIVOS">
+                <el-option
+                  style="height: 50px"
+                  v-for="item in inactiveEntity"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                  <div
+                    class="
+                      flex flex-row
+                      justify-between
+                      items-end
+                      py-1
+                      leading-normal
+                    "
+                  >
+                    <div class="flex flex-col">
+                      <span class="text-xs text-gray-500">{{
+                        item.shortName
+                      }}</span>
+                      <span>{{ item.name }}</span>
+                    </div>
+                    <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                  </div>
+                </el-option>
+              </el-option-group>
+            </el-select>
+          </el-form-item>
+          <el-form-item
+            label="Proveedor"
+            class="col-span-5"
+            prop="entity"
+            v-if="taxesEditForm.registerType != 'invoices'"
           >
             <el-select
               class="w-full"
@@ -199,6 +269,44 @@
             </el-input-number>
           </el-form-item>
           <el-form-item
+            label="Fovial"
+            class="col-span-2"
+            prop="iva"
+            v-if="taxesEditForm.registerType != 'invoices'"
+          >
+            <el-input-number
+              v-model="taxesEditForm.fovial"
+              :value="taxesFovialContrans"
+              type="number"
+              size="small"
+              autocomplete="off"
+              style="width: 100%"
+              :min="0.0"
+              :step="0.01"
+              :precision="2"
+            >
+            </el-input-number>
+          </el-form-item>
+          <el-form-item
+            label="Contrans"
+            class="col-span-2"
+            prop="contrans"
+            v-if="taxesEditForm.registerType != 'invoices'"
+          >
+            <el-input-number
+              v-model="taxesEditForm.contrans"
+              :value="taxesFovialContrans"
+              style="width: 100%"
+              autocomplete="off"
+              size="small"
+              type="number"
+              :min="0.0"
+              :step="0.01"
+              :precision="2"
+            >
+            </el-input-number>
+          </el-form-item>
+          <el-form-item
             label="Subtotal"
             prop="subtotal"
             class="col-span-2"
@@ -314,6 +422,8 @@ export default {
         date: "",
         sum: "",
         iva: "",
+        fovial: "",
+        contrans: "",
         subtotal: "",
         ivaRetenido: 0,
         total: "",
@@ -455,9 +565,16 @@ export default {
         this.taxesEditForm.subtotal - this.taxesEditForm.ivaRetenido;
       return taxesDetained;
     },
+    taxesFovialContrans() {
+      const fovialContrans =
+        this.taxesEditForm.fovial + this.taxesEditForm.contrans;
+      return fovialContrans;
+    },
     subTotal() {
-      const subtotal = this.taxes + this.taxesEditForm.sum;
-      this.taxesEditForm.subtotal = this.taxes + this.taxesEditForm.sum;
+      const subtotal =
+        this.taxes + this.taxesFovialContrans + this.taxesEditForm.sum;
+      this.taxesEditForm.subtotal =
+        this.taxes + this.taxesFovialContrans + this.taxesEditForm.sum;
       return subtotal;
     },
     totals() {
