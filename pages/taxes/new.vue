@@ -59,7 +59,7 @@
           </el-form-item>
         </div>
         <div class="grid grid-cols-12 gap-4">
-          <el-form-item
+          <!-- <el-form-item
             label="Cliente"
             class="col-span-5"
             prop="entity"
@@ -127,12 +127,13 @@
                 </el-option>
               </el-option-group>
             </el-select>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item
-            label="Proveedor"
+            :label="
+              taxesNewForm.registerType == 'invoices' ? 'Cliente' : 'Proveedor'
+            "
             class="col-span-5"
             prop="entity"
-            v-if="taxesNewForm.registerType != 'invoices'"
           >
             <el-select
               class="w-full"

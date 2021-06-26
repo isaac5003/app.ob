@@ -370,7 +370,7 @@
       <el-table-column
         label="Correlativo"
         width="140"
-        prop=""
+        prop="sequence"
         sortable="custom"
       ></el-table-column>
       <el-table-column
@@ -379,18 +379,13 @@
         prop="documentType"
         sortable="custom"
       ></el-table-column>
-      <el-table-column
-        label="Tipo de registro"
-        width="140"
-        prop="registerType"
-        sortable="custom"
-      >
-        <template slot-scope="scope">
-          <span>{{
-            scope.row.registerType == "invoices" ? "Venta" : "Compra"
-          }}</span>
-        </template></el-table-column
-      >
+      <el-table-column label="Suma" width="140" prop="sum" sortable="custom">
+        <template slot-scope="scop">
+          <span>
+            {{ scop.row.sum | formatMoney }}
+          </span>
+        </template>
+      </el-table-column>
       <el-table-column label="IVA" width="70" prop="iva" sortable="custom">
         <template slot-scope="scope">
           <span>{{ scope.row.iva | formatMoney }}</span>
@@ -544,7 +539,6 @@ export default {
     async openPreviewTax(id) {
       const { data } = await this.$axios.get(`/taxes/${id}`);
       this.taxesPreview = data.data;
-      console.log(this.taxesPreview);
       this.showTaxePreview = true;
     },
     selectionChange(selectionData) {
