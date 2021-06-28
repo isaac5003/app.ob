@@ -593,7 +593,6 @@ export default {
       this.$axios
         .get("/taxes/", { params })
         .then((res) => {
-          console.log(res);
           this.taxesList = res.data;
         })
         .catch((err) => {
