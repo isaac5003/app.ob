@@ -337,7 +337,11 @@ export default {
         const [customers, providers, tax, invoiceDocTypes] = res;
         this.customers = customers.data.data;
         this.providers = providers.data.data;
-        this.taxesEditForm = { ...this.taxesEditForm, ...tax.data.data };
+        this.taxesEditForm = {
+          ...this.taxesEditForm,
+          ...tax.data.data,
+          entity: tax.data.data.entity.id,
+        };
         this.invoiceDocumentTypes = invoiceDocTypes.data.data;
         this.entity(this.taxesEditForm.registerType);
       }
@@ -427,10 +431,10 @@ export default {
       if (registerType == "invoices") {
         this.activeEntity = this.customers.filter((c) => c.isActiveCustomer);
         this.inactiveEntity = this.customers.filter((c) => !c.isActiveCustomer);
-        this.documentType = this.invoiceDocumentTypes;
+        this.documentTypes = this.invoiceDocumentTypes;
       } else if (registerType == "purchases") {
-        this.activeEntity = this.providers.filter((c) => c.isActiveCustomer);
-        this.inactiveEntity = this.providers.filter((c) => !c.isActiveCustomer);
+        this.activeEntity = this.providers.filter((c) => c.isActiveProvider);
+        this.inactiveEntity = this.providers.filter((c) => !c.isActiveProvider);
         this.documentTypes = this.purchasesDocumentTypes;
       }
     },
@@ -455,7 +459,7 @@ export default {
                   .put(`/taxes/${taxData.id}`, {
                     ...taxData,
                     documentType: taxData.documentType.id,
-                    entity: taxData.entity.id,
+                    entity: taxData.entity,
                   })
                   .then((res) => {
                     this.$notify.success({
