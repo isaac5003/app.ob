@@ -1821,7 +1821,7 @@
                   </el-col>
                   <el-col :span="8">
                     <el-radio border size="small" class="w-full" :label="false"
-                      >Credito</el-radio
+                      >Crédito</el-radio
                     >
                   </el-col>
                 </el-row>
