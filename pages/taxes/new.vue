@@ -588,21 +588,23 @@ export default {
     taxesFovialContrans() {
       const fovialContrans =
         this.taxesNewForm.fovial + this.taxesNewForm.contrans;
+      this.taxesNewForm.subtotal =
+        this.taxes + this.taxesFovialContrans + this.taxesNewForm.sum;
       return fovialContrans;
     },
     subTotal() {
       const subtotal =
-        this.taxes + this.taxesFovialContrans + this.taxesNewForm.sum;
-      this.taxesNewForm.subtotal =
         this.taxes + this.taxesFovialContrans + this.taxesNewForm.sum;
       return subtotal;
     },
     totals() {
       const totals = this.subTotal;
       const totalDetained = this.taxesDetained;
+      const totalFovialConstrans = this.taxesFovialContrans;
       this.taxesNewForm.total = this.subTotal;
       this.taxesNewForm.total = this.taxesDetained;
-      return totals, totalDetained;
+      this.taxesNewForm.total = this.taxesFovialContrans;
+      return totals, totalDetained, totalFovialConstrans;
     },
   },
 };
