@@ -1637,86 +1637,6 @@
         >
       </span>
     </el-dialog>
-    <!-- Dialogo para agregar nueva condicion de pago -->
-    <el-dialog
-      :append-to-body="true"
-      title="Nueva condición de pago"
-      :visible.sync="showNewPayment"
-      width="30%"
-      @close="closeDialogs('newPaymentForm')"
-    >
-      <el-form
-        :model="newPaymentForm"
-        :rules="newzoneRules"
-        status-icon
-        ref="newPaymentForm"
-        @submit.prevent.native="submitPayment('newPaymentForm', newPaymentForm)"
-      >
-        <div>
-          <el-form-item label="Nombre de la condición de pago" prop="name">
-            <el-input
-              v-model="newPaymentForm.name"
-              clearable
-              type="text"
-              maxlength="100"
-              minlength="5"
-              show-word-limit
-            ></el-input>
-          </el-form-item>
-        </div>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button
-          type="primary"
-          size="small"
-          @click.native="submitPayment('newPaymentForm', newPaymentForm)"
-          >Guardar</el-button
-        >
-        <el-button @click="showNewPayment = false" size="small"
-          >Cancelar</el-button
-        >
-      </span>
-    </el-dialog>
-    <!-- Dialogo para editar condicion de pago -->
-    <el-dialog
-      :append-to-body="true"
-      title="Editar condición de pago"
-      :visible.sync="showEditPayment"
-      width="30%"
-      @close="closeDialogs('editPaymentForm')"
-    >
-      <el-form
-        :model="editPaymentForm"
-        :rules="newzoneRules"
-        status-icon
-        ref="editPaymentForm"
-        @submit.prevent.native="
-          submitPayment('editPaymentForm', editPaymentForm)
-        "
-      >
-        <el-form-item label="Nombre la condición de pago" prop="name">
-          <el-input
-            v-model="editPaymentForm.name"
-            clearable
-            type="text"
-            maxlength="100"
-            minlength="5"
-            show-word-limit
-          ></el-input>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button
-          type="primary"
-          size="small"
-          @click.native="submitPayment('editPaymentForm', editPaymentForm)"
-          >Guardar</el-button
-        >
-        <el-button @click="showEditPayment = false" size="small"
-          >Cancelar</el-button
-        >
-      </span>
-    </el-dialog>
     <el-tabs
       v-model="tab"
       @tab-click="
@@ -1888,7 +1808,7 @@
                 show-word-limit
               ></el-input>
             </el-form-item>
-            <el-form-item prop="" label="Tipo de pago">
+            <el-form-item prop="cashPayment" label="Tipo de pago">
               <el-radio-group
                 v-model="newPaymentForm.cashPayment"
                 class="w-full"
@@ -2008,8 +1928,14 @@
               <el-table-column
                 label="Condicion de pago"
                 prop="name"
-                min-width="260"
+                min-width="240"
               />
+              <el-table-column label="Tipo de pago" min-width="100">
+                <template slot-scope="scope">
+                  <span v-if="scope.row.cashPayment">Contado</span>
+                  <span v-else>Crédito</span>
+                </template>
+              </el-table-column>
               <el-table-column label="Estado" min-width="100">
                 <template slot-scope="scope">
                   <el-tag size="small" type="success" v-if="scope.row.active"
