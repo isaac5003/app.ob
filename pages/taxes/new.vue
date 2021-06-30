@@ -581,30 +581,41 @@ export default {
       return taxes;
     },
     taxesDetained() {
-      const taxesDetained =
-        this.taxesNewForm.subtotal - this.taxesNewForm.ivaRetenido;
+      let taxesDetained = 0;
+      if (this.taxesNewForm.registerType == "invoices") {
+        taxesDetained =
+          this.taxesNewForm.subtotal - this.taxesNewForm.ivaRetenido;
+      }
       return taxesDetained;
     },
     taxesFovialContrans() {
-      const fovialContrans =
-        this.taxesNewForm.fovial + this.taxesNewForm.contrans;
-      this.taxesNewForm.subtotal =
-        this.taxes + this.taxesFovialContrans + this.taxesNewForm.sum;
+      let fovialContrans = 0;
+      if (this.taxesNewForm.registerType == "purchases") {
+        fovialContrans = this.taxesNewForm.fovial + this.taxesNewForm.contrans;
+      }
       return fovialContrans;
     },
     subTotal() {
-      const subtotal =
-        this.taxes + this.taxesFovialContrans + this.taxesNewForm.sum;
+      let subtotal = 0;
+      if (this.taxesNewForm.registerType == "purchases") {
+        subtotal =
+          this.taxes + this.taxesFovialContrans + this.taxesNewForm.sum;
+      } else {
+        subtotal = this.taxes + this.taxesNewForm.sum;
+      }
+
+      this.taxesNewForm.subtotal = subtotal;
       return subtotal;
     },
     totals() {
-      const totals = this.subTotal;
+      let totals = this.subTotal;
       const totalDetained = this.taxesDetained;
-      const totalFovialConstrans = this.taxesFovialContrans;
       this.taxesNewForm.total = this.subTotal;
-      this.taxesNewForm.total = this.taxesDetained;
-      this.taxesNewForm.total = this.taxesFovialContrans;
-      return totals, totalDetained, totalFovialConstrans;
+      if (this.taxesNewForm.registerType == "invoices") {
+        this.taxesNewForm.total = this.taxesDetained;
+      }
+
+      return totals, totalDetained;
     },
   },
 };

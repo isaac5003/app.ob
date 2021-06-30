@@ -497,27 +497,41 @@ export default {
       return taxes;
     },
     taxesDetained() {
-      const taxesDetained =
-        this.taxesEditForm.subtotal - this.taxesEditForm.ivaRetenido;
+      let taxesDetained = 0;
+      if (this.taxesEditForm.registerType == "invoices") {
+        taxesDetained =
+          this.taxesEditForm.subtotal - this.taxesEditForm.ivaRetenido;
+      }
       return taxesDetained;
     },
     taxesFovialContrans() {
-      const fovialContrans =
-        this.taxesEditForm.fovial + this.taxesEditForm.contrans;
+      let fovialContrans = 0;
+      if (this.taxesEditForm.registerType == "purchases") {
+        fovialContrans =
+          this.taxesEditForm.fovial + this.taxesEditForm.contrans;
+      }
       return fovialContrans;
     },
     subTotal() {
-      const subtotal =
-        this.taxes + this.taxesFovialContrans + this.taxesEditForm.sum;
-      this.taxesEditForm.subtotal =
-        this.taxes + this.taxesFovialContrans + this.taxesEditForm.sum;
+      let subtotal = 0;
+      if (this.taxesEditForm.registerType == "purchases") {
+        subtotal =
+          this.taxes + this.taxesFovialContrans + this.taxesEditForm.sum;
+      } else {
+        subtotal = this.taxes + this.taxesEditForm.sum;
+      }
+
+      this.taxesEditForm.subtotal = subtotal;
       return subtotal;
     },
     totals() {
-      const totals = this.subTotal;
+      let totals = this.subTotal;
       const totalDetained = this.taxesDetained;
       this.taxesEditForm.total = this.subTotal;
-      this.taxesEditForm.total = this.taxesDetained;
+      if (this.taxesEditForm.registerType == "invoices") {
+        this.taxesEditForm.total = this.taxesDetained;
+      }
+
       return totals, totalDetained;
     },
   },
