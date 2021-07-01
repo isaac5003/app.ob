@@ -312,8 +312,9 @@
               clearable
               v-model="taxesForm.registerType"
               ref="taxesForm"
-              @change="entity('taxesForm', taxesForm.registerType)"
+              @change="fetchTaxes"
             >
+              <el-option label="Todos los registro" value="" />
               <el-option
                 v-for="i in registerType"
                 :key="i.id"
@@ -333,9 +334,10 @@
               filterable
               clearable
               v-model="taxesForm.documentType"
-              :disabled="taxesForm.registerType ? false : true"
               @change="fetchTaxes"
-              ><el-option
+            >
+              <el-option label="Todos los documentos" value="" />
+              <el-option
                 v-for="i in documentTypes"
                 :key="i.id"
                 :label="`${i.code} - ${i.name}`"
@@ -363,7 +365,7 @@
       ></el-table-column>
       <el-table-column
         label="Proveedor/cliente"
-        min-width="180"
+        min-width="240"
         prop="name"
         sortable="custom"
       ></el-table-column>
@@ -379,7 +381,7 @@
         prop="documentType"
         sortable="custom"
       ></el-table-column>
-      <el-table-column label="Suma" width="140" prop="sum" sortable="custom">
+      <el-table-column label="Suma" width="80" prop="sum" sortable="custom">
         <template slot-scope="scop">
           <span>
             {{ scop.row.sum | formatMoney }}
@@ -507,7 +509,28 @@ export default {
         order: null,
       },
       invoiceDocumentTypes: [],
-      documentTypes: [],
+      documentTypes: [
+        {
+          id: 1,
+          name: "Nacional",
+          code: "N",
+        },
+        {
+          id: 2,
+          name: "Factura de Exportación",
+          code: "FEX",
+        },
+        {
+          id: 3,
+          name: "Consumidor Final",
+          code: "FCF",
+        },
+        {
+          id: 4,
+          name: "Crédito Fiscal",
+          code: "CFC",
+        },
+      ],
       taxesList: {
         data: [],
         count: 0,
@@ -527,6 +550,21 @@ export default {
           id: 1,
           name: "Nacional",
           code: "N",
+        },
+        {
+          id: 2,
+          name: "Factura de Exportación",
+          code: "FEX",
+        },
+        {
+          id: 3,
+          name: "Consumidor Final",
+          code: "FCF",
+        },
+        {
+          id: 4,
+          name: "Crédito Fiscal",
+          code: "CFC",
         },
       ],
     };
@@ -562,7 +600,7 @@ export default {
       if (this.taxesForm.provider != "") {
         params = {
           ...params,
-          customer: this.taxesForm.provider,
+          provider: this.taxesForm.provider,
         };
       }
       if (this.taxesForm.search != "") {
@@ -643,19 +681,21 @@ export default {
         }
       );
     },
-    entity(formName, registerType) {
-      if (registerType == "invoices") {
-        this.documentTypes = this.invoiceDocumentTypes;
-        this.$refs[formName].fields
-          .find((f) => f.prop == "documentType")
-          .resetField();
-      } else if (registerType == "purchases") {
-        this.documentTypes = this.purchasesDocumentTypes;
-        this.$refs[formName].fields
-          .find((f) => f.prop == "documentType")
-          .resetField();
-      }
-    },
+    // entity(formName, registerType) {
+    //   if (registerType == "invoices") {
+    //     this.documentTypes = this.invoiceDocumentTypes;
+    //     this.$refs[formName].fields
+    //       .find((f) => f.prop == "documentType")
+    //       .resetField();
+    //     this.fetchTaxes();
+    //   } else if (registerType == "purchases") {
+    //     this.documentTypes = this.purchasesDocumentTypes;
+    //     this.$refs[formName].fields
+    //       .find((f) => f.prop == "documentType")
+    //       .resetField();
+    //     this.fetchTaxes();
+    //   }
+    // },
   },
   computed: {
     activeCustomers() {

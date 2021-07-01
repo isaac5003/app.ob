@@ -262,7 +262,11 @@
             label="Iva retenido"
             prop="ivaRetenido"
             class="col-span-2"
-            v-if="taxesEditForm.registerType != 'purchases'"
+            v-if="
+              taxesEditForm.registerType != 'purchases'
+                ? this.taxesEditForm.registerType
+                : ''
+            "
           >
             <el-input-number
               v-model="taxesEditForm.ivaRetenido"
