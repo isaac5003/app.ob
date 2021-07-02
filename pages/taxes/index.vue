@@ -312,9 +312,9 @@
               clearable
               v-model="taxesForm.registerType"
               ref="taxesForm"
-              @change="fetchTaxes"
+              @change="entity('taxesForm', taxesForm.registerType)"
             >
-              <el-option label="Todos los registro" value="" />
+              <el-option label="Todos los tipos de registros" value="" />
               <el-option
                 v-for="i in registerType"
                 :key="i.id"
@@ -335,8 +335,9 @@
               clearable
               v-model="taxesForm.documentType"
               @change="fetchTaxes"
+              :disabled="this.taxesForm.registerType ? false : true"
             >
-              <el-option label="Todos los documentos" value="" />
+              <el-option label="Todos los tipos de documentos" value="" />
               <el-option
                 v-for="i in documentTypes"
                 :key="i.id"
@@ -471,17 +472,22 @@ export default {
     const taxes = () => this.$axios.get("/taxes", { params: this.page });
     const invoiceDocumentTypes = () =>
       this.$axios.get("/invoices/document-types");
+    const porcheseDocumentTypes = () =>
+      this.$axios.get("/purchases/document-types");
     Promise.all([
       customers(),
       providers(),
       taxes(),
       invoiceDocumentTypes(),
+      porcheseDocumentTypes(),
     ]).then((res) => {
-      const [customers, providers, taxes, invoiceDocTypes] = res;
+      const [customers, providers, taxes, invoiceDocTypes, porcheses] = res;
       this.customers = customers.data.data;
       this.providers = providers.data.data;
       this.taxesList = taxes.data;
       this.invoiceDocumentTypes = invoiceDocTypes.data.data;
+      this.porcheseDocumentTypes = porcheses.data.data;
+      console.log(this.porcheseDocumentTypes);
       this.loading = false;
     });
   },
@@ -509,28 +515,8 @@ export default {
         order: null,
       },
       invoiceDocumentTypes: [],
-      documentTypes: [
-        {
-          id: 1,
-          name: "Nacional",
-          code: "N",
-        },
-        {
-          id: 2,
-          name: "Factura de Exportación",
-          code: "FEX",
-        },
-        {
-          id: 3,
-          name: "Consumidor Final",
-          code: "FCF",
-        },
-        {
-          id: 4,
-          name: "Crédito Fiscal",
-          code: "CFC",
-        },
-      ],
+
+      documentTypes: [],
       taxesList: {
         data: [],
         count: 0,
@@ -545,28 +531,7 @@ export default {
           name: "Débito Fiscal",
         },
       ],
-      purchasesDocumentTypes: [
-        {
-          id: 1,
-          name: "Nacional",
-          code: "N",
-        },
-        {
-          id: 2,
-          name: "Factura de Exportación",
-          code: "FEX",
-        },
-        {
-          id: 3,
-          name: "Consumidor Final",
-          code: "FCF",
-        },
-        {
-          id: 4,
-          name: "Crédito Fiscal",
-          code: "CFC",
-        },
-      ],
+      porcheseDocumentTypes: [],
     };
   },
   methods: {
@@ -681,21 +646,21 @@ export default {
         }
       );
     },
-    // entity(formName, registerType) {
-    //   if (registerType == "invoices") {
-    //     this.documentTypes = this.invoiceDocumentTypes;
-    //     this.$refs[formName].fields
-    //       .find((f) => f.prop == "documentType")
-    //       .resetField();
-    //     this.fetchTaxes();
-    //   } else if (registerType == "purchases") {
-    //     this.documentTypes = this.purchasesDocumentTypes;
-    //     this.$refs[formName].fields
-    //       .find((f) => f.prop == "documentType")
-    //       .resetField();
-    //     this.fetchTaxes();
-    //   }
-    // },
+    entity(formName, registerType) {
+      if (registerType == "invoices") {
+        this.documentTypes = this.invoiceDocumentTypes;
+        this.$refs[formName].fields
+          .find((f) => f.prop == "documentType")
+          .resetField();
+        this.fetchTaxes();
+      } else if (registerType == "purchases") {
+        this.documentTypes = this.porcheseDocumentTypes;
+        this.$refs[formName].fields
+          .find((f) => f.prop == "documentType")
+          .resetField();
+        this.fetchTaxes();
+      }
+    },
   },
   computed: {
     activeCustomers() {
