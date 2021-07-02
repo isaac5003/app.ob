@@ -311,8 +311,7 @@
               filterable
               clearable
               v-model="taxesForm.registerType"
-              ref="taxesForm"
-              @change="entity('taxesForm', taxesForm.registerType)"
+              @change="fetchTaxes"
             >
               <el-option label="Todos los tipos de registros" value="" />
               <el-option
@@ -335,15 +334,26 @@
               clearable
               v-model="taxesForm.documentType"
               @change="fetchTaxes"
-              :disabled="this.taxesForm.registerType ? false : true"
             >
               <el-option label="Todos los tipos de documentos" value="" />
-              <el-option
-                v-for="i in documentTypes"
-                :key="i.id"
-                :label="`${i.code} - ${i.name}`"
-                :value="i.id"
-            /></el-select>
+              <el-option-group>
+                <el-option
+                  v-for="i in porcheseDocumentTypes"
+                  :key="i.id"
+                  :label="`${i.code} - ${i.name}`"
+                  :value="i.id"
+                />
+              </el-option-group>
+              <el-option class="-mt-6" />
+              <el-option-group>
+                <el-option
+                  v-for="i in invoiceDocumentTypes"
+                  :key="i.id"
+                  :label="`${i.code} - ${i.name}`"
+                  :value="i.id"
+                />
+              </el-option-group>
+            </el-select>
           </el-form-item>
         </div>
       </el-form>
@@ -486,6 +496,7 @@ export default {
       this.providers = providers.data.data;
       this.taxesList = taxes.data;
       this.invoiceDocumentTypes = invoiceDocTypes.data.data;
+      console.log(this.invoiceDocumentTypes);
       this.porcheseDocumentTypes = porcheses.data.data;
       console.log(this.porcheseDocumentTypes);
       this.loading = false;
@@ -646,21 +657,21 @@ export default {
         }
       );
     },
-    entity(formName, registerType) {
-      if (registerType == "invoices") {
-        this.documentTypes = this.invoiceDocumentTypes;
-        this.$refs[formName].fields
-          .find((f) => f.prop == "documentType")
-          .resetField();
-        this.fetchTaxes();
-      } else if (registerType == "purchases") {
-        this.documentTypes = this.porcheseDocumentTypes;
-        this.$refs[formName].fields
-          .find((f) => f.prop == "documentType")
-          .resetField();
-        this.fetchTaxes();
-      }
-    },
+    // entity(formName, registerType) {
+    //   if (registerType == "invoices") {
+    //     this.documentTypes = this.invoiceDocumentTypes;
+    //     this.$refs[formName].fields
+    //       .find((f) => f.prop == "documentType")
+    //       .resetField();
+    //     this.fetchTaxes();
+    //   } else if (registerType == "purchases") {
+    //     this.documentTypes = this.porcheseDocumentTypes;
+    //     this.$refs[formName].fields
+    //       .find((f) => f.prop == "documentType")
+    //       .resetField();
+    //     this.fetchTaxes();
+    //   }
+    // },
   },
   computed: {
     activeCustomers() {
