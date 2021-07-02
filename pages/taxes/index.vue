@@ -338,21 +338,22 @@
               <el-option label="Todos los tipos de documentos" value="" />
               <el-option-group>
                 <el-option
-                  v-for="i in porcheseDocumentTypes"
+                  v-for="i in pucharsesDocumentTypes"
                   :key="i.id"
                   :label="`${i.code} - ${i.name}`"
                   :value="i.id"
                 />
               </el-option-group>
-              <el-option class="-mt-6" />
-              <el-option-group>
-                <el-option
-                  v-for="i in invoiceDocumentTypes"
-                  :key="i.id"
-                  :label="`${i.code} - ${i.name}`"
-                  :value="i.id"
-                />
-              </el-option-group>
+              <div class="mb-6">
+                <el-option-group>
+                  <el-option
+                    v-for="i in invoiceDocumentTypes"
+                    :key="i.id"
+                    :label="`${i.code} - ${i.name}`"
+                    :value="i.id"
+                  />
+                </el-option-group>
+              </div>
             </el-select>
           </el-form-item>
         </div>
@@ -376,13 +377,13 @@
       ></el-table-column>
       <el-table-column
         label="Proveedor/cliente"
-        min-width="240"
+        min-width="230"
         prop="name"
         sortable="custom"
       ></el-table-column>
       <el-table-column
         label="Correlativo"
-        width="140"
+        width="120"
         prop="sequence"
         sortable="custom"
       ></el-table-column>
@@ -392,14 +393,14 @@
         prop="documentType"
         sortable="custom"
       ></el-table-column>
-      <el-table-column label="Suma" width="80" prop="sum" sortable="custom">
+      <el-table-column label="Suma" width="90" prop="sum" sortable="custom">
         <template slot-scope="scop">
           <span>
             {{ scop.row.sum | formatMoney }}
           </span>
         </template>
       </el-table-column>
-      <el-table-column label="IVA" width="70" prop="iva" sortable="custom">
+      <el-table-column label="IVA" width="90" prop="iva" sortable="custom">
         <template slot-scope="scope">
           <span>{{ scope.row.iva | formatMoney }}</span>
         </template>
@@ -482,23 +483,27 @@ export default {
     const taxes = () => this.$axios.get("/taxes", { params: this.page });
     const invoiceDocumentTypes = () =>
       this.$axios.get("/invoices/document-types");
-    const porcheseDocumentTypes = () =>
+    const pucharsesDocumentTypes = () =>
       this.$axios.get("/purchases/document-types");
     Promise.all([
       customers(),
       providers(),
       taxes(),
       invoiceDocumentTypes(),
-      porcheseDocumentTypes(),
+      pucharsesDocumentTypes(),
     ]).then((res) => {
-      const [customers, providers, taxes, invoiceDocTypes, porcheses] = res;
+      const [
+        customers,
+        providers,
+        taxes,
+        invoiceDocTypes,
+        pucharsesDocumentTypes,
+      ] = res;
       this.customers = customers.data.data;
       this.providers = providers.data.data;
       this.taxesList = taxes.data;
       this.invoiceDocumentTypes = invoiceDocTypes.data.data;
-      console.log(this.invoiceDocumentTypes);
-      this.porcheseDocumentTypes = porcheses.data.data;
-      console.log(this.porcheseDocumentTypes);
+      this.pucharsesDocumentTypes = pucharsesDocumentTypes.data.data;
       this.loading = false;
     });
   },
@@ -526,8 +531,7 @@ export default {
         order: null,
       },
       invoiceDocumentTypes: [],
-
-      documentTypes: [],
+      pucharsesDocumentTypes: [],
       taxesList: {
         data: [],
         count: 0,
@@ -542,7 +546,6 @@ export default {
           name: "Débito Fiscal",
         },
       ],
-      porcheseDocumentTypes: [],
     };
   },
   methods: {
@@ -657,21 +660,6 @@ export default {
         }
       );
     },
-    // entity(formName, registerType) {
-    //   if (registerType == "invoices") {
-    //     this.documentTypes = this.invoiceDocumentTypes;
-    //     this.$refs[formName].fields
-    //       .find((f) => f.prop == "documentType")
-    //       .resetField();
-    //     this.fetchTaxes();
-    //   } else if (registerType == "purchases") {
-    //     this.documentTypes = this.porcheseDocumentTypes;
-    //     this.$refs[formName].fields
-    //       .find((f) => f.prop == "documentType")
-    //       .resetField();
-    //     this.fetchTaxes();
-    //   }
-    // },
   },
   computed: {
     activeCustomers() {
