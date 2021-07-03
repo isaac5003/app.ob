@@ -393,16 +393,28 @@
         prop="documentType"
         sortable="custom"
       ></el-table-column>
-      <el-table-column label="Suma" width="90" prop="sum" sortable="custom">
+      <el-table-column
+        label="Suma"
+        width="90"
+        prop="sum"
+        sortable="custom"
+        align="right"
+      >
         <template slot-scope="scop">
           <span>
             {{ scop.row.sum | formatMoney }}
           </span>
         </template>
       </el-table-column>
-      <el-table-column label="IVA" width="90" prop="iva" sortable="custom">
+      <el-table-column
+        label="IVA"
+        width="90"
+        prop="iva"
+        sortable="custom"
+        align="right"
+      >
         <template slot-scope="scope">
-          <span>{{ scope.row.iva | formatMoney }}</span>
+          <span class="justify-end">{{ scope.row.iva | formatMoney }}</span>
         </template>
       </el-table-column>
       <el-table-column label width="80" align="center">
