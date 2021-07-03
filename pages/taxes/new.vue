@@ -59,8 +59,79 @@
           </el-form-item>
         </div>
         <div class="grid grid-cols-12 gap-4">
+          <!-- <el-form-item
+            label="Cliente"
+            class="col-span-5"
+            prop="entity"
+            v-if="taxesNewForm.registerType != 'purchases'"
+          >
+            <el-select
+              class="w-full"
+              clearable
+              filterable
+              size="small"
+              v-model="taxesNewForm.entity"
+              placeholder="Seleccionar"
+            >
+              <el-option-group key="ACTIVOS" label="ACTIVOS">
+                <el-option
+                  v-for="item in activeEntity"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                  <div
+                    class="
+                      flex flex-row
+                      justify-between
+                      items-end
+                      py-1
+                      leading-normal
+                    "
+                  >
+                    <div class="flex flex-col">
+                      <span class="text-xs text-gray-500">{{
+                        item.shortName
+                      }}</span>
+                      <span>{{ item.name }}</span>
+                    </div>
+                    <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                  </div>
+                </el-option>
+              </el-option-group>
+              <el-option-group key="INACTIVOS" label="INACTIVOS">
+                <el-option
+                  style="height: 50px"
+                  v-for="item in inactiveEntity"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                  <div
+                    class="
+                      flex flex-row
+                      justify-between
+                      items-end
+                      py-1
+                      leading-normal
+                    "
+                  >
+                    <div class="flex flex-col">
+                      <span class="text-xs text-gray-500">{{
+                        item.shortName
+                      }}</span>
+                      <span>{{ item.name }}</span>
+                    </div>
+                    <span class="text-xs text-gray-500">{{ item.nrc }}</span>
+                  </div>
+                </el-option>
+              </el-option-group>
+            </el-select>
+          </el-form-item> -->
           <el-form-item
-            label="Cliente / Proveedor"
+            :label="
+              taxesNewForm.registerType == 'invoices' ? 'Cliente' : 'Proveedor'
+            "
             class="col-span-5"
             prop="entity"
           >
@@ -198,6 +269,44 @@
             </el-input-number>
           </el-form-item>
           <el-form-item
+            label="Fovial"
+            class="col-span-2"
+            prop="fovial"
+            v-if="taxesNewForm.registerType != 'invoices'"
+          >
+            <el-input-number
+              v-model="taxesNewForm.fovial"
+              type="number"
+              :value="taxesFovialContrans"
+              :min="0.0"
+              :step="0.01"
+              size="small"
+              autocomplete="off"
+              :precision="2"
+              style="width: 100%"
+            >
+            </el-input-number>
+          </el-form-item>
+          <el-form-item
+            label="Contrans"
+            class="col-span-2"
+            prop="contrans"
+            v-if="taxesNewForm.registerType != 'invoices'"
+          >
+            <el-input-number
+              v-model="taxesNewForm.contrans"
+              type="number"
+              :value="taxesFovialContrans"
+              :min="0.0"
+              :step="0.01"
+              size="small"
+              autocomplete="off"
+              :precision="2"
+              style="width: 100%"
+            >
+            </el-input-number>
+          </el-form-item>
+          <el-form-item
             label="Subtotal"
             prop="subtotal"
             class="col-span-2"
@@ -221,7 +330,11 @@
             label="Iva retenido"
             prop="ivaRetenido"
             class="col-span-2"
-            v-if="taxesNewForm.registerType != 'purchases'"
+            v-if="
+              taxesNewForm.registerType != 'purchases'
+                ? this.taxesNewForm.registerType
+                : ''
+            "
           >
             <el-input-number
               v-model="taxesNewForm.ivaRetenido"
@@ -313,6 +426,8 @@ export default {
         date: "",
         sum: "",
         iva: "",
+        fovial: "",
+        contrans: "",
         subtotal: "",
         ivaRetenido: "",
         total: "",
@@ -470,20 +585,40 @@ export default {
       return taxes;
     },
     taxesDetained() {
-      const taxesDetained =
-        this.taxesNewForm.subtotal - this.taxesNewForm.ivaRetenido;
+      let taxesDetained = 0;
+      if (this.taxesNewForm.registerType == "invoices") {
+        taxesDetained =
+          this.taxesNewForm.subtotal - this.taxesNewForm.ivaRetenido;
+      }
       return taxesDetained;
     },
+    taxesFovialContrans() {
+      let fovialContrans = 0;
+      if (this.taxesNewForm.registerType == "purchases") {
+        fovialContrans = this.taxesNewForm.fovial + this.taxesNewForm.contrans;
+      }
+      return fovialContrans;
+    },
     subTotal() {
-      const subtotal = this.taxes + this.taxesNewForm.sum;
-      this.taxesNewForm.subtotal = this.taxes + this.taxesNewForm.sum;
+      let subtotal = 0;
+      if (this.taxesNewForm.registerType == "purchases") {
+        subtotal =
+          this.taxes + this.taxesFovialContrans + this.taxesNewForm.sum;
+      } else {
+        subtotal = this.taxes + this.taxesNewForm.sum;
+      }
+
+      this.taxesNewForm.subtotal = subtotal;
       return subtotal;
     },
     totals() {
-      const totals = this.subTotal;
+      let totals = this.subTotal;
       const totalDetained = this.taxesDetained;
       this.taxesNewForm.total = this.subTotal;
-      this.taxesNewForm.total = this.taxesDetained;
+      if (this.taxesNewForm.registerType == "invoices") {
+        this.taxesNewForm.total = this.taxesDetained;
+      }
+
       return totals, totalDetained;
     },
   },

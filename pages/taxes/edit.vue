@@ -25,8 +25,8 @@
               clearable
               filterable
               size="small"
+              :disabled="true"
               @change="entity(taxesEditForm.registerType)"
-              disabled
             >
               <el-option
                 v-for="item in registerType"
@@ -61,7 +61,9 @@
         </div>
         <div class="grid grid-cols-12 gap-4">
           <el-form-item
-            label="Cliente / Proveedor"
+            :label="
+              taxesEditForm.registerType == 'invoices' ? 'Cliente' : 'Proveedor'
+            "
             class="col-span-5"
             prop="entity"
           >
@@ -199,6 +201,44 @@
             </el-input-number>
           </el-form-item>
           <el-form-item
+            label="Fovial"
+            class="col-span-2"
+            prop="iva"
+            v-if="taxesEditForm.registerType != 'invoices'"
+          >
+            <el-input-number
+              v-model="taxesEditForm.fovial"
+              :value="taxesFovialContrans"
+              type="number"
+              size="small"
+              autocomplete="off"
+              style="width: 100%"
+              :min="0.0"
+              :step="0.01"
+              :precision="2"
+            >
+            </el-input-number>
+          </el-form-item>
+          <el-form-item
+            label="Contrans"
+            class="col-span-2"
+            prop="contrans"
+            v-if="taxesEditForm.registerType != 'invoices'"
+          >
+            <el-input-number
+              v-model="taxesEditForm.contrans"
+              :value="taxesFovialContrans"
+              style="width: 100%"
+              autocomplete="off"
+              size="small"
+              type="number"
+              :min="0.0"
+              :step="0.01"
+              :precision="2"
+            >
+            </el-input-number>
+          </el-form-item>
+          <el-form-item
             label="Subtotal"
             prop="subtotal"
             class="col-span-2"
@@ -222,7 +262,11 @@
             label="Iva retenido"
             prop="ivaRetenido"
             class="col-span-2"
-            v-if="taxesEditForm.registerType != 'purchases'"
+            v-if="
+              taxesEditForm.registerType != 'purchases'
+                ? this.taxesEditForm.registerType
+                : ''
+            "
           >
             <el-input-number
               v-model="taxesEditForm.ivaRetenido"
@@ -318,6 +362,8 @@ export default {
         date: "",
         sum: "",
         iva: "",
+        fovial: "",
+        contrans: "",
         subtotal: "",
         ivaRetenido: 0,
         total: "",
@@ -455,20 +501,41 @@ export default {
       return taxes;
     },
     taxesDetained() {
-      const taxesDetained =
-        this.taxesEditForm.subtotal - this.taxesEditForm.ivaRetenido;
+      let taxesDetained = 0;
+      if (this.taxesEditForm.registerType == "invoices") {
+        taxesDetained =
+          this.taxesEditForm.subtotal - this.taxesEditForm.ivaRetenido;
+      }
       return taxesDetained;
     },
+    taxesFovialContrans() {
+      let fovialContrans = 0;
+      if (this.taxesEditForm.registerType == "purchases") {
+        fovialContrans =
+          this.taxesEditForm.fovial + this.taxesEditForm.contrans;
+      }
+      return fovialContrans;
+    },
     subTotal() {
-      const subtotal = this.taxes + this.taxesEditForm.sum;
-      this.taxesEditForm.subtotal = this.taxes + this.taxesEditForm.sum;
+      let subtotal = 0;
+      if (this.taxesEditForm.registerType == "purchases") {
+        subtotal =
+          this.taxes + this.taxesFovialContrans + this.taxesEditForm.sum;
+      } else {
+        subtotal = this.taxes + this.taxesEditForm.sum;
+      }
+
+      this.taxesEditForm.subtotal = subtotal;
       return subtotal;
     },
     totals() {
-      const totals = this.subTotal;
+      let totals = this.subTotal;
       const totalDetained = this.taxesDetained;
       this.taxesEditForm.total = this.subTotal;
-      this.taxesEditForm.total = this.taxesDetained;
+      if (this.taxesEditForm.registerType == "invoices") {
+        this.taxesEditForm.total = this.taxesDetained;
+      }
+
       return totals, totalDetained;
     },
   },

@@ -21,24 +21,16 @@
             <span class="">
               {{
                 taxesPreview
-                  ? taxesPreview.provider
-                    ? taxesPreview.provider.name
-                    : taxesPreview.customer.name
+                  ? taxesPreview.entity
+                    ? taxesPreview.entity.name
+                    : taxesPreview.entity.name
                   : ""
               }}
             </span>
           </div>
           <div class="col-span-2 flex flex-col">
             <span class="text-gray-700 font-bold text-xs">Fecha</span>
-            <span class=""
-              >{{
-                taxesPreview
-                  ? taxesPreview.provider
-                    ? taxesPreview.purchaseDate
-                    : taxesPreview.invoiceDate
-                  : ""
-              }}
-            </span>
+            <span class="">{{ taxesPreview ? taxesPreview.date : "" }} </span>
           </div>
           <div class="col-span-2 flex flex-col">
             <span class="text-gray-700 font-bold text-xs"
@@ -319,9 +311,9 @@
               filterable
               clearable
               v-model="taxesForm.registerType"
-              ref="taxesForm"
-              @change="entity('taxesForm', taxesForm.registerType)"
+              @change="fetchTaxes"
             >
+              <el-option label="Todos los tipos de registros" value="" />
               <el-option
                 v-for="i in registerType"
                 :key="i.id"
@@ -341,14 +333,28 @@
               filterable
               clearable
               v-model="taxesForm.documentType"
-              :disabled="taxesForm.registerType ? false : true"
               @change="fetchTaxes"
-              ><el-option
-                v-for="i in documentTypes"
-                :key="i.id"
-                :label="`${i.code} - ${i.name}`"
-                :value="i.id"
-            /></el-select>
+            >
+              <el-option label="Todos los tipos de documentos" value="" />
+              <el-option-group>
+                <el-option
+                  v-for="i in pucharsesDocumentTypes"
+                  :key="i.id"
+                  :label="`${i.code} - ${i.name}`"
+                  :value="i.id"
+                />
+              </el-option-group>
+              <div class="mb-6">
+                <el-option-group>
+                  <el-option
+                    v-for="i in invoiceDocumentTypes"
+                    :key="i.id"
+                    :label="`${i.code} - ${i.name}`"
+                    :value="i.id"
+                  />
+                </el-option-group>
+              </div>
+            </el-select>
           </el-form-item>
         </div>
       </el-form>
@@ -371,14 +377,14 @@
       ></el-table-column>
       <el-table-column
         label="Proveedor/cliente"
-        min-width="180"
+        min-width="230"
         prop="name"
         sortable="custom"
       ></el-table-column>
       <el-table-column
-        label="N° autorización"
-        width="140"
-        prop="authorization"
+        label="Correlativo"
+        width="120"
+        prop="sequence"
         sortable="custom"
       ></el-table-column>
       <el-table-column
@@ -388,20 +394,27 @@
         sortable="custom"
       ></el-table-column>
       <el-table-column
-        label="Tipo de registro"
-        width="140"
-        prop="registerType"
+        label="Suma"
+        width="90"
+        prop="sum"
         sortable="custom"
+        align="right"
+      >
+        <template slot-scope="scop">
+          <span>
+            {{ scop.row.sum | formatMoney }}
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="IVA"
+        width="90"
+        prop="iva"
+        sortable="custom"
+        align="right"
       >
         <template slot-scope="scope">
-          <span>{{
-            scope.row.registerType == "invoices" ? "Venta" : "Compra"
-          }}</span>
-        </template></el-table-column
-      >
-      <el-table-column label="IVA" width="70" prop="iva" sortable="custom">
-        <template slot-scope="scope">
-          <span>{{ scope.row.iva | formatMoney }}</span>
+          <span class="justify-end">{{ scope.row.iva | formatMoney }}</span>
         </template>
       </el-table-column>
       <el-table-column label width="80" align="center">
@@ -482,17 +495,27 @@ export default {
     const taxes = () => this.$axios.get("/taxes", { params: this.page });
     const invoiceDocumentTypes = () =>
       this.$axios.get("/invoices/document-types");
+    const pucharsesDocumentTypes = () =>
+      this.$axios.get("/purchases/document-types");
     Promise.all([
       customers(),
       providers(),
       taxes(),
       invoiceDocumentTypes(),
+      pucharsesDocumentTypes(),
     ]).then((res) => {
-      const [customers, providers, taxes, invoiceDocTypes] = res;
+      const [
+        customers,
+        providers,
+        taxes,
+        invoiceDocTypes,
+        pucharsesDocumentTypes,
+      ] = res;
       this.customers = customers.data.data;
       this.providers = providers.data.data;
       this.taxesList = taxes.data;
       this.invoiceDocumentTypes = invoiceDocTypes.data.data;
+      this.pucharsesDocumentTypes = pucharsesDocumentTypes.data.data;
       this.loading = false;
     });
   },
@@ -520,7 +543,7 @@ export default {
         order: null,
       },
       invoiceDocumentTypes: [],
-      documentTypes: [],
+      pucharsesDocumentTypes: [],
       taxesList: {
         data: [],
         count: 0,
@@ -535,13 +558,6 @@ export default {
           name: "Débito Fiscal",
         },
       ],
-      purchasesDocumentTypes: [
-        {
-          id: 1,
-          name: "Nacional",
-          code: "N",
-        },
-      ],
     };
   },
   methods: {
@@ -552,7 +568,6 @@ export default {
     async openPreviewTax(id) {
       const { data } = await this.$axios.get(`/taxes/${id}`);
       this.taxesPreview = data.data;
-      console.log(this.taxesPreview);
       this.showTaxePreview = true;
     },
     selectionChange(selectionData) {
@@ -576,7 +591,7 @@ export default {
       if (this.taxesForm.provider != "") {
         params = {
           ...params,
-          customer: this.taxesForm.provider,
+          provider: this.taxesForm.provider,
         };
       }
       if (this.taxesForm.search != "") {
@@ -607,7 +622,6 @@ export default {
       this.$axios
         .get("/taxes/", { params })
         .then((res) => {
-          console.log(res);
           this.taxesList = res.data;
         })
         .catch((err) => {
@@ -657,19 +671,6 @@ export default {
           },
         }
       );
-    },
-    entity(formName, registerType) {
-      if (registerType == "invoices") {
-        this.documentTypes = this.invoiceDocumentTypes;
-        this.$refs[formName].fields
-          .find((f) => f.prop == "documentType")
-          .resetField();
-      } else if (registerType == "purchases") {
-        this.documentTypes = this.purchasesDocumentTypes;
-        this.$refs[formName].fields
-          .find((f) => f.prop == "documentType")
-          .resetField();
-      }
     },
   },
   computed: {
